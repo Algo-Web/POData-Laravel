@@ -21,7 +21,7 @@ class MetadataProvider extends ServiceProvider
      */
     public function boot()
     {
-	setupRoute();
+	self::setupRoute();
         $isCaching = env('APP_METADATA_CACHING', false);
 
         if ($isCaching && Cache::has('metadata')) {
