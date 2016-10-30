@@ -11,7 +11,11 @@
     },
     "autoload": {
         "psr-0": {
-            "AlgoWeb\\PODataLaravel": "src/"
+            "AlgoWeb\\PODataLaravel": "src/",
+            "AlgoWeb\\PODataLaravel\\Controllers": "src/Controllers/",
+            "AlgoWeb\\PODataLaravel\\Models": "src/Models/",
+            "AlgoWeb\\PODataLaravel\\Providers": "src/Providers/",
+            "AlgoWeb\\PODataLaravel\Models\\Query":"src/Query/"
         }
     },
     "repositories": {
