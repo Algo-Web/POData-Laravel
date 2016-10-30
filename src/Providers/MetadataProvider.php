@@ -80,8 +80,8 @@ class MetadataProvider extends ServiceProvider
     private static function setupRoute(){
         $valueArray = [];
 
-        Route::any('odata.svc/{section}', 'ODataController@index') ->where(['section' => '.*']);
-        Route::any('odata.svc', 'ODataController@index');
+        Route::any('odata.svc/{section}', 'AlgoWeb\PODataLaravel\Controllers\ODataController@index') ->where(['section' => '.*']);
+        Route::any('odata.svc', 'AlgoWeb\PODataLaravel\Controllers\ODataController@index');
 
         Route::get('/', function () use ($valueArray) {
             $array = array(
