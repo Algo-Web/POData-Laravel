@@ -10,13 +10,8 @@
     "require-dev": {
     },
     "autoload": {
-        "psr-0": {
-            "AlgoWeb\\PODataLaravel\\Controllers\\ODataController": "src/Controllers/ODataController.php",
-            "AlgoWeb\\PODataLaravel\\Models\\MetadataTrait": "src/Models/MetadataTrait.php",
-            "AlgoWeb\\PODataLaravel\\Providers\\MetadataProvider": "src/Providers/MetadataProvider.php",
-            "AlgoWeb\\PODataLaravel\\Providers\\QueryProvider": "src/Providers/QueryProvider.php",
-            "AlgoWeb\\PODataLaravel\\Models\\Query\\LaravelExpressionProvider": "src/Query/LaravelExpressionProvider.php",
-            "AlgoWeb\\PODataLaravel\\Models\\Query\\LaravelQuery": "src/Query/LaravelQuery.php"
+        "psr-4": {
+            "AlgoWeb\\PODataLaravel\\": "src/"
         }
     },
     "repositories": {
