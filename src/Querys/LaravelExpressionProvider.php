@@ -1,6 +1,6 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models\Query;
+namespace AlgoWeb\PODataLaravel\Query;
 
 use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\ExpressionType;
 use POData\Providers\Metadata\Type\IType;
