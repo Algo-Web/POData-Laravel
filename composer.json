@@ -1,0 +1,17 @@
+{
+    "name": "algoweb/POData-Laravel",
+    "description": "Expose Odata services from laravel",
+    "keywords": ["laravel", "Odata", "services", "POData"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-0": {
+            "algoweb\\PODataLaravel": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
