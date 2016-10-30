@@ -10,7 +10,7 @@
     "require-dev": {
     },
     "autoload": {
-        "psr-0": {
+        "psr-4": {
             "AlgoWeb\\PODataLaravel\\": "src/",
             "AlgoWeb\\PODataLaravel\\Controllers\\": "src/Controllers/",
             "AlgoWeb\\PODataLaravel\\Models\\": "src/Models/",
