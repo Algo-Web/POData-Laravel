@@ -19,6 +19,6 @@
             "type": "git",
             "url": "git@github.com:Algo-Web/POData.git"
         }
-    }
+    },
     "minimum-stability": "dev"
 }
