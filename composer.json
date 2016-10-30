@@ -11,10 +11,12 @@
     },
     "autoload": {
         "psr-0": {
-            "AlgoWeb\\PODataLaravel\\Controllers\\": "src/Controllers/",
-            "AlgoWeb\\PODataLaravel\\Models\\": "src/Models/",
-            "AlgoWeb\\PODataLaravel\\Providers\\": "src/Providers/",
-            "AlgoWeb\\PODataLaravel\\Models\\Query\\": "src/Query/"
+            "AlgoWeb\\PODataLaravel\\Controllers\\ODataController": "src/Controllers/ODataController.php",
+            "AlgoWeb\\PODataLaravel\\Models\\MetadataTrait": "src/Models/MetadataTrait.php",
+            "AlgoWeb\\PODataLaravel\\Providers\\MetadataProvider": "src/Providers/MetadataProvider.php",
+            "AlgoWeb\\PODataLaravel\\Providers\\QueryProvider": "src/Providers/QueryProvider.php",
+            "AlgoWeb\\PODataLaravel\\Models\\Query\\LaravelExpressionProvider": "src/Query/LaravelExpressionProvider.php",
+            "AlgoWeb\\PODataLaravel\\Models\\Query\\LaravelQuery": "src/Query/LaravelQuery.php"
         }
     },
     "repositories": {
