@@ -42,7 +42,7 @@ class MetadataProvider extends ServiceProvider
         $Classes = $AutoClass::$classMap;
         foreach ($Classes as $name => $file) {
             if (\Illuminate\Support\Str::startsWith($name, "App")) {
-                if (in_array("App\\Models\\MetadataTrait", class_uses($name))) {
+                if (in_array("AlgoWeb\\PODataLaravel\\Models\\MetadataTrait", class_uses($name))) {
                     $ends[] = $name;
                 }
             }
