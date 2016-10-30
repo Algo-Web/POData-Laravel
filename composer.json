@@ -1,17 +1,24 @@
 {
-    "name": "algoweb/POData-Laravel",
+    "name": "Algo-Web/POData-Laravel",
     "description": "Expose Odata services from laravel",
     "keywords": ["laravel", "Odata", "services", "POData"],
     "license": "MIT",
     "require": {
+        "Algo-Web/POData": "dev-master",
         "php": ">=5.4.0"
     },
     "require-dev": {
     },
     "autoload": {
         "psr-0": {
-            "algoweb\\PODataLaravel": "src/"
+            "AlgoWeb\\PODataLaravel": "src/"
         }
     },
+    "repositories": {
+        "podata": {
+            "type": "git",
+            "url": "git@github.com:Algo-Web/POData.git"
+        }
+    }
     "minimum-stability": "dev"
 }
