@@ -48,16 +48,16 @@ trait MetadataTrait
         $connName = $this->getConnectionName();
 
         // to catch when tests are run without an extant phpunit.sqlite file
-        if ('testing' == App::environment()) {
+        /*if ('testing' == App::environment()) {
             try {
                 Schema::connection($connName);
             } catch (\Exception $e) {
                 throw new \ErrorException(
-                    "Master DB test file missing - do you need to run php artisan abi:regenerate?"
+                    "Master DB test file missing - did you forget to setup the database?"
                 );
             }
 
-        }
+        }*/
 
         assert(
             Schema::connection($connName)->hasTable($this->table),
