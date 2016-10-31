@@ -120,6 +120,12 @@ trait MetadataTrait
             if ($key == $keyName) {
                 continue;
             }
+            if($secret == "blob"){
+                $complex->setMediaLinkEntry(true);
+                $streamInfo = new ResourceStreamInfo($key);
+                $complex->addNamedStream($streamInfo);
+                continue;
+            }
             $metadata->addPrimitiveProperty($complex, $key, $this->mapping[$secret['type']]); // tag as isBag?
         }
 
