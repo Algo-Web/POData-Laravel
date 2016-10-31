@@ -58,11 +58,16 @@ trait MetadataTrait
             }
 
         }*/
-
-        assert(
-            Schema::connection($connName)->hasTable($this->table),
-            $this->table . ' table not present in current db, ' . $this->getConnectionName()
-        );
+        if (php_sapi_name() == "cli") {
+            if(!Schema::connection($connName)->hasTable($this->table)){
+                return;
+            }
+        }else{
+            assert(
+                Schema::connection($connName)->hasTable($this->table),
+                $this->table . ' table not present in current db, ' . $this->getConnectionName()
+            );
+        }
 
         $columns = Schema::connection($connName)->getColumnListing($this->table);
         $mask = $this->metadataMask();
