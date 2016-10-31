@@ -21,7 +21,7 @@ class MetadataProvider extends ServiceProvider
      */
     public function boot()
     {
-        if(App::runningInConsole() && count($_SERVER[ 'argv' ]) > 1 && $_SERVER[ 'argv' ][0] == "artisan"){
+        if(\App::runningInConsole() && count($_SERVER[ 'argv' ]) > 1 && $_SERVER[ 'argv' ][0] == "artisan"){
            return;
         }
 
