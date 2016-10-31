@@ -21,6 +21,11 @@ class MetadataProvider extends ServiceProvider
      */
     public function boot()
     {
+        if(App::runningInConsole() && count($_SERVER[ 'argv' ]) > 1 && $_SERVER[ 'argv' ][0] == "artisan"){
+           return;
+        }
+
+		
 	self::setupRoute();
         $isCaching = env('APP_METADATA_CACHING', false);
 
