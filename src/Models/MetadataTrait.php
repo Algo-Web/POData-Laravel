@@ -34,7 +34,8 @@ trait MetadataTrait
         'datetime' => EdmPrimitiveType::DATETIME,
         'decimal' => EdmPrimitiveType::DECIMAL,
         'text' => EdmPrimitiveType::STRING,
-        'boolean' => EdmPrimitiveType::BOOLEAN
+        'boolean' => EdmPrimitiveType::BOOLEAN,
+        'blob' => "stream"
     ];
 
     /*
