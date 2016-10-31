@@ -1,5 +1,5 @@
 {
-    "name": "Algo-Web/POData-Laravel",
+    "name": "algo-web/podata-laravel",
     "description": "Expose Odata services from laravel",
     "keywords": ["laravel", "Odata", "services", "POData"],
     "license": "MIT",
