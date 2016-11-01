@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Cache;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema;
 
 
 class MetadataProvider extends ServiceProvider
@@ -23,11 +22,10 @@ class MetadataProvider extends ServiceProvider
     {
         self::$METANAMESPACE = env('ODataMetaNamespace', 'Data');
         if(\App::runningInConsole() && count($_SERVER[ 'argv' ]) > 1 && $_SERVER[ 'argv' ][0] == "artisan"){
-           return;
+            return;
         }
 
-		
-	self::setupRoute();
+        self::setupRoute();
         $isCaching = env('APP_METADATA_CACHING', false);
 
         if ($isCaching && Cache::has('metadata')) {
