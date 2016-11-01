@@ -2,7 +2,6 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use POData\Providers\Metadata\ResourceStreamInfo;
@@ -229,30 +228,30 @@ trait MetadataTrait
      *
      * @return array
      */
-    abstract function getVisible();
+    public abstract function getVisible();
     /**
      * Get the hidden attributes for the model.
      *
      * @return array
      */
-    abstract function getHidden();
+    public abstract function getHidden();
     /**
      * Get the primary key for the model.
      *
      * @return string
      */
-    abstract function getKeyName();
+    public abstract function getKeyName();
 
     /**
      * Get the current connection name for the model.
      *
      * @return string
      */
-    abstract function getConnectionName();
+    public abstract function getConnectionName();
     /**
      * Get all of the current attributes on the model.
      *
      * @return array
      */
-    abstract function getAttributes();
+    public abstract function getAttributes();
 }
