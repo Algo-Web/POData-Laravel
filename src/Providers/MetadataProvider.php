@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Schema;
 
 class MetadataProvider extends ServiceProvider
 {
-    private static $METANAMESPACE = env('ODataMetaNamespace', 'Data');
+    protected static $METANAMESPACE = "Data";
 
     /**
      * Bootstrap the application services.  Post-boot.
@@ -21,6 +21,7 @@ class MetadataProvider extends ServiceProvider
      */
     public function boot()
     {
+        self::$METANAMESPACE = env('ODataMetaNamespace', 'Data');
         if(\App::runningInConsole() && count($_SERVER[ 'argv' ]) > 1 && $_SERVER[ 'argv' ][0] == "artisan"){
            return;
         }
@@ -105,7 +106,7 @@ class MetadataProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton('metadata', function ($app) {
-            return new SimpleMetadataProvider('Data', self::METANAMESPACE);
+            return new SimpleMetadataProvider('Data', self::$METANAMESPACE);
         });
     }
 }
