@@ -48,8 +48,6 @@ trait MetadataTrait
                 Schema::connection($connName)->hasTable($this->table),
                 $this->table . ' table not present in current db, ' . $this->getConnectionName()
             );
-        
-
         $columns = Schema::connection($connName)->getColumnListing($this->table);
         $mask = $this->metadataMask();
         $columns = array_intersect($columns, $mask);
@@ -215,16 +213,16 @@ trait MetadataTrait
                     $begin = strpos($code, 'function(');
                     $code = substr($code, $begin, strrpos($code, '}') - $begin + 1);
                     foreach (array(
-                               'hasMany',
-                               'hasManyThrough',
-                               'belongsToMany',
-                               'hasOne',
-                               'belongsTo',
-                               'morphOne',
-                               'morphTo',
-                               'morphMany',
-                               'morphToMany'
-                             ) as $relation) {
+                                'hasMany',
+                                'hasManyThrough',
+                                'belongsToMany',
+                                'hasOne',
+                                'belongsTo',
+                                'morphOne',
+                                'morphTo',
+                                'morphMany',
+                                'morphToMany'
+                                ) as $relation) {
                         $search = '$this->' . $relation . '(';
                         if ($pos = stripos($code, $search)) {
                             //Resolve the relation's model to a Relation object.
