@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Schema;
 
 class MetadataProvider extends ServiceProvider
 {
-    const METANAMESPACE = 'ABI';
+    const METANAMESPACE = env('ODataMetaNamespace', 'Data');
 
     /**
      * Bootstrap the application services.  Post-boot.
