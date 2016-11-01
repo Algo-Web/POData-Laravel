@@ -33,17 +33,6 @@ trait MetadataTrait
 
         $connName = $this->getConnectionName();
 
-        // to catch when tests are run without an extant phpunit.sqlite file
-        /*if ('testing' == App::environment()) {
-            try {
-                Schema::connection($connName);
-            } catch (\Exception $e) {
-                throw new \ErrorException(
-                    "Master DB test file missing - did you forget to setup the database?"
-                );
-            }
-
-        }*/
             assert(
                 Schema::connection($connName)->hasTable($this->table),
                 $this->table.' table not present in current db, '.$this->getConnectionName()
@@ -118,20 +107,6 @@ trait MetadataTrait
 
     public function hookUpRelationships($entityTypes, $resourceSets)
     {
-/*        $rel = $this->getPropertiesFromMethods();
-        $relationships = $this->getRelations();
-        $metadata = \App::make('metadata');
-
-        foreach ($relationships as $r) {
-            if ($r->isNside) {
-                $metadata->addResourceSetReferenceProperty($entityTypes[$r->ClassName], $r->relationshipsID,
-                    $ResourceSets[get_class ($this)]);
-            } else {
-                $metadata->addResourceReferenceProperty($entityTypes[get_class($this)], $r->relationshipID,
-                    $ResourceSets[$r->ClassName]);
-            }
-        }*/
-
         $metadata = \App::make('metadata');
         $rel = $this->getRelationshipsFromMethods();
         $thisClass = get_class($this);
@@ -168,7 +143,7 @@ trait MetadataTrait
     protected function getAllAttributes()
     {
         // Adapted from http://stackoverflow.com/a/33514981
-        //$columns = $this->getFillable();
+        // $columns = $this->getFillable();
         // Another option is to get all columns for the table like so:
         $connName = $this->getConnectionName();
         $columns = Schema::connection($connName)->getColumnListing($this->table);
@@ -194,8 +169,7 @@ trait MetadataTrait
             "KnownPolyMorphSide"=>array()
         );
         $methods = get_class_methods($model);
-//        dd($methods);
-        if ($methods) {
+        if (!empty($methods)) {
             foreach ($methods as $method) {
                 if (!method_exists('Illuminate\Database\Eloquent\Model', $method)
                 ) {
@@ -233,25 +207,11 @@ trait MetadataTrait
                                 if (in_array($relation, $relations)) {
                                     //Collection or array of models (because Collection is Arrayable)
                                     $relationships["HasMany"][$method] = $relatedModel;
-                                    /*$this->setProperty(
-                                        $method,
-                                        $this->getCollectionClass($relatedModel) . '|' . $relatedModel . '[]',
-                                        true,
-                                        null
-                                    );*/
                                 } elseif ($relation === "morphTo") {
                                     // Model isn't specified because relation is polymorphic
                                     $relationships["UnknownPolymorphSide"][$method] = '\Illuminate\Database\Eloquent\Model|\Eloquent';
-                                    /*$this->setProperty(
-                                        $method,
-                                        '\Illuminate\Database\Eloquent\Model|\Eloquent',
-                                        true,
-                                        null
-                                    );*/
-                                } else {
                                     //Single model is returned
                                     $relationships["HasOne"][$method] = $relatedModel;
-                                    //$this->setProperty($method, $relatedModel, true, null);
                                 }
                                 if (in_array($relation, ["morphMany", "morphOne"])) {
                                     $relationships["KnownPolyMorphSide"][$method] = $relatedModel;
@@ -264,4 +224,35 @@ trait MetadataTrait
         }
         return $relationships;
     }
+    /**
+     * Get the visible attributes for the model.
+     *
+     * @return array
+     */
+    abstract function getVisible();
+    /**
+     * Get the hidden attributes for the model.
+     *
+     * @return array
+     */
+    abstract function getHidden();
+    /**
+     * Get the primary key for the model.
+     *
+     * @return string
+     */
+    abstract function getKeyName();
+
+    /**
+     * Get the current connection name for the model.
+     *
+     * @return string
+     */
+    abstract function getConnectionName();
+    /**
+     * Get all of the current attributes on the model.
+     *
+     * @return array
+     */
+    abstract function getAttributes();
 }
