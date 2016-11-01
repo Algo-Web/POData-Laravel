@@ -310,7 +310,7 @@ class LaravelExpressionProvider implements IExpressionProvider
         return $nuSql;
     }
 
-   private function replace($sql, $bindings)
+    private function replace($sql, $bindings)
     {
         $needle = '?';
         foreach ($bindings as $replace) {
