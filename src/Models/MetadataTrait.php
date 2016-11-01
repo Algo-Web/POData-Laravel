@@ -104,7 +104,7 @@ trait MetadataTrait
             if ($key == $keyName) {
                 continue;
             }
-            if ($secret['type'] == "blob"){
+            if ($secret['type'] == "blob") {
                 $complex->setMediaLinkEntry(true);
                 $streamInfo = new ResourceStreamInfo($key);
                 $complex->addNamedStream($streamInfo);
