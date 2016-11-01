@@ -64,18 +64,6 @@ class LaravelQuery implements IQueryProvider
      *
      * @return QueryResult
      */
-    /*This function is to avoid conflicts with the interface class, but we should look at extending
-    // the interface class with additional signatures.
-    public function getResourceSet(
-        QueryType $queryType,
-        ResourceSet $resourceSet,
-        $filterInfo = null,
-        $orderBy = null,
-        $top = null,
-        $skipToken = null,
-        $sourceEntityInstance = null
-    ) {        return $this->getResourceSet($queryType,$resourceSet,$filterInfo,$orderBy,$top,$skipToken,null);
-    }*/
     public function getResourceSet(
         QueryType $queryType,
         ResourceSet $resourceSet,
