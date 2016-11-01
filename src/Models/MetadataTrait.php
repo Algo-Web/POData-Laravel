@@ -209,6 +209,7 @@ trait MetadataTrait
                                 } elseif ($relation === "morphTo") {
                                     // Model isn't specified because relation is polymorphic
                                     $relationships["UnknownPolymorphSide"][$method] = '\Illuminate\Database\Eloquent\Model|\Eloquent';
+                                } else {
                                     //Single model is returned
                                     $relationships["HasOne"][$method] = $relatedModel;
                                 }
