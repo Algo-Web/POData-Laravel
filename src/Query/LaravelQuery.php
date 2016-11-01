@@ -24,7 +24,7 @@ class LaravelQuery implements IQueryProvider
     public function __construct()
     {
         /* MySQLExpressionProvider();*/
-        $this->expression = new LaravelExpressionProvider(DB::table('dummy'));//PHPExpressionProvider('expression');
+        $this->expression = new LaravelExpressionProvider(DB::table('dummy')); //PHPExpressionProvider('expression');
         $this->queryProviderClassName = get_class($this);
     }
 
