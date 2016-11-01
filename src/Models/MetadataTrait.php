@@ -1,26 +1,12 @@
 <?php
 namespace AlgoWeb\PODataLaravel\Models;
 
-use Doctrine\DBAL\Exception\InvalidArgumentException;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Relations\Relation;
-
 use POData\Providers\Metadata\ResourceStreamInfo;
-use POData\Providers\Metadata\ResourceAssociationSetEnd;
-use POData\Providers\Metadata\ResourceAssociationSet;
-use POData\Common\NotImplementedException;
 use POData\Providers\Metadata\Type\EdmPrimitiveType;
-use POData\Providers\Metadata\ResourceSet;
-use POData\Providers\Metadata\ResourcePropertyKind;
-use POData\Providers\Metadata\ResourceProperty;
-use POData\Providers\Metadata\ResourceTypeKind;
-use POData\Providers\Metadata\ResourceType;
-use POData\Common\InvalidOperationException;
-use POData\Providers\Metadata\IMetadataProvider;
-use POData\Providers\Metadata\SimpleMetadataProvider;
 use Illuminate\Database\Eloquent\Model;
 
 trait MetadataTrait

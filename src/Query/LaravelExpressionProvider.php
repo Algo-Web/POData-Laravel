@@ -9,7 +9,6 @@ use POData\Providers\Metadata\ResourceType;
 use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\PropertyAccessExpression;
 use POData\UriProcessor\QueryProcessor\FunctionDescription;
 use POData\Providers\Expression\IExpressionProvider;
-use Illuminate\Support\Str;
 
 class LaravelExpressionProvider implements IExpressionProvider
 {
@@ -285,7 +284,7 @@ class LaravelExpressionProvider implements IExpressionProvider
                 .' ' . $str[1] . self::CLOSE_BRACKET;
         }
         //return self::OPEN_BRACKET . $left . ' ' . $operator . ' ' . $right . self::CLOSE_BRACKET;
-	    return $this->getSql();
+        return $this->getSql();
     }
     /**
      * To format unary expression.
@@ -311,7 +310,7 @@ class LaravelExpressionProvider implements IExpressionProvider
         return $nuSql;
     }
 
-    private function replace($sql, $bindings)
+   private function replace($sql, $bindings)
     {
         $needle = '?';
         foreach ($bindings as $replace) {

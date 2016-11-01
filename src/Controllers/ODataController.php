@@ -4,12 +4,8 @@ namespace AlgoWeb\PODataLaravel\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\App;
-use Illuminate\Foundation\Application;
-
 use POData\OperationContext\ServiceHost as ServiceHost;
 use POData\SimpleDataService as DataService;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
