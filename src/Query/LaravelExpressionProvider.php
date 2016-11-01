@@ -239,17 +239,17 @@ class LaravelExpressionProvider implements IExpressionProvider
             case ODataConstants::DATETIME_COMPARE:
                 return "DATETIMECMP($params[0]; $params[1])";
             case ODataConstants::DATETIME_YEAR:
-                return 'EXTRACT(YEAR from ' . $params[0] . ')';
+                return 'EXTRACT(YEAR from '.$params[0].')';
             case ODataConstants::DATETIME_MONTH:
-                return 'EXTRACT(MONTH from ' . $params[0] . ')';
+                return 'EXTRACT(MONTH from '.$params[0].')';
             case ODataConstants::DATETIME_DAY:
-                return 'EXTRACT(DAY from ' . $params[0] . ')';
+                return 'EXTRACT(DAY from '.$params[0].')';
             case ODataConstants::DATETIME_HOUR:
-                return 'EXTRACT(HOUR from ' . $params[0] . ')';
+                return 'EXTRACT(HOUR from '.$params[0].')';
             case ODataConstants::DATETIME_MINUTE:
-                return 'EXTRACT(MINUTE from ' . $params[0] . ')';
+                return 'EXTRACT(MINUTE from '.$params[0].')';
             case ODataConstants::DATETIME_SECOND:
-                return 'EXTRACT(SECOND from ' . $params[0] . ')';
+                return 'EXTRACT(SECOND from '.$params[0].')';
             case ODataConstants::MATHFUN_ROUND:
                 return "ROUND($params[0])";
             case ODataConstants::MATHFUN_CEILING:
@@ -280,8 +280,8 @@ class LaravelExpressionProvider implements IExpressionProvider
             $str = explode(';', $left, 2);
             $str[0] = str_replace('DATETIMECMP', '', $str[0]);
             return self::OPEN_BRACKET
-                .$str[0] . ' ' . $operator
-                .' ' . $str[1] . self::CLOSE_BRACKET;
+                .$str[0].' '.$operator
+                .' '.$str[1].self::CLOSE_BRACKET;
         }
         //return self::OPEN_BRACKET . $left . ' ' . $operator . ' ' . $right . self::CLOSE_BRACKET;
         return $this->getSql();
@@ -296,7 +296,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     private function _prepareUnaryExpression($operator, $child)
     {
-        return $operator . self::OPEN_BRACKET . $child . self::CLOSE_BRACKET;
+        return $operator.self::OPEN_BRACKET.$child.self::CLOSE_BRACKET;
     }
 
     private function getSql()

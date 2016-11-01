@@ -46,7 +46,7 @@ trait MetadataTrait
         }*/
             assert(
                 Schema::connection($connName)->hasTable($this->table),
-                $this->table . ' table not present in current db, ' . $this->getConnectionName()
+                $this->table.' table not present in current db, '.$this->getConnectionName()
             );
         $columns = Schema::connection($connName)->getColumnListing($this->table);
         $mask = $this->metadataMask();
@@ -104,7 +104,7 @@ trait MetadataTrait
             if ($key == $keyName) {
                 continue;
             }
-            if($secret['type'] == "blob"){
+            if ($secret['type'] == "blob"){
                 $complex->setMediaLinkEntry(true);
                 $streamInfo = new ResourceStreamInfo($key);
                 $complex->addNamedStream($streamInfo);
@@ -203,7 +203,7 @@ trait MetadataTrait
                     $reflection = new \ReflectionMethod($model, $method);
 
                     $file = new \SplFileObject($reflection->getFileName());
-                    $file->seek($reflection->getStartLine() - 1);
+                    $file->seek($reflection->getStartLine()-1);
                     $code = '';
                     while ($file->key() < $reflection->getEndLine()) {
                         $code .= $file->current();
@@ -211,7 +211,7 @@ trait MetadataTrait
                     }
                     $code = trim(preg_replace('/\s\s+/', '', $code));
                     $begin = strpos($code, 'function(');
-                    $code = substr($code, $begin, strrpos($code, '}') - $begin + 1);
+                    $code = substr($code, $begin, strrpos($code, '}')-$begin+1);
                     foreach (array(
                                 'hasMany',
                                 'hasManyThrough',
@@ -223,12 +223,12 @@ trait MetadataTrait
                                 'morphMany',
                                 'morphToMany'
                                 ) as $relation) {
-                        $search = '$this->' . $relation . '(';
+                        $search = '$this->'.$relation.'(';
                         if ($pos = stripos($code, $search)) {
                             //Resolve the relation's model to a Relation object.
                             $relationObj = $model->$method();
                             if ($relationObj instanceof Relation) {
-                                $relatedModel = '\\' . get_class($relationObj->getRelated());
+                                $relatedModel = '\\'.get_class($relationObj->getRelated());
                                 $relations = ['hasManyThrough', 'belongsToMany', 'hasMany', 'morphMany', 'morphToMany'];
                                 if (in_array($relation, $relations)) {
                                     //Collection or array of models (because Collection is Arrayable)
@@ -253,7 +253,7 @@ trait MetadataTrait
                                     $relationships["HasOne"][$method] = $relatedModel;
                                     //$this->setProperty($method, $relatedModel, true, null);
                                 }
-                                if (in_array($relation, ["morphMany","morphOne"])) {
+                                if (in_array($relation, ["morphMany", "morphOne"])) {
                                     $relationships["KnownPolyMorphSide"][$method] = $relatedModel;
                                 }
                             }
