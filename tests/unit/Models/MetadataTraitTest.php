@@ -16,7 +16,7 @@ class MetadataTraitTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = $this->getMockForAbstractClass('\AlgoWeb\PODataLaravel\Models\MetadataTrait');
+        $this->object = $this->getMockForTrait('\AlgoWeb\PODataLaravel\Models\MetadataTrait');
     }
 
     /**

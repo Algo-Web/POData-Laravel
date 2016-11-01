@@ -20,7 +20,7 @@ class MetadataProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->object = new \AlgoWeb\PODataLaravel\Providers\MetadataProvider();
+//        $this->object = new \AlgoWeb\PODataLaravel\Providers\MetadataProvider();
     }
 
     /**

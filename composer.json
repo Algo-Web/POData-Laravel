@@ -6,10 +6,12 @@
     "require": {
         "algo-web/podata": "dev-master",
         "doctrine/dbal": "^2.5",
-
+        "mockery/mockery": "dev-master",
         "php": ">=5.4.0"
     },
     "require-dev": {
+        "mockery/mockery": "dev-master",
+        "phpunit/phpunit": "4.8.*"
     },
     "autoload": {
         "psr-4": {

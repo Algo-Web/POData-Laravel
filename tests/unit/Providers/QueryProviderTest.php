@@ -20,7 +20,7 @@ class QueryProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->object = new \AlgoWeb\PODataLaravel\Providers\QueryProvider();
+//        $this->object = new \AlgoWeb\PODataLaravel\Providers\QueryProvider();
     }
 
     /**

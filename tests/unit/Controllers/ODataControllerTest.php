@@ -12,7 +12,7 @@ class ODataControllerTest extends \PHPUnit_Framework_TestCase
      * @var \AlgoWeb\PODataLaravel\Controllers\ODataController
      */
     protected $object;
-
+    protected $mock;
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
@@ -20,7 +20,13 @@ class ODataControllerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->object = new \AlgoWeb\PODataLaravel\Controllers\ODataController();
+//        $this->object  = \Mockery::mock('\AlgoWeb\PODataLaravel\Controllers\ODataController')->makePartial();
+	$this->getMockBuilder('App\Http\Controllers\Controller')->getMock();
+//        $this->mock = \Mockery::mock('App\Http\Controllers\Controller', 'Post');
+        $this->object  = \Mockery::mock('\AlgoWeb\PODataLaravel\Controllers\ODataController')->makePartial();
+
+
+
     }
 
     /**
