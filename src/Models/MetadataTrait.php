@@ -107,13 +107,13 @@ trait MetadataTrait
     /*
      * Assemble this model's OData metadata as xml schema
      */
-    public function getXmlSchema()
+    public function getXmlSchema($MetaNamespace = "Data")
     {
         $raw = $this->metadata();
 
         $metadata = \App::make('metadata');
 
-        $complex = $metadata->addEntityType(new \ReflectionClass(get_class($this)), $this->table, 'ABI');
+        $complex = $metadata->addEntityType(new \ReflectionClass(get_class($this)), $this->table, $MetaNamespace);
         $keyName = $this->getKeyName();
         $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);
         foreach ($raw as $key => $secret) {
