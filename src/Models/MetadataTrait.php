@@ -31,23 +31,28 @@ trait MetadataTrait
 
         $connName = $this->getConnectionName();
 
+        $connect = $this->getConnection();
+        $builder = $connect->getSchemaBuilder();
+
+        $table = $this->getTable();
+
         assert(
-            Schema::connection($connName)->hasTable($this->table),
-            $this->table.' table not present in current db, '.$this->getConnectionName()
+            $builder->hasTable($table),
+            $table.' table not present in current db, '.$this->getConnectionName()
         );
-        $columns = Schema::connection($connName)->getColumnListing($this->table);
+        $columns = $builder->getColumnListing($table);
         $mask = $this->metadataMask();
         $columns = array_intersect($columns, $mask);
 
         $tableData = [];
 
-        $foo = $this->getConnection()->getDoctrineSchemaManager()->listTableColumns($this->table);
+        $foo = $connect->getDoctrineSchemaManager()->listTableColumns($table);
 
         foreach ($columns as $column) {
             // Doctrine schema manager returns columns with lowercased names
             $rawColumn = $foo[strtolower($column)];
             $nullable = !($rawColumn->getNotNull());
-            $fillable = in_array($column, $this->fillable);
+            $fillable = in_array($column, $this->getFillable());
             $rawType = $rawColumn->getType();
             $type = $rawType->getName();
             $tableData[$column] = ['type' => $type, 'nullable' => $nullable, 'fillable' => $fillable];
@@ -84,7 +89,9 @@ trait MetadataTrait
 
         $metadata = \App::make('metadata');
 
-        $complex = $metadata->addEntityType(new \ReflectionClass(get_class($this)), $this->table, $MetaNamespace);
+        $table = $this->getTable();
+
+        $complex = $metadata->addEntityType(new \ReflectionClass(get_class($this)), $table, $MetaNamespace);
         $keyName = $this->getKeyName();
         $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);
         foreach ($raw as $key => $secret) {
@@ -254,6 +261,13 @@ trait MetadataTrait
     public abstract function getConnectionName();
 
     /**
+     * Get the database connection for the model.
+     *
+     * @return \Illuminate\Database\Connection
+     */
+    public abstract function getConnection();
+
+    /**
      * Get all of the current attributes on the model.
      *
      * @return array
@@ -266,4 +280,11 @@ trait MetadataTrait
      * @return string
      */
     public abstract function getTable();
+
+    /**
+     * Get the fillable attributes for the model.
+     *
+     * @return array
+     */
+    public abstract function getFillable();
 }
