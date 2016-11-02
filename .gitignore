@@ -1,0 +1,14 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Laravel template
+vendor/
+node_modules/
+
+# Rocketeer PHP task runner and deployment package. https://github.com/rocketeers/rocketeer
+.rocketeer/
+
+# Commit your application's lock file http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file
+# You may choose to ignore a library lock file http://getcomposer.org/doc/02-libraries.md#lock-file
+composer.lock
+
+# various IDE bits
+.idea/
