@@ -16,7 +16,10 @@
     "autoload": {
         "psr-4": {
             "AlgoWeb\\PODataLaravel\\": "src/"
-        }
+        },
+        "classmap": [
+            "tests/"
+        ]
     },
     "minimum-stability": "dev"
 }

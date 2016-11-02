@@ -29,8 +29,7 @@ trait MetadataTrait
     {
         assert($this instanceof Model, get_class($this));
 
-        $connName = $this->getConnectionName();
-
+        // Break these out separately to enable separate reuse
         $connect = $this->getConnection();
         $builder = $connect->getSchemaBuilder();
 
@@ -40,6 +39,7 @@ trait MetadataTrait
             $builder->hasTable($table),
             $table.' table not present in current db, '.$this->getConnectionName()
         );
+
         $columns = $builder->getColumnListing($table);
         $mask = $this->metadataMask();
         $columns = array_intersect($columns, $mask);
