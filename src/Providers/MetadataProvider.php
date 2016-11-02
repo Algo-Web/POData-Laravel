@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Schema as Schema;
 
 class MetadataProvider extends ServiceProvider
 {
