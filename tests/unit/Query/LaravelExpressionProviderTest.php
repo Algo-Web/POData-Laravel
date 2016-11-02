@@ -147,4 +147,3 @@ class LaravelExpressionProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 }
-

@@ -1,6 +1,7 @@
 <?php
 
 namespace AlgoWeb\PODataLaravel\Models;
+
 /**
  * Generated Test Class.
  */
