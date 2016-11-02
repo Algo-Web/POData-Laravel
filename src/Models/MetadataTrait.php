@@ -32,10 +32,10 @@ trait MetadataTrait
 
         $connName = $this->getConnectionName();
 
-            assert(
-                Schema::connection($connName)->hasTable($this->table),
-                $this->table.' table not present in current db, '.$this->getConnectionName()
-            );
+        assert(
+            Schema::connection($connName)->hasTable($this->table),
+            $this->table.' table not present in current db, '.$this->getConnectionName()
+        );
         $columns = Schema::connection($connName)->getColumnListing($this->table);
         $mask = $this->metadataMask();
         $columns = array_intersect($columns, $mask);
@@ -208,7 +208,8 @@ trait MetadataTrait
                                     $relationships["HasMany"][$method] = $relatedModel;
                                 } elseif ($relation === "morphTo") {
                                     // Model isn't specified because relation is polymorphic
-                                    $relationships["UnknownPolymorphSide"][$method] = '\Illuminate\Database\Eloquent\Model|\Eloquent';
+                                    $relationships["UnknownPolymorphSide"][$method] =
+                                        '\Illuminate\Database\Eloquent\Model|\Eloquent';
                                 } else {
                                     //Single model is returned
                                     $relationships["HasOne"][$method] = $relatedModel;

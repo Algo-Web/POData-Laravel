@@ -4,13 +4,13 @@ namespace AlgoWeb\PODataLaravel\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
+use AlgoWeb\PODataLaravel\Controllers\Controller as BaseController;
 use Illuminate\Support\Facades\App;
 use POData\OperationContext\ServiceHost as ServiceHost;
 use POData\SimpleDataService as DataService;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
 
-class ODataController extends Controller
+class ODataController extends BaseController
 {
     /**
      * Display a listing of the resource.

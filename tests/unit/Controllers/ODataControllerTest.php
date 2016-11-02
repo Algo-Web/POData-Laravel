@@ -1,6 +1,5 @@
 <?php
 
-
 namespace AlgoWeb\PODataLaravel\Controllers;
 
 /**
@@ -21,12 +20,9 @@ class ODataControllerTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 //        $this->object  = \Mockery::mock('\AlgoWeb\PODataLaravel\Controllers\ODataController')->makePartial();
-	$this->getMockBuilder('App\Http\Controllers\Controller')->getMock();
+        $this->getMockBuilder('App\Http\Controllers\Controller')->getMock();
 //        $this->mock = \Mockery::mock('App\Http\Controllers\Controller', 'Post');
         $this->object  = \Mockery::mock('\AlgoWeb\PODataLaravel\Controllers\ODataController')->makePartial();
-
-
-
     }
 
     /**
@@ -283,5 +279,4 @@ class ODataControllerTest extends \PHPUnit_Framework_TestCase
             'This test has not been implemented yet.'
         );
     }
-
 }

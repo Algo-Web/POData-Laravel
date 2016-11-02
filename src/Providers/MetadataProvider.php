@@ -82,13 +82,15 @@ class MetadataProvider extends ServiceProvider
         }
     }
 
-    private static function setupRoute() {
+    private static function setupRoute()
+    {
         $valueArray = [];
 
-        Route::any('odata.svc/{section}', 'AlgoWeb\PODataLaravel\Controllers\ODataController@index') ->where(['section' => '.*']);
+        Route::any('odata.svc/{section}', 'AlgoWeb\PODataLaravel\Controllers\ODataController@index')
+            ->where(['section' => '.*']);
         Route::any('odata.svc', 'AlgoWeb\PODataLaravel\Controllers\ODataController@index');
 
-        Route::get('/', function() use ($valueArray) {
+        Route::get('/', function () use ($valueArray) {
             $array = array(
                 '@odata.context' => Config::get('app.url').'/$metadata',
                 'value' => $valueArray
@@ -104,7 +106,7 @@ class MetadataProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('metadata', function($app) {
+        $this->app->singleton('metadata', function ($app) {
             return new SimpleMetadataProvider('Data', self::$METANAMESPACE);
         });
     }
