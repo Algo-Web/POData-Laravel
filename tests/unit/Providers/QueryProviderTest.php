@@ -1,6 +1,5 @@
 <?php
 
-
 namespace AlgoWeb\PODataLaravel\Providers;
 
 /**
@@ -147,5 +146,5 @@ class QueryProviderTest extends \PHPUnit_Framework_TestCase
             'This test has not been implemented yet.'
         );
     }
-
 }
+
