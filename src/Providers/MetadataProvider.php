@@ -21,7 +21,8 @@ class MetadataProvider extends ServiceProvider
     public function boot()
     {
         self::$METANAMESPACE = env('ODataMetaNamespace', 'Data');
-        if (\App::runningInConsole() && count($_SERVER['argv']) > 1 && $_SERVER['argv'][0] == "artisan") {
+        // If we aren't migrated, there's no DB tables to pull metadata _from_, so bail out early
+        if (!Schema::hasTable('migrations')) {
             return;
         }
 
