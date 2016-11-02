@@ -1,8 +1,7 @@
 <?php
 namespace AlgoWeb\PODataLaravel\Models;
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Schema as Schema;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use POData\Providers\Metadata\ResourceStreamInfo;
 use POData\Providers\Metadata\Type\EdmPrimitiveType;
@@ -225,18 +224,21 @@ trait MetadataTrait
         }
         return $relationships;
     }
+
     /**
      * Get the visible attributes for the model.
      *
      * @return array
      */
     public abstract function getVisible();
+
     /**
      * Get the hidden attributes for the model.
      *
      * @return array
      */
     public abstract function getHidden();
+
     /**
      * Get the primary key for the model.
      *
@@ -250,10 +252,18 @@ trait MetadataTrait
      * @return string
      */
     public abstract function getConnectionName();
+
     /**
      * Get all of the current attributes on the model.
      *
      * @return array
      */
     public abstract function getAttributes();
+
+    /**
+     * Get the table associated with the model.
+     *
+     * @return string
+     */
+    public abstract function getTable();
 }
