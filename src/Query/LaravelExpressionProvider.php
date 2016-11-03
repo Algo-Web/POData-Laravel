@@ -12,12 +12,12 @@ use POData\Providers\Expression\IExpressionProvider;
 
 class LaravelExpressionProvider implements IExpressionProvider
 {
-    const ADD = '+';
+  const ADD = '+';
     const CLOSE_BRACKET = ')';
     const COMMA = ',';
     const DIVIDE = '/';
     const SUBTRACT = '-';
-    const EQUAL = '=';
+    const EQUAL = '==';
     const GREATER_THAN = '>';
     const GREATER_THAN_OR_EQUAL = '>=';
     const LESS_THAN = '<';
@@ -25,27 +25,30 @@ class LaravelExpressionProvider implements IExpressionProvider
     const LOGICAL_AND = '&&';
     const LOGICAL_NOT = '!';
     const LOGICAL_OR = '||';
-    const MEMBER_ACCESS = '';
+    const MEMBER_ACCESS = '->';
     const MODULO = '%';
     const MULTIPLY = '*';
     const NEGATE = '-';
     const NOT_EQUAL = '!=';
     const OPEN_BRACKET = '(';
+    const TYPE_NAMESPACE = 'POData\\Providers\\Metadata\\Type\\';
+    /**
+     * The name of iterator.
+     *
+     * @var string
+     */
+    private $iteratorName;
     /**
      * The type of the resource pointed by the resource path segment.
      *
      * @var ResourceType
      */
-    private $resourceType;
-    private $entityMapping;
-    private $QueryBuilder;
+    private $_resourceType;
     /**
-     * Constructs new instance of MySQLExpressionProvider.
+     * @param string $iteratorName The name of the iterator
      */
-    public function __construct($QueryBuilder)
+    public function __construct()
     {
-        $this->QueryBuilder = $QueryBuilder;
-        $this->entityMapping = array();
     }
     /**
      * Get the name of the iterator.
@@ -54,16 +57,18 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function getIteratorName()
     {
-        return null;
+        return $this->iteratorName;
     }
     /**
      * call-back for setting the resource type.
      *
-     * @param ResourceType $resourceType The resource type on which the filter is going to be applied
+     * @param ResourceType $resourceType The resource type on which the filter
+     *                                   is going to be applied
      */
     public function setResourceType(ResourceType $resourceType)
     {
-        $this->resourceType = $resourceType;
+        $this->iteratorName = "$" . $resourceType->getName();
+        $this->_resourceType = $resourceType;
     }
     /**
      * Call-back for logical expression.
@@ -186,22 +191,19 @@ class LaravelExpressionProvider implements IExpressionProvider
     {
         $parent = $expression;
         $variable = null;
-        $entityTypeName = $this->resourceType->getName();
-        $propertyName = $parent->getResourceProperty()->getName();
-        if (is_array($this->entityMapping)) {
-            if (array_key_exists($entityTypeName, $this->entityMapping)) {
-                if (array_key_exists($propertyName, $this->entityMapping[$entityTypeName])) {
-                    return $this->entityMapping[$entityTypeName][$propertyName];
-                }
-            }
-        }
-        return $propertyName;
+        do {
+            $variable = $parent->getResourceProperty()->getName() . self::MEMBER_ACCESS . $variable;
+            $parent = $parent->getParent();
+        } while ($parent != null);
+        $variable = rtrim($variable, self::MEMBER_ACCESS);
+        $variable = $this->getIteratorName() . self::MEMBER_ACCESS . $variable;
+        return $variable;
     }
     /**
      * Call-back for function call expression.
      *
-     * @param FunctionDescription $functionDescription Description of the function
-     * @param array<string>       $params              Paameters to the function
+     * @param \POData\UriProcessor\QueryProcessor\FunctionDescription $functionDescription Description of the function
+     * @param array<string>                                           $params              Paameters to the function
      *
      * @return string
      */
@@ -209,55 +211,54 @@ class LaravelExpressionProvider implements IExpressionProvider
     {
         switch ($functionDescription->name) {
             case ODataConstants::STRFUN_COMPARE:
-                $this->QueryBuilder->where($params[0], '=', $params[1]);
-                return $this->getSql();
+                return "strcmp($params[0], $params[1])";
             case ODataConstants::STRFUN_ENDSWITH:
-                return "(STRCMP($params[1],RIGHT($params[0],LENGTH($params[1]))) = 0)";
+                return "(strcmp(substr($params[0], strlen($params[0]) - strlen($params[1])), $params[1]) === 0)";
             case ODataConstants::STRFUN_INDEXOF:
-                return "INSTR($params[0], $params[1]) - 1";
+                return "strpos($params[0], $params[1])";
             case ODataConstants::STRFUN_REPLACE:
-                return "REPLACE($params[0],$params[1],$params[2])";
+                return "str_replace($params[1], $params[2], $params[0])";
             case ODataConstants::STRFUN_STARTSWITH:
-                return "(STRCMP($params[1],LEFT($params[0],LENGTH($params[1]))) = 0)";
+                return "(strpos($params[0], $params[1]) === 0)";
             case ODataConstants::STRFUN_TOLOWER:
-                return "LOWER($params[0])";
+                return "strtolower($params[0])";
             case ODataConstants::STRFUN_TOUPPER:
-                return "UPPER($params[0])";
+                return "strtoupper($params[0])";
             case ODataConstants::STRFUN_TRIM:
-                return "TRIM($params[0])";
+                return "trim($params[0])";
             case ODataConstants::STRFUN_SUBSTRING:
                 return count($params) == 3 ?
-                    "SUBSTRING($params[0], $params[1] + 1, $params[2])" : "SUBSTRING($params[0], $params[1] + 1)";
+                    "substr($params[0], $params[1], $params[2])" : "substr($params[0], $params[1])";
             case ODataConstants::STRFUN_SUBSTRINGOF:
-                return "(LOCATE($params[0], $params[1]) > 0)";
+                return "(strpos($params[1], $params[0]) !== false)";
             case ODataConstants::STRFUN_CONCAT:
-                return "CONCAT($params[0],$params[1])";
+                return $params[0] . ' . ' . $params[1];
             case ODataConstants::STRFUN_LENGTH:
-                return "LENGTH($params[0])";
+                return "strlen($params[0])";
             case ODataConstants::GUIDFUN_EQUAL:
-                return "STRCMP($params[0], $params[1])";
+                return self::TYPE_NAMESPACE . "Guid::guidEqual($params[0], $params[1])";
             case ODataConstants::DATETIME_COMPARE:
-                return "DATETIMECMP($params[0]; $params[1])";
+                return self::TYPE_NAMESPACE . "DateTime::dateTimeCmp($params[0], $params[1])";
             case ODataConstants::DATETIME_YEAR:
-                return 'EXTRACT(YEAR from '.$params[0].')';
+                return self::TYPE_NAMESPACE . "DateTime::year($params[0])";
             case ODataConstants::DATETIME_MONTH:
-                return 'EXTRACT(MONTH from '.$params[0].')';
+                return self::TYPE_NAMESPACE . "DateTime::month($params[0])";
             case ODataConstants::DATETIME_DAY:
-                return 'EXTRACT(DAY from '.$params[0].')';
+                return self::TYPE_NAMESPACE . "DateTime::day($params[0])";
             case ODataConstants::DATETIME_HOUR:
-                return 'EXTRACT(HOUR from '.$params[0].')';
+                return self::TYPE_NAMESPACE . "DateTime::hour($params[0])";
             case ODataConstants::DATETIME_MINUTE:
-                return 'EXTRACT(MINUTE from '.$params[0].')';
+                return self::TYPE_NAMESPACE . "DateTime::minute($params[0])";
             case ODataConstants::DATETIME_SECOND:
-                return 'EXTRACT(SECOND from '.$params[0].')';
+                return self::TYPE_NAMESPACE . "DateTime::second($params[0])";
             case ODataConstants::MATHFUN_ROUND:
-                return "ROUND($params[0])";
+                return "round($params[0])";
             case ODataConstants::MATHFUN_CEILING:
-                return "CEIL($params[0])";
+                return "ceil($params[0])";
             case ODataConstants::MATHFUN_FLOOR:
-                return "FLOOR($params[0])";
+                return "floor($params[0])";
             case ODataConstants::BINFUL_EQUAL:
-                return "($params[0]  = $params[1])";
+                return self::TYPE_NAMESPACE . "Binary::binaryEqual($params[0], $params[1])";
             case 'is_null':
                 return "is_null($params[0])";
             default:
@@ -275,16 +276,8 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     private function _prepareBinaryExpression($operator, $left, $right)
     {
-        //DATETIMECMP
-        if (!substr_compare($left, 'DATETIMECMP', 0, 11)) {
-            $str = explode(';', $left, 2);
-            $str[0] = str_replace('DATETIMECMP', '', $str[0]);
-            return self::OPEN_BRACKET
-                .$str[0].' '.$operator
-                .' '.$str[1].self::CLOSE_BRACKET;
-        }
-        //return self::OPEN_BRACKET . $left . ' ' . $operator . ' ' . $right . self::CLOSE_BRACKET;
-        return $this->getSql();
+        return
+            self::OPEN_BRACKET . $left . ' ' . $operator . ' ' . $right . self::CLOSE_BRACKET;
     }
     /**
      * To format unary expression.
@@ -296,29 +289,6 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     private function _prepareUnaryExpression($operator, $child)
     {
-        return $operator.self::OPEN_BRACKET.$child.self::CLOSE_BRACKET;
-    }
-
-    private function getSql()
-    {
-        $sql = $this->replace($this->QueryBuilder->toSql(), $this->QueryBuilder->getBindings());
-
-        $nuSql = str_replace("select * from \"dummy\" where", "", $sql);
-        $nuSql = str_replace("select * from `dummy` where", "", $nuSql);
-        $nuSql = str_replace("select * from \'dummy\' where", "", $nuSql);
-
-        return $nuSql;
-    }
-
-    private function replace($sql, $bindings)
-    {
-        $needle = '?';
-        foreach ($bindings as $replace) {
-            $pos = strpos($sql, $needle);
-            if ($pos !== false) {
-                $sql = substr_replace($sql, $replace, $pos, strlen($needle));
-            }
-        }
-        return $sql;
+        return $operator . self::OPEN_BRACKET . $child . self::CLOSE_BRACKET;
     }
 }
