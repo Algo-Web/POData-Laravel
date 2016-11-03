@@ -2,10 +2,12 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+
 /**
  * Generated Test Class.
  */
-class MetadataProviderTest extends \PHPUnit_Framework_TestCase
+class MetadataProviderTest extends TestCase
 {
     /**
      * @var \AlgoWeb\PODataLaravel\Providers\MetadataProvider

@@ -2,10 +2,12 @@
 
 namespace AlgoWeb\PODataLaravel\Controllers;
 
+use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+
 /**
  * Generated Test Class.
  */
-class ODataControllerTest extends \PHPUnit_Framework_TestCase
+class ODataControllerTest extends TestCase
 {
     /**
      * @var \AlgoWeb\PODataLaravel\Controllers\ODataController

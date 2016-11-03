@@ -2,10 +2,12 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
+use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+
 /**
  * Generated Test Class.
  */
-class LaravelQueryTest extends \PHPUnit_Framework_TestCase
+class LaravelQueryTest extends TestCase
 {
     /**
      * @var \AlgoWeb\PODataLaravel\Query\LaravelQuery
