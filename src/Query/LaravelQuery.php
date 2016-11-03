@@ -86,10 +86,6 @@ class LaravelQuery implements IQueryProvider
         $result          = new QueryResult();
         $result->results = null;
         $result->count   = null;
-        if (isset($filterInfo)) {
-            $filterSet = $filterInfo->getExpressionAsString();
-            $sourceEntityInstance = $sourceEntityInstance->whereRaw($filterSet);
-        }
 
         if (isset($orderBy) && null != $orderBy) {
             foreach ($orderBy->getOrderByInfo()->getOrderByPathSegments() as $order) {
@@ -109,6 +105,14 @@ class LaravelQuery implements IQueryProvider
         }
 
         $resultSet = $sourceEntityInstance->get();
+
+        if(isset($filterInfo)){
+            $method = "return " .  $filterInfo->getExpressionAsString() . ";";
+            $clln = "$" . $resourceSet->getResourceType()->getName();
+            $isvalid = create_function($clln,$method );
+            $resultSet = $resultSet->filter($isvalid);
+        }
+
 
         if (QueryType::ENTITIES() == $queryType || QueryType::ENTITIES_WITH_COUNT() == $queryType) {
             $result->results = array();
