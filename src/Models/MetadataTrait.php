@@ -2,6 +2,7 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use Illuminate\Support\Facades\Schema as Schema;
+use Illuminate\Support\Facades\App as App;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use POData\Providers\Metadata\ResourceStreamInfo;
 use POData\Providers\Metadata\Type\EdmPrimitiveType;
@@ -87,7 +88,7 @@ trait MetadataTrait
     {
         $raw = $this->metadata();
 
-        $metadata = \App::make('metadata');
+        $metadata = App::make('metadata');
 
         $table = $this->getTable();
 

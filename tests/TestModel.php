@@ -8,7 +8,10 @@ use Illuminate\Database\Schema\Builder as SchemaBuilder;
 
 class TestModel extends Model
 {
-    use MetadataTrait;
+    use MetadataTrait {
+        metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
+        // not bury ourselves under a stack overflow and segfault
+    }
     protected $metaArray;
 
     public function __construct(array $meta = null)
@@ -44,6 +47,6 @@ class TestModel extends Model
         if (isset($this->metaArray)) {
             return $this->metaArray;
         }
-        return parent::metadata();
+        return $this->traitmetadata();
     }
 }
