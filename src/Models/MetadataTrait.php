@@ -151,8 +151,8 @@ trait MetadataTrait
         // Adapted from http://stackoverflow.com/a/33514981
         // $columns = $this->getFillable();
         // Another option is to get all columns for the table like so:
-        $connName = $this->getConnectionName();
-        $columns = Schema::connection($connName)->getColumnListing($this->table);
+        $builder = $this->getConnection()->getSchemaBuilder();
+        $columns = $builder->getColumnListing($this->getTable());
         // but it's safer to just get the fillable fields
 
         $attributes = $this->getAttributes();
