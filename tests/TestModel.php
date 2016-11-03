@@ -9,6 +9,15 @@ use Illuminate\Database\Schema\Builder as SchemaBuilder;
 class TestModel extends Model
 {
     use MetadataTrait;
+    protected $metaArray;
+
+    public function __construct(array $meta = null)
+    {
+        if (isset($meta)) {
+            $this->metaArray = $meta;
+        }
+        parent::__construct();
+    }
 
     public function getTable()
     {
@@ -28,5 +37,13 @@ class TestModel extends Model
     public function getFillable()
     {
         return [ 'name', 'added_at', 'weight', 'code'];
+    }
+
+    public function metadata()
+    {
+        if (isset($this->metaArray)) {
+            return $this->metaArray;
+        }
+        return parent::metadata();
     }
 }
