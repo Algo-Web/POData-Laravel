@@ -43,7 +43,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      *
      * @var ResourceType
      */
-    private $_resourceType;
+    private $resourceType;
     /**
      * @param string $iteratorName The name of the iterator
      */
@@ -68,7 +68,7 @@ class LaravelExpressionProvider implements IExpressionProvider
     public function setResourceType(ResourceType $resourceType)
     {
         $this->iteratorName = "$" . $resourceType->getName();
-        $this->_resourceType = $resourceType;
+        $this->resourceType = $resourceType;
     }
     /**
      * Call-back for logical expression.
