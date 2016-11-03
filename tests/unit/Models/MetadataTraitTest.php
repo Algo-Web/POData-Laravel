@@ -6,11 +6,12 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Database\Connection;
+use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 
 /**
  * Generated Test Class.
  */
-class MetadataTraitTest extends \PHPUnit_Framework_TestCase
+class MetadataTraitTest extends TestCase
 {
     /**
      * @var \AlgoWeb\PODataLaravel\Models\MetadataTrait
@@ -23,6 +24,7 @@ class MetadataTraitTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+        parent::setUp();
         $this->object = $this->getMockForTrait('\AlgoWeb\PODataLaravel\Models\MetadataTrait');
     }
 
@@ -32,6 +34,7 @@ class MetadataTraitTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
+        parent::tearDown();
     }
 
     /**
@@ -222,6 +225,41 @@ class MetadataTraitTest extends \PHPUnit_Framework_TestCase
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
+    }
+
+    /**
+     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getXmlSchema
+     */
+    public function testGetXmlSchemaBlobAndOthers()
+    {
+        $expectedTypes = [];
+        $expectedTypes['integer'] = 'POData\\Providers\\Metadata\\Type\\Int32';
+        $expectedTypes['string'] = 'POData\\Providers\\Metadata\\Type\\StringType';
+
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true];
+
+        $foo = new TestModel($meta);
+
+        $result = $foo->getXmlSchema();
+
+        $props = $result->getPropertiesDeclaredOnThisType();
+        $this->assertEquals(2, count($props));
+        foreach ($props as $key => $val) {
+            $this->assertTrue(array_key_exists($key, $meta));
+            $targType = get_class($val->getInstanceType());
+            $refType = $meta[$key]['type'];
+            $this->assertEquals($expectedTypes[$refType], $targType);
+        }
+
+        $streams = $result->getNamedStreamsDeclaredOnThisType();
+        $this->assertEquals(1, count($streams));
+        foreach ($streams as $key => $val) {
+            $this->assertTrue(array_key_exists($key, $meta));
+            $this->assertEquals('blob', $meta[$key]['type']);
+        }
     }
 
 
