@@ -1,7 +1,6 @@
 <?php
 namespace AlgoWeb\PODataLaravel\Models;
 
-use Illuminate\Support\Facades\Schema as Schema;
 use Illuminate\Support\Facades\App as App;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use POData\Providers\Metadata\ResourceStreamInfo;
