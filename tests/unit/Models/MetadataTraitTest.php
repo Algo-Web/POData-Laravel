@@ -286,8 +286,8 @@ class MetadataTraitTest extends TestCase
         $this->assertEquals(0, count($result['HasOne']));
         $this->assertEquals(0, count($result['HasMany']));
         $this->assertEquals(0, count($result['KnownPolyMorphSide']));
-        $this->assertEquals(1, count($result['UnknownPolymorphSide']));
-        $this->assertTrue(array_key_exists('morph', $result['UnknownPolymorphSide']));
+        $this->assertEquals(1, count($result['UnknownPolyMorphSide']));
+        $this->assertTrue(array_key_exists('morph', $result['UnknownPolyMorphSide']));
     }
 
     /**
@@ -301,7 +301,7 @@ class MetadataTraitTest extends TestCase
         $this->assertEquals(0, count($result['HasOne']));
         $this->assertEquals(1, count($result['HasMany']));
         $this->assertEquals(1, count($result['KnownPolyMorphSide']));
-        $this->assertEquals(0, count($result['UnknownPolymorphSide']));
+        $this->assertEquals(0, count($result['UnknownPolyMorphSide']));
         $this->assertTrue(array_key_exists('morphTarget', $result['KnownPolyMorphSide']));
         $this->assertTrue(array_key_exists('morphTarget', $result['HasMany']));
     }
@@ -317,7 +317,7 @@ class MetadataTraitTest extends TestCase
         $this->assertEquals(1, count($result['HasOne']));
         $this->assertEquals(0, count($result['HasMany']));
         $this->assertEquals(1, count($result['KnownPolyMorphSide']));
-        $this->assertEquals(0, count($result['UnknownPolymorphSide']));
+        $this->assertEquals(0, count($result['UnknownPolyMorphSide']));
         $this->assertTrue(array_key_exists('morphTarget', $result['KnownPolyMorphSide']));
         $this->assertTrue(array_key_exists('morphTarget', $result['HasOne']));
     }
