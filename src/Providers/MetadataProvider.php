@@ -89,14 +89,6 @@ class MetadataProvider extends ServiceProvider
         Route::any('odata.svc/{section}', 'AlgoWeb\PODataLaravel\Controllers\ODataController@index')
             ->where(['section' => '.*']);
         Route::any('odata.svc', 'AlgoWeb\PODataLaravel\Controllers\ODataController@index');
-
-        Route::get('/', function () use ($valueArray) {
-            $array = array(
-                '@odata.context' => Config::get('app.url').'/$metadata',
-                'value' => $valueArray
-            );
-            return $array;
-        });
     }
 
     /**
