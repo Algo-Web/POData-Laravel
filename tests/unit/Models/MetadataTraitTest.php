@@ -274,4 +274,15 @@ class MetadataTraitTest extends TestCase
             'This test has not been implemented yet.'
         );
     }
+
+    /**
+     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
+     */
+    public function testGetRelationshipsForMorphTarget()
+    {
+        $foo = new TestMorphTarget();
+
+        $result = $foo->getRelationshipsFromMethods();
+        dd($result);
+    }
 }
