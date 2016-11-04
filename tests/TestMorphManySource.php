@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Connection as Connection;
 use Mockery\Mockery;
 
-class TestMorphTarget extends Model
+class TestMorphManySource extends Model
 {
     use MetadataTrait {
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
@@ -59,8 +59,8 @@ class TestMorphTarget extends Model
         return $this->getRel();
     }
 
-    public function morph()
+    public function morphTarget()
     {
-        return $this->morphTo();
+        return $this->morphMany('AlgoWeb\PODataLaravel\Models\TestMorphTarget', 'morph');
     }
 }
