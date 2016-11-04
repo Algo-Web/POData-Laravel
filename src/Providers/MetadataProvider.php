@@ -5,7 +5,6 @@ namespace AlgoWeb\PODataLaravel\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
 use POData\Providers\Metadata\SimpleMetadataProvider;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema as Schema;
 
@@ -98,7 +97,7 @@ class MetadataProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('metadata', function ($app) {
+        $this->app->singleton('metadata', function($app) {
             return new SimpleMetadataProvider('Data', self::$METANAMESPACE);
         });
     }

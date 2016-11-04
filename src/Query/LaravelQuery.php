@@ -6,7 +6,6 @@ use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\UriProcessor\QueryProcessor\Expression\Parser\IExpressionProvider;
 use POData\UriProcessor\QueryProcessor\ExpressionParser\FilterInfo;
-use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 use POData\Providers\Query\IQueryProvider;
 use POData\Providers\Expression\MySQLExpressionProvider;
@@ -14,7 +13,6 @@ use POData\Providers\Query\QueryType;
 use POData\Providers\Query\QueryResult;
 use POData\Providers\Expression\PHPExpressionProvider;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Model as Model;
 
 class LaravelQuery implements IQueryProvider
 {
@@ -106,10 +104,10 @@ class LaravelQuery implements IQueryProvider
 
         $resultSet = $sourceEntityInstance->get();
 
-        if(isset($filterInfo)){
-            $method = "return " .  $filterInfo->getExpressionAsString() . ";";
-            $clln = "$" . $resourceSet->getResourceType()->getName();
-            $isvalid = create_function($clln,$method );
+        if (isset($filterInfo)) {
+            $method = "return ".$filterInfo->getExpressionAsString().";";
+            $clln = "$".$resourceSet->getResourceType()->getName();
+            $isvalid = create_function($clln, $method);
             $resultSet = $resultSet->filter($isvalid);
         }
 
@@ -147,6 +145,8 @@ class LaravelQuery implements IQueryProvider
 
     /**
      * Common method for getResourceFromRelatedResourceSet() and getResourceFromResourceSet()
+     * @param ResourceSet|null $resourceSet
+     * @param null|KeyDescriptor $keyDescriptor
      */
     protected function getResource(
         $resourceSet,
