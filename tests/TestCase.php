@@ -22,6 +22,9 @@ class TestCase extends BaseTestCase
      */
     public function createApplication()
     {
+        $database = \Mockery::mock(\Illuminate\Database\DatabaseManager::class)->makePartial();
+        $database->shouldReceive('table')->withAnyArgs()->andReturn($this->getBuilder());
+
         $confRepo = \Mockery::mock(\Illuminate\Config\Repository::class)->makePartial();
         $confRepo->shouldReceive('shouldRecompile')->andReturn(false);
 
@@ -30,6 +33,9 @@ class TestCase extends BaseTestCase
         $fileSys = \Mockery::mock(\Illuminate\Filesystem\Filesystem::class)->makePartial();
         $fileSys->shouldReceive('put')->andReturnNull();
 
+        $log = \Mockery::mock(\Illuminate\Log\Writer::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $log->shouldReceive('writeLog')->withAnyArgs()->andReturnNull();
+
         // Lifted straight out of the stock bootstrap/app.php shipped with Laravel
         // and repointed to underlying classes
         $app = new \AlgoWeb\PODataLaravel\Models\TestApplication($fileSys);
@@ -37,6 +43,8 @@ class TestCase extends BaseTestCase
         $app->instance('config', $confRepo);
         $app->config->set('app.providers', []);
         $app->instance('cache.store', $cacheRepo);
+        $app->instance('db', $database);
+        $app->instance('log', $log);
 
         $app->singleton(
             \Illuminate\Contracts\Http\Kernel::class,
@@ -64,5 +72,20 @@ class TestCase extends BaseTestCase
         );
 
         return $app;
+    }
+
+    protected function getBuilder()
+    {
+        $grammar = new \Illuminate\Database\Query\Grammars\Grammar;
+        $processor = \Mockery::mock('Illuminate\Database\Query\Processors\Processor')->makePartial();
+        $connect = \Mockery::mock('Illuminate\Database\ConnectionInterface');
+        $connect->shouldReceive('getQueryGrammar')->andReturn($grammar);
+        $connect->shouldReceive('getPostProcessor')->andReturn($processor);
+
+        return new \Illuminate\Database\Query\Builder(
+            $connect,
+            $grammar,
+            $processor
+        );
     }
 }
