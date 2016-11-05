@@ -140,7 +140,7 @@ class LaravelExpressionProvider implements IExpressionProvider
             case ExpressionType::NOTEQUAL:
                 return $this->_prepareBinaryExpression(self::NOT_EQUAL, $left, $right);
             default:
-                throw new \InvalidArgumentException('onArithmeticExpression');
+                throw new \InvalidArgumentException('onRelationalExpression');
         }
     }
     /**
@@ -202,12 +202,15 @@ class LaravelExpressionProvider implements IExpressionProvider
      * Call-back for function call expression.
      *
      * @param \POData\UriProcessor\QueryProcessor\FunctionDescription $functionDescription Description of the function
-     * @param array<string>                                           $params              Paameters to the function
+     * @param array<string>                                           $params              Parameters to the function
      *
      * @return string
      */
     public function onFunctionCallExpression($functionDescription, $params)
     {
+        if (!isset($functionDescription)) {
+            throw new \InvalidArgumentException('onFunctionCallExpression');
+        }
         switch ($functionDescription->name) {
             case ODataConstants::STRFUN_COMPARE:
                 return "strcmp($params[0], $params[1])";
