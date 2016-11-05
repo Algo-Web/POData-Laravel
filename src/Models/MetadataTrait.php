@@ -169,7 +169,7 @@ trait MetadataTrait
         $model = $this;
         $relationships = array(
             "HasOne" => array(),
-            "UnknownPolymorphSide"=>array(),
+            "UnknownPolyMorphSide"=>array(),
             "HasMany"=>array(),
             "KnownPolyMorphSide"=>array()
         );
@@ -214,7 +214,7 @@ trait MetadataTrait
                                     $relationships["HasMany"][$method] = $relatedModel;
                                 } elseif ($relation === "morphTo") {
                                     // Model isn't specified because relation is polymorphic
-                                    $relationships["UnknownPolymorphSide"][$method] =
+                                    $relationships["UnknownPolyMorphSide"][$method] =
                                         '\Illuminate\Database\Eloquent\Model|\Eloquent';
                                 } else {
                                     //Single model is returned

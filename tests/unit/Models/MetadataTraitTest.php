@@ -274,4 +274,51 @@ class MetadataTraitTest extends TestCase
             'This test has not been implemented yet.'
         );
     }
+
+    /**
+     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
+     */
+    public function testGetRelationshipsForMorphTarget()
+    {
+        $foo = new TestMorphTarget();
+
+        $result = $foo->getRelationshipsFromMethods();
+        $this->assertEquals(0, count($result['HasOne']));
+        $this->assertEquals(0, count($result['HasMany']));
+        $this->assertEquals(0, count($result['KnownPolyMorphSide']));
+        $this->assertEquals(1, count($result['UnknownPolyMorphSide']));
+        $this->assertTrue(array_key_exists('morph', $result['UnknownPolyMorphSide']));
+    }
+
+    /**
+     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
+     */
+    public function testGetRelationshipsForMorphManySource()
+    {
+        $foo = new TestMorphManySource();
+
+        $result = $foo->getRelationshipsFromMethods();
+        $this->assertEquals(0, count($result['HasOne']));
+        $this->assertEquals(1, count($result['HasMany']));
+        $this->assertEquals(1, count($result['KnownPolyMorphSide']));
+        $this->assertEquals(0, count($result['UnknownPolyMorphSide']));
+        $this->assertTrue(array_key_exists('morphTarget', $result['KnownPolyMorphSide']));
+        $this->assertTrue(array_key_exists('morphTarget', $result['HasMany']));
+    }
+
+    /**
+     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
+     */
+    public function testGetRelationshipsForMorphOneSource()
+    {
+        $foo = new TestMorphOneSource();
+
+        $result = $foo->getRelationshipsFromMethods();
+        $this->assertEquals(1, count($result['HasOne']));
+        $this->assertEquals(0, count($result['HasMany']));
+        $this->assertEquals(1, count($result['KnownPolyMorphSide']));
+        $this->assertEquals(0, count($result['UnknownPolyMorphSide']));
+        $this->assertTrue(array_key_exists('morphTarget', $result['KnownPolyMorphSide']));
+        $this->assertTrue(array_key_exists('morphTarget', $result['HasOne']));
+    }
 }

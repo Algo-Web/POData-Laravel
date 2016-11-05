@@ -22,7 +22,8 @@ class LaravelQuery implements IQueryProvider
     public function __construct()
     {
         /* MySQLExpressionProvider();*/
-        $this->expression = new LaravelExpressionProvider(DB::table('dummy')); //PHPExpressionProvider('expression');
+        $table = DB::table('dummy');
+        $this->expression = new LaravelExpressionProvider($table); //PHPExpressionProvider('expression');
         $this->queryProviderClassName = get_class($this);
     }
 
@@ -71,14 +72,11 @@ class LaravelQuery implements IQueryProvider
         $skipToken = null,
         $sourceEntityInstance = null
     ) {
-
         if ($resourceSet == null && $sourceEntityInstance == null) {
             throw new \Exception('Must supply at least one of a resource set and source entity');
         }
         if ($sourceEntityInstance == null) {
-            $entityClassName      = $resourceSet->getResourceType()->getInstanceType()->name;
-            $sourceEntityInstance = new $entityClassName();
-            $sourceEntityInstance = $sourceEntityInstance->newQuery();
+            $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
         }
 
         $result          = new QueryResult();
@@ -263,5 +261,16 @@ class LaravelQuery implements IQueryProvider
     ) {
         $propertyName = $targetProperty->getName();
         return $sourceEntityInstance->$propertyName;
+    }
+
+    /**
+     * @param ResourceSet $resourceSet
+     * @return mixed
+     */
+    protected function getSourceEntityInstance(ResourceSet $resourceSet)
+    {
+        $entityClassName = $resourceSet->getResourceType()->getInstanceType()->name;
+        $sourceEntityInstance = new $entityClassName();
+        return $sourceEntityInstance = $sourceEntityInstance->newQuery();
     }
 }

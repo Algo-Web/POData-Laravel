@@ -3,6 +3,12 @@
 namespace AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use POData\Providers\Metadata\ResourceSet;
+use POData\Providers\Metadata\ResourceProperty;
+use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
+use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use POData\Providers\Query\QueryType;
+use POData\Providers\Query\QueryResult;
 
 /**
  * Generated Test Class.
@@ -71,6 +77,44 @@ class LaravelQueryTest extends TestCase
         );
     }
 
+    /**
+     * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getResourceSet
+     */
+    public function testGetResourceSetWithEntitiesAndCount()
+    {
+        $instanceType = new \StdClass();
+        $instanceType->name = 'AlgoWeb\\PODataLaravel\\Models\\TestMorphManySource';
+
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($instanceType);
+
+        $queryType = QueryType::ENTITIES_WITH_COUNT();
+
+        $property = \Mockery::mock(ResourceProperty::class);
+        $property->shouldReceive('getName')->withNoArgs()->andReturn('morphTarget');
+
+        $rawBuilder = $this->getBuilder();
+
+        $rawResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class)
+            ->makePartial();
+        $rawResult->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']));
+        $rawResult->setQuery($rawBuilder);
+        $this->assertTrue(null != ($rawResult->getQuery()->getProcessor()));
+
+        $sourceEntity = \Mockery::mock(TestMorphManySource::class);
+        $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
+
+        $foo = \Mockery::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getSourceEntityInstance')->andReturn($rawResult);
+
+        $expected = ['eins', 'zwei', 'polizei'];
+
+        $result = $foo->getResourceSet($queryType, $mockResource);
+        $this->assertTrue($result instanceof QueryResult);
+        $this->assertEquals(3, $result->count);
+        $this->assertEquals($expected, $result->results);
+    }
+
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getResourceFromResourceSet
@@ -95,6 +139,94 @@ class LaravelQueryTest extends TestCase
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
+    }
+
+    /**
+     * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getRelatedResourceSet
+     */
+    public function testGetRelatedResourceSetWithEntitiesAndCount()
+    {
+        $mockResource = \Mockery::mock(ResourceSet::class);
+
+        $queryType = QueryType::ENTITIES_WITH_COUNT();
+
+        $property = \Mockery::mock(ResourceProperty::class);
+        $property->shouldReceive('getName')->withNoArgs()->andReturn('morphTarget');
+
+        $rawResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
+        $rawResult->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']));
+
+        $sourceEntity = \Mockery::mock(TestMorphManySource::class);
+        $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
+
+        $foo = new LaravelQuery();
+
+        $expected = ['eins', 'zwei', 'polizei'];
+
+        $result = $foo->getRelatedResourceSet($queryType, $mockResource, $sourceEntity, $mockResource, $property);
+        $this->assertTrue($result instanceof QueryResult);
+        $this->assertEquals(3, $result->count);
+        $this->assertEquals($expected, $result->results);
+    }
+
+    public function testGetRelatedResourcesCountOnlyNoSkipNoTake()
+    {
+        $mockResource = \Mockery::mock(ResourceSet::class);
+
+        $queryType = QueryType::COUNT();
+
+        $property = \Mockery::mock(ResourceProperty::class);
+        $property->shouldReceive('getName')->withNoArgs()->andReturn('morphTarget');
+
+        $rawResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
+        $rawResult->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']));
+
+        $sourceEntity = \Mockery::mock(TestMorphManySource::class);
+        $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
+
+        $foo = new LaravelQuery();
+        $result = $foo->getRelatedResourceSet($queryType, $mockResource, $sourceEntity, $mockResource, $property);
+        $this->assertTrue($result instanceof QueryResult);
+        $this->assertEquals(3, $result->count);
+        $this->assertEquals(null, $result->results);
+    }
+
+    public function testGetRelatedResourcesCountOnlyTwoSkipTwoTakeWithOneResultingRecord()
+    {
+        $mockResource = \Mockery::mock(ResourceSet::class);
+
+        $queryType = QueryType::COUNT();
+
+        $property = \Mockery::mock(ResourceProperty::class);
+        $property->shouldReceive('getName')->withNoArgs()->andReturn('morphTarget');
+
+        $finalResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
+        $finalResult->shouldReceive('get')->andReturn(collect(['polizei']));
+
+        $intermediateResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
+        $intermediateResult->shouldReceive('take')->withArgs([2])->andReturn($finalResult);
+
+        $rawResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
+        $rawResult->shouldReceive('skip')->withArgs([2])->andReturn($intermediateResult);
+
+        $sourceEntity = \Mockery::mock(TestMorphManySource::class);
+        $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
+
+        $foo = new LaravelQuery();
+        $result = $foo->getRelatedResourceSet(
+            $queryType,
+            $mockResource,
+            $sourceEntity,
+            $mockResource,
+            $property,
+            null,
+            null,
+            2,
+            2
+        );
+        $this->assertTrue($result instanceof QueryResult);
+        $this->assertEquals(1, $result->count);
+        $this->assertEquals(null, $result->results);
     }
 
 
