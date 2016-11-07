@@ -273,4 +273,46 @@ class LaravelQuery implements IQueryProvider
         $sourceEntityInstance = new $entityClassName();
         return $sourceEntityInstance = $sourceEntityInstance->newQuery();
     }
+    
+    /**
+     * Updates a resource 
+     *
+     * @param ResourceSet      $sourceResourceSet    The entity set containing the source entity
+     * @param object           $sourceEntityInstance The source entity instance
+     * @param KeyDescriptor    $keyDescriptor        The key identifying the entity to fetch
+     * @param object           $data                 The New data for the entity instance.
+     * @param bool             $shouldUpdate        Should undefined values be updated or reset to default
+     *
+     * @return object|null The new resource value if it is assignable or throw exception for null.
+     */
+    public function updateResource(ResourceSet $sourceResourceSet,$sourceEntityInstance, KeyDescriptor $keyDescriptor,$data, $shouldUpdate = false){
+        throw new \POData\Common\NotImplementedException();
+    }
+    /**
+     * Delete resource from a resource set.
+     * @param ResourceSet|null $resourceSet
+     * @param object           $sourceEntityInstance
+     *
+     * return bool true if resources sucessfully deteled, otherwise false.
+     */
+    public function deleteResource(
+        ResourceSet $sourceResourceSet,
+        $sourceEntityInstance
+    ){
+        throw new \POData\Common\NotImplementedException();
+    }
+    /**
+     * @param ResourceSet      $resourceSet   The entity set containing the entity to fetch
+     * @param object           $sourceEntityInstance The source entity instance
+     * @param object           $data                 The New data for the entity instance.
+     * 
+     * returns object|null returns the newly created model if sucessful or null if model creation failed.
+     */
+    public function createResourceforResourceSet(
+        ResourceSet $resourceSet,
+        $sourceEntityInstance,
+        $data
+    ){
+        throw new \POData\Common\NotImplementedException();
+    }
 }
