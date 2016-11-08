@@ -508,6 +508,29 @@ class LaravelExpressionProviderTest extends TestCase
         $result = $foo->onFunctionCallExpression($func, [ 'FoO']);
         $this->assertEquals($expected, $result);
     }
+    public function testOnFunctionCallExpressionStrSubstring()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $func = new FunctionDescription(ODataConstants::STRFUN_SUBSTRING, null, null);
+
+        $expected = "substr('foo', 2)";
+        $result = $foo->onFunctionCallExpression($func, [ 'foo', 2]);
+        $this->assertEquals($expected, $result);
+
+    }
+    
+    public function testOnFunctionCallExpressionStrSubstring2()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $func = new FunctionDescription(ODataConstants::STRFUN_SUBSTRING, null, null);
+
+        $expected = "substr('foo', 2, 3)";
+        $result = $foo->onFunctionCallExpression($func, [ 'foo', 2, 3]);
+        $this->assertEquals($expected, $result);
+
+    }
 
     public function testOnFunctionCallExpressionStrSubstringOf()
     {
