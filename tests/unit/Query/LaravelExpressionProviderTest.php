@@ -514,7 +514,7 @@ class LaravelExpressionProviderTest extends TestCase
 
         $func = new FunctionDescription(ODataConstants::STRFUN_SUBSTRING, null, null);
 
-        $expected = "substr('foo', 2)";
+        $expected = "substr(foo, 2)";
         $result = $foo->onFunctionCallExpression($func, [ 'foo', 2]);
         $this->assertEquals($expected, $result);
 
@@ -526,7 +526,7 @@ class LaravelExpressionProviderTest extends TestCase
 
         $func = new FunctionDescription(ODataConstants::STRFUN_SUBSTRING, null, null);
 
-        $expected = "substr('foo', 2, 3)";
+        $expected = "substr(foo, 2, 3)";
         $result = $foo->onFunctionCallExpression($func, [ 'foo', 2, 3]);
         $this->assertEquals($expected, $result);
 
