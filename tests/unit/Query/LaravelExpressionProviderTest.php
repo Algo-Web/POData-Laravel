@@ -354,14 +354,29 @@ class LaravelExpressionProviderTest extends TestCase
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider::onConstantExpression
-     * @todo   Implement testOnConstantExpression().
+     * @dataProvider OnConstantExpressionProvider
      */
-    public function testOnConstantExpression()
+    public function testOnConstantExpression($type, $value, $expected)
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $foo = new LaravelExpressionProvider();
+        $this->assertEquals($expected, $foo->OnConstantExpression($type,$value));
+
+    }
+
+
+    public function OnConstantExpressionProvider()
+    {
+        return [
+            [new \POData\Providers\Metadata\Type\Null1, null, "NULL"],
+            [new \POData\Providers\Metadata\Type\Boolean , true, "true"],
+            [new \POData\Providers\Metadata\Type\Boolean , false, "false"],
+            [new \POData\Providers\Metadata\Type\Byte, 254, 254],
+            [new \POData\Providers\Metadata\Type\Int16, 32767, 32767],
+            [new \POData\Providers\Metadata\Type\Int32, 2147483647, 2147483647],
+            [new \POData\Providers\Metadata\Type\Int64, 9223372036854775807, 9223372036854775807],
+            [new \POData\Providers\Metadata\Type\StringType, "the mighty string", "the mighty string"],
+
+        ];
     }
 
 
