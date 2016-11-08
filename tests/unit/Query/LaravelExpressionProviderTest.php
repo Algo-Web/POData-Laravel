@@ -386,10 +386,27 @@ class LaravelExpressionProviderTest extends TestCase
      */
     public function testOnPropertyAccessExpression()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $topLevelProperyAccess = \Mockery::mock('POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\PropertyAccessExpression')->makePartial();
+        $SecondLevelProperyAccess = \Mockery::mock('POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\PropertyAccessExpression')->makePartial();
+        $topLevelResourceProperty = \Mockery::mock('POData\Providers\Metadata\ResourceProperty')->makePartial();
+        $secondLevelResourceProperty = \Mockery::mock('POData\Providers\Metadata\ResourceProperty')->makePartial();
+
+
+        $topLevelProperyAccess->shouldReceive('getParent')->andReturn($SecondLevelProperyAccess);
+        $topLevelProperyAccess->shouldReceive('getResourceProperty')->andReturn($topLevelResourceProperty);
+        $SecondLevelProperyAccess->shouldReceive('getResourceProperty')->andReturn($secondLevelResourceProperty);
+        $topLevelResourceProperty->shouldReceive('getName')->andReturn("TopPropertyAccessor");
+        $secondLevelResourceProperty->shouldReceive('getName')->andReturn("SecondPropertyAccessor");
+
+
+        $foo = new LaravelExpressionProvider();
+        $fooRef= new \ReflectionObject( $foo );
+        $refProperty = $fooRef->getProperty( 'iteratorName' );
+        $refProperty->setAccessible( true );
+        $refProperty->setValue($foo, 'testIterator');
+        $expected = "testIterator->SecondPropertyAccessor->TopPropertyAccessor";
+        $result = $foo->onPropertyAccessExpression($topLevelProperyAccess);
+        $this->assertEquals($expected, $result);
     }
 
 
