@@ -21,7 +21,11 @@ class MetadataProvider extends ServiceProvider
     {
         self::$METANAMESPACE = env('ODataMetaNamespace', 'Data');
         // If we aren't migrated, there's no DB tables to pull metadata _from_, so bail out early
-        if (!Schema::hasTable('migrations')) {
+        try{
+            if (!Schema::hasTable('migrations')) {
+                return;
+            }
+        }catch(\Exception $e){
             return;
         }
 
