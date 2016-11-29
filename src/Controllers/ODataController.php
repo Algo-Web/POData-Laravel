@@ -32,9 +32,12 @@ class ODataController extends BaseController
 
         $odataResponse = $op->outgoingResponse();
         $content = $odataResponse->getStream();
-        $response = new Response($content, 200);
-
-        foreach ($odataResponse->getHeaders() as $headerName => $headerValue) {
+        $headers = $odataResponse->getHeaders();
+        $responseCode = $headers[\POData\Common\ODataConstants::HTTPRESPONSE_HEADER_STATUS_CODE];
+        $responseCode = isset($responseCode) ? $responseCode : 200;
+        $response = new Response($content, $responseCode);
+        $response->setStatusCode($headers["Status"]);
+        foreach ($headers as $headerName => $headerValue) {
             if (!is_null($headerValue)) {
                 $response->headers->set($headerName, $headerValue);
             }
