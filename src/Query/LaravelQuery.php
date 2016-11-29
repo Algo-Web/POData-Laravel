@@ -12,18 +12,22 @@ use POData\Providers\Expression\MySQLExpressionProvider;
 use POData\Providers\Query\QueryType;
 use POData\Providers\Query\QueryResult;
 use POData\Providers\Expression\PHPExpressionProvider;
+use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
+use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
 use Illuminate\Support\Facades\DB;
 
 class LaravelQuery implements IQueryProvider
 {
     protected $expression;
+    protected $auth;
     public $queryProviderClassName;
 
-    public function __construct()
+    public function __construct(AuthInterface $auth = null)
     {
         /* MySQLExpressionProvider();*/
         $this->expression = new LaravelExpressionProvider(); //PHPExpressionProvider('expression');
         $this->queryProviderClassName = get_class($this);
+        $this->auth = isset($auth) ? $auth : new NullAuthProvider();
     }
 
     /**
@@ -284,7 +288,13 @@ class LaravelQuery implements IQueryProvider
      *
      * @return object|null The new resource value if it is assignable or throw exception for null.
      */
-    public function updateResource(ResourceSet $sourceResourceSet,$sourceEntityInstance, KeyDescriptor $keyDescriptor,$data, $shouldUpdate = false){
+    public function updateResource(
+        ResourceSet $sourceResourceSet,
+        $sourceEntityInstance,
+        KeyDescriptor $keyDescriptor,
+        $data,
+        $shouldUpdate = false
+    ) {
         throw new \POData\Common\NotImplementedException();
     }
     /**
@@ -297,21 +307,21 @@ class LaravelQuery implements IQueryProvider
     public function deleteResource(
         ResourceSet $sourceResourceSet,
         $sourceEntityInstance
-    ){
+    ) {
         throw new \POData\Common\NotImplementedException();
     }
     /**
      * @param ResourceSet      $resourceSet   The entity set containing the entity to fetch
      * @param object           $sourceEntityInstance The source entity instance
      * @param object           $data                 The New data for the entity instance.
-     * 
+     *
      * returns object|null returns the newly created model if sucessful or null if model creation failed.
      */
     public function createResourceforResourceSet(
         ResourceSet $resourceSet,
         $sourceEntityInstance,
         $data
-    ){
+    ) {
         throw new \POData\Common\NotImplementedException();
     }
 }
