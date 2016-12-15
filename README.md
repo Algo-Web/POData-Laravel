@@ -23,7 +23,7 @@ AlgoWeb\PODataLaravel\Providers\QueryProvider::class,
 
 you then add the trait to the models you want to expose.
 
-```
+```php
     use \AlgoWeb\PODataLaravel\Models\MetadataTrait;
 ```
 
