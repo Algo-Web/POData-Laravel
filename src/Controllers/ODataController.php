@@ -37,6 +37,7 @@ class ODataController extends BaseController
         $responseCode = isset($responseCode) ? $responseCode : 200;
         $response = new Response($content, $responseCode);
         $response->setStatusCode($headers["Status"]);
+
         foreach ($headers as $headerName => $headerValue) {
             if (!is_null($headerValue)) {
                 $response->headers->set($headerName, $headerValue);
