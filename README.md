@@ -23,6 +23,13 @@ AlgoWeb\PODataLaravel\Providers\QueryProvider::class,
 
 you then add the trait to the models you want to expose.
 
-```php
+```
     use \AlgoWeb\PODataLaravel\Models\MetadataTrait;
 ```
+
+-- Known Limitations --
+
+* Cannot expose two models with the same class name in different
+namespaces - trying to expose both App\Foo\Model and App\Bar\Model
+will trip an exception complaining that resource set has already been
+added.
