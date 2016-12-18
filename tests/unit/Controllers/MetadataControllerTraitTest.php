@@ -22,10 +22,10 @@ class MetadataControllerTraitTest extends TestCase
         $this->assertTrue(array_key_exists('read', $result[TestModel::class]));
         $this->assertTrue(array_key_exists('update', $result[TestModel::class]));
         $this->assertTrue(array_key_exists('delete', $result[TestModel::class]));
-        $this->assertEquals('storeTestModel', $result[TestModel::class]['create'][0]);
-        $this->assertEquals('showTestModel', $result[TestModel::class]['read'][0]);
-        $this->assertEquals('updateTestModel', $result[TestModel::class]['update'][0]);
-        $this->assertEquals('destroyTestModel', $result[TestModel::class]['delete'][0]);
+        $this->assertEquals('storeTestModel', $result[TestModel::class]['create']['method']);
+        $this->assertEquals('showTestModel', $result[TestModel::class]['read']['method']);
+        $this->assertEquals('updateTestModel', $result[TestModel::class]['update']['method']);
+        $this->assertEquals('destroyTestModel', $result[TestModel::class]['delete']['method']);
     }
 
     public function testGetMethodNameOnEmptyArray()
@@ -138,11 +138,12 @@ class MetadataControllerTraitTest extends TestCase
 
         $result = $foo->getMethodName(TestModel::class, 'delete');
         $this->assertTrue(is_array($result));
-        $this->assertEquals(2, count($result));
-        $this->assertEquals('destroyTestModel', $result[0]);
-        $this->assertTrue(is_array($result[1]));
-        $this->assertEquals(1, count($result[1]));
-        $this->assertEquals('id', $result[1][0]['name']);
+        $this->assertEquals(3, count($result));
+        $this->assertEquals('destroyTestModel', $result['method']);
+        $this->assertEquals(TestController::class, $result['controller']);
+        $this->assertTrue(is_array($result['parameters']));
+        $this->assertEquals(1, count($result['parameters']));
+        $this->assertEquals('id', $result['parameters'][0]['name']);
     }
 
     public function testModelMappingUpdate()
@@ -151,13 +152,14 @@ class MetadataControllerTraitTest extends TestCase
 
         $result = $foo->getMethodName(TestModel::class, 'update');
         $this->assertTrue(is_array($result));
-        $this->assertEquals(2, count($result));
-        $this->assertEquals('updateTestModel', $result[0]);
-        $this->assertTrue(is_array($result[1]));
-        $this->assertEquals(2, count($result[1]));
-        $this->assertEquals('request', $result[1][0]['name']);
-        $this->assertEquals('Illuminate\Http\Request', $result[1][0]['type']);
-        $this->assertEquals('id', $result[1][1]['name']);
+        $this->assertEquals(3, count($result));
+        $this->assertEquals('updateTestModel', $result['method']);
+        $this->assertEquals(TestController::class, $result['controller']);
+        $this->assertTrue(is_array($result['parameters']));
+        $this->assertEquals(2, count($result['parameters']));
+        $this->assertEquals('request', $result['parameters'][0]['name']);
+        $this->assertEquals('Illuminate\Http\Request', $result['parameters'][0]['type']);
+        $this->assertEquals('id', $result['parameters'][1]['name']);
     }
 
     public function testGetMappingsMissingModelName()
