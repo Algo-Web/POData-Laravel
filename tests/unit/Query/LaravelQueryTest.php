@@ -2,6 +2,9 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
+use Illuminate\Support\Facades\App;
+
+use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceProperty;
@@ -9,6 +12,10 @@ use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use POData\Providers\Query\QueryType;
 use POData\Providers\Query\QueryResult;
+use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
+use POData\Providers\Metadata\SimpleMetadataProvider;
+use AlgoWeb\PODataLaravel\Models\TestModel;
+use AlgoWeb\PODataLaravel\Controllers\TestController;
 
 /**
  * Generated Test Class.
@@ -253,5 +260,51 @@ class LaravelQueryTest extends TestCase
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
+    }
+
+    public function testAttemptUpdate()
+    {
+        $this->seedControllerMetadata();
+
+        $metaProv = new SimpleMetadataProvider('Data', 'Data');
+
+        $fqModelName = TestModel::class;
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+
+        $instance = new TestModel($meta);
+        $type = $instance->getXmlSchema();
+        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
+        App::instance('metadata', $metaProv);
+
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $model = new TestModel();
+        $keyDesc = \Mockery::mock(KeyDescriptor::class);
+        $data = new \StdClass;
+        $shouldUpdate = false;
+
+
+        $foo = new LaravelQuery();
+        $result = $foo->updateResource($mockResource, $model, $keyDesc, $data);
+
+    }
+
+    private function seedControllerMetadata()
+    {
+        $translator = \Mockery::mock(\Illuminate\Translation\Translator::class)->makePartial();
+        $validate = new \Illuminate\Validation\Factory($translator);
+        App::instance('validator', $validate);
+
+        $mapping = new TestController();
+        $mapping = $mapping->getMappings();
+
+        $container = new MetadataControllerContainer();
+        $container->setMetadata($mapping);
+        // now that we've manually set up the controller metadata container, insert it
+        App::instance('metadataControllers', $container);
     }
 }

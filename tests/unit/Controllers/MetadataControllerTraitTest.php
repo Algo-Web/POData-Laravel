@@ -158,7 +158,7 @@ class MetadataControllerTraitTest extends TestCase
         $this->assertTrue(is_array($result['parameters']));
         $this->assertEquals(2, count($result['parameters']));
         $this->assertEquals('request', $result['parameters'][0]['name']);
-        $this->assertEquals('Illuminate\Http\Request', $result['parameters'][0]['type']);
+        $this->assertEquals('AlgoWeb\PODataLaravel\Requests\TestRequest', $result['parameters'][0]['type']);
         $this->assertEquals('id', $result['parameters'][1]['name']);
     }
 

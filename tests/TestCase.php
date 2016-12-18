@@ -43,7 +43,19 @@ class TestCase extends BaseTestCase
         $app = new \AlgoWeb\PODataLaravel\Models\TestApplication($fileSys);
         $app['env'] = 'testing';
         $app->instance('config', $confRepo);
-        $app->config->set('app.providers', [\AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider::class]);
+        $app->config->set(
+            'app.providers',
+            [
+                \AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider::class,
+                \Illuminate\View\ViewServiceProvider::class,
+            ]
+        );
+        $app->config->set(
+            'view.paths',
+            [
+                realpath(base_path('resources/views'))
+            ]
+        );
         $app->instance('cache.store', $cacheRepo);
         $app->instance('db', $database);
         $app->instance('log', $log);
@@ -75,6 +87,10 @@ class TestCase extends BaseTestCase
 
         $app->singleton('metadataControllers', function ($app) {
             return new MetadataControllerContainer();
+        });
+
+        $app->singleton('files', function () {
+            return new \Illuminate\Filesystem\Filesystem();
         });
 
         return $app;
