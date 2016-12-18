@@ -118,10 +118,17 @@ trait MetadataControllerTrait
         foreach ($params as $parm) {
             $detail = [];
             $detail['name'] = $parm->getName();
-            if (null != $parm->getClass()) {
-                $detail['type'] = $parm->getClass()->name;
+            $classHint = $parm->getClass();
+            $isRequest = false;
+            if (null != $classHint) {
+                // check to see if this is a request
+                $className = $classHint->name;
+                $class = new $className();
+                $isRequest = $class instanceof \Illuminate\Http\Request;
+                $detail['type'] = $className;
             }
 
+            $detail['isRequest'] = $isRequest;
             $parmArray[] = $detail;
 
         }
