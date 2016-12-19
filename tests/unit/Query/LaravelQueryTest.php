@@ -2,6 +2,9 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
+use Illuminate\Support\Facades\App;
+
+use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceProperty;
@@ -9,7 +12,15 @@ use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use POData\Providers\Query\QueryType;
 use POData\Providers\Query\QueryResult;
+use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
+use POData\Providers\Metadata\SimpleMetadataProvider;
+use AlgoWeb\PODataLaravel\Models\TestModel;
+use AlgoWeb\PODataLaravel\Controllers\TestController;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 /**
  * Generated Test Class.
  */
@@ -20,6 +31,8 @@ class LaravelQueryTest extends TestCase
      */
     protected $object;
 
+    protected $mapping;
+
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
@@ -28,6 +41,15 @@ class LaravelQueryTest extends TestCase
     {
         parent::setUp();
 //        $this->object = new \AlgoWeb\PODataLaravel\Query\LaravelQuery();
+        $this->mapping = [
+            TestModel::class =>
+                [
+                    'create' => 'storeTestModel',
+                    'read' => 'showTestModel',
+                    'update' => 'updateTestModel',
+                    'delete' => 'destroyTestModel'
+                ]
+        ];
     }
 
     /**
@@ -253,5 +275,168 @@ class LaravelQueryTest extends TestCase
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
+    }
+
+    public function testAttemptUpdate()
+    {
+        $controller = new TestController();
+
+        $testName = TestController::class;
+
+        $this->seedControllerMetadata($controller);
+
+        $metaProv = new SimpleMetadataProvider('Data', 'Data');
+
+        $fqModelName = TestModel::class;
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+
+        $instance = new TestModel($meta);
+        $type = $instance->getXmlSchema();
+        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
+        App::instance('metadata', $metaProv);
+
+        $std = new \StdClass();
+        $std->name = TestModel::class;
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
+        $model = new TestModel();
+        $model->id = 42;
+        $keyDesc = \Mockery::mock(KeyDescriptor::class);
+        $data = new \StdClass;
+        $data->name = 'Wibble';
+        $data->added_at = new \DateTime;
+        $data->weight = 0;
+        $data->code = 'Enigma';
+        $data->success = false;
+        $shouldUpdate = false;
+
+
+        $foo = new LaravelQuery();
+        $expected = 'Target model not successfully updated';
+        $actual = '';
+        try {
+            $result = $foo->updateResource($mockResource, $model, $keyDesc, $data);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testAttemptCreate()
+    {
+        $controller = new TestController();
+
+        $testName = TestController::class;
+
+        $this->seedControllerMetadata($controller);
+
+        $metaProv = new SimpleMetadataProvider('Data', 'Data');
+
+        $fqModelName = TestModel::class;
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+
+        $instance = new TestModel($meta);
+        $type = $instance->getXmlSchema();
+        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
+        App::instance('metadata', $metaProv);
+
+        $std = new \StdClass();
+        $std->name = TestModel::class;
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
+        $model = new TestModel();
+        $model->id = 42;
+        $keyDesc = \Mockery::mock(KeyDescriptor::class);
+        $data = new \StdClass;
+        $data->name = 'Wibble';
+        $data->added_at = new \DateTime;
+        $data->weight = 0;
+        $data->code = 'Enigma';
+        $data->success = false;
+        $shouldUpdate = false;
+
+        $foo = new LaravelQuery();
+        $expected = 'Target model not successfully created';
+        $actual = '';
+        try {
+            $result = $foo->createResourceForResourceSet($mockResource, $model, $data);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testAttemptDelete()
+    {
+        $controller = new TestController();
+
+        $testName = TestController::class;
+
+        $this->seedControllerMetadata($controller);
+
+        $metaProv = new SimpleMetadataProvider('Data', 'Data');
+
+        $fqModelName = TestModel::class;
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+
+        $instance = new TestModel($meta);
+        $type = $instance->getXmlSchema();
+        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
+        App::instance('metadata', $metaProv);
+
+        $std = new \StdClass();
+        $std->name = TestModel::class;
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
+        $model = new TestModel();
+        $model->id = null;
+        $keyDesc = \Mockery::mock(KeyDescriptor::class);
+        $data = new \StdClass;
+        $data->name = 'Wibble';
+        $data->added_at = new \DateTime;
+        $data->weight = 0;
+        $data->code = 'Enigma';
+        $data->success = false;
+        $shouldUpdate = false;
+
+        $foo = new LaravelQuery();
+        $expected = 'Target model not successfully deleted';
+        $actual = '';
+        try {
+            $result = $foo->deleteResource($mockResource, $model);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    private function seedControllerMetadata(TestController $controller = null)
+    {
+        $translator = \Mockery::mock(\Illuminate\Translation\Translator::class)->makePartial();
+        $validate = new \Illuminate\Validation\Factory($translator);
+        App::instance('validator', $validate);
+
+        $mapping = isset($controller) ? $controller : new TestController();
+        $mapping = $mapping->getMappings();
+
+        $container = new MetadataControllerContainer();
+        $container->setMetadata($mapping);
+        // now that we've manually set up the controller metadata container, insert it
+        App::instance('metadataControllers', $container);
     }
 }

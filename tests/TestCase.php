@@ -6,6 +6,8 @@ use Mockery;
 use PHPUnit_Framework_TestCase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use POData\Providers\Metadata\SimpleMetadataProvider;
+use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
+
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use org\bovigo\vfs\vfsStreamDirectory;
@@ -41,7 +43,19 @@ class TestCase extends BaseTestCase
         $app = new \AlgoWeb\PODataLaravel\Models\TestApplication($fileSys);
         $app['env'] = 'testing';
         $app->instance('config', $confRepo);
-        $app->config->set('app.providers', []);
+        $app->config->set(
+            'app.providers',
+            [
+                \AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider::class,
+                \Illuminate\View\ViewServiceProvider::class,
+            ]
+        );
+        $app->config->set(
+            'view.paths',
+            [
+                realpath(base_path('resources/views'))
+            ]
+        );
         $app->instance('cache.store', $cacheRepo);
         $app->instance('db', $database);
         $app->instance('log', $log);
@@ -70,6 +84,14 @@ class TestCase extends BaseTestCase
                 return new SimpleMetadataProvider('Data', 'Data');
             }
         );
+
+        $app->singleton('metadataControllers', function ($app) {
+            return new MetadataControllerContainer();
+        });
+
+        $app->singleton('files', function () {
+            return new \Illuminate\Filesystem\Filesystem();
+        });
 
         return $app;
     }

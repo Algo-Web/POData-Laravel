@@ -12,9 +12,13 @@ use POData\Providers\Expression\MySQLExpressionProvider;
 use POData\Providers\Query\QueryType;
 use POData\Providers\Query\QueryResult;
 use POData\Providers\Expression\PHPExpressionProvider;
+use \POData\Common\ODataException;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
+
+
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
 
 class LaravelQuery implements IQueryProvider
 {
@@ -276,9 +280,9 @@ class LaravelQuery implements IQueryProvider
         $sourceEntityInstance = new $entityClassName();
         return $sourceEntityInstance = $sourceEntityInstance->newQuery();
     }
-    
+
     /**
-     * Updates a resource 
+     * Updates a resource
      *
      * @param ResourceSet      $sourceResourceSet    The entity set containing the source entity
      * @param object           $sourceEntityInstance The source entity instance
@@ -295,7 +299,17 @@ class LaravelQuery implements IQueryProvider
         $data,
         $shouldUpdate = false
     ) {
-        throw new \POData\Common\NotImplementedException();
+        $verb = 'update';
+        $class = $sourceResourceSet->getResourceType()->getInstanceType()->name;
+
+        $data = $this->createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb);
+
+        $success = isset($data['id']);
+
+        if ($success) {
+            return $class::findOrFail($data['id']);
+        }
+        throw new ODataException('Target model not successfully updated', 422);
     }
     /**
      * Delete resource from a resource set.
@@ -308,7 +322,16 @@ class LaravelQuery implements IQueryProvider
         ResourceSet $sourceResourceSet,
         $sourceEntityInstance
     ) {
-        throw new \POData\Common\NotImplementedException();
+        $verb = 'delete';
+        $class = $sourceResourceSet->getResourceType()->getInstanceType()->name;
+
+        $data = $this->createUpdateDeleteCore($sourceEntityInstance, null, $class, $verb);
+
+        $success = isset($data['id']);
+        if ($success) {
+            return $class::findOrFail($data['id']);
+        }
+        throw new ODataException('Target model not successfully deleted', 422);
     }
     /**
      * @param ResourceSet      $resourceSet   The entity set containing the entity to fetch
@@ -322,6 +345,97 @@ class LaravelQuery implements IQueryProvider
         $sourceEntityInstance,
         $data
     ) {
-        throw new \POData\Common\NotImplementedException();
+        $verb = 'create';
+        $class = $resourceSet->getResourceType()->getInstanceType()->name;
+
+        $data = $this->createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb);
+
+        $success = isset($data['id']);
+
+        if ($success) {
+            return $class::findOrFail($data['id']);
+        }
+        throw new ODataException('Target model not successfully created', 422);
+    }
+
+    /**
+     * @param $sourceEntityInstance
+     * @param $data
+     * @param $class
+     * @param $verb
+     * @return array|mixed
+     * @throws ODataException
+     * @throws \POData\Common\InvalidOperationException
+     */
+    private function createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb)
+    {
+        $raw = App::make('metadataControllers');
+        $map = $raw->getMetadata();
+
+        if (!array_key_exists($class, $map)) {
+            throw new \POData\Common\InvalidOperationException('Controller mapping missing for class ' . $class);
+        }
+        $goal = $raw->getMapping($class, $verb);
+        if (null == $goal) {
+            throw new \POData\Common\InvalidOperationException(
+                'Controller mapping missing for ' . $verb . ' verb on class ' . $class
+            );
+        }
+
+        if (null == $data) {
+            $data = [];
+        }
+        if (is_object($data)) {
+            $data = (array)$data;
+        }
+        if (!is_array($data)) {
+            throw \POData\Common\ODataException::createPreConditionFailedError(
+                'Data not resolvable to key-value array'
+            );
+        }
+
+        $controlClass = $goal['controller'];
+        $method = $goal['method'];
+        $paramList = $goal['parameters'];
+        $controller = new $controlClass();
+        $parms = [];
+
+        foreach ($paramList as $spec) {
+            $varType = isset($spec['type']) ? $spec['type'] : null;
+            $varName = $spec['name'];
+            if ($spec['isRequest']) {
+                $var = new $varType();
+                $var->setMethod('POST');
+                $var->request = new \Symfony\Component\HttpFoundation\ParameterBag($data);
+            } else {
+                if (null != $varType) {
+                    // TODO: Give this smarts and actively pick up instantiation details
+                    $var = new $varType();
+                } else {
+                    $var = $sourceEntityInstance->$varName;
+                }
+            }
+            $parms[] = $var;
+        }
+
+        $result = call_user_func_array(array($controller, $method), $parms);
+
+        if (!($result instanceof \Illuminate\Http\JsonResponse)) {
+            throw ODataException::createInternalServerError('Controller response not well-formed json');
+        }
+        $data = $result->getData();
+        if (is_object($data)) {
+            $data = (array) $data;
+        }
+
+        if (!is_array($data)) {
+            throw ODataException::createInternalServerError('Controller response does not have an array');
+        }
+        if (!(key_exists('id', $data) && key_exists('status', $data) && key_exists('errors', $data))) {
+            throw ODataException::createInternalServerError(
+                'Controller response array missing at least one of id, status and/or errors fields'
+            );
+        }
+        return $data;
     }
 }

@@ -61,9 +61,10 @@ trait MetadataControllerTrait
             );
         }
 
+        $class = get_class($this);
         $parmArray = $this->getParameterNames($result);
 
-        return [$result, $parmArray];
+        return [ 'method' => $result, 'controller' => $class, 'parameters' => $parmArray];
     }
 
     public function getMappings()
@@ -98,7 +99,8 @@ trait MetadataControllerTrait
                     $allMappings[$key] = [];
                 }
 
-                $allMappings[$key][$verb] = [ $method, $parmArray];
+                $class = get_class($this);
+                $allMappings[$key][$verb] = [ 'method' => $method, 'controller' => $class, 'parameters' => $parmArray];
             }
         }
         return $allMappings;
@@ -115,12 +117,18 @@ trait MetadataControllerTrait
         $params = $r->getParameters();
         foreach ($params as $parm) {
             $detail = [];
-            $detail['class'] = get_class($this);
             $detail['name'] = $parm->getName();
-            if (null != $parm->getClass()) {
-                $detail['type'] = $parm->getClass()->name;
+            $classHint = $parm->getClass();
+            $isRequest = false;
+            if (null != $classHint) {
+                // check to see if this is a request
+                $className = $classHint->name;
+                $class = new $className();
+                $isRequest = $class instanceof \Illuminate\Http\Request;
+                $detail['type'] = $className;
             }
 
+            $detail['isRequest'] = $isRequest;
             $parmArray[] = $detail;
 
         }
