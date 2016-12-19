@@ -4,7 +4,6 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
-
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 
 class MetadataControllerProvider extends ServiceProvider
@@ -61,7 +60,7 @@ class MetadataControllerProvider extends ServiceProvider
                 foreach ($lock as $barrel => $roll) {
                     assert(
                         !array_key_exists($barrel, $metamix[$key]),
-                        'Mapping already defined for model '.$key. ' and CRUD verb '.$barrel
+                        'Mapping already defined for model '.$key.' and CRUD verb '.$barrel
                     );
                     $metamix[$key][$barrel] = $roll;
                 }
@@ -80,7 +79,7 @@ class MetadataControllerProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('metadataControllers', function ($app) {
+        $this->app->singleton('metadataControllers', function($app) {
             return new MetadataControllerContainer();
         });
     }

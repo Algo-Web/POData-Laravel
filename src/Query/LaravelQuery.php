@@ -15,9 +15,6 @@ use POData\Providers\Expression\PHPExpressionProvider;
 use \POData\Common\ODataException;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
-
-
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 
 class LaravelQuery implements IQueryProvider
@@ -313,7 +310,7 @@ class LaravelQuery implements IQueryProvider
     }
     /**
      * Delete resource from a resource set.
-     * @param ResourceSet|null $resourceSet
+     * @param ResourceSet|null $sourceResourceSet
      * @param object           $sourceEntityInstance
      *
      * return bool true if resources sucessfully deteled, otherwise false.
@@ -362,7 +359,7 @@ class LaravelQuery implements IQueryProvider
      * @param $sourceEntityInstance
      * @param $data
      * @param $class
-     * @param $verb
+     * @param string $verb
      * @return array|mixed
      * @throws ODataException
      * @throws \POData\Common\InvalidOperationException
@@ -373,12 +370,12 @@ class LaravelQuery implements IQueryProvider
         $map = $raw->getMetadata();
 
         if (!array_key_exists($class, $map)) {
-            throw new \POData\Common\InvalidOperationException('Controller mapping missing for class ' . $class);
+            throw new \POData\Common\InvalidOperationException('Controller mapping missing for class '.$class);
         }
         $goal = $raw->getMapping($class, $verb);
         if (null == $goal) {
             throw new \POData\Common\InvalidOperationException(
-                'Controller mapping missing for ' . $verb . ' verb on class ' . $class
+                'Controller mapping missing for '.$verb.' verb on class '.$class
             );
         }
 
@@ -386,7 +383,7 @@ class LaravelQuery implements IQueryProvider
             $data = [];
         }
         if (is_object($data)) {
-            $data = (array)$data;
+            $data = (array) $data;
         }
         if (!is_array($data)) {
             throw \POData\Common\ODataException::createPreConditionFailedError(
