@@ -48,23 +48,23 @@ trait MetadataControllerTrait
         }
 
         if (!array_key_exists($crudVerb, $lookup)) {
-            throw new \Exception('Metadata mapping for CRUD verb '. $crudVerb.' on model '.$modelName.' not defined');
+            throw new \Exception('Metadata mapping for CRUD verb '.$crudVerb.' on model '.$modelName.' not defined');
         }
         $result = $lookup[$crudVerb];
         if (!isset($result)) {
-            throw new \Exception('Metadata mapping for CRUD verb '. $crudVerb.' on model '.$modelName.' null');
+            throw new \Exception('Metadata mapping for CRUD verb '.$crudVerb.' on model '.$modelName.' null');
         }
 
         if (!method_exists($this, $result)) {
             throw new \Exception(
-                'Metadata target for CRUD verb '. $crudVerb.' on model '.$modelName.' does not exist'
+                'Metadata target for CRUD verb '.$crudVerb.' on model '.$modelName.' does not exist'
             );
         }
 
         $class = get_class($this);
         $parmArray = $this->getParameterNames($result);
 
-        return [ 'method' => $result, 'controller' => $class, 'parameters' => $parmArray];
+        return ['method' => $result, 'controller' => $class, 'parameters' => $parmArray];
     }
 
     public function getMappings()
@@ -86,12 +86,12 @@ trait MetadataControllerTrait
                     throw new \Exception('CRUD verb '.$verb.' not defined');
                 }
                 if (!isset($method)) {
-                    throw new \Exception('Metadata mapping for CRUD verb '. $verb.' on model '.$key.' null');
+                    throw new \Exception('Metadata mapping for CRUD verb '.$verb.' on model '.$key.' null');
                 }
 
                 if (!method_exists($this, $method)) {
                     throw new \Exception(
-                        'Metadata target for CRUD verb '. $verb.' on model '.$key.' does not exist'
+                        'Metadata target for CRUD verb '.$verb.' on model '.$key.' does not exist'
                     );
                 }
                 $parmArray = $this->getParameterNames($method);
@@ -100,7 +100,7 @@ trait MetadataControllerTrait
                 }
 
                 $class = get_class($this);
-                $allMappings[$key][$verb] = [ 'method' => $method, 'controller' => $class, 'parameters' => $parmArray];
+                $allMappings[$key][$verb] = ['method' => $method, 'controller' => $class, 'parameters' => $parmArray];
             }
         }
         return $allMappings;
