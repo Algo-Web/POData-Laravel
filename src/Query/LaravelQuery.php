@@ -300,7 +300,7 @@ class LaravelQuery implements IQueryProvider
         $shouldUpdate = false
     ) {
         $verb = 'update';
-        $class = get_class($sourceEntityInstance);
+        $class = $sourceResourceSet->getResourceType()->getInstanceType()->name;
 
         $data = $this->createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb);
 
@@ -323,7 +323,7 @@ class LaravelQuery implements IQueryProvider
         $sourceEntityInstance
     ) {
         $verb = 'delete';
-        $class = get_class($sourceEntityInstance);
+        $class = $sourceResourceSet->getResourceType()->getInstanceType()->name;
 
         $data = $this->createUpdateDeleteCore($sourceEntityInstance, null, $class, $verb);
 
@@ -346,7 +346,7 @@ class LaravelQuery implements IQueryProvider
         $data
     ) {
         $verb = 'create';
-        $class = get_class($sourceEntityInstance);
+        $class = $resourceSet->getResourceType()->getInstanceType()->name;
 
         $data = $this->createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb);
 

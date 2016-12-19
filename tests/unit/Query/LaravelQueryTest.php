@@ -300,7 +300,10 @@ class LaravelQueryTest extends TestCase
         $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
 
+        $std = new \StdClass();
+        $std->name = TestModel::class;
         $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
         $model->id = 42;
         $keyDesc = \Mockery::mock(KeyDescriptor::class);
@@ -347,7 +350,10 @@ class LaravelQueryTest extends TestCase
         $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
 
+        $std = new \StdClass();
+        $std->name = TestModel::class;
         $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
         $model->id = 42;
         $keyDesc = \Mockery::mock(KeyDescriptor::class);
@@ -393,7 +399,10 @@ class LaravelQueryTest extends TestCase
         $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
 
+        $std = new \StdClass();
+        $std->name = TestModel::class;
         $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
         $model->id = null;
         $keyDesc = \Mockery::mock(KeyDescriptor::class);
