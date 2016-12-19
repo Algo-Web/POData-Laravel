@@ -50,13 +50,14 @@ class TestController extends \Illuminate\Routing\Controller
         $validator = Validator::make($data, $rules);
 
         if ($validator->passes()) {
-            $model = new TestModel();
-            foreach ($data as $key => $val) {
-                $model->$key = $val;
-            }
-            $model->save();
+            $isSuccess = isset($data['success']) && true == $data['success'];
 
-            return response()->json(['status' => 'success', 'id' => $model->id, 'errors' => null]);
+            if ($isSuccess) {
+                return response()->json(['status' => 'success', 'id' => 1, 'errors' => null]);
+            }
+            $error = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] 0';
+            $errors = new \Illuminate\Support\MessageBag([$error]);
+            return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
         }
         return response()->json(['status' => 'error', 'id' => null, 'errors' => $validator->errors()]);
     }
@@ -69,10 +70,10 @@ class TestController extends \Illuminate\Routing\Controller
      */
     public function showTestModel($id)
     {
-        $targModel = TestModel::find($id);
+        $isSuccess = 0 < $id;
 
-        if (isset($targModel)) {
-            return response()->json(['status' => 'success', 'id' => $targModel->id, 'errors' => null]);
+        if ($isSuccess) {
+            return response()->json(['status' => 'success', 'id' => $id, 'errors' => null]);
         }
         $error = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
         $errors = new \Illuminate\Support\MessageBag([$error]);
@@ -96,9 +97,9 @@ class TestController extends \Illuminate\Routing\Controller
         $validator = Validator::make($data, $rules);
 
         if ($validator->passes()) {
-            $targModel = TestModel::find($id);
-            if (isset($targModel)) {
-                return response()->json(['status' => 'success', 'id' => $targModel->id, 'errors' => null]);
+            $isSuccess = isset($data['success']) && true == $data['success'];
+            if ($isSuccess) {
+                return response()->json(['status' => 'success', 'id' => $id, 'errors' => null]);
             }
             $err = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
             $errors = new \Illuminate\Support\MessageBag([$err]);
@@ -115,10 +116,10 @@ class TestController extends \Illuminate\Routing\Controller
      */
     public function destroyTestModel($id)
     {
-        $targModel = TestModel::find($id);
+        $isSuccess = 0 < $id;
 
-        if (isset($targModel)) {
-            return response()->json(['status' => 'success', 'id' => $targModel->id, 'errors' => null]);
+        if ($isSuccess) {
+            return response()->json(['status' => 'success', 'id' => $id, 'errors' => null]);
         }
         $error = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
         $errors = new \Illuminate\Support\MessageBag([$error]);

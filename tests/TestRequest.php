@@ -25,9 +25,10 @@ class TestRequest extends Request
     {
         return [
             'name' => 'required|string',
-            'added_at' => 'required|datetime',
+            'added_at' => 'required|date',
             'weight' => 'required|numeric',
-            'code' => 'required|string'
+            'code' => 'required|string',
+            'success' => 'required|boolean' // whether to trip a successful result or error
         ];
     }
 }
