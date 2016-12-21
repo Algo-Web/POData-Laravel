@@ -321,12 +321,15 @@ class LaravelQuery implements IQueryProvider
     ) {
         $verb = 'delete';
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->name;
+        $id = $sourceEntityInstance->getKey();
+        $name = $sourceEntityInstance->getKeyName();
+        $data = [$name => $id];
 
-        $data = $this->createUpdateDeleteCore($sourceEntityInstance, null, $class, $verb);
+        $data = $this->createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb);
 
         $success = isset($data['id']);
         if ($success) {
-            return $class::findOrFail($data['id']);
+            return true;
         }
         throw new ODataException('Target model not successfully deleted', 422);
     }
