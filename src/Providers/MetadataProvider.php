@@ -59,12 +59,13 @@ class MetadataProvider extends ServiceProvider
         $EntityTypes = array();
         $ResourceSets = array();
         $begins = [];
+        $numEnds = count($ends);
 
-        for ($i = 0; $i < count($ends); $i++) {
+        for ($i = 0; $i < $numEnds; $i++) {
             $bitter = $ends[$i];
-            $fqModelName = $bitter; //$bitter->fqName();
+            $fqModelName = $bitter;
             $name = substr($bitter, strrpos($bitter, '\\')+1);
-            //$fqModelName = $bitter;
+
             $instance = new $fqModelName();
             $metaSchema = $instance->getXmlSchema();
             // if for whatever reason we don't get an XML schema, move on to next entry and drop current one from
