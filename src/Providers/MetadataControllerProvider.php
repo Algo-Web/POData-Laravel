@@ -39,7 +39,7 @@ class MetadataControllerProvider extends ServiceProvider
         foreach ($Classes as $name => $file) {
             if (\Illuminate\Support\Str::startsWith($name, "App")) {
                 if (in_array("AlgoWeb\\PODataLaravel\\Controllers\\MetadataControllerTrait", class_uses($name))) {
-                    $ends[] = $name;
+                    $ends[] = new $name;
                 }
             }
         }
