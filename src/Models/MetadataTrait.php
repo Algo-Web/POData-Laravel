@@ -35,6 +35,10 @@ trait MetadataTrait
 
         $table = $this->getTable();
 
+        if (!$builder->hasTable($table)) {
+            return [];
+        }
+
         $columns = $builder->getColumnListing($table);
         $mask = $this->metadataMask();
         $columns = array_intersect($columns, $mask);
@@ -81,6 +85,9 @@ trait MetadataTrait
     public function getXmlSchema($MetaNamespace = "Data")
     {
         $raw = $this->metadata();
+        if ([] == $raw) {
+            return null;
+        }
 
         $metadata = App::make('metadata');
 
