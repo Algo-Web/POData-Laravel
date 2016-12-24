@@ -37,10 +37,8 @@ class MetadataControllerProvider extends ServiceProvider
         $ends = array();
         $Classes = $AutoClass::$classMap;
         foreach ($Classes as $name => $file) {
-            if (\Illuminate\Support\Str::startsWith($name, "App")) {
-                if (in_array("AlgoWeb\\PODataLaravel\\Controllers\\MetadataControllerTrait", class_uses($name))) {
-                    $ends[] = new $name;
-                }
+            if (in_array("AlgoWeb\\PODataLaravel\\Controllers\\MetadataControllerTrait", class_uses($name))) {
+                $ends[] = new $name();
             }
         }
 
@@ -79,7 +77,7 @@ class MetadataControllerProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('metadataControllers', function($app) {
+        $this->app->singleton('metadataControllers', function ($app) {
             return new MetadataControllerContainer();
         });
     }

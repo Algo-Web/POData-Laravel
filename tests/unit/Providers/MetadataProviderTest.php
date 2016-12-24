@@ -3,6 +3,8 @@
 namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Generated Test Class.
@@ -37,12 +39,11 @@ class MetadataProviderTest extends TestCase
      * @covers \AlgoWeb\PODataLaravel\Providers\MetadataProvider::boot
      * @todo   Implement testBoot().
      */
-    public function testBoot()
+    public function testBootNoMigrations()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $app = \Mockery::mock(\Illuminate\Contracts\Foundation\Application::class)->makePartial();
+        $foo = new \AlgoWeb\PODataLaravel\Providers\MetadataProvider($app);
+        $result = $foo->boot();
     }
 
 

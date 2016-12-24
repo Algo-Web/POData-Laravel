@@ -81,20 +81,9 @@ class MetadataTraitTest extends TestCase
         $foo = \Mockery::mock(TestModel::class)->makePartial();
         $foo->shouldReceive('getConnection')->andReturn($connect);
 
-        $expected = 'assert(): '
-                    . $foo->getTable()
-                    . ' table not present in current db, '
-                    .$foo->getConnectionName()
-                    . ' failed';
-        $actual = null;
-
-        try {
-            $result = $foo->metadata();
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-
-        $this->assertEquals($expected, $actual);
+        $result = $foo->metadata();
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(0, count($result));
     }
 
     public function testMetadataGeneration()
@@ -260,6 +249,16 @@ class MetadataTraitTest extends TestCase
             $this->assertTrue(array_key_exists($key, $meta));
             $this->assertEquals('blob', $meta[$key]['type']);
         }
+    }
+
+    public function testGetXmlSchemaOnEmptyMetadata()
+    {
+        $meta = [];
+
+        $foo = new TestModel($meta);
+
+        $result = $foo->getXmlSchema();
+        $this->assertNull($result);
     }
 
 

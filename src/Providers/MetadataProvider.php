@@ -58,18 +58,31 @@ class MetadataProvider extends ServiceProvider
 
         $EntityTypes = array();
         $ResourceSets = array();
+        $begins = [];
+        $numEnds = count($ends);
 
-        foreach ($ends as $bitter) {
-            $fqModelName = $bitter; //$bitter->fqName();
+        for ($i = 0; $i < $numEnds; $i++) {
+            $bitter = $ends[$i];
+            $fqModelName = $bitter;
             $name = substr($bitter, strrpos($bitter, '\\')+1);
-            //$fqModelName = $bitter;
+
             $instance = new $fqModelName();
-            $EntityTypes[$fqModelName] = $instance->getXmlSchema();
+            $metaSchema = $instance->getXmlSchema();
+            // if for whatever reason we don't get an XML schema, move on to next entry and drop current one from
+            // further processing
+            if (null == $metaSchema) {
+                continue;
+            }
+            $EntityTypes[$fqModelName] = $metaSchema;
             $ResourceSets[$fqModelName] = $meta->addResourceSet(
                 strtolower($name),
                 $EntityTypes[$fqModelName]
             );
+            $begins[] = $bitter;
         }
+
+        $ends = $begins;
+        unset($begins);
 
         // now that endpoints are hooked up, tackle the relationships
         // if we'd tried earlier, we'd be guaranteed to try to hook a relation up to null, which would be bad
@@ -101,7 +114,7 @@ class MetadataProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('metadata', function($app) {
+        $this->app->singleton('metadata', function ($app) {
             return new SimpleMetadataProvider('Data', self::$METANAMESPACE);
         });
     }
