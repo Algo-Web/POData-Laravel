@@ -35,11 +35,6 @@ trait MetadataTrait
 
         $table = $this->getTable();
 
-        assert(
-            $builder->hasTable($table),
-            $table.' table not present in current db, '.$this->getConnectionName()
-        );
-
         $columns = $builder->getColumnListing($table);
         $mask = $this->metadataMask();
         $columns = array_intersect($columns, $mask);
