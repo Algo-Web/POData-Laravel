@@ -45,7 +45,13 @@ trait MetadataTrait
 
         $tableData = [];
 
-        $foo = $connect->getDoctrineSchemaManager()->listTableColumns($table);
+        $rawFoo = $connect->getDoctrineSchemaManager()->listTableColumns($table);
+        $foo = [];
+        foreach ($rawFoo as $key => $val) {
+            // Work around glitch in Doctrine when reading from MariaDB which added ` characters to root key value
+            $key = trim($key, '`');
+            $foo[$key] = $val;
+        }
 
         foreach ($columns as $column) {
             // Doctrine schema manager returns columns with lowercased names
