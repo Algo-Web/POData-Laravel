@@ -37,8 +37,15 @@ class MetadataControllerProvider extends ServiceProvider
         $ends = array();
         $Classes = $AutoClass::$classMap;
         foreach ($Classes as $name => $file) {
-            if (in_array("AlgoWeb\\PODataLaravel\\Controllers\\MetadataControllerTrait", class_uses($name))) {
-                $ends[] = new $name();
+            try {
+                if (in_array(
+                    "AlgoWeb\\PODataLaravel\\Controllers\\MetadataControllerTrait",
+                    class_uses($name, false)
+                )) {
+                    $ends[] = new $name();
+                }
+            } catch (\Exception $e) {
+                // Squash exceptions thrown here so app can continue booting
             }
         }
 
