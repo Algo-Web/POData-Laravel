@@ -1,3 +1,7 @@
+Unreleased
+----------
+   * Add functionality to customise endpoint names
+
 0.2.4 (2016-12-27)
 ------------------
    * Squash exceptions during class enumeration, so your application can
