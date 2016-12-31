@@ -86,6 +86,22 @@ trait MetadataTrait
     }
 
     /*
+     * Get the endpoint name being exposed
+     *
+     */
+    public function getEndpointName()
+    {
+        $endpoint = isset($this->endpoint) ? $this->endpoint : null;
+
+        if (!isset($endpoint)) {
+            $bitter = get_class();
+            $name = substr($bitter, strrpos($bitter, '\\')+1);
+            return strtolower($name);
+        }
+        return strtolower($endpoint);
+    }
+
+    /*
      * Assemble this model's OData metadata as xml schema
      */
     public function getXmlSchema($MetaNamespace = "Data")

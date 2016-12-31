@@ -61,59 +61,6 @@ class ODataControllerTest extends TestCase
         );
     }
 
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Controllers\ODataController::beforeFilter
-     * @todo   Implement testBeforeFilter().
-     */
-    public function testBeforeFilter()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Controllers\ODataController::afterFilter
-     * @todo   Implement testAfterFilter().
-     */
-    public function testAfterFilter()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Controllers\ODataController::forgetBeforeFilter
-     * @todo   Implement testForgetBeforeFilter().
-     */
-    public function testForgetBeforeFilter()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Controllers\ODataController::forgetAfterFilter
-     * @todo   Implement testForgetAfterFilter().
-     */
-    public function testForgetAfterFilter()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
-
     /**
      * @covers \AlgoWeb\PODataLaravel\Controllers\ODataController::getMiddleware
      * @todo   Implement testGetMiddleware().
@@ -125,33 +72,6 @@ class ODataControllerTest extends TestCase
             'This test has not been implemented yet.'
         );
     }
-
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Controllers\ODataController::getBeforeFilters
-     * @todo   Implement testGetBeforeFilters().
-     */
-    public function testGetBeforeFilters()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Controllers\ODataController::getAfterFilters
-     * @todo   Implement testGetAfterFilters().
-     */
-    public function testGetAfterFilters()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Controllers\ODataController::getRouter

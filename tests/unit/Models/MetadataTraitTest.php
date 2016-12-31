@@ -233,6 +233,7 @@ class MetadataTraitTest extends TestCase
         $foo = new TestModel($meta);
 
         $result = $foo->getXmlSchema();
+        $this->assertEquals('testmodel', $result->getName());
 
         $props = $result->getPropertiesDeclaredOnThisType();
         $this->assertEquals(2, count($props));
@@ -319,5 +320,22 @@ class MetadataTraitTest extends TestCase
         $this->assertEquals(0, count($result['UnknownPolyMorphSide']));
         $this->assertTrue(array_key_exists('morphTarget', $result['KnownPolyMorphSide']));
         $this->assertTrue(array_key_exists('morphTarget', $result['HasOne']));
+    }
+
+    public function testGetDefaultEndpointName()
+    {
+        $foo = new TestModel();
+
+        $expected = 'testmodel';
+        $actual = $foo->getEndpointName();
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetEndpointSpecifiedName()
+    {
+        $foo = new TestModel(null, 'EndPoint');
+        $expected = 'endpoint';
+        $actual = $foo->getEndpointName();
+        $this->assertEquals($expected, $actual);
     }
 }
