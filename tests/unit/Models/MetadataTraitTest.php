@@ -233,6 +233,7 @@ class MetadataTraitTest extends TestCase
         $foo = new TestModel($meta);
 
         $result = $foo->getXmlSchema();
+        $this->assertEquals('testmodel', $result->getName());
 
         $props = $result->getPropertiesDeclaredOnThisType();
         $this->assertEquals(2, count($props));
@@ -332,7 +333,7 @@ class MetadataTraitTest extends TestCase
 
     public function testGetEndpointSpecifiedName()
     {
-        $foo = new TestModel(null, 'endpoint');
+        $foo = new TestModel(null, 'EndPoint');
         $expected = 'endpoint';
         $actual = $foo->getEndpointName();
         $this->assertEquals($expected, $actual);

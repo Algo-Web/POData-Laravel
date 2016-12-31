@@ -64,9 +64,9 @@ class MetadataProvider extends ServiceProvider
         for ($i = 0; $i < $numEnds; $i++) {
             $bitter = $ends[$i];
             $fqModelName = $bitter;
-            $name = substr($bitter, strrpos($bitter, '\\')+1);
 
             $instance = new $fqModelName();
+            $name = $instance->getEndpointName();
             $metaSchema = $instance->getXmlSchema();
             // if for whatever reason we don't get an XML schema, move on to next entry and drop current one from
             // further processing
