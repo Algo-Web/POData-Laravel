@@ -91,12 +91,14 @@ trait MetadataTrait
      */
     public function getEndpointName()
     {
-        if (!isset($this->endpoint)) {
+        $endpoint = isset($this->endpoint) ? $this->endpoint : null;
+
+        if (!isset($endpoint)) {
             $bitter = get_class();
             $name = substr($bitter, strrpos($bitter, '\\')+1);
             return strtolower($name);
         }
-        return strtolower($this->endpoint);
+        return strtolower($endpoint);
     }
 
     /*
