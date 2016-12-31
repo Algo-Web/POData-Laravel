@@ -14,10 +14,13 @@ class TestModel extends Model
     }
     protected $metaArray;
 
-    public function __construct(array $meta = null)
+    public function __construct(array $meta = null, $endpoint = null)
     {
         if (isset($meta)) {
             $this->metaArray = $meta;
+        }
+        if (isset($endpoint)) {
+            $this->endpoint = $endpoint;
         }
         parent::__construct();
     }

@@ -23,6 +23,11 @@ trait MetadataTrait
     ];
 
     /*
+     * Optional endpoint name to return if specified
+     */
+    protected $endpoint = null;
+
+    /*
      * Retrieve and assemble this model's metadata for OData packaging
      */
     public function metadata()
@@ -83,6 +88,18 @@ trait MetadataTrait
         }
 
         return $attribs;
+    }
+
+    /*
+     * Get the endpoint name being exposed
+     *
+     */
+    public function getEndpointName()
+    {
+        if (!isset($this->endpoint)) {
+            return $this->getTable();
+        }
+        return $this->endpoint;
     }
 
     /*

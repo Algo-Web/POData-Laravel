@@ -320,4 +320,21 @@ class MetadataTraitTest extends TestCase
         $this->assertTrue(array_key_exists('morphTarget', $result['KnownPolyMorphSide']));
         $this->assertTrue(array_key_exists('morphTarget', $result['HasOne']));
     }
+
+    public function testGetDefaultEndpointName()
+    {
+        $foo = new TestModel();
+
+        $expected = 'testmodel';
+        $actual = $foo->getEndpointName();
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetEndpointSpecifiedName()
+    {
+        $foo = new TestModel(null, 'endpoint');
+        $expected = 'endpoint';
+        $actual = $foo->getEndpointName();
+        $this->assertEquals($expected, $actual);
+    }
 }
