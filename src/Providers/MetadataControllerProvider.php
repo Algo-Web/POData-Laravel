@@ -5,6 +5,7 @@ namespace AlgoWeb\PODataLaravel\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
+use Illuminate\Support\Facades\App;
 
 class MetadataControllerProvider extends ServiceProvider
 {
@@ -37,6 +38,10 @@ class MetadataControllerProvider extends ServiceProvider
         $ends = array();
         $Classes = $AutoClass::$classMap;
         foreach ($Classes as $name => $file) {
+            // if class doesn't exist (for whatever reason), skip it now rather than muck about later
+            if (!class_exists($name)) {
+                continue;
+            }
             try {
                 if (in_array(
                     "AlgoWeb\\PODataLaravel\\Controllers\\MetadataControllerTrait",
@@ -45,7 +50,10 @@ class MetadataControllerProvider extends ServiceProvider
                     $ends[] = new $name();
                 }
             } catch (\Exception $e) {
-                // Squash exceptions thrown here so app can continue booting
+                if (!App::runningInConsole()) {
+                    throw $e;
+                }
+                // Squash exceptions thrown here when running from CLI so app can continue booting
             }
         }
 
