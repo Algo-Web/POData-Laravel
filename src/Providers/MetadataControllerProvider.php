@@ -38,6 +38,10 @@ class MetadataControllerProvider extends ServiceProvider
         $ends = array();
         $Classes = $AutoClass::$classMap;
         foreach ($Classes as $name => $file) {
+            // not in app namespace, keep moving
+            if (!\Illuminate\Support\Str::startsWith($name, "App")) {
+                continue;
+            }
             // if class doesn't exist (for whatever reason), skip it now rather than muck about later
             if (!class_exists($name)) {
                 continue;
