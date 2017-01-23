@@ -33,5 +33,10 @@ you then add the trait to the models you want to expose.
 namespaces - trying to expose both App\Foo\Model and App\Bar\Model
 will trip an exception complaining that resource set has already been
 added.
-** This can be worked around by setting a custom endpoint name on one
+* This can be worked around by setting a custom endpoint name on one
 of the colliding models.
+
+-- Configuration options --
+* APP_METADATA_CACHING - Whether or not to turn model metadata caching on
+* APP_METADATA_CACHE_DURATION - If caching, how long (in minutes) to
+retain cached metadata

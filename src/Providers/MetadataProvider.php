@@ -92,7 +92,9 @@ class MetadataProvider extends ServiceProvider
             $instance->hookUpRelationships($EntityTypes, $ResourceSets);
         }
         if ($isCaching) {
-            Cache::put('metadata', $meta, 10);
+            $cacheTime = env('APP_METADATA_CACHE_DURATION', 10);
+            $cacheTime = !is_numeric($cacheTime) ? 10 : abs($cacheTime);
+            Cache::put('metadata', $meta, $cacheTime);
         } else {
             Cache::forget('metadata');
         }
