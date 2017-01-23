@@ -2,7 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Controllers;
 
-use Illuminate\Routing\Controller;
+use Illuminate\Routing\Controller as BaseController;
 
 trait MetadataControllerTrait
 {
@@ -30,7 +30,7 @@ trait MetadataControllerTrait
     public function getMethodName($modelName, $crudVerb)
     {
         // enforce we're actually hooked up to a controller
-        assert($this instanceof Controller, get_class($this));
+        assert($this instanceof BaseController, get_class($this));
         // enforce that mapping is actually not empty
         assert(0 < count($this->mapping), "Mapping array must not be empty");
 
@@ -70,7 +70,7 @@ trait MetadataControllerTrait
     public function getMappings()
     {
         // enforce we're actually hooked up to a controller
-        assert($this instanceof Controller, get_class($this));
+        assert($this instanceof BaseController, get_class($this));
         // enforce that mapping is actually not empty
         assert(0 < count($this->mapping), "Mapping array must not be empty");
 
