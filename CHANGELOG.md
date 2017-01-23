@@ -1,6 +1,7 @@
 Unreleased
 ----------
    * Add functionality to customise endpoint names
+   * Only squash cli provider exceptions
 
 0.2.4 (2016-12-27)
 ------------------
