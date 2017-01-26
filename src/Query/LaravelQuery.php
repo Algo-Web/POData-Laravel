@@ -97,12 +97,6 @@ class LaravelQuery implements IQueryProvider
                 }
             }
         }
-        if (isset($skipToken)) {
-            $sourceEntityInstance = $sourceEntityInstance->skip($skipToken);
-        }
-        if (isset($top)) {
-            $sourceEntityInstance = $sourceEntityInstance->take($top);
-        }
 
         $resultSet = $sourceEntityInstance->get();
 
@@ -113,6 +107,15 @@ class LaravelQuery implements IQueryProvider
             $resultSet = $resultSet->filter($isvalid);
         }
 
+        $resultCount = $resultSet->count();
+
+        if (isset($skipToken)) {
+            $resultSet = $resultSet->slice($skipToken);
+        }
+        if (isset($top)) {
+            $resultSet = $resultSet->take($top);
+        }
+
 
         if (QueryType::ENTITIES() == $queryType || QueryType::ENTITIES_WITH_COUNT() == $queryType) {
             $result->results = array();
@@ -121,10 +124,7 @@ class LaravelQuery implements IQueryProvider
             }
         }
         if (QueryType::COUNT() == $queryType || QueryType::ENTITIES_WITH_COUNT() == $queryType) {
-            if (is_array($resultSet)) {
-                $resultSet = collect($resultSet);
-            }
-            $result->count = $resultSet->count();
+            $result->count = $resultCount;
         }
         return $result;
     }
