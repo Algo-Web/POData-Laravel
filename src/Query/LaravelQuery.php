@@ -124,9 +124,6 @@ class LaravelQuery implements IQueryProvider
             }
         }
         if (QueryType::COUNT() == $queryType || QueryType::ENTITIES_WITH_COUNT() == $queryType) {
-            if (is_array($resultSet)) {
-                $resultSet = collect($resultSet);
-            }
             $result->count = $resultCount;
         }
         return $result;
