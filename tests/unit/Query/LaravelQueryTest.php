@@ -223,13 +223,12 @@ class LaravelQueryTest extends TestCase
         $property->shouldReceive('getName')->withNoArgs()->andReturn('morphTarget');
 
         $finalResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
-        $finalResult->shouldReceive('get')->andReturn(collect(['polizei']));
-
-        $intermediateResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
-        $intermediateResult->shouldReceive('take')->withArgs([2])->andReturn($finalResult);
+        $finalResult->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']));
+        $finalResult->shouldReceive('count')->andReturn(3);
+        $finalResult->shouldReceive('slice')->withArgs([2])->andReturn(collect(['polizei']));
 
         $rawResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
-        $rawResult->shouldReceive('skip')->withArgs([2])->andReturn($intermediateResult);
+        $rawResult->shouldReceive('get')->withAnyArgs()->andReturn($finalResult);
 
         $sourceEntity = \Mockery::mock(TestMorphManySource::class);
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
@@ -247,7 +246,7 @@ class LaravelQueryTest extends TestCase
             2
         );
         $this->assertTrue($result instanceof QueryResult);
-        $this->assertEquals(1, $result->count);
+        $this->assertEquals(3, $result->count);
         $this->assertEquals(null, $result->results);
     }
 
