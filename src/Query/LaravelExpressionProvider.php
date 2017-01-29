@@ -58,6 +58,17 @@ class LaravelExpressionProvider implements IExpressionProvider
     {
         return $this->iteratorName;
     }
+
+    /**
+     * Get the resource type
+     *
+     * @return object|null
+     */
+    public function getResourceType()
+    {
+        return $this->resourceType;
+    }
+
     /**
      * call-back for setting the resource type.
      *
