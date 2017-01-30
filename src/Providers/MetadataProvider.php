@@ -31,8 +31,9 @@ class MetadataProvider extends ServiceProvider
 
         self::setupRoute();
         $isCaching = env('APP_METADATA_CACHING', false);
+        $hasCache = Cache::has('metadata');
 
-        if ($isCaching && Cache::has('metadata')) {
+        if ($isCaching && $hasCache) {
             $meta = Cache::get('metadata');
             $this->app->instance('metadata', $meta);
             return;
@@ -92,9 +93,11 @@ class MetadataProvider extends ServiceProvider
             $instance->hookUpRelationships($EntityTypes, $ResourceSets);
         }
         if ($isCaching) {
-            $cacheTime = env('APP_METADATA_CACHE_DURATION', 10);
-            $cacheTime = !is_numeric($cacheTime) ? 10 : abs($cacheTime);
-            Cache::put('metadata', $meta, $cacheTime);
+            if (!$hasCache) {
+                $cacheTime = env('APP_METADATA_CACHE_DURATION', 10);
+                $cacheTime = !is_numeric($cacheTime) ? 10 : abs($cacheTime);
+                Cache::put('metadata', $meta, $cacheTime);
+            }
         } else {
             Cache::forget('metadata');
         }

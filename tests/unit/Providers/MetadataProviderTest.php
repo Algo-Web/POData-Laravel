@@ -5,6 +5,7 @@ namespace AlgoWeb\PODataLaravel\Providers;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Generated Test Class.
@@ -45,7 +46,6 @@ class MetadataProviderTest extends TestCase
         $foo = new \AlgoWeb\PODataLaravel\Providers\MetadataProvider($app);
         $result = $foo->boot();
     }
-
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Providers\MetadataProvider::register

@@ -63,27 +63,24 @@ class LaravelQueryTest extends TestCase
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::handlesOrderedPaging
-     * @todo   Implement testHandlesOrderedPaging().
      */
     public function testHandlesOrderedPaging()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $foo = new LaravelQuery();
+        $this->assertTrue($foo->handlesOrderedPaging());
     }
 
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getExpressionProvider
-     * @todo   Implement testGetExpressionProvider().
      */
     public function testGetExpressionProvider()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $foo = new LaravelQuery();
+        $result = $foo->getExpressionProvider();
+        $this->assertTrue($result instanceof LaravelExpressionProvider);
+        $this->assertNull($result->getIteratorName());
+        $this->assertNull($result->getResourceType());
     }
 
 
