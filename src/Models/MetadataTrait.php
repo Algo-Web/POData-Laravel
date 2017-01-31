@@ -47,6 +47,8 @@ trait MetadataTrait
 
         $rawFoo = $connect->getDoctrineSchemaManager()->listTableColumns($table);
         $foo = [];
+        $getters = $this->collectGetters();
+
         foreach ($rawFoo as $key => $val) {
             // Work around glitch in Doctrine when reading from MariaDB which added ` characters to root key value
             $key = trim($key, '`');
@@ -61,6 +63,10 @@ trait MetadataTrait
             $rawType = $rawColumn->getType();
             $type = $rawType->getName();
             $tableData[$column] = ['type' => $type, 'nullable' => $nullable, 'fillable' => $fillable];
+        }
+
+        foreach ($getters as $get) {
+            $tableData[$get] = ['type' => 'text', 'nullable' => false, 'fillable' => false];
         }
 
         return $tableData;
