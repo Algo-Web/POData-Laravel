@@ -185,6 +185,13 @@ trait MetadataTrait
                 $attributes[$column] = null;
             }
         }
+
+        $methods = $this->collectGetters();
+
+        foreach ($methods as $method) {
+            $attributes[$method] = null;
+        }
+
         return $attributes;
     }
 
@@ -311,4 +318,28 @@ trait MetadataTrait
      * @return array
      */
     public abstract function getFillable();
+
+    /**
+     * Dig up all defined getters on the model
+     *
+     * @return array
+     */
+    protected function collectGetters()
+    {
+        $getterz = [];
+        $methods = get_class_methods($this);
+        foreach ($methods as $method) {
+            if (starts_with($method, 'get') && ends_with($method, 'Attribute') && 'getAttribute' != $method) {
+                $getterz[] = $method;
+            }
+        }
+        $methods = [];
+
+        foreach ($getterz as $getter) {
+            $residual = substr($getter, 3);
+            $residual = substr($residual, 0, -9);
+            $methods[] = $residual;
+        }
+        return $methods;
+    }
 }

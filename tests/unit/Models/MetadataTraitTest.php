@@ -338,4 +338,22 @@ class MetadataTraitTest extends TestCase
         $actual = $foo->getEndpointName();
         $this->assertEquals($expected, $actual);
     }
+
+    public function testGetMetadataMaskWithGetterSet()
+    {
+        $columns = ['name', 'added_at', 'weight', 'code'];
+        $expected = ['name', 'added_at', 'weight', 'code', 'WeightCode'];
+
+        $mockBuilder = \Mockery::mock(\Illuminate\Database\Schema\MySqlBuilder::class)->makePartial();
+        $mockBuilder->shouldReceive('getColumnListing')->andReturn($columns);
+
+        $foo = \Mockery::mock(TestGetterModel::class)->makePartial();
+        $foo->shouldReceive('getConnection->getSchemaBuilder')->andReturn($mockBuilder);
+
+        $result = $foo->metadataMask();
+        $this->assertEquals(count($expected), count($result));
+        for ($i = 0; $i < count($result); $i++) {
+            $this->assertEquals($expected[$i], $result[$i]);
+        }
+    }
 }
