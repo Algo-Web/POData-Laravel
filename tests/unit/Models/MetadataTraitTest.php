@@ -112,7 +112,6 @@ class MetadataTraitTest extends TestCase
         $connect->shouldReceive('getSchemaBuilder')->andReturn($schemaBuilder);
         $connect->shouldReceive('getDoctrineSchemaManager->listTableColumns')->andReturn($columns);
 
-
         $foo = \Mockery::mock(TestModel::class)->makePartial();
         $foo->shouldReceive('getConnection')->andReturn($connect);
         $foo->shouldReceive('metadataMask')->andReturn(['id', 'name']);
@@ -123,6 +122,49 @@ class MetadataTraitTest extends TestCase
 
         $result = $foo->metadata();
         $this->assertEquals($expected, $result);
+    }
+
+    public function testMetadataGenerationWithGetter()
+    {
+        $expected = [];
+        $expected['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
+        $expected['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+        $expected['added_at'] = ['type' => 'integer', 'nullable' => false, 'fillable' => true];
+        $expected['weight'] = ['type' => 'integer', 'nullable' => false, 'fillable' => true];
+        $expected['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+        $expected['WeightCode'] = ['type' => 'text', 'nullable' => false, 'fillable' => false];
+
+        $intType = \Mockery::mock(\Doctrine\DBAL\Types\IntegerType::class);
+        $intType->shouldReceive('getName')->andReturn('integer');
+
+        $strType = \Mockery::mock(\Doctrine\DBAL\Types\StringType::class);
+        $strType->shouldReceive('getName')->andReturn('string');
+
+        $id = \Mockery::mock(\Doctrine\DBAL\Schema\Column::class)->makePartial();
+        $id->shouldReceive('getNotNull')->andReturn(true);
+        $id->shouldReceive('getType')->andReturn($intType);
+
+        $name = \Mockery::mock(\Doctrine\DBAL\Schema\Column::class)->makePartial();
+        $name->shouldReceive('getNotNull')->andReturn(true);
+        $name->shouldReceive('getType')->andReturn($strType);
+
+        $columns = ['id' => $id, 'name' => $name, 'added_at' => $id, 'weight' => $id, 'code' => $name];
+
+        $schemaBuilder = \Mockery::mock(\Illuminate\Database\Schema\Builder::class)->makePartial();
+        $schemaBuilder->shouldReceive('hasTable')->andReturn(true);
+        $schemaBuilder->shouldReceive('getColumnListing')->andReturn(['id', 'name', 'added_at', 'weight', 'code']);
+
+        $connect = \Mockery::mock(Connection::class)->makePartial();
+        $connect->shouldReceive('getSchemaBuilder')->andReturn($schemaBuilder);
+        $connect->shouldReceive('getDoctrineSchemaManager->listTableColumns')->andReturn($columns);
+
+        $foo = \Mockery::mock(TestGetterModel::class)->makePartial();
+        $foo->shouldReceive('getConnection')->andReturn($connect);
+        $result = $foo->metadata();
+        $this->assertEquals(count($expected), count($result));
+        foreach ($expected as $key => $val) {
+            $this->assertTrue($val === $result[$key]);
+        }
     }
 
 
@@ -337,5 +379,23 @@ class MetadataTraitTest extends TestCase
         $expected = 'endpoint';
         $actual = $foo->getEndpointName();
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetMetadataMaskWithGetterSet()
+    {
+        $columns = ['name', 'added_at', 'weight', 'code'];
+        $expected = ['name', 'added_at', 'weight', 'code', 'WeightCode'];
+
+        $mockBuilder = \Mockery::mock(\Illuminate\Database\Schema\MySqlBuilder::class)->makePartial();
+        $mockBuilder->shouldReceive('getColumnListing')->andReturn($columns);
+
+        $foo = \Mockery::mock(TestGetterModel::class)->makePartial();
+        $foo->shouldReceive('getConnection->getSchemaBuilder')->andReturn($mockBuilder);
+
+        $result = $foo->metadataMask();
+        $this->assertEquals(count($expected), count($result));
+        for ($i = 0; $i < count($result); $i++) {
+            $this->assertEquals($expected[$i], $result[$i]);
+        }
     }
 }

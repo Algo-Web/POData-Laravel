@@ -47,6 +47,8 @@ trait MetadataTrait
 
         $rawFoo = $connect->getDoctrineSchemaManager()->listTableColumns($table);
         $foo = [];
+        $getters = $this->collectGetters();
+
         foreach ($rawFoo as $key => $val) {
             // Work around glitch in Doctrine when reading from MariaDB which added ` characters to root key value
             $key = trim($key, '`');
@@ -61,6 +63,10 @@ trait MetadataTrait
             $rawType = $rawColumn->getType();
             $type = $rawType->getName();
             $tableData[$column] = ['type' => $type, 'nullable' => $nullable, 'fillable' => $fillable];
+        }
+
+        foreach ($getters as $get) {
+            $tableData[$get] = ['type' => 'text', 'nullable' => false, 'fillable' => false];
         }
 
         return $tableData;
@@ -185,6 +191,13 @@ trait MetadataTrait
                 $attributes[$column] = null;
             }
         }
+
+        $methods = $this->collectGetters();
+
+        foreach ($methods as $method) {
+            $attributes[$method] = null;
+        }
+
         return $attributes;
     }
 
@@ -311,4 +324,28 @@ trait MetadataTrait
      * @return array
      */
     public abstract function getFillable();
+
+    /**
+     * Dig up all defined getters on the model
+     *
+     * @return array
+     */
+    protected function collectGetters()
+    {
+        $getterz = [];
+        $methods = get_class_methods($this);
+        foreach ($methods as $method) {
+            if (starts_with($method, 'get') && ends_with($method, 'Attribute') && 'getAttribute' != $method) {
+                $getterz[] = $method;
+            }
+        }
+        $methods = [];
+
+        foreach ($getterz as $getter) {
+            $residual = substr($getter, 3);
+            $residual = substr($residual, 0, -9);
+            $methods[] = $residual;
+        }
+        return $methods;
+    }
 }
