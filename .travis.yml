@@ -19,3 +19,8 @@ after_script:
 after_success:
   - coveralls
 
+env: # important!
+matrix:
+  allow_failures:
+  - php: nightly
+
