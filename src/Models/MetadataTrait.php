@@ -16,6 +16,7 @@ trait MetadataTrait
         'integer' => EdmPrimitiveType::INT32,
         'string' => EdmPrimitiveType::STRING,
         'datetime' => EdmPrimitiveType::DATETIME,
+        'float' => EdmPrimitiveType::SINGLE,
         'decimal' => EdmPrimitiveType::DECIMAL,
         'text' => EdmPrimitiveType::STRING,
         'boolean' => EdmPrimitiveType::BOOLEAN,
