@@ -27,8 +27,7 @@ class ODataController extends BaseController
         $query = App::make('odataquery');
         $meta = App::make('metadata');
 
-        $service = new DataService($query, $meta);
-        $service->setHost($host);
+        $service = new DataService($query, $meta, $host);
         $service->handleRequest();
 
         $odataResponse = $op->outgoingResponse();
