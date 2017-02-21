@@ -165,7 +165,8 @@ class LaravelQuery implements IQueryProvider
         }
         if ($keyDescriptor) {
             foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
-                $sourceEntityInstance = $sourceEntityInstance->where($key, $value[0]);
+                $trimValue = trim($value[0], "\"'");
+                $sourceEntityInstance = $sourceEntityInstance->where($key, $trimValue);
             }
         }
         foreach ($whereCondition as $fieldName => $fieldValue) {
