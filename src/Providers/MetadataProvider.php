@@ -47,18 +47,19 @@ class MetadataProvider extends ServiceProvider
                 $AutoClass = $class;
             }
         }
-        $ends = array();
+        $ends = [];
         $Classes = $AutoClass::$classMap;
+        $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : "App";
         foreach ($Classes as $name => $file) {
-            if (\Illuminate\Support\Str::startsWith($name, "App")) {
+            if (\Illuminate\Support\Str::startsWith($name, $startName)) {
                 if (in_array("AlgoWeb\\PODataLaravel\\Models\\MetadataTrait", class_uses($name))) {
                     $ends[] = $name;
                 }
             }
         }
 
-        $EntityTypes = array();
-        $ResourceSets = array();
+        $EntityTypes = [];
+        $ResourceSets = [];
         $begins = [];
         $numEnds = count($ends);
 

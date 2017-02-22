@@ -124,7 +124,7 @@ trait MetadataTrait
 
         $complex = $metadata->addEntityType(new \ReflectionClass(get_class($this)), $table, $MetaNamespace);
         $keyName = $this->getKeyName();
-        if(null != $keyName){
+        if (null != $keyName) {
             $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);
         }
         foreach ($raw as $key => $secret) {
