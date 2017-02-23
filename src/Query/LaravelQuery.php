@@ -76,10 +76,7 @@ class LaravelQuery implements IQueryProvider
         $skipToken = null,
         $sourceEntityInstance = null
     ) {
-        if ($resourceSet == null && $sourceEntityInstance == null) {
-            throw new \Exception('Must supply at least one of a resource set and source entity');
-        }
-        if ($sourceEntityInstance == null) {
+        if (null == $sourceEntityInstance) {
             $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
         }
 
@@ -156,10 +153,11 @@ class LaravelQuery implements IQueryProvider
         array $whereCondition = [],
         $sourceEntityInstance = null
     ) {
-        if ($resourceSet == null && $sourceEntityInstance == null) {
+        if (null == $resourceSet && null == $sourceEntityInstance) {
             throw new \Exception('Must supply at least one of a resource set and source entity');
         }
-        if ($sourceEntityInstance == null) {
+
+        if (null == $sourceEntityInstance) {
             $entityClassName = $resourceSet->getResourceType()->getInstanceType()->name;
             $sourceEntityInstance = new $entityClassName();
         }
