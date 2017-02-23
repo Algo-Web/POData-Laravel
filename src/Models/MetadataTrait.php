@@ -123,8 +123,8 @@ trait MetadataTrait
         $metadata = App::make('metadata');
 
         $table = $this->getTable();
-
-        $complex = $metadata->addEntityType(new \ReflectionClass(get_class($this)), $table, $MetaNamespace);
+        $rf = new \ReflectionClass(get_class($this));
+        $complex = $metadata->addEntityType($rf, $rf->getShortName(), $MetaNamespace);
         $keyName = $this->getKeyName();
         if (null != $keyName) {
             $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);
@@ -256,7 +256,7 @@ trait MetadataTrait
                                 $relations = ['hasManyThrough', 'belongsToMany', 'hasMany', 'morphMany', 'morphToMany'];
                                 if (in_array($relation, $relations)) {
                                     //Collection or array of models (because Collection is Arrayable)
-                                    $relationships["HasMany"][$method] = $relatedModel;
+                                    $relationships["HasMany"][$method] =  $relatedModel;
                                 } elseif ($relation === "morphTo") {
                                     // Model isn't specified because relation is polymorphic
                                     $relationships["UnknownPolyMorphSide"][$method] =
