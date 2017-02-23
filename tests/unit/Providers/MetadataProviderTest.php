@@ -5,7 +5,9 @@ namespace AlgoWeb\PODataLaravel\Providers;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use POData\Providers\Metadata\SimpleMetadataProvider;
 
 /**
  * Generated Test Class.
@@ -45,6 +47,36 @@ class MetadataProviderTest extends TestCase
         $app = \Mockery::mock(\Illuminate\Contracts\Foundation\Application::class)->makePartial();
         $foo = new \AlgoWeb\PODataLaravel\Providers\MetadataProvider($app);
         $result = $foo->boot();
+    }
+
+    public function testBootHasMigrationsIsNotCached()
+    {
+        config(['APP_METADATA_CACHING' => true]);
+        $schema = Schema::getFacadeRoot();
+        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
+        $schema->shouldReceive('hasTable')->andReturn(true);
+        $schema->shouldReceive('getColumnListing')->andReturn([]);
+
+        $meta = \Mockery::mock(SimpleMetadataProvider::class);
+
+        $cache = Cache::getFacadeRoot();
+        $cache->shouldReceive('has')->withArgs(['metadata'])->andReturn(true);
+        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn('aybabtu');
+
+        $app = \Mockery::mock(\Illuminate\Contracts\Foundation\Application::class)->makePartial();
+        $app->shouldReceive('make')->withArgs(['metadata'])->andReturn($meta)->once();
+        $foo = new \AlgoWeb\PODataLaravel\Providers\MetadataProvider($app);
+
+        $expected = 'Method Mockery_2_Illuminate_Database_Connection::getDoctrineDriver() does not'
+                    .' exist on this mock object';
+        $actual = null;
+
+        try {
+            $foo->boot();
+        } catch (\BadMethodCallException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -150,4 +182,3 @@ class MetadataProviderTest extends TestCase
         );
     }
 }
-
