@@ -165,7 +165,7 @@ trait MetadataTrait
             $r = trim($r, '\\');
             if (in_array($r, $combinedKeys)) {
                 $targResourceSet = $resourceSets[$r];
-                $metadata->addResourceReferenceProperty($resourceType, substr($r,strrpos($r,'\\')+1), $targResourceSet);
+                $metadata->addResourceReferenceProperty($resourceType, $n, $targResourceSet);
             }
         }
         foreach ($rel["HasMany"] as $n => $r) {
@@ -175,7 +175,6 @@ trait MetadataTrait
                 $metadata->addResourceSetReferenceProperty($resourceType, $n, $targResourceSet);
             }
         }
-
         return $rel;
     }
 
