@@ -16,6 +16,8 @@ use \POData\Common\ODataException;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
 use Illuminate\Support\Facades\App;
+use Illuminate\Database\Eloquent\Model;
+use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 class LaravelQuery implements IQueryProvider
 {
@@ -74,8 +76,12 @@ class LaravelQuery implements IQueryProvider
         $orderBy = null,
         $top = null,
         $skipToken = null,
-        $sourceEntityInstance = null
+        Model $sourceEntityInstance = null
     ) {
+        if (null != $filterInfo && !($filterInfo instanceof FilterInfo)) {
+            throw new InvalidArgumentException('Filter info must be either null or instance of FilterInfo.');
+        }
+
         if (null == $sourceEntityInstance) {
             $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
         }
@@ -84,7 +90,7 @@ class LaravelQuery implements IQueryProvider
         $result->results = null;
         $result->count   = null;
 
-        if (isset($orderBy) && null != $orderBy) {
+        if (null != $orderBy) {
             foreach ($orderBy->getOrderByInfo()->getOrderByPathSegments() as $order) {
                 foreach ($order->getSubPathSegments() as $subOrder) {
                     $sourceEntityInstance = $sourceEntityInstance->orderBy(
@@ -151,7 +157,7 @@ class LaravelQuery implements IQueryProvider
         $resourceSet,
         $keyDescriptor,
         array $whereCondition = [],
-        $sourceEntityInstance = null
+        Model $sourceEntityInstance = null
     ) {
         if (null == $resourceSet && null == $sourceEntityInstance) {
             throw new \Exception('Must supply at least one of a resource set and source entity');
@@ -206,8 +212,14 @@ class LaravelQuery implements IQueryProvider
         $top = null,
         $skip = null
     ) {
+        if (!($sourceEntityInstance instanceof Model)) {
+            throw new InvalidArgumentException('Source entity must be an Eloquent model.');
+        }
+
         $propertyName = $targetProperty->getName();
         $results = $sourceEntityInstance->$propertyName();
+        $relatedClass = $results->getRelated();
+        $sourceEntityInstance = new $relatedClass();
 
         return $this->getResourceSet(
             $queryType,
@@ -216,9 +228,8 @@ class LaravelQuery implements IQueryProvider
             $orderBy,
             $top,
             $skip,
-            $results
+            $sourceEntityInstance
         );
-
     }
 
     /**
@@ -240,6 +251,9 @@ class LaravelQuery implements IQueryProvider
         ResourceProperty $targetProperty,
         KeyDescriptor $keyDescriptor
     ) {
+        if (!($sourceEntityInstance instanceof Model)) {
+            throw new InvalidArgumentException('Source entity must be an Eloquent model.');
+        }
         $propertyName = $targetProperty->getName();
         return $this->getResource(null, $keyDescriptor, [], $sourceEntityInstance->$propertyName);
     }
@@ -262,6 +276,9 @@ class LaravelQuery implements IQueryProvider
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty
     ) {
+        if (!($sourceEntityInstance instanceof Model)) {
+            throw new InvalidArgumentException('Source entity must be an Eloquent model.');
+        }
         $propertyName = $targetProperty->getName();
         return $sourceEntityInstance->$propertyName;
     }
@@ -295,6 +312,9 @@ class LaravelQuery implements IQueryProvider
         $data,
         $shouldUpdate = false
     ) {
+        if (!(null == $sourceEntityInstance || $sourceEntityInstance instanceof Model)) {
+            throw new InvalidArgumentException('Source entity must either be null or an Eloquent model.');
+        }
         $verb = 'update';
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->name;
 
@@ -318,6 +338,9 @@ class LaravelQuery implements IQueryProvider
         ResourceSet $sourceResourceSet,
         $sourceEntityInstance
     ) {
+        if (!($sourceEntityInstance instanceof Model)) {
+            throw new InvalidArgumentException('Source entity must be an Eloquent model.');
+        }
         $verb = 'delete';
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->name;
         $id = $sourceEntityInstance->getKey();
@@ -344,6 +367,9 @@ class LaravelQuery implements IQueryProvider
         $sourceEntityInstance,
         $data
     ) {
+        if (!(null == $sourceEntityInstance || $sourceEntityInstance instanceof Model)) {
+            throw new InvalidArgumentException('Source entity must either be null or an Eloquent model.');
+        }
         $verb = 'create';
         $class = $resourceSet->getResourceType()->getInstanceType()->name;
 
