@@ -422,7 +422,7 @@ class LaravelQuery implements IQueryProvider
         $controlClass = $goal['controller'];
         $method = $goal['method'];
         $paramList = $goal['parameters'];
-        $controller = new $controlClass();
+        $controller = App::make($controlClass);
         $parms = [];
 
         foreach ($paramList as $spec) {
@@ -446,7 +446,7 @@ class LaravelQuery implements IQueryProvider
         $result = call_user_func_array(array($controller, $method), $parms);
 
         if (!($result instanceof \Illuminate\Http\JsonResponse)) {
-            throw ODataException::createInternalServerError('Controller response not well-formed json');
+            throw ODataException::createInternalServerError('Controller response not well-formed json.');
         }
         $data = $result->getData();
         if (is_object($data)) {
@@ -454,11 +454,11 @@ class LaravelQuery implements IQueryProvider
         }
 
         if (!is_array($data)) {
-            throw ODataException::createInternalServerError('Controller response does not have an array');
+            throw ODataException::createInternalServerError('Controller response does not have an array.');
         }
         if (!(key_exists('id', $data) && key_exists('status', $data) && key_exists('errors', $data))) {
             throw ODataException::createInternalServerError(
-                'Controller response array missing at least one of id, status and/or errors fields'
+                'Controller response array missing at least one of id, status and/or errors fields.'
             );
         }
         return $data;

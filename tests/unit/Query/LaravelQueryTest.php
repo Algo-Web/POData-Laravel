@@ -2,10 +2,12 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use POData\Common\ODataException;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceProperty;
 use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
@@ -569,6 +571,144 @@ class LaravelQueryTest extends TestCase
         try {
             $result = $foo->deleteResource($mockResource, $model);
         } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testAttemptDeleteMalformedControllerResponse()
+    {
+        $controller = new TestController();
+
+        $testName = TestController::class;
+        $mockController = m::mock($testName)->makePartial();
+        $mockController->shouldReceive('destroyTestModel')->withAnyArgs()->andReturnNull()->once();
+
+        $this->seedControllerMetadata($controller);
+
+        $metaProv = new SimpleMetadataProvider('Data', 'Data');
+
+        $fqModelName = TestModel::class;
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+
+        $instance = new TestModel($meta);
+        $type = $instance->getXmlSchema();
+        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
+        App::instance('metadata', $metaProv);
+        App::instance($testName, $mockController);
+
+        $std = new \StdClass();
+        $std->name = TestModel::class;
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
+        $model = new TestModel();
+        $model->id = null;
+
+        $foo = new LaravelQuery();
+        $expected = 'Controller response not well-formed json.';
+        $actual = null;
+        try {
+            $result = $foo->deleteResource($mockResource, $model);
+        } catch (ODataException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testAttemptDeleteMalformedResponseData()
+    {
+        $controller = new TestController();
+
+        $json = m::mock(JsonResponse::class)->makePartial();
+        $json->shouldReceive('getData')->andReturnNull()->once();
+
+        $testName = TestController::class;
+        $mockController = m::mock($testName)->makePartial();
+        $mockController->shouldReceive('destroyTestModel')->withAnyArgs()->andReturn($json)->once();
+
+        $this->seedControllerMetadata($controller);
+
+        $metaProv = new SimpleMetadataProvider('Data', 'Data');
+
+        $fqModelName = TestModel::class;
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+
+        $instance = new TestModel($meta);
+        $type = $instance->getXmlSchema();
+        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
+        App::instance('metadata', $metaProv);
+        App::instance($testName, $mockController);
+
+        $std = new \StdClass();
+        $std->name = TestModel::class;
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
+        $model = new TestModel();
+        $model->id = null;
+
+        $foo = new LaravelQuery();
+        $expected = 'Controller response does not have an array.';
+        $actual = null;
+        try {
+            $result = $foo->deleteResource($mockResource, $model);
+        } catch (ODataException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testAttemptDeleteIncompleteResponseData()
+    {
+        $controller = new TestController();
+
+        $json = m::mock(JsonResponse::class)->makePartial();
+        $json->shouldReceive('getData')->andReturn([])->once();
+
+        $testName = TestController::class;
+        $mockController = m::mock($testName)->makePartial();
+        $mockController->shouldReceive('destroyTestModel')->withAnyArgs()->andReturn($json)->once();
+
+        $this->seedControllerMetadata($controller);
+
+        $metaProv = new SimpleMetadataProvider('Data', 'Data');
+
+        $fqModelName = TestModel::class;
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+
+        $instance = new TestModel($meta);
+        $type = $instance->getXmlSchema();
+        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
+        App::instance('metadata', $metaProv);
+        App::instance($testName, $mockController);
+
+        $std = new \StdClass();
+        $std->name = TestModel::class;
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
+        $model = new TestModel();
+        $model->id = null;
+
+        $foo = new LaravelQuery();
+        $expected = 'Controller response array missing at least one of id, status and/or errors fields.';
+        $actual = null;
+        try {
+            $result = $foo->deleteResource($mockResource, $model);
+        } catch (ODataException $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
