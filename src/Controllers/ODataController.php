@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use POData\OperationContext\ServiceHost as ServiceHost;
 use POData\SimpleDataService as DataService;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
+use voku\helper\AntiXSS;
 
 class ODataController extends BaseController
 {
@@ -20,6 +21,7 @@ class ODataController extends BaseController
      */
     public function index(Request $request, $dump = false)
     {
+        $antiXss = new AntiXSS();
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
         $host->setServiceUri("/odata.svc/");
@@ -47,9 +49,10 @@ class ODataController extends BaseController
         }
 
         $content = $odataResponse->getStream();
+        $content = $antiXss->xss_clean($content);
         $headers = $odataResponse->getHeaders();
         $responseCode = $headers[\POData\Common\ODataConstants::HTTPRESPONSE_HEADER_STATUS_CODE];
-        $responseCode = isset($responseCode) ? $responseCode : 200;
+        $responseCode = isset($responseCode) ? intval($responseCode) : 200;
         $response = new Response($content, $responseCode);
         $response->setStatusCode($headers["Status"]);
 
