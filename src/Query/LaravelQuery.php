@@ -160,7 +160,7 @@ class LaravelQuery implements IQueryProvider
         Model $sourceEntityInstance = null
     ) {
         if (null == $resourceSet && null == $sourceEntityInstance) {
-            throw new \Exception('Must supply at least one of a resource set and source entity');
+            throw new \Exception('Must supply at least one of a resource set and source entity.');
         }
 
         if (null == $sourceEntityInstance) {
@@ -288,8 +288,8 @@ class LaravelQuery implements IQueryProvider
     protected function getSourceEntityInstance(ResourceSet $resourceSet)
     {
         $entityClassName = $resourceSet->getResourceType()->getInstanceType()->name;
-        $sourceEntityInstance = new $entityClassName();
-        return $sourceEntityInstance = $sourceEntityInstance->newQuery();
+        $sourceEntityInstance = App::make($entityClassName);
+        return $sourceEntityInstance->newQuery();
     }
 
     /**

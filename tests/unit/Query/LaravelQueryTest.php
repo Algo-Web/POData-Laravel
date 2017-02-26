@@ -146,15 +146,18 @@ class LaravelQueryTest extends TestCase
 
         $rawResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class)
             ->makePartial();
-        $rawResult->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']));
+        $rawResult->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']))->never();
         $rawResult->setQuery($rawBuilder);
         $this->assertTrue(null != ($rawResult->getQuery()->getProcessor()));
 
         $sourceEntity = \Mockery::mock(TestMorphManySource::class);
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
+        $sourceEntity->shouldReceive('newQuery')->andReturnSelf()->once();
+        $sourceEntity->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']))->once();
+        App::instance($instanceType->name, $sourceEntity);
 
         $foo = \Mockery::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getSourceEntityInstance')->andReturn($rawResult);
+        //$foo->shouldReceive('getSourceEntityInstance')->andReturn($rawResult);
 
         $expected = ['eins', 'zwei', 'polizei'];
 
@@ -415,6 +418,57 @@ class LaravelQueryTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testGetResourceFromRelatedResourceSetNonNullSourceInstanceMissingPropertyThrowException()
+    {
+        $srcResource = m::mock(ResourceSet::class);
+        $dstResource = m::mock(ResourceSet::class);
+        $property = m::mock(ResourceProperty::class);
+        $property->shouldReceive('getName')->andReturn('name');
+        $key = m::mock(KeyDescriptor::class);
+        $sourceEntity = \Mockery::mock(TestMorphManySource::class)->makePartial();
+
+        $foo = new LaravelQuery();
+
+        $expected = 'Must supply at least one of a resource set and source entity.';
+        $actual = null;
+
+        try {
+            $foo->getResourceFromRelatedResourceSet($srcResource, $sourceEntity, $dstResource, $property, $key);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetResourceFromRelatedResourceSetNonNullSourceInstance()
+    {
+        $srcResource = m::mock(ResourceSet::class);
+        $dstResource = m::mock(ResourceSet::class);
+        $property = m::mock(ResourceProperty::class);
+        $property->shouldReceive('getName')->andReturn('morphTarget');
+        $key = m::mock(KeyDescriptor::class);
+        $key->shouldReceive('getValidatedNamedValues')->andReturn(['a' => 'b'])->once();
+
+        $finalResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
+        $finalResult->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']));
+        $finalResult->shouldReceive('count')->andReturn(3);
+        $finalResult->shouldReceive('slice')->withArgs([2])->andReturn(collect(['polizei']));
+
+        $rawResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
+        $rawResult->shouldReceive('get')->withAnyArgs()->andReturn($finalResult);
+        $rawResult->shouldReceive('getRelated')->andReturn(TestMorphTarget::class);
+
+        $sourceEntity = \Mockery::mock(TestMorphManySource::class)->makePartial();
+        $sourceEntity->shouldReceive('where')->andReturnSelf();
+        $sourceEntity->shouldReceive('orderBy')->andReturnSelf();
+        $sourceEntity->shouldReceive('getAttribute')->withArgs(['morphTarget'])->andReturnSelf()->once();
+        $sourceEntity->shouldReceive('get')->andReturn(collect(['a']))->once();
+
+        $foo = new LaravelQuery();
+
+        $result = $foo->getResourceFromRelatedResourceSet($srcResource, $sourceEntity, $dstResource, $property, $key);
+        $this->assertEquals('a', $result);
+    }
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getResourceFromRelatedResourceSet
@@ -431,14 +485,34 @@ class LaravelQueryTest extends TestCase
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getRelatedResourceReference
-     * @todo   Implement testGetRelatedResourceReference().
      */
     public function testGetRelatedResourceReference()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $srcResource = m::mock(ResourceSet::class);
+        $dstResource = m::mock(ResourceSet::class);
+        $property = m::mock(ResourceProperty::class);
+        $property->shouldReceive('getName')->andReturn('morphTarget');
+
+        $finalResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
+        $finalResult->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']));
+        $finalResult->shouldReceive('count')->andReturn(3);
+        $finalResult->shouldReceive('slice')->withArgs([2])->andReturn(collect(['polizei']));
+
+        $rawResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
+        $rawResult->shouldReceive('get')->withAnyArgs()->andReturn($finalResult);
+        $rawResult->shouldReceive('getRelated')->andReturn(TestMorphTarget::class);
+
+        $sourceEntity = \Mockery::mock(TestMorphManySource::class)->makePartial();
+        $sourceEntity->shouldReceive('where')->andReturnSelf();
+        $sourceEntity->shouldReceive('orderBy')->andReturnSelf();
+        $sourceEntity->shouldReceive('getAttribute')->withArgs(['morphTarget'])->andReturnSelf()->once();
+        $sourceEntity->shouldReceive('get')->andReturn(collect(['a']))->once();
+
+        $foo = new LaravelQuery();
+
+        $result = $foo->getRelatedResourceReference($srcResource, $sourceEntity, $dstResource, $property);
+        $this->assertEquals('a', $result->get()->first());
+
     }
 
     public function testGetRelatedResourceReferenceNullSourceInstance()
@@ -479,6 +553,8 @@ class LaravelQueryTest extends TestCase
         }
         $this->assertEquals($expected, $actual);
     }
+
+
 
     public function testAttemptUpdate()
     {
