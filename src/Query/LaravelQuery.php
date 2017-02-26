@@ -310,20 +310,8 @@ class LaravelQuery implements IQueryProvider
         $data,
         $shouldUpdate = false
     ) {
-        if (!(null == $sourceEntityInstance || $sourceEntityInstance instanceof Model)) {
-            throw new InvalidArgumentException('Source entity must either be null or an Eloquent model.');
-        }
         $verb = 'update';
-        $class = $sourceResourceSet->getResourceType()->getInstanceType()->name;
-
-        $data = $this->createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb);
-
-        $success = isset($data['id']);
-
-        if ($success) {
-            return $class::findOrFail($data['id']);
-        }
-        throw new ODataException('Target model not successfully updated', 422);
+        return $this->createUpdateCoreWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb);
     }
     /**
      * Delete resource from a resource set.
@@ -336,10 +324,11 @@ class LaravelQuery implements IQueryProvider
         ResourceSet $sourceResourceSet,
         $sourceEntityInstance
     ) {
+        $verb = 'delete';
         if (!($sourceEntityInstance instanceof Model)) {
             throw new InvalidArgumentException('Source entity must be an Eloquent model.');
         }
-        $verb = 'delete';
+
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->name;
         $id = $sourceEntityInstance->getKey();
         $name = $sourceEntityInstance->getKeyName();
@@ -365,20 +354,8 @@ class LaravelQuery implements IQueryProvider
         $sourceEntityInstance,
         $data
     ) {
-        if (!(null == $sourceEntityInstance || $sourceEntityInstance instanceof Model)) {
-            throw new InvalidArgumentException('Source entity must either be null or an Eloquent model.');
-        }
         $verb = 'create';
-        $class = $resourceSet->getResourceType()->getInstanceType()->name;
-
-        $data = $this->createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb);
-
-        $success = isset($data['id']);
-
-        if ($success) {
-            return $class::findOrFail($data['id']);
-        }
-        throw new ODataException('Target model not successfully created', 422);
+        return $this->createUpdateCoreWrapper($resourceSet, $sourceEntityInstance, $data, $verb);
     }
 
     /**
@@ -477,5 +454,33 @@ class LaravelQuery implements IQueryProvider
         $data
     ) {
         // TODO: Implement putResource() method.
+    }
+
+    /**
+     * @param ResourceSet $sourceResourceSet
+     * @param $sourceEntityInstance
+     * @param $data
+     * @param $verb
+     * @return mixed
+     * @throws ODataException
+     * @throws \POData\Common\InvalidOperationException
+     */
+    private function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $sourceEntityInstance, $data, $verb)
+    {
+        $lastWord = 'update' == $verb ? 'updated' : 'created';
+        if (!(null == $sourceEntityInstance || $sourceEntityInstance instanceof Model)) {
+            throw new InvalidArgumentException('Source entity must either be null or an Eloquent model.');
+        }
+
+        $class = $sourceResourceSet->getResourceType()->getInstanceType()->name;
+
+        $data = $this->createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb);
+
+        $success = isset($data['id']);
+
+        if ($success) {
+            return $class::findOrFail($data['id']);
+        }
+        throw new ODataException('Target model not successfully '.$lastWord, 422);
     }
 }
