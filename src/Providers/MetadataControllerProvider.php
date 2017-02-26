@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use AlgoWeb\PODataLaravel\Controllers\MetadataControllerTrait;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
@@ -20,48 +21,17 @@ class MetadataControllerProvider extends ServiceProvider
 
         if ($isCaching && Cache::has('metadataControllers')) {
             $meta = Cache::get('metadataControllers');
-            $this->app->instance('metadataControllers', $meta);
+            App::instance('metadataControllers', $meta);
             return;
         }
 
-        $meta = $this->app->make('metadataControllers');
+        $meta = App::make('metadataControllers');
 
-        $classes = get_declared_classes();
-        $AutoClass = null;
-        foreach ($classes as $class) {
-            if (\Illuminate\Support\Str::startsWith($class, "Composer\\Autoload\\ComposerStaticInit")) {
-                $AutoClass = $class;
-            }
-        }
-
-        $metamix = [];
-        $ends = array();
-        $Classes = $AutoClass::$classMap;
-        foreach ($Classes as $name => $file) {
-            // not in app namespace, keep moving
-            if (!\Illuminate\Support\Str::startsWith($name, "App")) {
-                continue;
-            }
-            // if class doesn't exist (for whatever reason), skip it now rather than muck about later
-            if (!class_exists($name)) {
-                continue;
-            }
-            try {
-                if (in_array(
-                    "AlgoWeb\\PODataLaravel\\Controllers\\MetadataControllerTrait",
-                    class_uses($name, false)
-                )) {
-                    $ends[] = new $name();
-                }
-            } catch (\Exception $e) {
-                if (!App::runningInConsole()) {
-                    throw $e;
-                }
-                // Squash exceptions thrown here when running from CLI so app can continue booting
-            }
-        }
+        $Classes = $this->getClassMap();
+        $ends = $this->getCandidateControllers($Classes);
 
         // now process each class that uses the metadata controller trait and stick results in $metamix
+        $metamix = [];
         $map = null;
         foreach ($ends as $end) {
             $map = $end->getMappings();
@@ -81,7 +51,6 @@ class MetadataControllerProvider extends ServiceProvider
                     );
                     $metamix[$key][$barrel] = $roll;
                 }
-
             }
         }
 
@@ -99,5 +68,55 @@ class MetadataControllerProvider extends ServiceProvider
         $this->app->singleton('metadataControllers', function ($app) {
             return new MetadataControllerContainer();
         });
+    }
+
+    /**
+     * @param $Classes
+     * @return array
+     * @throws \Exception
+     */
+    protected function getCandidateControllers($Classes)
+    {
+        $ends = [];
+        $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : "App";
+        foreach ($Classes as $name) {
+            // not in app namespace, keep moving
+            if (!\Illuminate\Support\Str::startsWith($name, $startName)) {
+                continue;
+            }
+            // if class doesn't exist (for whatever reason), skip it now rather than muck about later
+            if (!class_exists($name)) {
+                continue;
+            }
+            try {
+                if (in_array(MetadataControllerTrait::class, class_uses($name, false))) {
+                    $ends[] = App::make($name);
+                }
+            } catch (\Exception $e) {
+                if (!App::runningInConsole()) {
+                    throw $e;
+                }
+                // Squash exceptions thrown here when running from CLI so app can continue booting
+            }
+        }
+        return $ends;
+    }
+
+    /**
+     * @param $classMap
+     * @return mixed
+     */
+    protected function getClassMap()
+    {
+        $classes = get_declared_classes();
+        $AutoClass = null;
+        foreach ($classes as $class) {
+            if (\Illuminate\Support\Str::startsWith($class, "Composer\\Autoload\\ComposerStaticInit")) {
+                $AutoClass = $class;
+            }
+        }
+
+        $Classes = $AutoClass::$classMap;
+        return array_keys($Classes);
     }
 }

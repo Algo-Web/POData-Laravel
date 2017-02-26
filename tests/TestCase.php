@@ -19,7 +19,7 @@ class TestCase extends BaseTestCase
     public function setUp()
     {
         if (!defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE')) {
-            define('PODATA_LARAVEL_APP_ROOT_NAMESPACE', 'AlgoWeb\PODataLaravel\Models');
+            define('PODATA_LARAVEL_APP_ROOT_NAMESPACE', 'AlgoWeb\PODataLaravel');
         }
         parent::setUp();
     }
