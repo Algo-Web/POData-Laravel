@@ -154,8 +154,8 @@ class LaravelQuery implements IQueryProvider
      * @param null|KeyDescriptor $keyDescriptor
      */
     protected function getResource(
-        $resourceSet,
-        $keyDescriptor,
+        ResourceSet $resourceSet = null,
+        KeyDescriptor $keyDescriptor = null,
         array $whereCondition = [],
         Model $sourceEntityInstance = null
     ) {
@@ -165,8 +165,9 @@ class LaravelQuery implements IQueryProvider
 
         if (null == $sourceEntityInstance) {
             $entityClassName = $resourceSet->getResourceType()->getInstanceType()->name;
-            $sourceEntityInstance = new $entityClassName();
+            $sourceEntityInstance = App::make($entityClassName);
         }
+
         if ($keyDescriptor) {
             foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
                 $trimValue = trim($value[0], "\"'");
@@ -177,10 +178,7 @@ class LaravelQuery implements IQueryProvider
             $sourceEntityInstance = $sourceEntityInstance->where($fieldName, $fieldValue);
         }
         $sourceEntityInstance = $sourceEntityInstance->get();
-        if (0 == $sourceEntityInstance->count()) {
-            return null;
-        }
-        return $sourceEntityInstance->first();
+        return (0 == $sourceEntityInstance->count()) ? null : $sourceEntityInstance->first();
     }
 
     /**
@@ -398,12 +396,12 @@ class LaravelQuery implements IQueryProvider
         $map = $raw->getMetadata();
 
         if (!array_key_exists($class, $map)) {
-            throw new \POData\Common\InvalidOperationException('Controller mapping missing for class '.$class);
+            throw new \POData\Common\InvalidOperationException('Controller mapping missing for class '.$class.'.');
         }
         $goal = $raw->getMapping($class, $verb);
         if (null == $goal) {
             throw new \POData\Common\InvalidOperationException(
-                'Controller mapping missing for '.$verb.' verb on class '.$class
+                'Controller mapping missing for '.$verb.' verb on class '.$class.'.'
             );
         }
 
@@ -415,7 +413,7 @@ class LaravelQuery implements IQueryProvider
         }
         if (!is_array($data)) {
             throw \POData\Common\ODataException::createPreConditionFailedError(
-                'Data not resolvable to key-value array'
+                'Data not resolvable to key-value array.'
             );
         }
 

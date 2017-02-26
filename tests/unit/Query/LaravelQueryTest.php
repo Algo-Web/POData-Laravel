@@ -7,13 +7,20 @@ use Illuminate\Support\Facades\App;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceProperty;
 use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Query\QueryType;
 use POData\Providers\Query\QueryResult;
+use POData\UriProcessor\QueryProcessor\ExpressionParser\FilterInfo;
+use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
+use POData\UriProcessor\QueryProcessor\OrderByParser\OrderByInfo;
+use POData\UriProcessor\QueryProcessor\OrderByParser\OrderByPathSegment;
+use POData\UriProcessor\QueryProcessor\OrderByParser\OrderBySubPathSegment;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use AlgoWeb\PODataLaravel\Models\TestModel;
@@ -157,17 +164,95 @@ class LaravelQueryTest extends TestCase
         $this->assertEquals($expected, $result->results);
     }
 
+    public function testGetResourceSetWithSuppliedOrderAndFilterInfo()
+    {
+        $instanceType = new \StdClass();
+        $instanceType->name = 'AlgoWeb\\PODataLaravel\\Models\\TestMorphManySource';
+
+        $resourceType = m::mock(ResourceType::class);
+        $resourceType->shouldReceive('getInstanceType')->andReturn($instanceType);
+        $resourceType->shouldReceive('getName')->andReturn('name');
+
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType')->andReturn($resourceType);
+
+        $queryType = QueryType::COUNT();
+
+        $property = \Mockery::mock(ResourceProperty::class);
+        $property->shouldReceive('getName')->withNoArgs()->andReturn('morphTarget');
+
+        $rawBuilder = $this->getBuilder();
+
+        $rawResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class)
+            ->makePartial();
+        $rawResult->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']));
+        $rawResult->setQuery($rawBuilder);
+        $this->assertTrue(null != ($rawResult->getQuery()->getProcessor()));
+
+        $resultSet = m::mock(\Illuminate\Support\Collection::class)->makePartial();
+        $resultSet->shouldReceive('count')->andReturn(3);
+        $resultSet->shouldReceive('slice')->andReturnSelf()->once();
+        $resultSet->shouldReceive('take')->andReturnSelf()->once();
+        $resultSet->shouldReceive('filter')->andReturnSelf()->once();
+
+        $sourceEntity = \Mockery::mock(TestMorphManySource::class);
+        $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
+        $sourceEntity->shouldReceive('orderBy')->withArgs(['hammer', 'asc'])->andReturnSelf()->once();
+        $sourceEntity->shouldReceive('orderBy')->withArgs(['hammer', 'desc'])->andReturnSelf()->once();
+        $sourceEntity->shouldReceive('get')->andReturn($resultSet)->once();
+
+        $subPathSegment = m::mock(OrderBySubPathSegment::class);
+        $subPathSegment->shouldReceive('getName')->andReturn('hammer');
+
+        $orderByPathSegment1 = m::mock(OrderByPathSegment::class);
+        $orderByPathSegment1->shouldReceive('getSubPathSegments')
+            ->andReturn([$subPathSegment, $subPathSegment])->once();
+        $orderByPathSegment1->shouldReceive('isAscending')->andReturn(true, false);
+
+        $segments = [$orderByPathSegment1];
+
+        $order = m::mock(InternalOrderByInfo::class)->makePartial();
+        $order->shouldReceive('getOrderByInfo->getOrderByPathSegments')->andReturn($segments)->once();
+
+        $filter = m::mock(FilterInfo::class);
+        $filter->shouldReceive('getExpressionAsString')->andReturn('')->once();
+
+        $foo = \Mockery::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getSourceEntityInstance')->andReturn($rawResult);
+
+        $result = $foo->getResourceSet($queryType, $mockResource, $filter, $order, 5, 'skipToken', $sourceEntity);
+        $this->assertTrue($result instanceof QueryResult);
+        $this->assertEquals(3, $result->count);
+        $this->assertEquals(null, $result->results);
+
+    }
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getResourceFromResourceSet
-     * @todo   Implement testGetResourceFromResourceSet().
      */
-    public function testGetResourceFromResourceSet()
+    public function testGetResourceFromResourceSetEmptyResult()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $instanceType = new \StdClass();
+        $instanceType->name = 'AlgoWeb\\PODataLaravel\\Models\\TestMorphManySource';
+
+        $resourceType = m::mock(ResourceType::class);
+        $resourceType->shouldReceive('getInstanceType')->andReturn($instanceType);
+        $resourceType->shouldReceive('getName')->andReturn('name');
+
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType')->andReturn($resourceType);
+
+        $key = m::mock(KeyDescriptor::class);
+        $key->shouldReceive('getValidatedNamedValues')->andReturn(['a' => 'b'])->once();
+
+        $source = m::mock(TestMorphManySource::class)->makePartial();
+        $source->shouldReceive('where')->withAnyArgs()->andReturnSelf()->times(1);
+        $source->shouldReceive('get')->andReturn(collect([]))->times(1);
+        App::instance($instanceType->name, $source);
+
+        $foo = new LaravelQuery();
+        $result = $foo->getResourceFromResourceSet($mockResource, $key);
+        $this->assertNull($result);
     }
 
 
@@ -406,14 +491,7 @@ class LaravelQueryTest extends TestCase
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
         $fqModelName = TestModel::class;
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true];
-        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true];
-        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-
-        $instance = new TestModel($meta);
+        $instance = $this->generateTestModelWithMetadata();
         $type = $instance->getXmlSchema();
         $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
@@ -473,14 +551,7 @@ class LaravelQueryTest extends TestCase
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
         $fqModelName = TestModel::class;
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true];
-        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true];
-        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-
-        $instance = new TestModel($meta);
+        $instance = $this->generateTestModelWithMetadata();
         $type = $instance->getXmlSchema();
         $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
@@ -503,6 +574,44 @@ class LaravelQueryTest extends TestCase
         $foo = new LaravelQuery();
         $expected = 'Target model not successfully created';
         $actual = '';
+        try {
+            $result = $foo->createResourceForResourceSet($mockResource, $model, $data);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testAttemptCreateNonResolvableData()
+    {
+        $controller = new TestController();
+
+        $testName = TestController::class;
+
+        $this->seedControllerMetadata($controller);
+
+        $metaProv = new SimpleMetadataProvider('Data', 'Data');
+
+        $fqModelName = TestModel::class;
+        $instance = $this->generateTestModelWithMetadata();
+        $type = $instance->getXmlSchema();
+        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
+        App::instance('metadata', $metaProv);
+
+        $std = new \StdClass();
+        $std->name = TestModel::class;
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
+        $model = new TestModel();
+        $model->id = 42;
+        $keyDesc = \Mockery::mock(KeyDescriptor::class);
+        $data = new \StdClass;
+        $data = 'Wibble';
+        $shouldUpdate = false;
+
+        $foo = new LaravelQuery();
+        $expected = 'Data not resolvable to key-value array.';
+        $actual = null;
         try {
             $result = $foo->createResourceForResourceSet($mockResource, $model, $data);
         } catch (\Exception $e) {
@@ -538,14 +647,7 @@ class LaravelQueryTest extends TestCase
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
         $fqModelName = TestModel::class;
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true];
-        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true];
-        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-
-        $instance = new TestModel($meta);
+        $instance = $this->generateTestModelWithMetadata();
         $type = $instance->getXmlSchema();
         $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
@@ -589,14 +691,7 @@ class LaravelQueryTest extends TestCase
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
         $fqModelName = TestModel::class;
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true];
-        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true];
-        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-
-        $instance = new TestModel($meta);
+        $instance = $this->generateTestModelWithMetadata();
         $type = $instance->getXmlSchema();
         $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
@@ -636,14 +731,7 @@ class LaravelQueryTest extends TestCase
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
         $fqModelName = TestModel::class;
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true];
-        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true];
-        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-
-        $instance = new TestModel($meta);
+        $instance = $this->generateTestModelWithMetadata();
         $type = $instance->getXmlSchema();
         $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
@@ -683,14 +771,7 @@ class LaravelQueryTest extends TestCase
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
         $fqModelName = TestModel::class;
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true];
-        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true];
-        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-
-        $instance = new TestModel($meta);
+        $instance = $this->generateTestModelWithMetadata();
         $type = $instance->getXmlSchema();
         $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
@@ -714,6 +795,96 @@ class LaravelQueryTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testAttemptDeleteWithControllerMappingMissing()
+    {
+        $controller = new TestController();
+
+        $json = m::mock(JsonResponse::class)->makePartial();
+        $json->shouldReceive('getData')->andReturn([])->never();
+
+        $testName = TestController::class;
+        $mockController = m::mock($testName)->makePartial();
+        $mockController->shouldReceive('destroyTestModel')->withAnyArgs()->andReturn($json)->never();
+
+        $this->seedControllerMetadata($controller);
+
+        $metaProv = new SimpleMetadataProvider('Data', 'Data');
+
+        $fqModelName = TestModel::class;
+        $instance = $this->generateTestModelWithMetadata();
+        $type = $instance->getXmlSchema();
+        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
+        $container = m::mock(MetadataControllerContainer::class)->makePartial();
+        $container->shouldReceive('getMetadata')->andReturn([])->once();
+        App::instance('metadata', $metaProv);
+        App::instance($testName, $mockController);
+        App::instance('metadataControllers', $container);
+
+        $std = new \StdClass();
+        $std->name = TestModel::class;
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
+        $model = new TestModel();
+        $model->id = null;
+
+        $foo = new LaravelQuery();
+        $expected = 'Controller mapping missing for class AlgoWeb\PODataLaravel\Models\TestModel.';
+        $actual = null;
+
+        try {
+            $result = $foo->deleteResource($mockResource, $model);
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testAttemptDeleteWithControllerVerbMappingMissing()
+    {
+        $controller = new TestController();
+
+        $json = m::mock(JsonResponse::class)->makePartial();
+        $json->shouldReceive('getData')->andReturn([])->never();
+
+        $testName = TestController::class;
+        $mockController = m::mock($testName)->makePartial();
+        $mockController->shouldReceive('destroyTestModel')->withAnyArgs()->andReturn($json)->never();
+
+        $this->seedControllerMetadata($controller);
+
+        $metaProv = new SimpleMetadataProvider('Data', 'Data');
+
+        $fqModelName = TestModel::class;
+        $instance = $this->generateTestModelWithMetadata();
+        $type = $instance->getXmlSchema();
+        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
+        $container = m::mock(MetadataControllerContainer::class)->makePartial();
+        $container->shouldReceive('getMetadata')->andReturn([TestModel::class => ''])->once();
+        $container->shouldReceive('getMapping')->withAnyArgs()->andReturn(null)->once();
+        App::instance('metadata', $metaProv);
+        App::instance($testName, $mockController);
+        App::instance('metadataControllers', $container);
+
+        $std = new \StdClass();
+        $std->name = TestModel::class;
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
+        $model = new TestModel();
+        $model->id = null;
+
+        $foo = new LaravelQuery();
+        $expected = 'Controller mapping missing for delete verb on class AlgoWeb\PODataLaravel\Models\TestModel.';
+        $actual = null;
+
+        try {
+            $result = $foo->deleteResource($mockResource, $model);
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+
     private function seedControllerMetadata(TestController $controller = null)
     {
         $translator = \Mockery::mock(\Illuminate\Translation\Translator::class)->makePartial();
@@ -727,5 +898,21 @@ class LaravelQueryTest extends TestCase
         $container->setMetadata($mapping);
         // now that we've manually set up the controller metadata container, insert it
         App::instance('metadataControllers', $container);
+    }
+
+    /**
+     * @return TestModel
+     */
+    private function generateTestModelWithMetadata()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+
+        $instance = new TestModel($meta);
+        return $instance;
     }
 }
