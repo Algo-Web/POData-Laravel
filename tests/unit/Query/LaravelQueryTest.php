@@ -587,16 +587,19 @@ class LaravelQueryTest extends TestCase
         $data->success = false;
         $shouldUpdate = false;
 
-
         $foo = new LaravelQuery();
         $expected = 'Target model not successfully updated';
         $actual = '';
+        $expectedCode = 422;
+        $actualCode = null;
         try {
             $result = $foo->updateResource($mockResource, $model, $keyDesc, $data);
-        } catch (\Exception $e) {
+        } catch (ODataException $e) {
             $actual = $e->getMessage();
+            $actualCode = $e->getStatusCode();
         }
         $this->assertEquals($expected, $actual);
+        $this->assertEquals($expectedCode, $actualCode);
     }
 
     public function testAttemptCreateBadSourceInstanceThrowException()
@@ -746,12 +749,16 @@ class LaravelQueryTest extends TestCase
         $foo = new LaravelQuery();
         $expected = 'Target model not successfully deleted';
         $actual = '';
+        $expectedCode = 422;
+        $actualCode = null;
         try {
             $result = $foo->deleteResource($mockResource, $model);
-        } catch (\Exception $e) {
+        } catch (ODataException $e) {
             $actual = $e->getMessage();
+            $actualCode = $e->getStatusCode();
         }
         $this->assertEquals($expected, $actual);
+        $this->assertEquals($expectedCode, $actualCode);
     }
 
     public function testAttemptDeleteMalformedControllerResponse()
@@ -783,12 +790,16 @@ class LaravelQueryTest extends TestCase
         $foo = new LaravelQuery();
         $expected = 'Controller response not well-formed json.';
         $actual = null;
+        $expectedCode = 500;
+        $actualCode = null;
         try {
             $result = $foo->deleteResource($mockResource, $model);
         } catch (ODataException $e) {
             $actual = $e->getMessage();
+            $actualCode = $e->getStatusCode();
         }
         $this->assertEquals($expected, $actual);
+        $this->assertEquals($expectedCode, $actualCode);
     }
 
     public function testAttemptDeleteMalformedResponseData()
@@ -823,12 +834,17 @@ class LaravelQueryTest extends TestCase
         $foo = new LaravelQuery();
         $expected = 'Controller response does not have an array.';
         $actual = null;
+        $expectedCode = 500;
+        $actualCode = null;
+
         try {
             $result = $foo->deleteResource($mockResource, $model);
         } catch (ODataException $e) {
             $actual = $e->getMessage();
+            $actualCode = $e->getStatusCode();
         }
         $this->assertEquals($expected, $actual);
+        $this->assertEquals($expectedCode, $actualCode);
     }
 
     public function testAttemptDeleteIncompleteResponseData()
@@ -863,12 +879,182 @@ class LaravelQueryTest extends TestCase
         $foo = new LaravelQuery();
         $expected = 'Controller response array missing at least one of id, status and/or errors fields.';
         $actual = null;
+        $expectedCode = 500;
+        $actualCode = null;
         try {
             $result = $foo->deleteResource($mockResource, $model);
         } catch (ODataException $e) {
             $actual = $e->getMessage();
+            $actualCode = $e->getStatusCode();
         }
         $this->assertEquals($expected, $actual);
+        $this->assertEquals($expectedCode, $actualCode);
+    }
+
+    public function testAttemptDeleteSuccessful()
+    {
+        $controller = new TestController();
+
+        $json = m::mock(JsonResponse::class)->makePartial();
+        $json->shouldReceive('getData')->andReturn(['id' => 0, 'status' => null, 'errors' => null])->once();
+
+        $testName = TestController::class;
+        $mockController = m::mock($testName)->makePartial();
+        $mockController->shouldReceive('destroyTestModel')->withAnyArgs()->andReturn($json)->once();
+
+        $this->seedControllerMetadata($controller);
+
+        $metaProv = new SimpleMetadataProvider('Data', 'Data');
+
+        $fqModelName = TestModel::class;
+        $instance = $this->generateTestModelWithMetadata();
+        $type = $instance->getXmlSchema();
+        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
+        App::instance('metadata', $metaProv);
+        App::instance($testName, $mockController);
+
+        $std = new \StdClass();
+        $std->name = TestModel::class;
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
+        $model = new TestModel();
+        $model->id = null;
+
+        $foo = new LaravelQuery();
+        $result = $foo->deleteResource($mockResource, $model);
+        $this->assertTrue($result);
+    }
+
+    public function testAttemptDeleteIncompleteResponseDataOnlyHasId()
+    {
+        $controller = new TestController();
+
+        $json = m::mock(JsonResponse::class)->makePartial();
+        $json->shouldReceive('getData')->andReturn(['id' => null])->once();
+
+        $testName = TestController::class;
+        $mockController = m::mock($testName)->makePartial();
+        $mockController->shouldReceive('destroyTestModel')->withAnyArgs()->andReturn($json)->once();
+
+        $this->seedControllerMetadata($controller);
+
+        $metaProv = new SimpleMetadataProvider('Data', 'Data');
+
+        $fqModelName = TestModel::class;
+        $instance = $this->generateTestModelWithMetadata();
+        $type = $instance->getXmlSchema();
+        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
+        App::instance('metadata', $metaProv);
+        App::instance($testName, $mockController);
+
+        $std = new \StdClass();
+        $std->name = TestModel::class;
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
+        $model = new TestModel();
+        $model->id = null;
+
+        $foo = new LaravelQuery();
+        $expected = 'Controller response array missing at least one of id, status and/or errors fields.';
+        $actual = null;
+        $expectedCode = 500;
+        $actualCode = null;
+        try {
+            $result = $foo->deleteResource($mockResource, $model);
+        } catch (ODataException $e) {
+            $actual = $e->getMessage();
+            $actualCode = $e->getStatusCode();
+        }
+        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expectedCode, $actualCode);
+    }
+
+    public function testAttemptDeleteIncompleteResponseDataOnlyHasStatus()
+    {
+        $controller = new TestController();
+
+        $json = m::mock(JsonResponse::class)->makePartial();
+        $json->shouldReceive('getData')->andReturn(['status' => null])->once();
+
+        $testName = TestController::class;
+        $mockController = m::mock($testName)->makePartial();
+        $mockController->shouldReceive('destroyTestModel')->withAnyArgs()->andReturn($json)->once();
+
+        $this->seedControllerMetadata($controller);
+
+        $metaProv = new SimpleMetadataProvider('Data', 'Data');
+
+        $fqModelName = TestModel::class;
+        $instance = $this->generateTestModelWithMetadata();
+        $type = $instance->getXmlSchema();
+        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
+        App::instance('metadata', $metaProv);
+        App::instance($testName, $mockController);
+
+        $std = new \StdClass();
+        $std->name = TestModel::class;
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
+        $model = new TestModel();
+        $model->id = null;
+
+        $foo = new LaravelQuery();
+        $expected = 'Controller response array missing at least one of id, status and/or errors fields.';
+        $actual = null;
+        $expectedCode = 500;
+        $actualCode = null;
+        try {
+            $result = $foo->deleteResource($mockResource, $model);
+        } catch (ODataException $e) {
+            $actual = $e->getMessage();
+            $actualCode = $e->getStatusCode();
+        }
+        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expectedCode, $actualCode);
+    }
+
+    public function testAttemptDeleteIncompleteResponseDataOnlyHasErrors()
+    {
+        $controller = new TestController();
+
+        $json = m::mock(JsonResponse::class)->makePartial();
+        $json->shouldReceive('getData')->andReturn(['errors' => null])->once();
+
+        $testName = TestController::class;
+        $mockController = m::mock($testName)->makePartial();
+        $mockController->shouldReceive('destroyTestModel')->withAnyArgs()->andReturn($json)->once();
+
+        $this->seedControllerMetadata($controller);
+
+        $metaProv = new SimpleMetadataProvider('Data', 'Data');
+
+        $fqModelName = TestModel::class;
+        $instance = $this->generateTestModelWithMetadata();
+        $type = $instance->getXmlSchema();
+        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
+        App::instance('metadata', $metaProv);
+        App::instance($testName, $mockController);
+
+        $std = new \StdClass();
+        $std->name = TestModel::class;
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
+        $model = new TestModel();
+        $model->id = null;
+
+        $foo = new LaravelQuery();
+        $expected = 'Controller response array missing at least one of id, status and/or errors fields.';
+        $actual = null;
+        $expectedCode = 500;
+        $actualCode = null;
+        try {
+            $result = $foo->deleteResource($mockResource, $model);
+        } catch (ODataException $e) {
+            $actual = $e->getMessage();
+            $actualCode = $e->getStatusCode();
+        }
+        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expectedCode, $actualCode);
     }
 
     public function testAttemptDeleteWithControllerMappingMissing()
