@@ -12,3 +12,10 @@ composer.lock
 
 # various IDE bits
 .idea/
+
+# humbug debris
+humbuglog.txt
+
+# misc
+build/
+cover/
