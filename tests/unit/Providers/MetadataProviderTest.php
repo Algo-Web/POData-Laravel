@@ -85,10 +85,12 @@ class MetadataProviderTest extends TestCase
      */
     public function testRegister()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $foo = new MetadataProvider($this->app);
+
+        $result = App::make('metadata');
+        $this->assertTrue($result instanceof SimpleMetadataProvider);
+        $this->assertEquals('Data', $result->getContainerName());
+        $this->assertEquals('Data', $result->getContainerNameSpace());
     }
 
 
