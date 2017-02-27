@@ -384,8 +384,7 @@ class LaravelQuery implements IQueryProvider
 
         if (null == $data) {
             $data = [];
-        }
-        if (is_object($data)) {
+        } elseif (is_object($data)) {
             $data = (array) $data;
         }
         if (!is_array($data)) {
@@ -398,45 +397,12 @@ class LaravelQuery implements IQueryProvider
         $method = $goal['method'];
         $paramList = $goal['parameters'];
         $controller = App::make($controlClass);
-        $parms = [];
-
-        foreach ($paramList as $spec) {
-            $varType = isset($spec['type']) ? $spec['type'] : null;
-            $varName = $spec['name'];
-            if ($spec['isRequest']) {
-                $var = new $varType();
-                $var->setMethod('POST');
-                $var->request = new \Symfony\Component\HttpFoundation\ParameterBag($data);
-            } else {
-                if (null != $varType) {
-                    // TODO: Give this smarts and actively pick up instantiation details
-                    $var = new $varType();
-                } else {
-                    $var = $sourceEntityInstance->$varName;
-                }
-            }
-            $parms[] = $var;
-        }
+        $parms = $this->createUpdateDeleteProcessInput($sourceEntityInstance, $data, $paramList);
+        unset($data);
 
         $result = call_user_func_array(array($controller, $method), $parms);
 
-        if (!($result instanceof \Illuminate\Http\JsonResponse)) {
-            throw ODataException::createInternalServerError('Controller response not well-formed json.');
-        }
-        $data = $result->getData();
-        if (is_object($data)) {
-            $data = (array) $data;
-        }
-
-        if (!is_array($data)) {
-            throw ODataException::createInternalServerError('Controller response does not have an array.');
-        }
-        if (!(key_exists('id', $data) && key_exists('status', $data) && key_exists('errors', $data))) {
-            throw ODataException::createInternalServerError(
-                'Controller response array missing at least one of id, status and/or errors fields.'
-            );
-        }
-        return $data;
+        return $this->createUpdateDeleteProcessOutput($result);
     }
 
     /**
@@ -482,5 +448,59 @@ class LaravelQuery implements IQueryProvider
             return $class::findOrFail($data['id']);
         }
         throw new ODataException('Target model not successfully '.$lastWord, 422);
+    }
+
+    /**
+     * @param $sourceEntityInstance
+     * @param $data
+     * @param $paramList
+     * @return array
+     */
+    private function createUpdateDeleteProcessInput($sourceEntityInstance, $data, $paramList)
+    {
+        $parms = [];
+
+        foreach ($paramList as $spec) {
+            $varType = isset($spec['type']) ? $spec['type'] : null;
+            $varName = $spec['name'];
+            if (null == $varType) {
+                $parms[] = $sourceEntityInstance->$varName;
+                continue;
+            }
+            // TODO: Give this smarts and actively pick up instantiation details
+            $var = new $varType();
+            if ($spec['isRequest']) {
+                $var->setMethod('POST');
+                $var->request = new \Symfony\Component\HttpFoundation\ParameterBag($data);
+            }
+            $parms[] = $var;
+        }
+        return $parms;
+    }
+
+    /**
+     * @param $result
+     * @return array|mixed
+     * @throws ODataException
+     */
+    private function createUpdateDeleteProcessOutput($result)
+    {
+        if (!($result instanceof \Illuminate\Http\JsonResponse)) {
+            throw ODataException::createInternalServerError('Controller response not well-formed json.');
+        }
+        $outData = $result->getData();
+        if (is_object($outData)) {
+            $outData = (array)$outData;
+        }
+
+        if (!is_array($outData)) {
+            throw ODataException::createInternalServerError('Controller response does not have an array.');
+        }
+        if (!(key_exists('id', $outData) && key_exists('status', $outData) && key_exists('errors', $outData))) {
+            throw ODataException::createInternalServerError(
+                'Controller response array missing at least one of id, status and/or errors fields.'
+            );
+        }
+        return $outData;
     }
 }
