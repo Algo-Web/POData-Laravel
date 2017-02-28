@@ -2,8 +2,10 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
+use POData\Providers\Metadata\IMetadataProvider;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema as Schema;
@@ -35,10 +37,10 @@ class MetadataProvider extends ServiceProvider
 
         if ($isCaching && $hasCache) {
             $meta = Cache::get('metadata');
-            $this->app->instance('metadata', $meta);
+            App::instance('metadata', $meta);
             return;
         }
-        $meta = $this->app->make('metadata');
+        $meta = App::make('metadata');
 
         $modelNames = $this->getCandidateModels();
 
@@ -115,6 +117,7 @@ class MetadataProvider extends ServiceProvider
      */
     protected function getEntityTypesAndResourceSets($meta, $ends)
     {
+        assert($meta instanceof IMetadataProvider, get_class($meta));
         $EntityTypes = [];
         $ResourceSets = [];
         $begins = [];
@@ -124,7 +127,7 @@ class MetadataProvider extends ServiceProvider
             $bitter = $ends[$i];
             $fqModelName = $bitter;
 
-            $instance = new $fqModelName();
+            $instance = App::make($fqModelName);
             $name = strtolower($instance->getEndpointName());
             $metaSchema = $instance->getXmlSchema();
             // if for whatever reason we don't get an XML schema, move on to next entry and drop current one from
