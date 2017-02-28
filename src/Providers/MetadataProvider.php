@@ -40,51 +40,9 @@ class MetadataProvider extends ServiceProvider
         }
         $meta = $this->app->make('metadata');
 
-        $classes = get_declared_classes();
-        $AutoClass = null;
-        foreach ($classes as $class) {
-            if (\Illuminate\Support\Str::startsWith($class, "Composer\\Autoload\\ComposerStaticInit")) {
-                $AutoClass = $class;
-            }
-        }
-        $ends = [];
-        $Classes = $AutoClass::$classMap;
-        $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : "App";
-        foreach ($Classes as $name => $file) {
-            if (\Illuminate\Support\Str::startsWith($name, $startName)) {
-                if (in_array("AlgoWeb\\PODataLaravel\\Models\\MetadataTrait", class_uses($name))) {
-                    $ends[] = $name;
-                }
-            }
-        }
+        $modelNames = $this->getCandidateModels();
 
-        $EntityTypes = [];
-        $ResourceSets = [];
-        $begins = [];
-        $numEnds = count($ends);
-
-        for ($i = 0; $i < $numEnds; $i++) {
-            $bitter = $ends[$i];
-            $fqModelName = $bitter;
-
-            $instance = new $fqModelName();
-            $name = $instance->getEndpointName();
-            $metaSchema = $instance->getXmlSchema();
-            // if for whatever reason we don't get an XML schema, move on to next entry and drop current one from
-            // further processing
-            if (null == $metaSchema) {
-                continue;
-            }
-            $EntityTypes[$fqModelName] = $metaSchema;
-            $ResourceSets[$fqModelName] = $meta->addResourceSet(
-                strtolower($name),
-                $EntityTypes[$fqModelName]
-            );
-            $begins[] = $bitter;
-        }
-
-        $ends = $begins;
-        unset($begins);
+        list($EntityTypes, $ResourceSets, $ends) = $this->getEntityTypesAndResourceSets($meta, $modelNames);
 
         // now that endpoints are hooked up, tackle the relationships
         // if we'd tried earlier, we'd be guaranteed to try to hook a relation up to null, which would be bad
@@ -123,5 +81,62 @@ class MetadataProvider extends ServiceProvider
         $this->app->singleton('metadata', function ($app) {
             return new SimpleMetadataProvider('Data', self::$METANAMESPACE);
         });
+    }
+
+    /**
+     * @return array
+     */
+    protected function getCandidateModels()
+    {
+        $classes = get_declared_classes();
+        $AutoClass = null;
+        foreach ($classes as $class) {
+            if (\Illuminate\Support\Str::startsWith($class, "Composer\\Autoload\\ComposerStaticInit")) {
+                $AutoClass = $class;
+            }
+        }
+        $ends = [];
+        $Classes = $AutoClass::$classMap;
+        $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : "App";
+        foreach ($Classes as $name => $file) {
+            if (\Illuminate\Support\Str::startsWith($name, $startName)) {
+                if (in_array("AlgoWeb\\PODataLaravel\\Models\\MetadataTrait", class_uses($name))) {
+                    $ends[] = $name;
+                }
+            }
+        }
+        return $ends;
+    }
+
+    /**
+     * @param $meta
+     * @param $ends
+     * @return array
+     */
+    protected function getEntityTypesAndResourceSets($meta, $ends)
+    {
+        $EntityTypes = [];
+        $ResourceSets = [];
+        $begins = [];
+        $numEnds = count($ends);
+
+        for ($i = 0; $i < $numEnds; $i++) {
+            $bitter = $ends[$i];
+            $fqModelName = $bitter;
+
+            $instance = new $fqModelName();
+            $name = strtolower($instance->getEndpointName());
+            $metaSchema = $instance->getXmlSchema();
+            // if for whatever reason we don't get an XML schema, move on to next entry and drop current one from
+            // further processing
+            if (null == $metaSchema) {
+                continue;
+            }
+            $EntityTypes[$fqModelName] = $metaSchema;
+            $ResourceSets[$fqModelName] = $meta->addResourceSet($name, $metaSchema);
+            $begins[] = $bitter;
+        }
+
+        return array($EntityTypes, $ResourceSets, $begins);
     }
 }

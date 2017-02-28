@@ -81,11 +81,11 @@ class MetadataProviderTest extends TestCase
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Providers\MetadataProvider::register
-     * @todo   Implement testRegister().
      */
     public function testRegister()
     {
         $foo = new MetadataProvider($this->app);
+        $foo->register();
 
         $result = App::make('metadata');
         $this->assertTrue($result instanceof SimpleMetadataProvider);
