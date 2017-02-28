@@ -83,9 +83,11 @@ trait MetadataTrait
 
         $visible = $this->getVisible();
         $hidden = $this->getHidden();
-        if (0 != count($visible)) {
+        if (0 < count($visible)) {
+            assert(!empty($visible));
             $attribs = array_intersect($visible, $attribs);
-        } elseif (0 != count($hidden)) {
+        } elseif (0 < count($hidden)) {
+            assert(!empty($hidden));
             $attribs = array_diff($attribs, $hidden);
         }
 

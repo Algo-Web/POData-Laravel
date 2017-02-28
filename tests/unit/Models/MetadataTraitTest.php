@@ -171,19 +171,6 @@ class MetadataTraitTest extends TestCase
         }
     }
 
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::metadataMask
-     * @todo   Implement testMetadataMask().
-     */
-    public function testMetadataMask()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
     /**
      * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::metadataMask
      */
@@ -209,6 +196,38 @@ class MetadataTraitTest extends TestCase
         $foo = \Mockery::mock(TestModel::class)->makePartial();
         $foo->shouldReceive('getHidden')->andReturn([]);
         $foo->shouldReceive('getVisible')->andReturn(['name', 'height']);
+
+        $result = $foo->metadataMask();
+        $expResDiff = array_diff($expected, $result); // values in expected that are not in result, ignoring order
+        $resExpDiff = array_diff($result, $expected); // values in result that are not in expected, ignoring order
+        $this->assertEquals(0, count($expResDiff) + count($resExpDiff)); // if all keys are common, arrays are equal
+    }
+
+    /**
+     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::metadataMask
+     */
+    public function testMetadataMaskNothingHiddenOverlappingSingleVisible()
+    {
+        $expected = ['name'];
+        $foo = \Mockery::mock(TestModel::class)->makePartial();
+        $foo->shouldReceive('getHidden')->andReturn([]);
+        $foo->shouldReceive('getVisible')->andReturn(['name']);
+
+        $result = $foo->metadataMask();
+        $expResDiff = array_diff($expected, $result); // values in expected that are not in result, ignoring order
+        $resExpDiff = array_diff($result, $expected); // values in result that are not in expected, ignoring order
+        $this->assertEquals(0, count($expResDiff) + count($resExpDiff)); // if all keys are common, arrays are equal
+    }
+
+    /**
+     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::metadataMask
+     */
+    public function testMetadataMaskNothingVisibleOverlappingSingleHidden()
+    {
+        $expected = ['id', 'added_at', 'weight', 'code'];
+        $foo = \Mockery::mock(TestModel::class)->makePartial();
+        $foo->shouldReceive('getHidden')->andReturn(['name']);
+        $foo->shouldReceive('getVisible')->andReturn([]);
 
         $result = $foo->metadataMask();
         $expResDiff = array_diff($expected, $result); // values in expected that are not in result, ignoring order
