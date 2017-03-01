@@ -4,6 +4,9 @@ namespace AlgoWeb\PODataLaravel\Models;
 
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolver;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Mockery;
 use PHPUnit_Framework_TestCase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -16,12 +19,26 @@ use org\bovigo\vfs\vfsStreamDirectory;
 
 class TestCase extends BaseTestCase
 {
+    protected $origFacade = [];
+
+    /**
+     *
+     */
     public function setUp()
     {
         if (!defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE')) {
             define('PODATA_LARAVEL_APP_ROOT_NAMESPACE', 'AlgoWeb\PODataLaravel');
         }
         parent::setUp();
+        $this->origFacade['cache'] = Cache::getFacadeRoot();
+        //$this->origFacade['schema'] = Schema::getFacadeRoot();
+    }
+
+    public function tearDown()
+    {
+        Cache::swap($this->origFacade['cache']);
+        //Schema::swap($this->origFacade['schema']);
+        parent::tearDown();
     }
 
 

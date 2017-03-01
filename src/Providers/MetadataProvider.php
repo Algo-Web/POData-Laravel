@@ -32,7 +32,7 @@ class MetadataProvider extends ServiceProvider
         }
 
         self::setupRoute();
-        $isCaching = env('APP_METADATA_CACHING', false);
+        $isCaching = true === $this->checkIsCaching();
         $hasCache = Cache::has('metadata');
 
         if ($isCaching && $hasCache) {
@@ -55,7 +55,7 @@ class MetadataProvider extends ServiceProvider
         }
         if ($isCaching) {
             if (!$hasCache) {
-                $cacheTime = env('APP_METADATA_CACHE_DURATION', 10);
+                $cacheTime = env('APP_METADATA_CACHE_DURATION', null);
                 $cacheTime = !is_numeric($cacheTime) ? 10 : abs($cacheTime);
                 Cache::put('metadata', $meta, $cacheTime);
             }
@@ -141,5 +141,13 @@ class MetadataProvider extends ServiceProvider
         }
 
         return array($EntityTypes, $ResourceSets, $begins);
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function checkIsCaching()
+    {
+        return true === env('APP_METADATA_CACHING', false);
     }
 }
