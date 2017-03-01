@@ -164,6 +164,7 @@ class LaravelQuery implements IQueryProvider
         }
 
         if (null == $sourceEntityInstance) {
+            assert(null != $resourceSet);
             $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
         }
 

@@ -229,9 +229,13 @@ trait MetadataTrait
                         $code .= $file->current();
                         $file->next();
                     }
+
                     $code = trim(preg_replace('/\s\s+/', '', $code));
+                    assert(false !== stripos($code, 'function'), 'Function definition must have keyword \'function\'');
                     $begin = strpos($code, 'function(');
                     $code = substr($code, $begin, strrpos($code, '}')-$begin+1);
+                    $lastCode = $code[strlen($code)-1];
+                    assert("}" == $lastCode, "Final character of function definition must be closing brace");
                     foreach (array(
                                 'hasMany',
                                 'hasManyThrough',
