@@ -37,7 +37,7 @@ class ODataController extends BaseController
         if (true === $dump) {
             // iff XTest header is set, containing class and method name
             // dump outgoing odataResponse, metadata, and incoming request
-            $xTest = $request->header('XTest', null);
+            $xTest = $request->header('XTest');
             if (null != $xTest) {
                 $cerealRequest = serialize($request);
                 $cerealMeta = serialize($meta);

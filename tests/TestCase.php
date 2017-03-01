@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Models;
 
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolver;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
@@ -51,6 +52,7 @@ class TestCase extends BaseTestCase
      */
     public function createApplication()
     {
+        $file = \Mockery::mock(FilesystemAdapter::class)->makePartial();
         $schema = \Mockery::mock(\Illuminate\Database\Schema\Blueprint::class)->makePartial();
         $grammar = \Mockery::mock(\Illuminate\Database\Schema\Grammars\Grammar::class)->makePartial();
 
@@ -107,6 +109,7 @@ class TestCase extends BaseTestCase
         $app->instance('cache', $cacheStore);
         $app->instance('db', $database);
         $app->instance('log', $log);
+        $app->instance('filesystem', $file);
 
 
         $app->singleton(
