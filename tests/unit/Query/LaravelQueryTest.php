@@ -152,7 +152,7 @@ class LaravelQueryTest extends TestCase
 
         $sourceEntity = \Mockery::mock(TestMorphManySource::class);
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
-        $sourceEntity->shouldReceive('newQuery')->andReturnSelf()->once();
+        $sourceEntity->shouldReceive('newQuery')->andReturnSelf()->never();
         $sourceEntity->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']))->once();
         App::instance($instanceType->name, $sourceEntity);
 

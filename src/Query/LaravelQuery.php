@@ -164,8 +164,7 @@ class LaravelQuery implements IQueryProvider
         }
 
         if (null == $sourceEntityInstance) {
-            $entityClassName = $resourceSet->getResourceType()->getInstanceType()->name;
-            $sourceEntityInstance = App::make($entityClassName);
+            $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
         }
 
         if ($keyDescriptor) {
@@ -288,8 +287,7 @@ class LaravelQuery implements IQueryProvider
     protected function getSourceEntityInstance(ResourceSet $resourceSet)
     {
         $entityClassName = $resourceSet->getResourceType()->getInstanceType()->name;
-        $sourceEntityInstance = App::make($entityClassName);
-        return $sourceEntityInstance->newQuery();
+        return App::make($entityClassName);
     }
 
     /**
