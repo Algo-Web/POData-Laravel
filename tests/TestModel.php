@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Eloquent\Model as Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 
 class TestModel extends Model
@@ -43,6 +44,15 @@ class TestModel extends Model
     public function getFillable()
     {
         return [ 'name', 'added_at', 'weight', 'code'];
+    }
+
+    public static function findOrFail($id, $columns = ['*'])
+    {
+        if (!is_numeric($id) || !is_int($id) || 0 >= $id) {
+            throw (new ModelNotFoundException)->setModel(TestModel::class, $id);
+        } else {
+            return new self;
+        }
     }
 
     public function metadata()

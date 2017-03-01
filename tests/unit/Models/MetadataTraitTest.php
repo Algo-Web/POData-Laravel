@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Database\Connection;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use Mockery as m;
+use POData\Providers\Metadata\ResourceSet;
+use POData\Providers\Metadata\ResourceType;
+use POData\Providers\Metadata\SimpleMetadataProvider;
 
 /**
  * Generated Test Class.
@@ -167,19 +171,6 @@ class MetadataTraitTest extends TestCase
         }
     }
 
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::metadataMask
-     * @todo   Implement testMetadataMask().
-     */
-    public function testMetadataMask()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
     /**
      * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::metadataMask
      */
@@ -205,6 +196,38 @@ class MetadataTraitTest extends TestCase
         $foo = \Mockery::mock(TestModel::class)->makePartial();
         $foo->shouldReceive('getHidden')->andReturn([]);
         $foo->shouldReceive('getVisible')->andReturn(['name', 'height']);
+
+        $result = $foo->metadataMask();
+        $expResDiff = array_diff($expected, $result); // values in expected that are not in result, ignoring order
+        $resExpDiff = array_diff($result, $expected); // values in result that are not in expected, ignoring order
+        $this->assertEquals(0, count($expResDiff) + count($resExpDiff)); // if all keys are common, arrays are equal
+    }
+
+    /**
+     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::metadataMask
+     */
+    public function testMetadataMaskNothingHiddenOverlappingSingleVisible()
+    {
+        $expected = ['name'];
+        $foo = \Mockery::mock(TestModel::class)->makePartial();
+        $foo->shouldReceive('getHidden')->andReturn([]);
+        $foo->shouldReceive('getVisible')->andReturn(['name']);
+
+        $result = $foo->metadataMask();
+        $expResDiff = array_diff($expected, $result); // values in expected that are not in result, ignoring order
+        $resExpDiff = array_diff($result, $expected); // values in result that are not in expected, ignoring order
+        $this->assertEquals(0, count($expResDiff) + count($resExpDiff)); // if all keys are common, arrays are equal
+    }
+
+    /**
+     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::metadataMask
+     */
+    public function testMetadataMaskNothingVisibleOverlappingSingleHidden()
+    {
+        $expected = ['id', 'added_at', 'weight', 'code'];
+        $foo = \Mockery::mock(TestModel::class)->makePartial();
+        $foo->shouldReceive('getHidden')->andReturn(['name']);
+        $foo->shouldReceive('getVisible')->andReturn([]);
 
         $result = $foo->metadataMask();
         $expResDiff = array_diff($expected, $result); // values in expected that are not in result, ignoring order
@@ -307,14 +330,135 @@ class MetadataTraitTest extends TestCase
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::hookUpRelationships
-     * @todo   Implement testHookUpRelationships().
      */
-    public function testHookUpRelationships()
+    public function testHookUpRelationshipsBadInputFormat()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $meta = [];
+
+        $foo = new TestModel($meta);
+        $types = 'types';
+        $sets = 'sets';
+
+        $expected = 'assert(): Both entityTypes and resourceSets must be arrays failed';
+        $actual = null;
+
+        try {
+            $result = $foo->hookUpRelationships($types, $sets);
+        } catch (\ErrorException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testHookUpRelationshipsOneInputNotArray()
+    {
+        $foo = m::mock(TestModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getRelationshipsFromMethods')->andReturn([])->never();
+
+        $types = [];
+        $sets = 'scoobie oobie doobie oobie doobie melodie';
+
+        $expected = 'assert(): Both entityTypes and resourceSets must be arrays failed';
+        $actual = null;
+
+        try {
+            $result = $foo->hookUpRelationships($types, $sets);
+        } catch (\ErrorException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+        try {
+            $result = $foo->hookUpRelationships($sets, $types);
+        } catch (\ErrorException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testHookUpRelationshipsBothEmptyArrays()
+    {
+        $foo = m::mock(TestModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getRelationshipsFromMethods')->andReturn([])->once();
+
+        $types = [];
+        $sets = [];
+
+        $result = $foo->hookUpRelationships($types, $sets);
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(0, count($result));
+    }
+
+    public function testHookUpRelationshipsExistsInOnlyOneArray()
+    {
+        $foo = m::mock(TestModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getRelationshipsFromMethods')->andReturn([])->twice();
+
+        $types = [get_class($foo) => 'bar'];
+        $sets = [];
+
+        $result = $foo->hookUpRelationships($types, $sets);
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(0, count($result));
+
+        $result = $foo->hookUpRelationships($sets, $types);
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(0, count($result));
+    }
+
+    public function testHookUpRelationshipsHasOnlyHasOneRelations()
+    {
+        $meta = m::mock(SimpleMetadataProvider::class);
+        $meta->shouldReceive('addResourceReferenceProperty')->withAnyArgs()->andReturnNull()->once();
+        $meta->shouldReceive('addResourceSetReferenceProperty')->withAnyArgs()->andReturnNull()->never();
+        App::instance('metadata', $meta);
+
+        $foo = m::mock(TestModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $fooName = get_class($foo);
+        $barName = TestMorphTarget::class;
+
+        $rel = [];
+        $rel['HasOne'] = ['b' => $barName];
+        $rel['HasMany'] = [];
+        $foo->shouldReceive('getRelationshipsFromMethods')->andReturn($rel)->once();
+
+        $type1 = m::mock(ResourceType::class);
+        $type2 = m::mock(ResourceType::class);
+        $set1 = m::mock(ResourceSet::class);
+        $set2 = m::mock(ResourceSet::class);
+        $types = [$fooName => $type1, $barName => $type2];
+        $sets = [$fooName => $set1, $barName => $set2];
+
+        $result = $foo->hookUpRelationships($types, $sets);
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(2, count($result));
+    }
+
+    public function testHookUpRelationshipsHasOnlyHasManyRelations()
+    {
+        $meta = m::mock(SimpleMetadataProvider::class);
+        $meta->shouldReceive('addResourceReferenceProperty')->withAnyArgs()->andReturnNull()->never();
+        $meta->shouldReceive('addResourceSetReferenceProperty')->withAnyArgs()->andReturnNull()->once();
+        App::instance('metadata', $meta);
+
+        $foo = m::mock(TestModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $fooName = get_class($foo);
+        $barName = TestMorphTarget::class;
+
+        $rel = [];
+        $rel['HasMany'] = ['b' => $barName];
+        $rel['HasOne'] = [];
+        $foo->shouldReceive('getRelationshipsFromMethods')->andReturn($rel)->once();
+
+        $type1 = m::mock(ResourceType::class);
+        $type2 = m::mock(ResourceType::class);
+        $set1 = m::mock(ResourceSet::class);
+        $set2 = m::mock(ResourceSet::class);
+        $types = [$fooName => $type1, $barName => $type2];
+        $sets = [$fooName => $set1, $barName => $set2];
+
+        $result = $foo->hookUpRelationships($types, $sets);
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(2, count($result));
     }
 
     /**

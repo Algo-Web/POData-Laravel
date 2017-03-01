@@ -83,9 +83,11 @@ trait MetadataTrait
 
         $visible = $this->getVisible();
         $hidden = $this->getHidden();
-        if (0 != count($visible)) {
+        if (0 < count($visible)) {
+            assert(!empty($visible));
             $attribs = array_intersect($visible, $attribs);
-        } elseif (0 != count($hidden)) {
+        } elseif (0 < count($hidden)) {
+            assert(!empty($hidden));
             $attribs = array_diff($attribs, $hidden);
         }
 
@@ -124,7 +126,7 @@ trait MetadataTrait
 
         $complex = $metadata->addEntityType(new \ReflectionClass(get_class($this)), $table, $MetaNamespace);
         $keyName = $this->getKeyName();
-        if(null != $keyName){
+        if (null != $keyName) {
             $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);
         }
         foreach ($raw as $key => $secret) {
@@ -145,31 +147,30 @@ trait MetadataTrait
 
     public function hookUpRelationships($entityTypes, $resourceSets)
     {
-        $metadata = \App::make('metadata');
+        assert(is_array($entityTypes) && is_array($resourceSets), "Both entityTypes and resourceSets must be arrays");
+        $metadata = App::make('metadata');
         $rel = $this->getRelationshipsFromMethods();
         $thisClass = get_class($this);
+        $thisInTypes = array_key_exists($thisClass, $entityTypes);
+        $thisInSets = array_key_exists($thisClass, $resourceSets);
+
+        if (!($thisInSets && $thisInTypes)) {
+            return $rel;
+        }
+
+        $resourceType = $entityTypes[$thisClass];
+        // if $r is in $combined keys, then its in keyspaces of both $entityTypes and $resourceSets
+        $combinedKeys = array_intersect(array_keys($entityTypes), array_keys($resourceSets));
         foreach ($rel["HasOne"] as $n => $r) {
-            if ($r[0] == "\\") {
-                $r = substr($r, 1);
-            }
-            if (array_key_exists($r, $entityTypes)
-                && array_key_exists($r, $resourceSets)
-                && array_key_exists($thisClass, $entityTypes)
-                && array_key_exists($thisClass, $resourceSets)) {
-                $resourceType = $entityTypes[$thisClass];
+            $r = trim($r, '\\');
+            if (in_array($r, $combinedKeys)) {
                 $targResourceSet = $resourceSets[$r];
                 $metadata->addResourceReferenceProperty($resourceType, $n, $targResourceSet);
             }
         }
         foreach ($rel["HasMany"] as $n => $r) {
-            if ($r[0] == "\\") {
-                $r = substr($r, 1);
-            }
-            if (array_key_exists($r, $entityTypes)
-                 && array_key_exists($r, $resourceSets)
-                 && array_key_exists($thisClass, $entityTypes)
-                 && array_key_exists($thisClass, $resourceSets)) {
-                $resourceType = $entityTypes[$thisClass];
+            $r = trim($r, '\\');
+            if (in_array($r, $combinedKeys)) {
                 $targResourceSet = $resourceSets[$r];
                 $metadata->addResourceSetReferenceProperty($resourceType, $n, $targResourceSet);
             }
@@ -228,9 +229,13 @@ trait MetadataTrait
                         $code .= $file->current();
                         $file->next();
                     }
+
                     $code = trim(preg_replace('/\s\s+/', '', $code));
+                    assert(false !== stripos($code, 'function'), 'Function definition must have keyword \'function\'');
                     $begin = strpos($code, 'function(');
                     $code = substr($code, $begin, strrpos($code, '}')-$begin+1);
+                    $lastCode = $code[strlen($code)-1];
+                    assert("}" == $lastCode, "Final character of function definition must be closing brace");
                     foreach (array(
                                 'hasMany',
                                 'hasManyThrough',

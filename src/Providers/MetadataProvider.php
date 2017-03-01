@@ -2,13 +2,15 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
+use POData\Providers\Metadata\IMetadataProvider;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema as Schema;
 
-class MetadataProvider extends ServiceProvider
+class MetadataProvider extends MetadataBaseProvider
 {
     protected static $METANAMESPACE = "Data";
 
@@ -30,60 +32,19 @@ class MetadataProvider extends ServiceProvider
         }
 
         self::setupRoute();
-        $isCaching = env('APP_METADATA_CACHING', false);
+        $isCaching = true === $this->getIsCaching();
         $hasCache = Cache::has('metadata');
 
         if ($isCaching && $hasCache) {
             $meta = Cache::get('metadata');
-            $this->app->instance('metadata', $meta);
+            App::instance('metadata', $meta);
             return;
         }
-        $meta = $this->app->make('metadata');
+        $meta = App::make('metadata');
 
-        $classes = get_declared_classes();
-        $AutoClass = null;
-        foreach ($classes as $class) {
-            if (\Illuminate\Support\Str::startsWith($class, "Composer\\Autoload\\ComposerStaticInit")) {
-                $AutoClass = $class;
-            }
-        }
-        $ends = array();
-        $Classes = $AutoClass::$classMap;
-        foreach ($Classes as $name => $file) {
-            if (\Illuminate\Support\Str::startsWith($name, "App")) {
-                if (in_array("AlgoWeb\\PODataLaravel\\Models\\MetadataTrait", class_uses($name))) {
-                    $ends[] = $name;
-                }
-            }
-        }
+        $modelNames = $this->getCandidateModels();
 
-        $EntityTypes = array();
-        $ResourceSets = array();
-        $begins = [];
-        $numEnds = count($ends);
-
-        for ($i = 0; $i < $numEnds; $i++) {
-            $bitter = $ends[$i];
-            $fqModelName = $bitter;
-
-            $instance = new $fqModelName();
-            $name = $instance->getEndpointName();
-            $metaSchema = $instance->getXmlSchema();
-            // if for whatever reason we don't get an XML schema, move on to next entry and drop current one from
-            // further processing
-            if (null == $metaSchema) {
-                continue;
-            }
-            $EntityTypes[$fqModelName] = $metaSchema;
-            $ResourceSets[$fqModelName] = $meta->addResourceSet(
-                strtolower($name),
-                $EntityTypes[$fqModelName]
-            );
-            $begins[] = $bitter;
-        }
-
-        $ends = $begins;
-        unset($begins);
+        list($EntityTypes, $ResourceSets, $ends) = $this->getEntityTypesAndResourceSets($meta, $modelNames);
 
         // now that endpoints are hooked up, tackle the relationships
         // if we'd tried earlier, we'd be guaranteed to try to hook a relation up to null, which would be bad
@@ -92,15 +53,9 @@ class MetadataProvider extends ServiceProvider
             $instance = new $fqModelName();
             $instance->hookUpRelationships($EntityTypes, $ResourceSets);
         }
-        if ($isCaching) {
-            if (!$hasCache) {
-                $cacheTime = env('APP_METADATA_CACHE_DURATION', 10);
-                $cacheTime = !is_numeric($cacheTime) ? 10 : abs($cacheTime);
-                Cache::put('metadata', $meta, $cacheTime);
-            }
-        } else {
-            Cache::forget('metadata');
-        }
+
+        $key = 'metadata';
+        $this->handlePostBoot($isCaching, $hasCache, $key, $meta);
     }
 
     private static function setupRoute()
@@ -122,5 +77,56 @@ class MetadataProvider extends ServiceProvider
         $this->app->singleton('metadata', function ($app) {
             return new SimpleMetadataProvider('Data', self::$METANAMESPACE);
         });
+    }
+
+    /**
+     * @return array
+     */
+    protected function getCandidateModels()
+    {
+        $Classes = $this->getClassMap();
+        $ends = [];
+        $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : "App";
+        foreach ($Classes as $name) {
+            if (\Illuminate\Support\Str::startsWith($name, $startName)) {
+                if (in_array("AlgoWeb\\PODataLaravel\\Models\\MetadataTrait", class_uses($name))) {
+                    $ends[] = $name;
+                }
+            }
+        }
+        return $ends;
+    }
+
+    /**
+     * @param $meta
+     * @param $ends
+     * @return array
+     */
+    protected function getEntityTypesAndResourceSets($meta, $ends)
+    {
+        assert($meta instanceof IMetadataProvider, get_class($meta));
+        $EntityTypes = [];
+        $ResourceSets = [];
+        $begins = [];
+        $numEnds = count($ends);
+
+        for ($i = 0; $i < $numEnds; $i++) {
+            $bitter = $ends[$i];
+            $fqModelName = $bitter;
+
+            $instance = App::make($fqModelName);
+            $name = strtolower($instance->getEndpointName());
+            $metaSchema = $instance->getXmlSchema();
+            // if for whatever reason we don't get an XML schema, move on to next entry and drop current one from
+            // further processing
+            if (null == $metaSchema) {
+                continue;
+            }
+            $EntityTypes[$fqModelName] = $metaSchema;
+            $ResourceSets[$fqModelName] = $meta->addResourceSet($name, $metaSchema);
+            $begins[] = $bitter;
+        }
+
+        return array($EntityTypes, $ResourceSets, $begins);
     }
 }

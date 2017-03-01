@@ -2,6 +2,12 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\ConnectionResolver;
+use Illuminate\Filesystem\FilesystemAdapter;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Mockery;
 use PHPUnit_Framework_TestCase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -14,6 +20,28 @@ use org\bovigo\vfs\vfsStreamDirectory;
 
 class TestCase extends BaseTestCase
 {
+    protected $origFacade = [];
+
+    /**
+     *
+     */
+    public function setUp()
+    {
+        if (!defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE')) {
+            define('PODATA_LARAVEL_APP_ROOT_NAMESPACE', 'AlgoWeb\PODataLaravel');
+        }
+        parent::setUp();
+        $this->origFacade['cache'] = Cache::getFacadeRoot();
+        //$this->origFacade['schema'] = Schema::getFacadeRoot();
+    }
+
+    public function tearDown()
+    {
+        Cache::swap($this->origFacade['cache']);
+        //Schema::swap($this->origFacade['schema']);
+        parent::tearDown();
+    }
+
 
     /**
      * Creates the application.
@@ -24,13 +52,28 @@ class TestCase extends BaseTestCase
      */
     public function createApplication()
     {
+        $file = \Mockery::mock(FilesystemAdapter::class)->makePartial();
+        $schema = \Mockery::mock(\Illuminate\Database\Schema\Blueprint::class)->makePartial();
+        $grammar = \Mockery::mock(\Illuminate\Database\Schema\Grammars\Grammar::class)->makePartial();
+
+        $dbConn = \Mockery::mock(\Illuminate\Database\Connection::class)->makePartial();
+        $dbConn->shouldReceive('getSchemaBuilder')->andReturn($schema);
+        $dbConn->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+
+        $builder = $this->getBuilder($dbConn);
+
         $database = \Mockery::mock(\Illuminate\Database\DatabaseManager::class)->makePartial();
-        $database->shouldReceive('table')->withAnyArgs()->andReturn($this->getBuilder());
+        $database->shouldReceive('table')->withAnyArgs()->andReturn($builder);
+        $database->shouldReceive('connection')->andReturn($dbConn);
+
+        $resolver = \Mockery::mock(ConnectionResolver::class)->makePartial();
+        $resolver->shouldReceive('connection')->andReturn($dbConn);
 
         $confRepo = \Mockery::mock(\Illuminate\Config\Repository::class)->makePartial();
         $confRepo->shouldReceive('shouldRecompile')->andReturn(false);
 
         $cacheRepo = \Mockery::mock(\Illuminate\Cache\Repository::class)->makePartial();
+        $cacheStore = \Mockery::mock(\Illuminate\Cache\ArrayStore::class)->makePartial();
 
         $fileSys = \Mockery::mock(\Illuminate\Filesystem\Filesystem::class)->makePartial();
         $fileSys->shouldReceive('put')->andReturnNull();
@@ -56,9 +99,18 @@ class TestCase extends BaseTestCase
                 realpath(base_path('resources/views'))
             ]
         );
+        $app->config->set('database.default', 'sqlite');
+        $app->config->set('database.connections', ['sqlite' => [
+            'driver'   => 'sqlite',
+            'database' => ':memory:',
+            'prefix'   => '',
+        ]]);
         $app->instance('cache.store', $cacheRepo);
+        $app->instance('cache', $cacheStore);
         $app->instance('db', $database);
         $app->instance('log', $log);
+        $app->instance('filesystem', $file);
+
 
         $app->singleton(
             \Illuminate\Contracts\Http\Kernel::class,
@@ -93,16 +145,22 @@ class TestCase extends BaseTestCase
             return new \Illuminate\Filesystem\Filesystem();
         });
 
+        \Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver);
+
         return $app;
     }
 
-    protected function getBuilder()
+    protected function getBuilder(ConnectionInterface $conn = null)
     {
         $grammar = new \Illuminate\Database\Query\Grammars\Grammar;
         $processor = \Mockery::mock('Illuminate\Database\Query\Processors\Processor')->makePartial();
-        $connect = \Mockery::mock('Illuminate\Database\ConnectionInterface');
-        $connect->shouldReceive('getQueryGrammar')->andReturn($grammar);
-        $connect->shouldReceive('getPostProcessor')->andReturn($processor);
+        if (null != $conn) {
+            $connect = $conn;
+        } else {
+            $connect = \Mockery::mock('Illuminate\Database\ConnectionInterface');
+            $connect->shouldReceive('getQueryGrammar')->andReturn($grammar);
+            $connect->shouldReceive('getPostProcessor')->andReturn($processor);
+        }
 
         return new \Illuminate\Database\Query\Builder(
             $connect,

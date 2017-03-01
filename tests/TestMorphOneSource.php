@@ -33,7 +33,7 @@ class TestMorphOneSource extends Model
 
     public function getTable()
     {
-        return 'testmorphtarget';
+        return 'testmorphonetarget';
     }
 
     public function getConnectionName()

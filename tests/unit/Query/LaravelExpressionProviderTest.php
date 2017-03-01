@@ -61,6 +61,8 @@ class LaravelExpressionProviderTest extends TestCase
         $foo->setResourceType($resource);
         $result = $foo->getIteratorName();
         $this->assertEquals($expected, $result);
+        $remix = $foo->getResourceType();
+        $this->assertEquals('dangerZone', $remix->getName());
     }
 
 

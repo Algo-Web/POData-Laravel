@@ -2,12 +2,13 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use AlgoWeb\PODataLaravel\Controllers\MetadataControllerTrait;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use Illuminate\Support\Facades\App;
 
-class MetadataControllerProvider extends ServiceProvider
+class MetadataControllerProvider extends MetadataBaseProvider
 {
     /**
      * Bootstrap the application services.  Post-boot.
@@ -16,52 +17,25 @@ class MetadataControllerProvider extends ServiceProvider
      */
     public function boot()
     {
-        $isCaching = env('APP_METADATA_CACHING', false);
+        $isCaching = true === $this->getIsCaching();
+        $hasCache = null;
 
-        if ($isCaching && Cache::has('metadataControllers')) {
-            $meta = Cache::get('metadataControllers');
-            $this->app->instance('metadataControllers', $meta);
-            return;
-        }
-
-        $meta = $this->app->make('metadataControllers');
-
-        $classes = get_declared_classes();
-        $AutoClass = null;
-        foreach ($classes as $class) {
-            if (\Illuminate\Support\Str::startsWith($class, "Composer\\Autoload\\ComposerStaticInit")) {
-                $AutoClass = $class;
+        if ($isCaching) {
+            $hasCache = Cache::has('metadataControllers');
+            if ($hasCache) {
+                $meta = Cache::get('metadataControllers');
+                App::instance('metadataControllers', $meta);
+                return;
             }
         }
 
-        $metamix = [];
-        $ends = array();
-        $Classes = $AutoClass::$classMap;
-        foreach ($Classes as $name => $file) {
-            // not in app namespace, keep moving
-            if (!\Illuminate\Support\Str::startsWith($name, "App")) {
-                continue;
-            }
-            // if class doesn't exist (for whatever reason), skip it now rather than muck about later
-            if (!class_exists($name)) {
-                continue;
-            }
-            try {
-                if (in_array(
-                    "AlgoWeb\\PODataLaravel\\Controllers\\MetadataControllerTrait",
-                    class_uses($name, false)
-                )) {
-                    $ends[] = new $name();
-                }
-            } catch (\Exception $e) {
-                if (!App::runningInConsole()) {
-                    throw $e;
-                }
-                // Squash exceptions thrown here when running from CLI so app can continue booting
-            }
-        }
+        $meta = App::make('metadataControllers');
+
+        $Classes = $this->getClassMap();
+        $ends = $this->getCandidateControllers($Classes);
 
         // now process each class that uses the metadata controller trait and stick results in $metamix
+        $metamix = [];
         $map = null;
         foreach ($ends as $end) {
             $map = $end->getMappings();
@@ -81,12 +55,13 @@ class MetadataControllerProvider extends ServiceProvider
                     );
                     $metamix[$key][$barrel] = $roll;
                 }
-
             }
         }
 
         $meta->setMetadata($metamix);
 
+        $key = 'metadataControllers';
+        $this->handlePostBoot($isCaching, $hasCache, $key, $meta);
     }
 
     /**
@@ -99,5 +74,37 @@ class MetadataControllerProvider extends ServiceProvider
         $this->app->singleton('metadataControllers', function ($app) {
             return new MetadataControllerContainer();
         });
+    }
+
+    /**
+     * @param $Classes
+     * @return array
+     * @throws \Exception
+     */
+    protected function getCandidateControllers($Classes)
+    {
+        $ends = [];
+        $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : "App";
+        foreach ($Classes as $name) {
+            // not in app namespace, keep moving
+            if (!\Illuminate\Support\Str::startsWith($name, $startName)) {
+                continue;
+            }
+            // if class doesn't exist (for whatever reason), skip it now rather than muck about later
+            if (!class_exists($name)) {
+                continue;
+            }
+            try {
+                if (in_array(MetadataControllerTrait::class, class_uses($name, false))) {
+                    $ends[] = App::make($name);
+                }
+            } catch (\Exception $e) {
+                if (!App::runningInConsole()) {
+                    throw $e;
+                }
+                // Squash exceptions thrown here when running from CLI so app can continue booting
+            }
+        }
+        return $ends;
     }
 }

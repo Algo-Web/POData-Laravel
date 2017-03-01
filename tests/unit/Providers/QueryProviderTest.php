@@ -3,6 +3,8 @@
 namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use Illuminate\Support\Facades\App;
 
 /**
  * Generated Test Class.
@@ -39,12 +41,9 @@ class QueryProviderTest extends TestCase
      */
     public function testBoot()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $foo = new QueryProvider($this->app);
+        $foo->boot();
     }
-
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Providers\QueryProvider::register
@@ -52,10 +51,11 @@ class QueryProviderTest extends TestCase
      */
     public function testRegister()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $foo = new QueryProvider($this->app);
+        $foo->register();
+
+        $result = App::make('odataquery');
+        $this->assertTrue($result instanceof LaravelQuery);
     }
 
 
