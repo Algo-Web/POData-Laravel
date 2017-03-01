@@ -699,6 +699,59 @@ class LaravelQueryTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testAttemptUpdateBadIdThrowException()
+    {
+        $controller = new TestController();
+
+        $json = m::mock(JsonResponse::class)->makePartial();
+        $json->shouldReceive('getData')->andReturn(['id' => -1, 'status' => 'success', 'errors' => null])->once();
+
+        $testName = TestController::class;
+        $mockController = m::mock($testName)->makePartial();
+        $mockController->shouldReceive('updateTestModel')->withAnyArgs()->andReturn($json)->once();
+
+        $this->seedControllerMetadata($controller);
+
+        $metaProv = new SimpleMetadataProvider('Data', 'Data');
+
+        $fqModelName = TestModel::class;
+        $instance = $this->generateTestModelWithMetadata();
+        $type = $instance->getXmlSchema();
+        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
+        App::instance('metadata', $metaProv);
+        App::instance($testName, $mockController);
+
+        $std = new \StdClass();
+        $std->name = TestModel::class;
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
+        $model = new TestModel();
+        $model->id = null;
+
+        $data = new \StdClass;
+        $data->name = 'Wibble';
+        $data->added_at = new \DateTime;
+        $data->weight = 0;
+        $data->code = 'Enigma';
+        $data->success = false;
+        $key = m::mock(KeyDescriptor::class);
+
+        $foo = new LaravelQuery();
+        $expected = 'No query results for model [AlgoWeb\\PODataLaravel\\Models\\TestModel] -1';
+        $actual = null;
+        $expectedCode = 500;
+        $actualCode = null;
+        try {
+            $result = $foo->updateResource($mockResource, $model, $key, $data);
+        } catch (ODataException $e) {
+            $actual = $e->getMessage();
+            $actualCode = $e->getStatusCode();
+        }
+        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expectedCode, $actualCode);
+    }
+
+
     public function testAttemptDeleteBadSourceInstanceThrowException()
     {
         $mockResource = m::mock(ResourceSet::class);
@@ -1144,6 +1197,15 @@ class LaravelQueryTest extends TestCase
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testPutResource()
+    {
+        $resource = \Mockery::mock(ResourceSet::class);
+        $key = m::mock(KeyDescriptor::class);
+
+        $foo = new LaravelQuery();
+        $foo->putResource($resource, $key, []);
     }
 
 

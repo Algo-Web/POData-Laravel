@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use Illuminate\Support\Facades\App;
 
-class MetadataControllerProvider extends ServiceProvider
+class MetadataControllerProvider extends MetadataBaseProvider
 {
     /**
      * Bootstrap the application services.  Post-boot.
@@ -18,6 +18,7 @@ class MetadataControllerProvider extends ServiceProvider
     public function boot()
     {
         $isCaching = true === $this->getIsCaching();
+        $hasCache = null;
 
         if ($isCaching) {
             $hasCache = Cache::has('metadataControllers');
@@ -59,16 +60,8 @@ class MetadataControllerProvider extends ServiceProvider
 
         $meta->setMetadata($metamix);
 
-        if ($isCaching) {
-            if (!$hasCache) {
-                $cacheTime = env('APP_METADATA_CACHE_DURATION', null);
-                $cacheTime = !is_numeric($cacheTime) ? 10 : abs($cacheTime);
-                Cache::put('metadataControllers', $meta, $cacheTime);
-            }
-        } else {
-            Cache::forget('metadataControllers');
-        }
-
+        $key = 'metadataControllers';
+        $this->handlePostBoot($isCaching, $hasCache, $key, $meta);
     }
 
     /**
@@ -113,31 +106,5 @@ class MetadataControllerProvider extends ServiceProvider
             }
         }
         return $ends;
-    }
-
-    /**
-     * @param $classMap
-     * @return array
-     */
-    protected function getClassMap()
-    {
-        $classes = get_declared_classes();
-        $AutoClass = null;
-        foreach ($classes as $class) {
-            if (\Illuminate\Support\Str::startsWith($class, "Composer\\Autoload\\ComposerStaticInit")) {
-                $AutoClass = $class;
-            }
-        }
-
-        $Classes = $AutoClass::$classMap;
-        return array_keys($Classes);
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function getIsCaching()
-    {
-        return true === env('APP_METADATA_CACHING', false);
     }
 }

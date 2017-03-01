@@ -444,7 +444,11 @@ class LaravelQuery implements IQueryProvider
         $success = isset($data['id']);
 
         if ($success) {
-            return $class::findOrFail($data['id']);
+            try {
+                return $class::findOrFail($data['id']);
+            } catch (\Exception $e) {
+                throw new ODataException($e->getMessage(), 500);
+            }
         }
         throw new ODataException('Target model not successfully '.$lastWord, 422);
     }

@@ -10,7 +10,7 @@ use POData\Providers\Metadata\SimpleMetadataProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema as Schema;
 
-class MetadataProvider extends ServiceProvider
+class MetadataProvider extends MetadataBaseProvider
 {
     protected static $METANAMESPACE = "Data";
 
@@ -32,7 +32,7 @@ class MetadataProvider extends ServiceProvider
         }
 
         self::setupRoute();
-        $isCaching = true === $this->checkIsCaching();
+        $isCaching = true === $this->getIsCaching();
         $hasCache = Cache::has('metadata');
 
         if ($isCaching && $hasCache) {
@@ -53,15 +53,9 @@ class MetadataProvider extends ServiceProvider
             $instance = new $fqModelName();
             $instance->hookUpRelationships($EntityTypes, $ResourceSets);
         }
-        if ($isCaching) {
-            if (!$hasCache) {
-                $cacheTime = env('APP_METADATA_CACHE_DURATION', null);
-                $cacheTime = !is_numeric($cacheTime) ? 10 : abs($cacheTime);
-                Cache::put('metadata', $meta, $cacheTime);
-            }
-        } else {
-            Cache::forget('metadata');
-        }
+
+        $key = 'metadata';
+        $this->handlePostBoot($isCaching, $hasCache, $key, $meta);
     }
 
     private static function setupRoute()
@@ -90,17 +84,10 @@ class MetadataProvider extends ServiceProvider
      */
     protected function getCandidateModels()
     {
-        $classes = get_declared_classes();
-        $AutoClass = null;
-        foreach ($classes as $class) {
-            if (\Illuminate\Support\Str::startsWith($class, "Composer\\Autoload\\ComposerStaticInit")) {
-                $AutoClass = $class;
-            }
-        }
+        $Classes = $this->getClassMap();
         $ends = [];
-        $Classes = $AutoClass::$classMap;
         $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : "App";
-        foreach ($Classes as $name => $file) {
+        foreach ($Classes as $name) {
             if (\Illuminate\Support\Str::startsWith($name, $startName)) {
                 if (in_array("AlgoWeb\\PODataLaravel\\Models\\MetadataTrait", class_uses($name))) {
                     $ends[] = $name;
@@ -141,13 +128,5 @@ class MetadataProvider extends ServiceProvider
         }
 
         return array($EntityTypes, $ResourceSets, $begins);
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function checkIsCaching()
-    {
-        return true === env('APP_METADATA_CACHING', false);
     }
 }

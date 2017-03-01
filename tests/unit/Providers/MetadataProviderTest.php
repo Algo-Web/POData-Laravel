@@ -49,13 +49,26 @@ class MetadataProviderTest extends TestCase
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Providers\MetadataProvider::boot
-     * @todo   Implement testBoot().
      */
     public function testBootNoMigrations()
     {
-        $app = \Mockery::mock(\Illuminate\Contracts\Foundation\Application::class)->makePartial();
-        $foo = new \AlgoWeb\PODataLaravel\Providers\MetadataProvider($app);
-        $result = $foo->boot();
+        $schema = Schema::getFacadeRoot();
+        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(false)->once();
+
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->boot();
+    }
+
+    /**
+     * @covers \AlgoWeb\PODataLaravel\Providers\MetadataProvider::boot
+     */
+    public function testBootNoMigrationsExceptionThrown()
+    {
+        $schema = Schema::getFacadeRoot();
+        $schema->shouldReceive('hasTable')->andThrow(new \Exception())->once();
+
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->boot();
     }
 
     public function testBootHasMigrationsIsCached()
@@ -79,7 +92,7 @@ class MetadataProviderTest extends TestCase
         Cache::swap($cache);
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('checkIsCaching')->andReturn(true)->once();
+        $foo->shouldReceive('getIsCaching')->andReturn(true)->once();
 
         $foo->boot();
         $result = App::make('metadata');
@@ -118,7 +131,7 @@ class MetadataProviderTest extends TestCase
         Cache::swap($cache);
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('checkIsCaching')->andReturn(true)->once();
+        $foo->shouldReceive('getIsCaching')->andReturn(true)->once();
 
         $foo->boot();
     }
