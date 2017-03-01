@@ -17,12 +17,15 @@ class MetadataControllerProvider extends ServiceProvider
      */
     public function boot()
     {
-        $isCaching = env('APP_METADATA_CACHING', false);
+        $isCaching = true === $this->getIsCaching();
 
-        if ($isCaching && Cache::has('metadataControllers')) {
-            $meta = Cache::get('metadataControllers');
-            App::instance('metadataControllers', $meta);
-            return;
+        if ($isCaching) {
+            $hasCache = Cache::has('metadataControllers');
+            if ($hasCache) {
+                $meta = Cache::get('metadataControllers');
+                App::instance('metadataControllers', $meta);
+                return;
+            }
         }
 
         $meta = App::make('metadataControllers');
@@ -55,6 +58,16 @@ class MetadataControllerProvider extends ServiceProvider
         }
 
         $meta->setMetadata($metamix);
+
+        if ($isCaching) {
+            if (!$hasCache) {
+                $cacheTime = env('APP_METADATA_CACHE_DURATION', null);
+                $cacheTime = !is_numeric($cacheTime) ? 10 : abs($cacheTime);
+                Cache::put('metadataControllers', $meta, $cacheTime);
+            }
+        } else {
+            Cache::forget('metadataControllers');
+        }
 
     }
 
@@ -104,7 +117,7 @@ class MetadataControllerProvider extends ServiceProvider
 
     /**
      * @param $classMap
-     * @return mixed
+     * @return array
      */
     protected function getClassMap()
     {
@@ -118,5 +131,13 @@ class MetadataControllerProvider extends ServiceProvider
 
         $Classes = $AutoClass::$classMap;
         return array_keys($Classes);
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getIsCaching()
+    {
+        return true === env('APP_METADATA_CACHING', false);
     }
 }
