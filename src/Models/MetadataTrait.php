@@ -254,7 +254,7 @@ trait MetadataTrait
                                 $relations = ['hasManyThrough', 'belongsToMany', 'hasMany', 'morphMany', 'morphToMany'];
                                 if (in_array($relation, $relations)) {
                                     //Collection or array of models (because Collection is Arrayable)
-                                    $relationships["HasMany"][$method] =  $relatedModel;
+                                    $relationships["HasMany"][$method] = $relatedModel;
                                 } elseif ($relation === "morphTo") {
                                     // Model isn't specified because relation is polymorphic
                                     $relationships["UnknownPolyMorphSide"][$method] =
