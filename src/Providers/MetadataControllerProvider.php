@@ -3,6 +3,8 @@
 namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerTrait;
+use AlgoWeb\PODataLaravel\Controllers\TestController;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
@@ -96,7 +98,9 @@ class MetadataControllerProvider extends MetadataBaseProvider
             }
             try {
                 if (in_array(MetadataControllerTrait::class, class_uses($name, false))) {
-                    $ends[] = App::make($name);
+                    $result = App::make($name);
+                    $ends[] = $result;
+                    assert($result instanceof Controller, "Resolved result not a controller");
                 }
             } catch (\Exception $e) {
                 if (!App::runningInConsole()) {
