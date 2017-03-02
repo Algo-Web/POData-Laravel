@@ -50,6 +50,7 @@ class LaravelExpressionProviderTest extends TestCase
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider::setResourceType
+     * @covers \AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider::getResourceType
      */
     public function testSetResourceType()
     {
@@ -64,7 +65,6 @@ class LaravelExpressionProviderTest extends TestCase
         $remix = $foo->getResourceType();
         $this->assertEquals('dangerZone', $remix->getName());
     }
-
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider::onLogicalExpression
