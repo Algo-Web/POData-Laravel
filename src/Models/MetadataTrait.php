@@ -122,7 +122,6 @@ trait MetadataTrait
 
         $metadata = App::make('metadata');
 
-        $table = $this->getTable();
         $rf = new \ReflectionClass(get_class($this));
         $complex = $metadata->addEntityType($rf, $rf->getShortName(), $MetaNamespace);
         $keyName = $this->getKeyName();
