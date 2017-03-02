@@ -23,6 +23,7 @@ class LaravelQuery implements IQueryProvider
 {
     protected $expression;
     protected $auth;
+    protected $reader;
     public $queryProviderClassName;
 
     public function __construct(AuthInterface $auth = null)
@@ -31,6 +32,7 @@ class LaravelQuery implements IQueryProvider
         $this->expression = new LaravelExpressionProvider(); //PHPExpressionProvider('expression');
         $this->queryProviderClassName = get_class($this);
         $this->auth = isset($auth) ? $auth : new NullAuthProvider();
+        $this->reader = new LaravelReadQuery();
     }
 
     /**
@@ -56,6 +58,16 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
+     * Gets the LaravelReadQuery instance used to handle read queries (repetitious, nyet?)
+     *
+     * @return LaravelReadQuery
+     */
+    public function getReader()
+    {
+        return $this->reader;
+    }
+
+    /**
      * Gets collection of entities belongs to an entity set
      * IE: http://host/EntitySet
      *  http://host/EntitySet?$skip=10&$top=5&filter=Prop gt Value
@@ -78,58 +90,15 @@ class LaravelQuery implements IQueryProvider
         $skipToken = null,
         Model $sourceEntityInstance = null
     ) {
-        if (null != $filterInfo && !($filterInfo instanceof FilterInfo)) {
-            throw new InvalidArgumentException('Filter info must be either null or instance of FilterInfo.');
-        }
-
-        if (null == $sourceEntityInstance) {
-            $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
-        }
-
-        $result          = new QueryResult();
-        $result->results = null;
-        $result->count   = null;
-
-        if (null != $orderBy) {
-            foreach ($orderBy->getOrderByInfo()->getOrderByPathSegments() as $order) {
-                foreach ($order->getSubPathSegments() as $subOrder) {
-                    $sourceEntityInstance = $sourceEntityInstance->orderBy(
-                        $subOrder->getName(),
-                        $order->isAscending() ? 'asc' : 'desc'
-                    );
-                }
-            }
-        }
-
-        $resultSet = $sourceEntityInstance->get();
-
-        if (isset($filterInfo)) {
-            $method = "return ".$filterInfo->getExpressionAsString().";";
-            $clln = "$".$resourceSet->getResourceType()->getName();
-            $isvalid = create_function($clln, $method);
-            $resultSet = $resultSet->filter($isvalid);
-        }
-
-        $resultCount = $resultSet->count();
-
-        if (isset($skipToken)) {
-            $resultSet = $resultSet->slice($skipToken);
-        }
-        if (isset($top)) {
-            $resultSet = $resultSet->take($top);
-        }
-
-
-        if (QueryType::ENTITIES() == $queryType || QueryType::ENTITIES_WITH_COUNT() == $queryType) {
-            $result->results = array();
-            foreach ($resultSet as $res) {
-                $result->results[] = $res;
-            }
-        }
-        if (QueryType::COUNT() == $queryType || QueryType::ENTITIES_WITH_COUNT() == $queryType) {
-            $result->count = $resultCount;
-        }
-        return $result;
+        return $this->getReader()->getResourceSet(
+            $queryType,
+            $resourceSet,
+            $filterInfo,
+            $orderBy,
+            $top,
+            $skipToken,
+            $sourceEntityInstance
+        );
     }
     /**
      * Gets an entity instance from an entity set identified by a key
@@ -145,40 +114,7 @@ class LaravelQuery implements IQueryProvider
         ResourceSet $resourceSet,
         KeyDescriptor $keyDescriptor = null
     ) {
-        return $this->getResource($resourceSet, $keyDescriptor);
-    }
-
-    /**
-     * Common method for getResourceFromRelatedResourceSet() and getResourceFromResourceSet()
-     * @param ResourceSet|null $resourceSet
-     * @param null|KeyDescriptor $keyDescriptor
-     */
-    protected function getResource(
-        ResourceSet $resourceSet = null,
-        KeyDescriptor $keyDescriptor = null,
-        array $whereCondition = [],
-        Model $sourceEntityInstance = null
-    ) {
-        if (null == $resourceSet && null == $sourceEntityInstance) {
-            throw new \Exception('Must supply at least one of a resource set and source entity.');
-        }
-
-        if (null == $sourceEntityInstance) {
-            assert(null != $resourceSet);
-            $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
-        }
-
-        if ($keyDescriptor) {
-            foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
-                $trimValue = trim($value[0], "\"'");
-                $sourceEntityInstance = $sourceEntityInstance->where($key, $trimValue);
-            }
-        }
-        foreach ($whereCondition as $fieldName => $fieldValue) {
-            $sourceEntityInstance = $sourceEntityInstance->where($fieldName, $fieldValue);
-        }
-        $sourceEntityInstance = $sourceEntityInstance->get();
-        return (0 == $sourceEntityInstance->count()) ? null : $sourceEntityInstance->first();
+        return $this->getReader()->getResourceFromResourceSet($resourceSet, $keyDescriptor);
     }
 
     /**
@@ -210,23 +146,16 @@ class LaravelQuery implements IQueryProvider
         $top = null,
         $skip = null
     ) {
-        if (!($sourceEntityInstance instanceof Model)) {
-            throw new InvalidArgumentException('Source entity must be an Eloquent model.');
-        }
-
-        $propertyName = $targetProperty->getName();
-        $results = $sourceEntityInstance->$propertyName();
-        $relatedClass = $results->getRelated();
-        $sourceEntityInstance = new $relatedClass();
-
-        return $this->getResourceSet(
+        return $this->getReader()->getRelatedResourceSet(
             $queryType,
             $sourceResourceSet,
+            $sourceEntityInstance,
+            $targetResourceSet,
+            $targetProperty,
             $filter,
             $orderBy,
             $top,
-            $skip,
-            $sourceEntityInstance
+            $skip
         );
     }
 
@@ -249,11 +178,13 @@ class LaravelQuery implements IQueryProvider
         ResourceProperty $targetProperty,
         KeyDescriptor $keyDescriptor
     ) {
-        if (!($sourceEntityInstance instanceof Model)) {
-            throw new InvalidArgumentException('Source entity must be an Eloquent model.');
-        }
-        $propertyName = $targetProperty->getName();
-        return $this->getResource(null, $keyDescriptor, [], $sourceEntityInstance->$propertyName);
+        return $this->getReader()->getResourceFromRelatedResourceSet(
+            $sourceResourceSet,
+            $sourceEntityInstance,
+            $targetResourceSet,
+            $targetProperty,
+            $keyDescriptor
+        );
     }
 
     /**
@@ -274,21 +205,12 @@ class LaravelQuery implements IQueryProvider
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty
     ) {
-        if (!($sourceEntityInstance instanceof Model)) {
-            throw new InvalidArgumentException('Source entity must be an Eloquent model.');
-        }
-        $propertyName = $targetProperty->getName();
-        return $sourceEntityInstance->$propertyName;
-    }
-
-    /**
-     * @param ResourceSet $resourceSet
-     * @return mixed
-     */
-    protected function getSourceEntityInstance(ResourceSet $resourceSet)
-    {
-        $entityClassName = $resourceSet->getResourceType()->getInstanceType()->name;
-        return App::make($entityClassName);
+        return $this->getReader()->getRelatedResourceReference(
+            $sourceResourceSet,
+            $sourceEntityInstance,
+            $targetResourceSet,
+            $targetProperty
+        );
     }
 
     /**
@@ -381,9 +303,8 @@ class LaravelQuery implements IQueryProvider
             );
         }
 
-        if (null == $data) {
-            $data = [];
-        } elseif (is_object($data)) {
+        assert($data != null, "Data must not be null");
+        if (is_object($data)) {
             $data = (array) $data;
         }
         if (!is_array($data)) {

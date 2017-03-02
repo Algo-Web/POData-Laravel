@@ -42,6 +42,11 @@ class LaravelQueryTest extends TestCase
      */
     protected $object;
 
+    /**
+     * @var \AlgoWeb\PODataLaravel\Query\LaravelReadQuery
+     */
+    protected $reader;
+
     protected $mapping;
 
     /**
@@ -156,7 +161,9 @@ class LaravelQueryTest extends TestCase
         $sourceEntity->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']))->once();
         App::instance($instanceType->name, $sourceEntity);
 
+        $reader = m::mock(LaravelReadQuery::class)->makePartial();
         $foo = \Mockery::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getReader')->andReturn($reader);
         //$foo->shouldReceive('getSourceEntityInstance')->andReturn($rawResult);
 
         $expected = ['eins', 'zwei', 'polizei'];
@@ -165,6 +172,65 @@ class LaravelQueryTest extends TestCase
         $this->assertTrue($result instanceof QueryResult);
         $this->assertEquals(3, $result->count);
         $this->assertEquals($expected, $result->results);
+    }
+
+    public function testGetResourceSetWithNoInstance()
+    {
+        $testModel = m::mock(TestModel::class)->makePartial();
+        $testModel->shouldReceive('get')->andReturn(collect(['a', 'b']))->once();
+        App::instance(TestModel::class, $testModel);
+
+        $instance = new \StdClass();
+        $instance->name = TestModel::class;
+
+        $queryType = QueryType::ENTITIES();
+        $type = m::mock(ResourceType::class);
+        $type->shouldReceive('getInstanceType')->andReturn($instance);
+
+        $resource = m::mock(ResourceSet::class);
+        $resource->shouldReceive('getResourceType')->andReturn($type);
+        $sourceEntityInstance = null;
+
+
+        $reader = m::mock(LaravelReadQuery::class)->makePartial();
+        $foo = \Mockery::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getReader')->andReturn($reader);
+
+        $expected = ['a', 'b'];
+        $result = $foo->getResourceSet($queryType, $resource);
+        $this->assertTrue(is_array($result->results));
+        $this->assertEquals(2, count($result->results));
+        $this->assertEquals($expected, $result->results);
+        $this->assertNull($result->count);
+    }
+
+    public function testGetResourceWithNoInstance()
+    {
+        $where = ['foo' => 2];
+
+        $testModel = m::mock(TestModel::class)->makePartial();
+        $testModel->shouldReceive('get')->andReturn(collect(['a', 'b']))->once();
+        $testModel->shouldReceive('where')->andReturn($testModel);
+        App::instance(TestModel::class, $testModel);
+
+        $key = null;
+
+        $instance = new \StdClass();
+        $instance->name = TestModel::class;
+
+        $type = m::mock(ResourceType::class);
+        $type->shouldReceive('getInstanceType')->andReturn($instance);
+
+        $resource = m::mock(ResourceSet::class);
+        $resource->shouldReceive('getResourceType')->andReturn($type);
+        $sourceEntityInstance = null;
+
+        $reader = m::mock(LaravelReadQuery::class)->makePartial();
+        $foo = \Mockery::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getReader')->andReturn($reader);
+
+        $result = $reader->getResource($resource, $key, $where);
+        $this->assertEquals('a', $result);
     }
 
     public function testGetResourceSetWithSuppliedOrderAndFilterInfo()
@@ -220,7 +286,9 @@ class LaravelQueryTest extends TestCase
         $filter = m::mock(FilterInfo::class);
         $filter->shouldReceive('getExpressionAsString')->andReturn('')->once();
 
+        $reader = m::mock(LaravelReadQuery::class)->makePartial();
         $foo = \Mockery::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getReader')->andReturn($reader);
         $foo->shouldReceive('getSourceEntityInstance')->andReturn($rawResult);
 
         $result = $foo->getResourceSet($queryType, $mockResource, $filter, $order, 5, 'skipToken', $sourceEntity);
@@ -255,6 +323,16 @@ class LaravelQueryTest extends TestCase
 
         $foo = new LaravelQuery();
         $result = $foo->getResourceFromResourceSet($mockResource, $key);
+        $this->assertNull($result);
+    }
+
+    public function testGetResourceFromResourceSetUsingReaderEmptyResult()
+    {
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $foo = m::mock(LaravelReadQuery::class)->makePartial();
+        $foo->shouldReceive('getResource')->andReturn(null)->once();
+
+        $result = $foo->getResourceFromResourceSet($mockResource);
         $this->assertNull($result);
     }
 
@@ -318,8 +396,10 @@ class LaravelQueryTest extends TestCase
         $query->count = 3;
         $query->results = ['eins', 'zwei', 'polizei'];
 
-        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getResourceSet')->withAnyArgs()->andReturn($query);
+        $reader = m::mock(LaravelReadQuery::class)->makePartial();
+        $reader->shouldReceive('getResourceSet')->withAnyArgs()->andReturn($query);
+        $foo = \Mockery::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getReader')->andReturn($reader);
 
         $expected = ['eins', 'zwei', 'polizei'];
 
@@ -346,8 +426,10 @@ class LaravelQueryTest extends TestCase
 
         $sourceEntity = \Mockery::mock(TestMorphManySource::class)->makePartial();
 
-        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getResourceSet')->withAnyArgs()->andReturn($query);
+        $reader = m::mock(LaravelReadQuery::class)->makePartial();
+        $reader->shouldReceive('getResourceSet')->withAnyArgs()->andReturn($query);
+        $foo = \Mockery::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getReader')->andReturn($reader);
         $result = $foo->getRelatedResourceSet($queryType, $mockResource, $sourceEntity, $mockResource, $property);
         $this->assertTrue($result instanceof QueryResult);
         $this->assertEquals(3, $result->count);
@@ -378,8 +460,10 @@ class LaravelQueryTest extends TestCase
         $sourceEntity = \Mockery::mock(TestMorphManySource::class)->makePartial();
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
 
-        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getResourceSet')->withAnyArgs()->andReturn($query);
+        $reader = m::mock(LaravelReadQuery::class)->makePartial();
+        $reader->shouldReceive('getResourceSet')->withAnyArgs()->andReturn($query);
+        $foo = \Mockery::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getReader')->andReturn($reader);
         $result = $foo->getRelatedResourceSet(
             $queryType,
             $mockResource,
@@ -534,6 +618,21 @@ class LaravelQueryTest extends TestCase
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetRelatedResourceReferenceWithValidGubbins()
+    {
+        $model = new TestModel();
+        $model->name = 'Hammer, MC';
+
+        $source = m::mock(ResourceSet::class);
+        $targ = m::mock(ResourceSet::class);
+        $property = m::mock(ResourceProperty::class);
+        $property->shouldReceive('getName')->andReturn('name');
+
+        $foo = new LaravelQuery();
+        $result = $foo->getRelatedResourceReference($source, $model, $targ, $property);
+        $this->assertEquals($model->name, $result);
     }
 
     public function testAttemptUpdateBadSourceInstanceThrowException()
@@ -1207,7 +1306,6 @@ class LaravelQueryTest extends TestCase
         $foo = new LaravelQuery();
         $foo->putResource($resource, $key, []);
     }
-
 
     private function seedControllerMetadata(TestController $controller = null)
     {
