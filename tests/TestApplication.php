@@ -9,6 +9,7 @@ use Illuminate\Foundation\ProviderRepository;
 class TestApplication extends Application
 {
     protected $filesys;
+    protected $inConsole = true;
 
     public function __construct(Filesystem $file)
     {
@@ -27,5 +28,15 @@ class TestApplication extends Application
 
         (new ProviderRepository($this, $this->filesys, $manifestPath))
             ->load($this->config['app.providers']);
+    }
+
+    public function runningInConsole()
+    {
+        return $this->inConsole;
+    }
+
+    public function setConsole($flag)
+    {
+        $this->inConsole = true === $flag;
     }
 }

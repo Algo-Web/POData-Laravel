@@ -4,8 +4,10 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Controllers\ElectricBoogalooController;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
+use AlgoWeb\PODataLaravel\Models\TestApplication;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestModel;
+use ErrorException;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Mockery as m;
@@ -218,5 +220,38 @@ class MetadataControllerProviderTest extends TestCase
         $metadata = $result->getMetadata();
         $this->assertTrue(is_array($metadata));
         $this->assertEquals(0, count($metadata));
+    }
+
+    public function testBootExceptionThrownDuringResolution()
+    {
+        $app = App::make('app');
+        $app->setConsole(false);
+
+        $container = m::mock(MetadataControllerContainer::class);
+        $container->shouldReceive('setMetadata')->withArgs([[]])->passthru()->never();
+        $container->shouldReceive('setMetadata')->with(m::not([]))->andReturnNull()->never();
+        $container->shouldReceive('getMetadata')->passthru();
+        App::instance('metadataControllers', $container);
+
+        App::instance(TestController::class, $container);
+
+        $cache = Cache::getFacadeRoot();
+        $cache->shouldReceive('has')->withArgs(['metadataControllers'])->andReturn(false)->never();
+        $cache->shouldReceive('get')->withArgs(['metadataControllers'])->andReturn('aybabtu')->never();
+        $cache->shouldReceive('forget')->with('metadataControllers')->never();
+
+        $foo = m::mock(MetadataControllerProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getClassMap')->andReturn([TestController::class])->once();
+        $foo->shouldReceive('getIsCaching')->andReturn(false)->once();
+
+        $expected = 'assert(): Resolved result not a controller failed';
+        $actual = null;
+
+        try {
+            $foo->boot();
+        } catch (ErrorException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 }
