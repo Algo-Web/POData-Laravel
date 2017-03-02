@@ -52,7 +52,7 @@ class LaravelExpressionProvider implements IExpressionProvider
     public function __construct()
     {
         $this->functionDescriptionParsers[ODataConstants::STRFUN_COMPARE] = function($params){
-           return "strcmp($params[0], $params[1])";
+            return "strcmp($params[0], $params[1])";
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_ENDSWITH] = function($params){
             return "(strcmp(substr($params[0], strlen($params[0]) - strlen($params[1])), $params[1]) === 0)";
@@ -80,7 +80,7 @@ class LaravelExpressionProvider implements IExpressionProvider
                 "substr($params[0], $params[1], $params[2])" : "substr($params[0], $params[1])";
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_SUBSTRINGOF] = function($params){
-           return "(strpos($params[1], $params[0]) !== false)";
+            return "(strpos($params[1], $params[0]) !== false)";
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_CONCAT] = function($params){
             return $params[0].' . '.$params[1];
