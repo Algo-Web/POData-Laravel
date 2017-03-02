@@ -298,7 +298,7 @@ class MetadataTraitTest extends TestCase
         $foo = new TestModel($meta);
 
         $result = $foo->getXmlSchema();
-        $this->assertEquals('testmodel', $result->getName());
+        $this->assertEquals('TestModel', $result->getName());
 
         $props = $result->getPropertiesDeclaredOnThisType();
         $this->assertEquals(2, count($props));

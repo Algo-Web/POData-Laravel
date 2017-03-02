@@ -122,9 +122,8 @@ trait MetadataTrait
 
         $metadata = App::make('metadata');
 
-        $table = $this->getTable();
-
-        $complex = $metadata->addEntityType(new \ReflectionClass(get_class($this)), $table, $MetaNamespace);
+        $rf = new \ReflectionClass(get_class($this));
+        $complex = $metadata->addEntityType($rf, $rf->getShortName(), $MetaNamespace);
         $keyName = $this->getKeyName();
         if (null != $keyName) {
             $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);
@@ -175,7 +174,6 @@ trait MetadataTrait
                 $metadata->addResourceSetReferenceProperty($resourceType, $n, $targResourceSet);
             }
         }
-
         return $rel;
     }
 
