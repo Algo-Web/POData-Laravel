@@ -51,82 +51,82 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function __construct()
     {
-            $this->functionDescriptionParsers[ODataConstants::STRFUN_COMPARE] = function($params){
-                return "strcmp($params[0], $params[1])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::STRFUN_ENDSWITH] = function($params){
-                return "(strcmp(substr($params[0], strlen($params[0]) - strlen($params[1])), $params[1]) === 0)";
-			};
-            $this->functionDescriptionParsers[ODataConstants::STRFUN_INDEXOF] = function($params){
-                return "strpos($params[0], $params[1])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::STRFUN_REPLACE] = function($params){
-                return "str_replace($params[1], $params[2], $params[0])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::STRFUN_STARTSWITH] = function($params){
-                return "(strpos($params[0], $params[1]) === 0)";
-			};
-            $this->functionDescriptionParsers[ODataConstants::STRFUN_TOLOWER] = function($params){
-                return "strtolower($params[0])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::STRFUN_TOUPPER] = function($params){
-                return "strtoupper($params[0])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::STRFUN_TRIM] = function($params){
-                return "trim($params[0])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::STRFUN_SUBSTRING] = function($params){
-                return count($params) == 3 ?
-                    "substr($params[0], $params[1], $params[2])" : "substr($params[0], $params[1])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::STRFUN_SUBSTRINGOF] = function($params){
-                return "(strpos($params[1], $params[0]) !== false)";
-			};
-            $this->functionDescriptionParsers[ODataConstants::STRFUN_CONCAT] = function($params){
-                return $params[0].' . '.$params[1];
-			};
-            $this->functionDescriptionParsers[ODataConstants::STRFUN_LENGTH] = function($params){
-                return "strlen($params[0])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::GUIDFUN_EQUAL] = function($params){
-                return self::TYPE_NAMESPACE."Guid::guidEqual($params[0], $params[1])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::DATETIME_COMPARE] = function($params){
-                return self::TYPE_NAMESPACE."DateTime::dateTimeCmp($params[0], $params[1])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::DATETIME_YEAR] = function($params){
-                return self::TYPE_NAMESPACE."DateTime::year($params[0])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::DATETIME_MONTH] = function($params){
-                return self::TYPE_NAMESPACE."DateTime::month($params[0])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::DATETIME_DAY] = function($params){
-                return self::TYPE_NAMESPACE."DateTime::day($params[0])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::DATETIME_HOUR] = function($params){
-                return self::TYPE_NAMESPACE."DateTime::hour($params[0])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::DATETIME_MINUTE] = function($params){
-                return self::TYPE_NAMESPACE."DateTime::minute($params[0])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::DATETIME_SECOND] = function($params){
-                return self::TYPE_NAMESPACE."DateTime::second($params[0])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::MATHFUN_ROUND] = function($params){
-                return "round($params[0])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::MATHFUN_CEILING] = function($params){
-                return "ceil($params[0])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::MATHFUN_FLOOR] = function($params){
-                return "floor($params[0])";
-			};
-            $this->functionDescriptionParsers[ODataConstants::BINFUL_EQUAL] = function($params){
-                return self::TYPE_NAMESPACE."Binary::binaryEqual($params[0], $params[1])";
-			};
-            $this->functionDescriptionParsers['is_null'] = function($params){
-                return "is_null($params[0])";
-			};
+        $this->functionDescriptionParsers[ODataConstants::STRFUN_COMPARE] = function($params){
+           return "strcmp($params[0], $params[1])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::STRFUN_ENDSWITH] = function($params){
+            return "(strcmp(substr($params[0], strlen($params[0]) - strlen($params[1])), $params[1]) === 0)";
+        };
+        $this->functionDescriptionParsers[ODataConstants::STRFUN_INDEXOF] = function($params){
+            return "strpos($params[0], $params[1])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::STRFUN_REPLACE] = function($params){
+            return "str_replace($params[1], $params[2], $params[0])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::STRFUN_STARTSWITH] = function($params){
+            return "(strpos($params[0], $params[1]) === 0)";
+        };
+        $this->functionDescriptionParsers[ODataConstants::STRFUN_TOLOWER] = function($params){
+            return "strtolower($params[0])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::STRFUN_TOUPPER] = function($params){
+            return "strtoupper($params[0])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::STRFUN_TRIM] = function($params){
+            return "trim($params[0])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::STRFUN_SUBSTRING] = function($params){
+            return count($params) == 3 ?
+                "substr($params[0], $params[1], $params[2])" : "substr($params[0], $params[1])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::STRFUN_SUBSTRINGOF] = function($params){
+           return "(strpos($params[1], $params[0]) !== false)";
+        };
+        $this->functionDescriptionParsers[ODataConstants::STRFUN_CONCAT] = function($params){
+            return $params[0].' . '.$params[1];
+        };
+        $this->functionDescriptionParsers[ODataConstants::STRFUN_LENGTH] = function($params){
+            return "strlen($params[0])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::GUIDFUN_EQUAL] = function($params){
+            return self::TYPE_NAMESPACE."Guid::guidEqual($params[0], $params[1])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::DATETIME_COMPARE] = function($params){
+            return self::TYPE_NAMESPACE."DateTime::dateTimeCmp($params[0], $params[1])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::DATETIME_YEAR] = function($params){
+            return self::TYPE_NAMESPACE."DateTime::year($params[0])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::DATETIME_MONTH] = function($params){
+            return self::TYPE_NAMESPACE."DateTime::month($params[0])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::DATETIME_DAY] = function($params){
+            return self::TYPE_NAMESPACE."DateTime::day($params[0])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::DATETIME_HOUR] = function($params){
+            return self::TYPE_NAMESPACE."DateTime::hour($params[0])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::DATETIME_MINUTE] = function($params){
+            return self::TYPE_NAMESPACE."DateTime::minute($params[0])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::DATETIME_SECOND] = function($params){
+            return self::TYPE_NAMESPACE."DateTime::second($params[0])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::MATHFUN_ROUND] = function($params){
+            return "round($params[0])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::MATHFUN_CEILING] = function($params){
+            return "ceil($params[0])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::MATHFUN_FLOOR] = function($params){
+            return "floor($params[0])";
+        };
+        $this->functionDescriptionParsers[ODataConstants::BINFUL_EQUAL] = function($params){
+            return self::TYPE_NAMESPACE."Binary::binaryEqual($params[0], $params[1])";
+        };
+        $this->functionDescriptionParsers['is_null'] = function($params){
+            return "is_null($params[0])";
+        };
     }
     /**
      * Get the name of the iterator.
