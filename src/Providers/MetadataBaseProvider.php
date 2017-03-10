@@ -5,7 +5,7 @@ namespace AlgoWeb\PODataLaravel\Providers;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 
-class MetadataBaseProvider extends ServiceProvider
+abstract class MetadataBaseProvider extends ServiceProvider
 {
 
     /**
