@@ -38,7 +38,7 @@ class LaravelReadQuery
         $orderBy = null,
         $top = null,
         $skipToken = null,
-        Model $sourceEntityInstance = null
+        $sourceEntityInstance = null
     ) {
         if (null != $filterInfo && !($filterInfo instanceof FilterInfo)) {
             throw new InvalidArgumentException('Filter info must be either null or instance of FilterInfo.');
@@ -129,12 +129,11 @@ class LaravelReadQuery
             throw new InvalidArgumentException('Source entity must be an Eloquent model.');
         }
 
+        assert(null != $sourceEntityInstance, "Source instance must not be null");
         $this->checkSourceInstance($sourceEntityInstance);
 
         $propertyName = $targetProperty->getName();
         $results = $sourceEntityInstance->$propertyName();
-        $relatedClass = $results->getRelated();
-        $sourceEntityInstance = new $relatedClass();
 
         return $this->getResourceSet(
             $queryType,
@@ -143,7 +142,7 @@ class LaravelReadQuery
             $orderBy,
             $top,
             $skip,
-            $sourceEntityInstance
+            $results
         );
     }
 
@@ -174,7 +173,7 @@ class LaravelReadQuery
         ResourceSet $resourceSet = null,
         KeyDescriptor $keyDescriptor = null,
         array $whereCondition = [],
-        Model $sourceEntityInstance = null
+        $sourceEntityInstance = null
     ) {
         if (null == $resourceSet && null == $sourceEntityInstance) {
             throw new \Exception('Must supply at least one of a resource set and source entity.');
@@ -270,7 +269,7 @@ class LaravelReadQuery
     protected function checkSourceInstance($source)
     {
         if (!(null == $source || $source instanceof Model || $source instanceof Relation)) {
-            throw new InvalidArgumentException('Source entity instance must be null, a model, or a relation');
+            throw new InvalidArgumentException('Source entity instance must be null, a model, or a relation.');
         }
     }
 }

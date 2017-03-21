@@ -99,19 +99,6 @@ class LaravelQueryTest extends TestCase
         $this->assertNull($result->getResourceType());
     }
 
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getResourceSet
-     * @todo   Implement testGetResourceSet().
-     */
-    public function testGetResourceSet()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
     public function testGetResourceSetBadFilterInfoInstanceThrowException()
     {
         $query = m::mock(QueryType::class);
@@ -125,6 +112,44 @@ class LaravelQueryTest extends TestCase
 
         try {
             $foo->getResourceSet($query, $resourceSet, $filter);
+        } catch (InvalidArgumentException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetResourceSetBadSourceInstanceButStillObject()
+    {
+        $query = m::mock(QueryType::class);
+        $resourceSet = m::mock(ResourceSet::class);
+        $source = new \DateTime();
+
+        $foo = new LaravelQuery();
+
+        $expected = 'Source entity instance must be null, a model, or a relation.';
+        $actual = null;
+
+        try {
+            $foo->getResourceSet($query, $resourceSet, null, null, null, null, $source);
+        } catch (InvalidArgumentException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetResourceSetBadSourceInstanceButNotObject()
+    {
+        $query = m::mock(QueryType::class);
+        $resourceSet = m::mock(ResourceSet::class);
+        $source = 'aybabtu';
+
+        $foo = new LaravelQuery();
+
+        $expected = 'Source entity instance must be null, a model, or a relation.';
+        $actual = null;
+
+        try {
+            $foo->getResourceSet($query, $resourceSet, null, null, null, null, $source);
         } catch (InvalidArgumentException $e) {
             $actual = $e->getMessage();
         }
@@ -334,19 +359,6 @@ class LaravelQueryTest extends TestCase
 
         $result = $foo->getResourceFromResourceSet($mockResource);
         $this->assertNull($result);
-    }
-
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getRelatedResourceSet
-     * @todo   Implement testGetRelatedResourceSet().
-     */
-    public function testGetRelatedResourceSet()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
     }
 
     public function testGetRelatedResourceSetNullSourceInstance()
