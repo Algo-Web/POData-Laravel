@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\UriProcessor\QueryProcessor\Expression\Parser\IExpressionProvider;

@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 
@@ -320,7 +321,31 @@ class LaravelQueryTest extends TestCase
         $this->assertTrue($result instanceof QueryResult);
         $this->assertEquals(3, $result->count);
         $this->assertEquals(null, $result->results);
+    }
 
+    public function testGetResourceSetFromRelation()
+    {
+        $instanceType = new \StdClass();
+        $instanceType->name = 'AlgoWeb\\PODataLaravel\\Models\\TestMorphManySource';
+
+        $resourceType = m::mock(ResourceType::class);
+        $resourceType->shouldReceive('getInstanceType')->andReturn($instanceType);
+        $resourceType->shouldReceive('getName')->andReturn('name');
+
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType')->andReturn($resourceType);
+
+        $queryType = QueryType::ENTITIES_WITH_COUNT();
+
+        $source = m::mock(HasMany::class)->makePartial();
+        $source->shouldReceive('get')->andReturn(collect(['a']))->once();
+        $source->shouldReceive('count')->andReturn(1)->never();
+
+        $foo = m::mock(LaravelReadQuery::class)->makePartial();
+
+        $result = $foo->getResourceSet($queryType, $mockResource, null, null, null, null, $source);
+        $this->assertEquals(1, $result->count);
+        $this->assertEquals(1, count($result->results));
     }
 
     /**

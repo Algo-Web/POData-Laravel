@@ -168,6 +168,7 @@ class LaravelReadQuery
      * Common method for getResourceFromRelatedResourceSet() and getResourceFromResourceSet()
      * @param ResourceSet|null $resourceSet
      * @param KeyDescriptor|null $keyDescriptor
+     * @param Model|Relation|null $sourceEntityInstance Starting point of query
      */
     public function getResource(
         ResourceSet $resourceSet = null,
