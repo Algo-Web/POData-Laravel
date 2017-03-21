@@ -7,7 +7,7 @@ php:
   - nightly
   
 before_script:
-  - ls -al
+  - mkdir -p bootstrap/cache
   - ls -al bootstrap/
   - composer install
 
