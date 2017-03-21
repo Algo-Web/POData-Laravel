@@ -9,9 +9,7 @@ php:
 before_script:
   - mkdir -p bootstrap/cache
   - ls -al bootstrap/
-  - uname -a
-  - echo $USER
-  - id
+  - chmod 777 bootstrap/cache
   - composer install
 
 script:
