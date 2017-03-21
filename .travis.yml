@@ -9,6 +9,9 @@ php:
 before_script:
   - mkdir -p bootstrap/cache
   - ls -al bootstrap/
+  - uname -a
+  - echo $USER
+  - id
   - composer install
 
 script:
