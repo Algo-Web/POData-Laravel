@@ -281,9 +281,6 @@ class MetadataTraitTest extends TestCase
         );
     }
 
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getXmlSchema
-     */
     public function testGetXmlSchemaBlobAndOthers()
     {
         $expectedTypes = [];
