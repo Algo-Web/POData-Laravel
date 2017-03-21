@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\UriProcessor\QueryProcessor\Expression\Parser\IExpressionProvider;
@@ -78,6 +79,7 @@ class LaravelQuery implements IQueryProvider
      * @param mixed $orderBy sorted order if we want to get the data in some specific order
      * @param int $top number of records which  need to be skip
      * @param String $skipToken value indicating what records to skip
+     * @param Model|Relation|null $sourceEntityInstance Starting point of query
      *
      * @return QueryResult
      */
@@ -88,7 +90,7 @@ class LaravelQuery implements IQueryProvider
         $orderBy = null,
         $top = null,
         $skipToken = null,
-        Model $sourceEntityInstance = null
+        $sourceEntityInstance = null
     ) {
         return $this->getReader()->getResourceSet(
             $queryType,

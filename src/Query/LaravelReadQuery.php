@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Query;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use POData\Providers\Metadata\ResourceProperty;
@@ -26,6 +27,7 @@ class LaravelReadQuery
      * @param mixed $orderBy sorted order if we want to get the data in some specific order
      * @param int $top number of records which  need to be skip
      * @param String $skipToken value indicating what records to skip
+     * @param Model|Relation|null $sourceEntityInstance Starting point of query
      *
      * @return QueryResult
      */
@@ -36,11 +38,13 @@ class LaravelReadQuery
         $orderBy = null,
         $top = null,
         $skipToken = null,
-        Model $sourceEntityInstance = null
+        $sourceEntityInstance = null
     ) {
         if (null != $filterInfo && !($filterInfo instanceof FilterInfo)) {
             throw new InvalidArgumentException('Filter info must be either null or instance of FilterInfo.');
         }
+
+        $this->checkSourceInstance($sourceEntityInstance);
 
         if (null == $sourceEntityInstance) {
             $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
@@ -125,10 +129,11 @@ class LaravelReadQuery
             throw new InvalidArgumentException('Source entity must be an Eloquent model.');
         }
 
+        assert(null != $sourceEntityInstance, "Source instance must not be null");
+        $this->checkSourceInstance($sourceEntityInstance);
+
         $propertyName = $targetProperty->getName();
         $results = $sourceEntityInstance->$propertyName();
-        $relatedClass = $results->getRelated();
-        $sourceEntityInstance = new $relatedClass();
 
         return $this->getResourceSet(
             $queryType,
@@ -137,7 +142,7 @@ class LaravelReadQuery
             $orderBy,
             $top,
             $skip,
-            $sourceEntityInstance
+            $results
         );
     }
 
@@ -163,16 +168,19 @@ class LaravelReadQuery
      * Common method for getResourceFromRelatedResourceSet() and getResourceFromResourceSet()
      * @param ResourceSet|null $resourceSet
      * @param KeyDescriptor|null $keyDescriptor
+     * @param Model|Relation|null $sourceEntityInstance Starting point of query
      */
     public function getResource(
         ResourceSet $resourceSet = null,
         KeyDescriptor $keyDescriptor = null,
         array $whereCondition = [],
-        Model $sourceEntityInstance = null
+        $sourceEntityInstance = null
     ) {
         if (null == $resourceSet && null == $sourceEntityInstance) {
             throw new \Exception('Must supply at least one of a resource set and source entity.');
         }
+
+        $this->checkSourceInstance($sourceEntityInstance);
 
         if (null == $sourceEntityInstance) {
             assert(null != $resourceSet);
@@ -213,6 +221,8 @@ class LaravelReadQuery
         if (!($sourceEntityInstance instanceof Model)) {
             throw new InvalidArgumentException('Source entity must be an Eloquent model.');
         }
+        $this->checkSourceInstance($sourceEntityInstance);
+
         $propertyName = $targetProperty->getName();
         return $sourceEntityInstance->$propertyName;
     }
@@ -252,5 +262,15 @@ class LaravelReadQuery
     {
         $entityClassName = $resourceSet->getResourceType()->getInstanceType()->name;
         return App::make($entityClassName);
+    }
+
+    /**
+     * @param Model|Relation|null $source
+     */
+    protected function checkSourceInstance($source)
+    {
+        if (!(null == $source || $source instanceof Model || $source instanceof Relation)) {
+            throw new InvalidArgumentException('Source entity instance must be null, a model, or a relation.');
+        }
     }
 }

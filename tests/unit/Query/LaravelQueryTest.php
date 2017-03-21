@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 
@@ -99,19 +100,6 @@ class LaravelQueryTest extends TestCase
         $this->assertNull($result->getResourceType());
     }
 
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getResourceSet
-     * @todo   Implement testGetResourceSet().
-     */
-    public function testGetResourceSet()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
     public function testGetResourceSetBadFilterInfoInstanceThrowException()
     {
         $query = m::mock(QueryType::class);
@@ -125,6 +113,44 @@ class LaravelQueryTest extends TestCase
 
         try {
             $foo->getResourceSet($query, $resourceSet, $filter);
+        } catch (InvalidArgumentException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetResourceSetBadSourceInstanceButStillObject()
+    {
+        $query = m::mock(QueryType::class);
+        $resourceSet = m::mock(ResourceSet::class);
+        $source = new \DateTime();
+
+        $foo = new LaravelQuery();
+
+        $expected = 'Source entity instance must be null, a model, or a relation.';
+        $actual = null;
+
+        try {
+            $foo->getResourceSet($query, $resourceSet, null, null, null, null, $source);
+        } catch (InvalidArgumentException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetResourceSetBadSourceInstanceButNotObject()
+    {
+        $query = m::mock(QueryType::class);
+        $resourceSet = m::mock(ResourceSet::class);
+        $source = 'aybabtu';
+
+        $foo = new LaravelQuery();
+
+        $expected = 'Source entity instance must be null, a model, or a relation.';
+        $actual = null;
+
+        try {
+            $foo->getResourceSet($query, $resourceSet, null, null, null, null, $source);
         } catch (InvalidArgumentException $e) {
             $actual = $e->getMessage();
         }
@@ -295,7 +321,31 @@ class LaravelQueryTest extends TestCase
         $this->assertTrue($result instanceof QueryResult);
         $this->assertEquals(3, $result->count);
         $this->assertEquals(null, $result->results);
+    }
 
+    public function testGetResourceSetFromRelation()
+    {
+        $instanceType = new \StdClass();
+        $instanceType->name = 'AlgoWeb\\PODataLaravel\\Models\\TestMorphManySource';
+
+        $resourceType = m::mock(ResourceType::class);
+        $resourceType->shouldReceive('getInstanceType')->andReturn($instanceType);
+        $resourceType->shouldReceive('getName')->andReturn('name');
+
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType')->andReturn($resourceType);
+
+        $queryType = QueryType::ENTITIES_WITH_COUNT();
+
+        $source = m::mock(HasMany::class)->makePartial();
+        $source->shouldReceive('get')->andReturn(collect(['a']))->once();
+        $source->shouldReceive('count')->andReturn(1)->never();
+
+        $foo = m::mock(LaravelReadQuery::class)->makePartial();
+
+        $result = $foo->getResourceSet($queryType, $mockResource, null, null, null, null, $source);
+        $this->assertEquals(1, $result->count);
+        $this->assertEquals(1, count($result->results));
     }
 
     /**
@@ -334,19 +384,6 @@ class LaravelQueryTest extends TestCase
 
         $result = $foo->getResourceFromResourceSet($mockResource);
         $this->assertNull($result);
-    }
-
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getRelatedResourceSet
-     * @todo   Implement testGetRelatedResourceSet().
-     */
-    public function testGetRelatedResourceSet()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
     }
 
     public function testGetRelatedResourceSetNullSourceInstance()
