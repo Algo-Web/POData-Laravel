@@ -1341,7 +1341,7 @@ class LaravelQueryTest extends TestCase
         $key = m::mock(KeyDescriptor::class);
 
         $foo = new LaravelQuery();
-        $foo->putResource($resource, $key, []);
+        $this->assertTrue($foo->putResource($resource, $key, []));
     }
 
     private function seedControllerMetadata(TestController $controller = null)

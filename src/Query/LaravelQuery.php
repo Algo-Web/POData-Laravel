@@ -334,7 +334,7 @@ class LaravelQuery implements IQueryProvider
      * @param KeyDescriptor $keyDescriptor The key identifying the entity to update
      * @param $data
      *
-     * @return bool|null Returns result of executiong query
+     * @return bool|null Returns result of executing query
      */
     public function putResource(
         ResourceSet $resourceSet,
@@ -342,6 +342,7 @@ class LaravelQuery implements IQueryProvider
         $data
     ) {
         // TODO: Implement putResource() method.
+        return true;
     }
 
     /**
