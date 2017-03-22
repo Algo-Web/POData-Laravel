@@ -219,6 +219,29 @@ class MetadataProviderTest extends TestCase
         $this->assertEquals('Data', $result->getContainerNameSpace());
     }
 
+    public function testPostBootHandlingRoundTrip()
+    {
+        $foo = new TestProvider($this->app);
+        $meta = 'meta';
+        $key = 'secret';
+
+        $foo->handlePostBoot(true, false, $key, $meta);
+        $this->assertEquals($meta, Cache::get($key));
+
+        $foo->handlePostBoot(false, false, $key, $meta);
+        $this->assertEquals(null, Cache::get($key));
+    }
+
+    public function testPostBootHandlingHasCacheIsCaching()
+    {
+        $foo = new TestProvider($this->app);
+        $meta = 'meta';
+        $key = 'secret';
+
+        $foo->handlePostBoot(true, true, $key, $meta);
+        $this->assertEquals(null, Cache::get($key));
+    }
+
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Providers\MetadataProvider::pathsToPublish

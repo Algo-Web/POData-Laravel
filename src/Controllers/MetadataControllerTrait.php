@@ -117,7 +117,7 @@ trait MetadataControllerTrait
         $params = $r->getParameters();
         foreach ($params as $parm) {
             $detail = [];
-            $detail['name'] = $parm->getName();
+            $detail['name'] = $parm->name;
             $classHint = $parm->getClass();
             $isRequest = false;
             if (null != $classHint) {
@@ -129,7 +129,7 @@ trait MetadataControllerTrait
             }
 
             $detail['isRequest'] = $isRequest;
-            $parmArray[] = $detail;
+            $parmArray[$parm->name] = $detail;
 
         }
         return $parmArray;

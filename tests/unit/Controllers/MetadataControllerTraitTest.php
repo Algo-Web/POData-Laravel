@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Controllers;
 
+use AlgoWeb\PODataLaravel\Requests\TestRequest;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
@@ -26,6 +27,19 @@ class MetadataControllerTraitTest extends TestCase
         $this->assertEquals('showTestModel', $result[TestModel::class]['read']['method']);
         $this->assertEquals('updateTestModel', $result[TestModel::class]['update']['method']);
         $this->assertEquals('destroyTestModel', $result[TestModel::class]['delete']['method']);
+
+        // check isRequest handling - single parm
+        $parms = $result[TestModel::class]['create']['parameters']['request'];
+        $this->assertEquals(3, count($parms));
+        $this->assertEquals('request', $parms['name']);
+        $this->assertEquals(TestRequest::class, $parms['type']);
+        $this->assertEquals(true, $parms['isRequest']);
+
+        // check isRequest handling - multiple parm
+        $parms = $result[TestModel::class]['update']['parameters']['id'];
+        $this->assertEquals(2, count($parms));
+        $this->assertEquals('id', $parms['name']);
+        $this->assertEquals(false, $parms['isRequest']);
     }
 
     public function testGetMethodNameOnEmptyArray()
@@ -143,7 +157,7 @@ class MetadataControllerTraitTest extends TestCase
         $this->assertEquals(TestController::class, $result['controller']);
         $this->assertTrue(is_array($result['parameters']));
         $this->assertEquals(1, count($result['parameters']));
-        $this->assertEquals('id', $result['parameters'][0]['name']);
+        $this->assertEquals('id', $result['parameters']['id']['name']);
     }
 
     public function testModelMappingUpdate()
@@ -157,9 +171,9 @@ class MetadataControllerTraitTest extends TestCase
         $this->assertEquals(TestController::class, $result['controller']);
         $this->assertTrue(is_array($result['parameters']));
         $this->assertEquals(2, count($result['parameters']));
-        $this->assertEquals('request', $result['parameters'][0]['name']);
-        $this->assertEquals('AlgoWeb\PODataLaravel\Requests\TestRequest', $result['parameters'][0]['type']);
-        $this->assertEquals('id', $result['parameters'][1]['name']);
+        $this->assertEquals('request', $result['parameters']['request']['name']);
+        $this->assertEquals('AlgoWeb\PODataLaravel\Requests\TestRequest', $result['parameters']['request']['type']);
+        $this->assertEquals('id', $result['parameters']['id']['name']);
     }
 
     public function testGetMappingsMissingModelName()
