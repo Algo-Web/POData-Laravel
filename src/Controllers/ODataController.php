@@ -49,7 +49,7 @@ class ODataController extends BaseController
         }
 
         $content = $odataResponse->getStream();
-        $content = $antiXss->xss_clean($content);
+        //$content = $antiXss->xss_clean($content);
         $headers = $odataResponse->getHeaders();
         $responseCode = $headers[\POData\Common\ODataConstants::HTTPRESPONSE_HEADER_STATUS_CODE];
         $responseCode = isset($responseCode) ? intval($responseCode) : 200;
