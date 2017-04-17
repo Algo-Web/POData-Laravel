@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
@@ -185,6 +186,9 @@ class LaravelQueryTest extends TestCase
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
         $sourceEntity->shouldReceive('newQuery')->andReturnSelf()->never();
         $sourceEntity->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']))->once();
+        $sourceEntity->shouldReceive('count')->andReturn(3)->once();
+        $sourceEntity->shouldReceive('skip')->andReturn($sourceEntity)->once();
+        $sourceEntity->shouldReceive('take')->andReturn($sourceEntity)->once();
         App::instance($instanceType->name, $sourceEntity);
 
         $reader = m::mock(LaravelReadQuery::class)->makePartial();
@@ -203,6 +207,9 @@ class LaravelQueryTest extends TestCase
     public function testGetResourceSetWithNoInstance()
     {
         $testModel = m::mock(TestModel::class)->makePartial();
+        $testModel->shouldReceive('count')->andReturn(2)->once();
+        $testModel->shouldReceive('skip')->andReturn($testModel)->once();
+        $testModel->shouldReceive('take')->andReturn($testModel)->once();
         $testModel->shouldReceive('get')->andReturn(collect(['a', 'b']))->once();
         App::instance(TestModel::class, $testModel);
 
@@ -294,6 +301,9 @@ class LaravelQueryTest extends TestCase
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
         $sourceEntity->shouldReceive('orderBy')->withArgs(['hammer', 'asc'])->andReturnSelf()->once();
         $sourceEntity->shouldReceive('orderBy')->withArgs(['hammer', 'desc'])->andReturnSelf()->once();
+        $sourceEntity->shouldReceive('count')->andReturn(3)->once();
+        $sourceEntity->shouldReceive('skip')->andReturn($sourceEntity)->never();
+        $sourceEntity->shouldReceive('take')->andReturn($sourceEntity)->never();
         $sourceEntity->shouldReceive('get')->andReturn($resultSet)->once();
 
         $subPathSegment = m::mock(OrderBySubPathSegment::class);
@@ -339,13 +349,52 @@ class LaravelQueryTest extends TestCase
 
         $source = m::mock(HasMany::class)->makePartial();
         $source->shouldReceive('get')->andReturn(collect(['a']))->once();
-        $source->shouldReceive('count')->andReturn(1)->never();
+        $source->shouldReceive('skip')->andReturn($source)->once();
+        $source->shouldReceive('take')->andReturn($source)->once();
+        $source->shouldReceive('count')->andReturn(1)->once();
 
         $foo = m::mock(LaravelReadQuery::class)->makePartial();
 
         $result = $foo->getResourceSet($queryType, $mockResource, null, null, null, null, $source);
         $this->assertEquals(1, $result->count);
         $this->assertEquals(1, count($result->results));
+    }
+
+    public function testGetResourceSetWithBigSetAndFilter()
+    {
+        $query = m::mock(Builder::class)->makePartial();
+
+        $instanceType = new \StdClass();
+        $instanceType->name = 'AlgoWeb\\PODataLaravel\\Models\\TestMorphManySource';
+
+        $resourceType = m::mock(ResourceType::class);
+        $resourceType->shouldReceive('getInstanceType')->andReturn($instanceType);
+        $resourceType->shouldReceive('getName')->andReturn('name');
+
+        $mockResource = \Mockery::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType')->andReturn($resourceType);
+
+        $filter = m::mock(FilterInfo::class)->makePartial();
+        $filter->shouldReceive('getExpressionAsString')->andReturn('true');
+
+        $queryType = QueryType::ENTITIES_WITH_COUNT();
+
+        $collet = collect([0, 1, 0, 1]);
+        $source = m::mock(TestModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $source->shouldReceive('enforceOrderBy')->andReturnNull()->once();
+        $source->shouldReceive('count')->andReturn(20001)->once();
+        $source->shouldReceive('get')->withAnyArgs()->andReturn($collet)->once();
+        $source->shouldReceive('newQuery')->andReturn($query);
+        $source->shouldReceive('forPage')->withAnyArgs()->andReturn($source, collect([]));
+
+        $foo = m::mock(LaravelReadQuery::class)->makePartial();
+
+        $result = $foo->getResourceSet($queryType, $mockResource, $filter, null, 2, 1, $source);
+        $this->assertEquals(4, $result->count);
+        $this->assertEquals(2, count($result->results));
+        $res = $result->results;
+        $this->assertEquals(1, $res[0]);
+        $this->assertEquals(0, $res[1]);
     }
 
     /**

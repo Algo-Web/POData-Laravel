@@ -65,20 +65,66 @@ class LaravelReadQuery
             }
         }
 
-        $resultSet = $sourceEntityInstance->get();
+        if (!isset($skipToken)) {
+            $skipToken = 0;
+        }
 
+        $nullFilter = true;
+        $isValid = null;
         if (isset($filterInfo)) {
             $method = "return ".$filterInfo->getExpressionAsString().";";
             $clln = "$".$resourceSet->getResourceType()->getName();
             $isvalid = create_function($clln, $method);
-            $resultSet = $resultSet->filter($isvalid);
+            $nullFilter = false;
         }
 
-        $resultCount = $resultSet->count();
+        $bulkSetCount = $sourceEntityInstance->count();
+        $bigSet = 20000 < $bulkSetCount;
 
-        if (isset($skipToken)) {
+        if ($nullFilter) {
+            // default no-filter case, palm processing off to database engine - is a lot faster
+            $resultSet = $sourceEntityInstance->skip($skipToken)->take($top)->get();
+            $resultCount = $bulkSetCount;
+        } elseif ($bigSet) {
+            assert(isset($isvalid), "Filter closure not set");
+            $resultSet = collect([]);
+            $results = null;
+            $resultCount = null;
+            $rawCount = 0;
+            $rawTop = null == $top ? $bulkSetCount : $top;
+
+            // loop thru, chunk by chunk, to reduce chances of exhausting memory
+            $sourceEntityInstance->chunk(
+                5000,
+                function ($results) use ($isvalid, &$skipToken, &$resultSet, &$rawCount, $rawTop) {
+                    // apply filter
+                    $results = $results->filter($isvalid);
+                    // need to iterate through full result set to find count of items matching filter,
+                    // so we can't bail out early
+                    $rawCount += $results->count();
+                    // now bolt on filtrate to accumulating result set if we haven't accumulated enough bitz
+                    if ($rawTop > $resultSet->count() + $skipToken) {
+                        $resultSet = collect(array_merge($resultSet->all(), $results->all()));
+                        $sliceAmount = min($skipToken, $resultSet->count());
+                        $resultSet = $resultSet->slice($sliceAmount);
+                        $skipToken -= $sliceAmount;
+                    }
+                }
+            );
+
+            // clean up residual to-be-skipped records
             $resultSet = $resultSet->slice($skipToken);
+            $resultCount = $rawCount;
+        } else {
+            $resultSet = $sourceEntityInstance->get();
+            $resultSet = $resultSet->filter($isvalid);
+            $resultCount = $resultSet->count();
+
+            if (isset($skipToken)) {
+                $resultSet = $resultSet->slice($skipToken);
+            }
         }
+
         if (isset($top)) {
             $resultSet = $resultSet->take($top);
         }
