@@ -70,7 +70,7 @@ class LaravelReadQuery
         }
 
         $nullFilter = true;
-        $isValid = null;
+        $isvalid = null;
         if (isset($filterInfo)) {
             $method = "return ".$filterInfo->getExpressionAsString().";";
             $clln = "$".$resourceSet->getResourceType()->getName();
@@ -88,10 +88,8 @@ class LaravelReadQuery
         } elseif ($bigSet) {
             assert(isset($isvalid), "Filter closure not set");
             $resultSet = collect([]);
-            $results = null;
-            $resultCount = null;
             $rawCount = 0;
-            $rawTop = null == $top ? $bulkSetCount : $top;
+            $rawTop = null === $top ? $bulkSetCount : $top;
 
             // loop thru, chunk by chunk, to reduce chances of exhausting memory
             $sourceEntityInstance->chunk(
