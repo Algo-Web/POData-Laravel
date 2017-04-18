@@ -68,6 +68,9 @@ class LaravelReadQuery
         if (!isset($skipToken)) {
             $skipToken = 0;
         }
+        if (!isset($top)) {
+            $top = PHP_INT_MAX;
+        }
 
         $nullFilter = true;
         $isvalid = null;
