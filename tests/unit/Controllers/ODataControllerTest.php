@@ -88,7 +88,7 @@ class ODataControllerTest extends TestCase
         $dump = false;
 
         $expected = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<service xmlns="http://www.w3.org/2007/app" xmlns:atom="http://www.w3.org/2005/Atom" xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc">
+<service xmlns:atom="http://www.w3.org/2005/Atom" xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc" xmlns="http://www.w3.org/2007/app">
  <workspace>
   <atom:title>Default</atom:title>
  </workspace>
@@ -114,7 +114,7 @@ class ODataControllerTest extends TestCase
         $dump = true;
 
         $expected = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<service xmlns="http://www.w3.org/2007/app" xmlns:atom="http://www.w3.org/2005/Atom" xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc">
+<service xmlns:atom="http://www.w3.org/2005/Atom" xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc" xmlns="http://www.w3.org/2007/app">
  <workspace>
   <atom:title>Default</atom:title>
  </workspace>
@@ -146,7 +146,7 @@ class ODataControllerTest extends TestCase
         $dump = true;
 
         $expected = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<service xmlns="http://www.w3.org/2007/app" xmlns:atom="http://www.w3.org/2005/Atom" xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc">
+<service xmlns:atom="http://www.w3.org/2005/Atom" xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc" xmlns="http://www.w3.org/2007/app">
  <workspace>
   <atom:title>Default</atom:title>
  </workspace>
