@@ -54,9 +54,9 @@ class TestMorphOneSource extends Model
         return $this->traitmetadata();
     }
 
-    public function getRelationshipsFromMethods()
+    public function getRelationshipsFromMethods($biDir = false)
     {
-        return $this->getRel();
+        return $this->getRel($biDir);
     }
 
     public function morphTarget()

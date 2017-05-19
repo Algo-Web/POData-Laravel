@@ -19,6 +19,7 @@ class MetadataBidirectionalTest extends TestCase
         $actual = $foo->getRelationships();
         $this->assertTrue(isset($actual));
         $this->assertTrue(is_array($actual));
+        $this->assertEquals(count($expected), count($actual));
 
         foreach ($expected as $key => $outer) {
             $this->assertTrue(isset($actual[$key]));
@@ -40,6 +41,7 @@ class MetadataBidirectionalTest extends TestCase
         $actual = $foo->getRelationships();
         $this->assertTrue(isset($actual));
         $this->assertTrue(is_array($actual));
+        $this->assertEquals(count($expected), count($actual));
 
         foreach ($expected as $key => $outer) {
             $this->assertTrue(isset($actual[$key]));
@@ -73,6 +75,63 @@ class MetadataBidirectionalTest extends TestCase
             $this->assertTrue(isset($actual[$key]));
             $this->assertTrue(is_array($actual[$key]));
             $this->assertEquals($expectedBar[$key], $actual[$key]);
+        }
+    }
+
+    public function testPolymorphicUnknownSide()
+    {
+        $foo = new TestMorphTarget();
+        $targ = TestMorphTarget::class;
+
+        $expected = [ 'morph_id' => [ 'target' => $targ, 'property' => 'morph', 'local' => 'id']];
+
+        $actual = $foo->getRelationships();
+        $this->assertTrue(isset($actual));
+        $this->assertTrue(is_array($actual));
+        $this->assertEquals(count($expected), count($actual));
+
+        foreach ($expected as $key => $outer) {
+            $this->assertTrue(isset($actual[$key]));
+            $this->assertTrue(is_array($actual[$key]));
+            $this->assertEquals($expected[$key], $actual[$key]);
+        }
+    }
+
+    public function testPolymorphicKnownManySide()
+    {
+        $foo = new TestMorphManySource();
+        $targ = TestMorphTarget::class;
+
+        $expected = [ 'id' => [ 'target' => $targ, 'property' => 'morphTarget', 'local' => 'morph_id']];
+
+        $actual = $foo->getRelationships();
+        $this->assertTrue(isset($actual));
+        $this->assertTrue(is_array($actual));
+        $this->assertEquals(count($expected), count($actual));
+
+        foreach ($expected as $key => $outer) {
+            $this->assertTrue(isset($actual[$key]));
+            $this->assertTrue(is_array($actual[$key]));
+            $this->assertEquals($expected[$key], $actual[$key]);
+        }
+    }
+
+    public function testPolymorphicKnownOneSide()
+    {
+        $foo = new TestMorphOneSource();
+        $targ = TestMorphTarget::class;
+
+        $expected = [ 'id' => [ 'target' => $targ, 'property' => 'morphTarget', 'local' => 'morph_id']];
+
+        $actual = $foo->getRelationships();
+        $this->assertTrue(isset($actual));
+        $this->assertTrue(is_array($actual));
+        $this->assertEquals(count($expected), count($actual));
+
+        foreach ($expected as $key => $outer) {
+            $this->assertTrue(isset($actual[$key]));
+            $this->assertTrue(is_array($actual[$key]));
+            $this->assertEquals($expected[$key], $actual[$key]);
         }
     }
 }

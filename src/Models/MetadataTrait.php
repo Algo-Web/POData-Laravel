@@ -3,6 +3,8 @@ namespace AlgoWeb\PODataLaravel\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Facades\App as App;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use POData\Providers\Metadata\ResourceStreamInfo;
@@ -185,7 +187,42 @@ trait MetadataTrait
         $hooks = [];
 
         $rels = $this->getRelationshipsFromMethods(true);
+
+        foreach ($rels['UnknownPolyMorphSide'] as $property => $foo) {
+            $targ = get_class($foo->getRelated());
+            $key = $foo->getForeignKey();
+            $localRaw = $foo->getQualifiedParentKeyName();
+            $localSegments = explode('.', $localRaw);
+            $localName = $localSegments[count($localSegments) - 1];
+
+            $first = $key;
+            $last = $localName;
+            if (!isset($hooks[$first])) {
+                $hooks[$first] = [ 'target' => $targ, 'property' => $property, 'local' => $last];
+            }
+        }
+
+        foreach ($rels['KnownPolyMorphSide'] as $property => $foo) {
+
+            $targ = get_class($foo->getRelated());
+
+            $keyRaw = $foo->getQualifiedParentKeyName();
+            $keySegments = explode('.', $keyRaw);
+            $keyName = $keySegments[count($keySegments) - 1];
+            $localRaw = $foo->getForeignKeyName();
+            $localSegments = explode('.', $localRaw);
+            $localName = $localSegments[count($localSegments) - 1];
+            $first = $keyName;
+            $last = $localName;
+            if (!isset($hooks[$first])) {
+                $hooks[$first] = [ 'target' => $targ, 'property' => $property, 'local' => $last];
+            }
+        }
+
         foreach ($rels['HasOne'] as $property => $foo) {
+            if ($foo instanceof MorphOne) {
+                continue;
+            }
             $isBelong = $foo instanceof BelongsTo;
             $targ = get_class($foo->getRelated());
             $keyName = $isBelong ? $foo->getForeignKey() : $foo->getForeignKeyName();
@@ -199,6 +236,9 @@ trait MetadataTrait
             }
         }
         foreach ($rels['HasMany'] as $property => $foo) {
+            if ($foo instanceof MorphMany) {
+                continue;
+            }
             $isBelong = $foo instanceof BelongsToMany;
             $targ = get_class($foo->getRelated());
             $keyRaw = $isBelong ? $foo->getQualifiedForeignKeyName() : $foo->getForeignKeyName();
