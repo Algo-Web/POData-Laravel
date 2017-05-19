@@ -106,7 +106,7 @@ class ODataControllerTest extends TestCase
      */
     public function testIndexCallToBaseServiceDumpSetButNoHeader()
     {
-        $request = m::mock(Request::class)->makePartial();
+        $request = m::mock(Request::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $request->shouldReceive('getMethod')->andReturn('GET');
         $request->shouldReceive('getQueryString')->andReturn('');
         $request->shouldReceive('getBaseUrl')->andReturn('http://192.168.2.1/abm-master/public/odata.svc');

@@ -1,6 +1,7 @@
 <?php
 namespace AlgoWeb\PODataLaravel\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\App as App;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use POData\Providers\Metadata\ResourceStreamInfo;
@@ -178,6 +179,36 @@ trait MetadataTrait
         return $rel;
     }
 
+    public function getRelationships()
+    {
+        $hooks = [];
+
+        $rels = $this->getRelationshipsFromMethods(true);
+        foreach ($rels['HasOne'] as $property => $foo) {
+            $isBelong = $foo instanceof BelongsTo;
+            $keyName = $isBelong ? $foo->getForeignKey() : $foo->getForeignKeyName();
+            $localRaw = $isBelong ? $foo->getOwnerKey() : $foo->getQualifiedParentKeyName();
+            $localSegments = explode('.', $localRaw);
+            $localName = $localSegments[count($localSegments) - 1];
+            $first = $isBelong ? $localName : $keyName;
+            $last = $isBelong ? $keyName : $localName;
+            if (!isset($hooks[$first])) {
+                $hooks[$first] = ['property' => $property, 'local' => $last];
+            }
+        }
+        foreach ($rels['HasMany'] as $property => $foo) {
+            $keyName = $foo->getForeignKeyName();
+            $localRaw = $foo->getQualifiedParentKeyName();
+            $localSegments = explode('.', $localRaw);
+            $localName = $localSegments[count($localSegments) - 1];
+            if (!isset($hooks[$keyName])) {
+                $hooks[$keyName] = ['property' => $property, 'local' => $localName];
+            }
+        }
+
+        return $hooks;
+    }
+
     protected function getAllAttributes()
     {
         // Adapted from http://stackoverflow.com/a/33514981
@@ -204,7 +235,7 @@ trait MetadataTrait
         return $attributes;
     }
 
-    protected function getRelationshipsFromMethods()
+    protected function getRelationshipsFromMethods($biDir = false)
     {
         $model = $this;
         $relationships = array(
@@ -255,17 +286,18 @@ trait MetadataTrait
                                 $relations = ['hasManyThrough', 'belongsToMany', 'hasMany', 'morphMany', 'morphToMany'];
                                 if (in_array($relation, $relations)) {
                                     //Collection or array of models (because Collection is Arrayable)
-                                    $relationships["HasMany"][$method] = $relatedModel;
+                                    $relationships["HasMany"][$method] = $biDir ? $relationObj : $relatedModel;
                                 } elseif ($relation === "morphTo") {
                                     // Model isn't specified because relation is polymorphic
                                     $relationships["UnknownPolyMorphSide"][$method] =
-                                        '\Illuminate\Database\Eloquent\Model|\Eloquent';
+                                        $biDir ? $relationObj : '\Illuminate\Database\Eloquent\Model|\Eloquent';
                                 } else {
                                     //Single model is returned
-                                    $relationships["HasOne"][$method] = $relatedModel;
+                                    $relationships["HasOne"][$method] = $biDir ? $relationObj : $relatedModel;
                                 }
                                 if (in_array($relation, ["morphMany", "morphOne"])) {
-                                    $relationships["KnownPolyMorphSide"][$method] = $relatedModel;
+                                    $relationships["KnownPolyMorphSide"][$method] =
+                                        $biDir ? $relationObj : $relatedModel;
                                 }
                             }
                         }
