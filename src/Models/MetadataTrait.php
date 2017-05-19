@@ -322,7 +322,8 @@ trait MetadataTrait
                                 'morphOne',
                                 'morphTo',
                                 'morphMany',
-                                'morphToMany'
+                                'morphToMany',
+                                'morphedByMany'
                                 ) as $relation) {
                         $search = '$this->'.$relation.'(';
                         if ($pos = stripos($code, $search)) {
@@ -330,7 +331,14 @@ trait MetadataTrait
                             $relationObj = $model->$method();
                             if ($relationObj instanceof Relation) {
                                 $relatedModel = '\\'.get_class($relationObj->getRelated());
-                                $relations = ['hasManyThrough', 'belongsToMany', 'hasMany', 'morphMany', 'morphToMany'];
+                                $relations = [
+                                    'hasManyThrough',
+                                    'belongsToMany',
+                                    'hasMany',
+                                    'morphMany',
+                                    'morphToMany',
+                                    'morphedByMany'
+                                ];
                                 if (in_array($relation, $relations)) {
                                     //Collection or array of models (because Collection is Arrayable)
                                     $relationships["HasMany"][$method] = $biDir ? $relationObj : $relatedModel;
@@ -342,8 +350,12 @@ trait MetadataTrait
                                     //Single model is returned
                                     $relationships["HasOne"][$method] = $biDir ? $relationObj : $relatedModel;
                                 }
-                                if (in_array($relation, ["morphMany", "morphOne"])) {
+                                if (in_array($relation, ["morphMany", "morphOne", "morphedByMany"])) {
                                     $relationships["KnownPolyMorphSide"][$method] =
+                                        $biDir ? $relationObj : $relatedModel;
+                                }
+                                if (in_array($relation, ["morphToMany"])) {
+                                    $relationships["UnknownPolyMorphSide"][$method] =
                                         $biDir ? $relationObj : $relatedModel;
                                 }
                             }
