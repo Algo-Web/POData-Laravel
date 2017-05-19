@@ -45,4 +45,30 @@ class MetadataBidirectionalTest extends TestCase
             $this->assertEquals($expected[$key], $actual[$key]);
         }
     }
+
+    public function testMonomorphicManyToMany()
+    {
+        $foo = new TestMonomorphicManySource();
+        $bar = new TestMonomorphicManyTarget();
+
+        $expectedFoo = [ 'many_source' => [ 'property' => 'manySource', 'local' => 'many_id']];
+        $expectedBar = [ 'many_id' => [ 'property' => 'manyTarget', 'local' => 'many_source']];
+
+        $actual = $foo->getRelationships();
+        $this->assertTrue(isset($actual));
+        $this->assertTrue(is_array($actual));
+
+        foreach ($expectedFoo as $key => $outer) {
+            $this->assertTrue(isset($actual[$key]));
+            $this->assertTrue(is_array($actual[$key]));
+            $this->assertEquals($expectedFoo[$key], $actual[$key]);
+        }
+
+        $actual = $bar->getRelationships();
+        foreach ($expectedBar as $key => $outer) {
+            $this->assertTrue(isset($actual[$key]));
+            $this->assertTrue(is_array($actual[$key]));
+            $this->assertEquals($expectedBar[$key], $actual[$key]);
+        }
+    }
 }

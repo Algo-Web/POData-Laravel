@@ -2,6 +2,7 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\App as App;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use POData\Providers\Metadata\ResourceStreamInfo;
@@ -197,8 +198,11 @@ trait MetadataTrait
             }
         }
         foreach ($rels['HasMany'] as $property => $foo) {
-            $keyName = $foo->getForeignKeyName();
-            $localRaw = $foo->getQualifiedParentKeyName();
+            $isBelong = $foo instanceof BelongsToMany;
+            $keyRaw = $isBelong ? $foo->getQualifiedForeignKeyName() : $foo->getForeignKeyName();
+            $keySegments = explode('.', $keyRaw);
+            $keyName = $keySegments[count($keySegments) - 1];
+            $localRaw = $isBelong ? $foo->getQualifiedRelatedKeyName() : $foo->getQualifiedParentKeyName();
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
             if (!isset($hooks[$keyName])) {
