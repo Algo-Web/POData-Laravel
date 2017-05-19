@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\App as App;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use POData\Providers\Metadata\ResourceStreamInfo;
@@ -190,13 +191,17 @@ trait MetadataTrait
         $rels = $this->getRelationshipsFromMethods(true);
 
         foreach ($rels['UnknownPolyMorphSide'] as $property => $foo) {
+            $isMany = $foo instanceof MorphToMany;
             $targ = get_class($foo->getRelated());
-            $key = $foo->getForeignKey();
-            $localRaw = $foo->getQualifiedParentKeyName();
+
+            $keyRaw = $isMany ? $foo->getQualifiedForeignKeyName() : $foo->getForeignKey();
+            $keySegments = explode('.', $keyRaw);
+            $keyName = $keySegments[count($keySegments) - 1];
+            $localRaw = $isMany ? $foo->getQualifiedRelatedKeyName() : $foo->getQualifiedParentKeyName();
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
 
-            $first = $key;
+            $first = $keyName;
             $last = $localName;
             if (!isset($hooks[$first])) {
                 $hooks[$first] = [ 'target' => $targ, 'property' => $property, 'local' => $last];
@@ -204,17 +209,17 @@ trait MetadataTrait
         }
 
         foreach ($rels['KnownPolyMorphSide'] as $property => $foo) {
-
+            $isMany = $foo instanceof MorphToMany;
             $targ = get_class($foo->getRelated());
 
-            $keyRaw = $foo->getQualifiedParentKeyName();
+            $keyRaw = $isMany ? $foo->getQualifiedForeignKeyName() : $foo->getForeignKeyName();
             $keySegments = explode('.', $keyRaw);
             $keyName = $keySegments[count($keySegments) - 1];
-            $localRaw = $foo->getForeignKeyName();
+            $localRaw = $isMany ? $foo->getQualifiedRelatedKeyName() : $foo->getQualifiedParentKeyName();
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
-            $first = $keyName;
-            $last = $localName;
+            $first = $isMany ? $keyName : $localName;
+            $last = $isMany ? $localName : $keyName;
             if (!isset($hooks[$first])) {
                 $hooks[$first] = [ 'target' => $targ, 'property' => $property, 'local' => $last];
             }
@@ -237,7 +242,7 @@ trait MetadataTrait
             }
         }
         foreach ($rels['HasMany'] as $property => $foo) {
-            if ($foo instanceof MorphMany) {
+            if ($foo instanceof MorphMany || $foo instanceof MorphToMany) {
                 continue;
             }
             $isBelong = $foo instanceof BelongsToMany;

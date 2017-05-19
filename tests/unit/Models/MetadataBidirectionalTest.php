@@ -134,4 +134,42 @@ class MetadataBidirectionalTest extends TestCase
             $this->assertEquals($expected[$key], $actual[$key]);
         }
     }
+
+    public function testPolymorphicManyToManyUnknownSide()
+    {
+        $foo = new TestMorphManyToManySource();
+        $targ = TestMorphManyToManyTarget::class;
+
+        $expected = [ 'source_id' => [ 'target' => $targ, 'property' => 'manySource', 'local' => 'target_id']];
+
+        $actual = $foo->getRelationships();
+        $this->assertTrue(isset($actual));
+        $this->assertTrue(is_array($actual));
+        $this->assertEquals(count($expected), count($actual));
+
+        foreach ($expected as $key => $outer) {
+            $this->assertTrue(isset($actual[$key]));
+            $this->assertTrue(is_array($actual[$key]));
+            $this->assertEquals($expected[$key], $actual[$key]);
+        }
+    }
+
+    public function testPolymorphicManyToManyKnownSide()
+    {
+        $foo = new TestMorphManyToManyTarget();
+        $targ = TestMorphManyToManySource::class;
+
+        $expected = [ 'target_id' => [ 'target' => $targ, 'property' => 'manyTarget', 'local' => 'source_id']];
+
+        $actual = $foo->getRelationships();
+        $this->assertTrue(isset($actual));
+        $this->assertTrue(is_array($actual));
+        $this->assertEquals(count($expected), count($actual));
+
+        foreach ($expected as $key => $outer) {
+            $this->assertTrue(isset($actual[$key]));
+            $this->assertTrue(is_array($actual[$key]));
+            $this->assertEquals($expected[$key], $actual[$key]);
+        }
+    }
 }
