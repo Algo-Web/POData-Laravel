@@ -35,4 +35,22 @@ class TestMonomorphicManySource extends Model
     {
         return $this->belongsToMany(TestMonomorphicManyTarget::class, "target_source", "many_source", "many_id");
     }
+
+    public function getTable()
+    {
+        return 'testMonomorphicManySource';
+    }
+
+    public function getConnectionName()
+    {
+        return 'testconnection';
+    }
+
+    public function metadata()
+    {
+        if (isset($this->metaArray)) {
+            return $this->metaArray;
+        }
+        return $this->traitmetadata();
+    }
 }
