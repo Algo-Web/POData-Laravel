@@ -187,6 +187,7 @@ trait MetadataTrait
         $rels = $this->getRelationshipsFromMethods(true);
         foreach ($rels['HasOne'] as $property => $foo) {
             $isBelong = $foo instanceof BelongsTo;
+            $targ = get_class($foo->getRelated());
             $keyName = $isBelong ? $foo->getForeignKey() : $foo->getForeignKeyName();
             $localRaw = $isBelong ? $foo->getOwnerKey() : $foo->getQualifiedParentKeyName();
             $localSegments = explode('.', $localRaw);
@@ -194,11 +195,12 @@ trait MetadataTrait
             $first = $isBelong ? $localName : $keyName;
             $last = $isBelong ? $keyName : $localName;
             if (!isset($hooks[$first])) {
-                $hooks[$first] = ['property' => $property, 'local' => $last];
+                $hooks[$first] = [ 'target' => $targ, 'property' => $property, 'local' => $last];
             }
         }
         foreach ($rels['HasMany'] as $property => $foo) {
             $isBelong = $foo instanceof BelongsToMany;
+            $targ = get_class($foo->getRelated());
             $keyRaw = $isBelong ? $foo->getQualifiedForeignKeyName() : $foo->getForeignKeyName();
             $keySegments = explode('.', $keyRaw);
             $keyName = $keySegments[count($keySegments) - 1];
@@ -206,7 +208,7 @@ trait MetadataTrait
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
             if (!isset($hooks[$keyName])) {
-                $hooks[$keyName] = ['property' => $property, 'local' => $localName];
+                $hooks[$keyName] = [ 'target' => $targ, 'property' => $property, 'local' => $localName];
             }
         }
 
