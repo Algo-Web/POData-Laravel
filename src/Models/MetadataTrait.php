@@ -208,14 +208,7 @@ trait MetadataTrait
 
             $first = $keyName;
             $last = $localName;
-            if (!isset($hooks[$first])) {
-                $hooks[$first] = [];
-            }
-            $hooks[$first][$targ] = [
-                'property' => $property,
-                'local' => $last,
-                'multiplicity' => $mult
-            ];
+            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
         }
 
         foreach ($rels['KnownPolyMorphSide'] as $property => $foo) {
@@ -236,14 +229,7 @@ trait MetadataTrait
             $localName = $localSegments[count($localSegments) - 1];
             $first = $isMany ? $keyName : $localName;
             $last = $isMany ? $localName : $keyName;
-            if (!isset($hooks[$first])) {
-                $hooks[$first] = [];
-            }
-            $hooks[$first][$targ] = [
-                'property' => $property,
-                'local' => $last,
-                'multiplicity' => $mult
-            ];
+            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
         }
 
         foreach ($rels['HasOne'] as $property => $foo) {
@@ -259,14 +245,7 @@ trait MetadataTrait
             $localName = $localSegments[count($localSegments) - 1];
             $first = $isBelong ? $localName : $keyName;
             $last = $isBelong ? $keyName : $localName;
-            if (!isset($hooks[$first])) {
-                $hooks[$first] = [];
-            }
-            $hooks[$first][$targ] = [
-                'property' => $property,
-                'local' => $last,
-                'multiplicity' => $mult
-            ];
+            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
         }
         foreach ($rels['HasMany'] as $property => $foo) {
             if ($foo instanceof MorphMany || $foo instanceof MorphToMany) {
@@ -286,14 +265,9 @@ trait MetadataTrait
             $localRaw = $isBelong ? $foo->$rkMethodName() : $foo->getQualifiedParentKeyName();
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
-            if (!isset($hooks[$keyName])) {
-                $hooks[$keyName] = [];
-            }
-            $hooks[$keyName][$targ] = [
-                'property' => $property,
-                'local' => $localName,
-                'multiplicity' => $mult
-            ];
+            $first = $keyName;
+            $last = $localName;
+            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
         }
 
         return $hooks;
@@ -501,5 +475,25 @@ trait MetadataTrait
         $rkMethodName = method_exists($foo, 'getQualifiedRelatedKeyName')
             ? 'getQualifiedRelatedKeyName' : 'getQualifiedRelatedPivotKeyName';
         return array($fkMethodName, $rkMethodName);
+    }
+
+    /**
+     * @param $hooks
+     * @param $first
+     * @param $property
+     * @param $last
+     * @param $mult
+     * @param $targ
+     */
+    private function addRelationsHook(&$hooks, $first, $property, $last, $mult, $targ)
+    {
+        if (!isset($hooks[$first])) {
+            $hooks[$first] = [];
+        }
+        $hooks[$first][$targ] = [
+            'property' => $property,
+            'local' => $last,
+            'multiplicity' => $mult
+        ];
     }
 }
