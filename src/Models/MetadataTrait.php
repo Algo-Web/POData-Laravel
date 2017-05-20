@@ -196,10 +196,7 @@ trait MetadataTrait
             $mult = $isMany ? '*' : '1';
 
             if ($isMany) {
-                $fkMethodName = method_exists($foo, 'getQualifiedForeignKeyName')
-                    ? 'getQualifiedForeignKeyName' : 'getQualifiedForeignPivotKeyName';
-                $rkMethodName = method_exists($foo, 'getQualifiedRelatedKeyName')
-                    ? 'getQualifiedRelatedKeyName' : 'getQualifiedRelatedPivotKeyName';
+                list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo);
             }
 
             $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->getForeignKey();
@@ -228,10 +225,7 @@ trait MetadataTrait
             $mult = $foo instanceof MorphOne ? '0..1' : $mult;
 
             if ($isMany) {
-                $fkMethodName = method_exists($foo, 'getQualifiedForeignKeyName')
-                    ? 'getQualifiedForeignKeyName' : 'getQualifiedForeignPivotKeyName';
-                $rkMethodName = method_exists($foo, 'getQualifiedRelatedKeyName')
-                    ? 'getQualifiedRelatedKeyName' : 'getQualifiedRelatedPivotKeyName';
+                list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo);
             }
 
             $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->getForeignKeyName();
@@ -283,10 +277,7 @@ trait MetadataTrait
             $targ = get_class($foo->getRelated());
 
             if ($isBelong) {
-                $fkMethodName = method_exists($foo, 'getQualifiedForeignKeyName')
-                    ? 'getQualifiedForeignKeyName' : 'getQualifiedForeignPivotKeyName';
-                $rkMethodName = method_exists($foo, 'getQualifiedRelatedKeyName')
-                    ? 'getQualifiedRelatedKeyName' : 'getQualifiedRelatedPivotKeyName';
+                list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo);
             }
 
             $keyRaw = $isBelong ? $foo->$fkMethodName() : $foo->getForeignKeyName();
@@ -497,5 +488,18 @@ trait MetadataTrait
             $methods[] = $residual;
         }
         return $methods;
+    }
+
+    /**
+     * @param $foo
+     * @return array
+     */
+    private function polyglotKeyMethodNames($foo)
+    {
+        $fkMethodName = method_exists($foo, 'getQualifiedForeignKeyName')
+            ? 'getQualifiedForeignKeyName' : 'getQualifiedForeignPivotKeyName';
+        $rkMethodName = method_exists($foo, 'getQualifiedRelatedKeyName')
+            ? 'getQualifiedRelatedKeyName' : 'getQualifiedRelatedPivotKeyName';
+        return array($fkMethodName, $rkMethodName);
     }
 }
