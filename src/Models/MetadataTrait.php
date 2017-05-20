@@ -193,6 +193,7 @@ trait MetadataTrait
         foreach ($rels['UnknownPolyMorphSide'] as $property => $foo) {
             $isMany = $foo instanceof MorphToMany;
             $targ = get_class($foo->getRelated());
+            $mult = $isMany ? '*' : '1';
 
             $keyRaw = $isMany ? $foo->getQualifiedForeignKeyName() : $foo->getForeignKey();
             $keySegments = explode('.', $keyRaw);
@@ -204,13 +205,20 @@ trait MetadataTrait
             $first = $keyName;
             $last = $localName;
             if (!isset($hooks[$first])) {
-                $hooks[$first] = [ 'target' => $targ, 'property' => $property, 'local' => $last];
+                $hooks[$first] = [
+                    'target' => $targ,
+                    'property' => $property,
+                    'local' => $last,
+                    'multiplicity' => $mult
+                ];
             }
         }
 
         foreach ($rels['KnownPolyMorphSide'] as $property => $foo) {
             $isMany = $foo instanceof MorphToMany;
             $targ = get_class($foo->getRelated());
+            $mult = $isMany ? '*' : $foo instanceof MorphMany ? '*' : '1';
+            $mult = $foo instanceof MorphOne ? '0..1' : $mult;
 
             $keyRaw = $isMany ? $foo->getQualifiedForeignKeyName() : $foo->getForeignKeyName();
             $keySegments = explode('.', $keyRaw);
@@ -221,7 +229,12 @@ trait MetadataTrait
             $first = $isMany ? $keyName : $localName;
             $last = $isMany ? $localName : $keyName;
             if (!isset($hooks[$first])) {
-                $hooks[$first] = [ 'target' => $targ, 'property' => $property, 'local' => $last];
+                $hooks[$first] = [
+                    'target' => $targ,
+                    'property' => $property,
+                    'local' => $last,
+                    'multiplicity' => $mult
+                ];
             }
         }
 
@@ -230,6 +243,7 @@ trait MetadataTrait
                 continue;
             }
             $isBelong = $foo instanceof BelongsTo;
+            $mult = $isBelong ? '1' : '0..1';
             $targ = get_class($foo->getRelated());
             $keyName = $isBelong ? $foo->getForeignKey() : $foo->getForeignKeyName();
             $localRaw = $isBelong ? $foo->getOwnerKey() : $foo->getQualifiedParentKeyName();
@@ -238,7 +252,12 @@ trait MetadataTrait
             $first = $isBelong ? $localName : $keyName;
             $last = $isBelong ? $keyName : $localName;
             if (!isset($hooks[$first])) {
-                $hooks[$first] = [ 'target' => $targ, 'property' => $property, 'local' => $last];
+                $hooks[$first] = [
+                    'target' => $targ,
+                    'property' => $property,
+                    'local' => $last,
+                    'multiplicity' => $mult
+                ];
             }
         }
         foreach ($rels['HasMany'] as $property => $foo) {
@@ -246,6 +265,7 @@ trait MetadataTrait
                 continue;
             }
             $isBelong = $foo instanceof BelongsToMany;
+            $mult = '*';
             $targ = get_class($foo->getRelated());
             $keyRaw = $isBelong ? $foo->getQualifiedForeignKeyName() : $foo->getForeignKeyName();
             $keySegments = explode('.', $keyRaw);
@@ -254,7 +274,12 @@ trait MetadataTrait
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
             if (!isset($hooks[$keyName])) {
-                $hooks[$keyName] = [ 'target' => $targ, 'property' => $property, 'local' => $localName];
+                $hooks[$keyName] = [
+                    'target' => $targ,
+                    'property' => $property,
+                    'local' => $localName,
+                    'multiplicity' => $mult
+                ];
             }
         }
 
