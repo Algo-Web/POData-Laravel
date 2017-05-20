@@ -5,7 +5,15 @@ namespace AlgoWeb\PODataLaravel\Providers;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestGetterModel;
 use AlgoWeb\PODataLaravel\Models\TestModel;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManySource;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManyTarget;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
+use AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
+use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use Illuminate\Cache\ArrayStore;
@@ -110,7 +118,10 @@ class MetadataProviderTest extends TestCase
         App::instance('metadata', $meta);
 
         $classen = [TestModel::class, TestGetterModel::class, TestMorphManySource::class, TestMorphOneSource::class,
-            TestMorphTarget::class];
+            TestMorphTarget::class, TestMonomorphicManySource::class, TestMonomorphicManyTarget::class,
+            TestMonomorphicSource::class, TestMonomorphicTarget::class, TestMorphManyToManySource::class,
+            TestMorphManyToManyTarget::class, TestMonomorphicOneAndManySource::class,
+            TestMonomorphicOneAndManyTarget::class];
 
         foreach ($classen as $className) {
             $testModel = m::mock($className)->makePartial();
@@ -151,7 +162,8 @@ class MetadataProviderTest extends TestCase
         $schema->shouldReceive('hasTable')->andReturn(true);
         $schema->shouldReceive('getColumnListing')->andReturn([]);
 
-        $meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
+        //$meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
+        $meta = new SimpleMetadataProvider('Data', 'Data');
         App::instance('metadata', $meta);
 
         $cacheStore = m::mock(\Illuminate\Cache\Repository::class)->makePartial();

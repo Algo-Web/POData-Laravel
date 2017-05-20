@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Connection as Connection;
 use Mockery\Mockery;
 
-class TestMorphManySource extends Model
+class TestMonomorphicManyTarget extends Model
 {
     use MetadataTrait {
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
@@ -31,36 +31,8 @@ class TestMorphManySource extends Model
         parent::__construct();
     }
 
-    public function getTable()
+    public function manyTarget()
     {
-        return 'testmorphmanytarget';
-    }
-
-    public function getConnectionName()
-    {
-        return 'testconnection';
-    }
-
-    public function getConnection()
-    {
-        return $this->connect;
-    }
-
-    public function metadata()
-    {
-        if (isset($this->metaArray)) {
-            return $this->metaArray;
-        }
-        return $this->traitmetadata();
-    }
-
-    public function getRelationshipsFromMethods($biDir = false)
-    {
-        return $this->getRel($biDir);
-    }
-
-    public function morphTarget()
-    {
-        return $this->morphMany('AlgoWeb\PODataLaravel\Models\TestMorphTarget', 'morph');
+        return $this->belongsToMany(TestMonomorphicManySource::class, "target_source", "many_id", "many_source");
     }
 }

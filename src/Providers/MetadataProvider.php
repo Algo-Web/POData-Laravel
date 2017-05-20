@@ -117,6 +117,7 @@ class MetadataProvider extends MetadataBaseProvider
             $instance = App::make($fqModelName);
             $name = strtolower($instance->getEndpointName());
             $metaSchema = $instance->getXmlSchema();
+
             // if for whatever reason we don't get an XML schema, move on to next entry and drop current one from
             // further processing
             if (null == $metaSchema) {

@@ -1,6 +1,11 @@
 <?php
 namespace AlgoWeb\PODataLaravel\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\App as App;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use POData\Providers\Metadata\ResourceStreamInfo;
@@ -128,6 +133,7 @@ trait MetadataTrait
         if (null != $keyName) {
             $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);
         }
+
         foreach ($raw as $key => $secret) {
             if ($key == $keyName) {
                 continue;
@@ -178,6 +184,23 @@ trait MetadataTrait
         return $rel;
     }
 
+    public function getRelationships()
+    {
+        $hooks = [];
+
+        $rels = $this->getRelationshipsFromMethods(true);
+
+        $this->getRelationshipsUnknownPolyMorph($rels, $hooks);
+
+        $this->getRelationshipsKnownPolyMorph($rels, $hooks);
+
+        $this->getRelationshipsHasOne($rels, $hooks);
+
+        $this->getRelationshipsHasMany($rels, $hooks);
+
+        return $hooks;
+    }
+
     protected function getAllAttributes()
     {
         // Adapted from http://stackoverflow.com/a/33514981
@@ -204,7 +227,7 @@ trait MetadataTrait
         return $attributes;
     }
 
-    protected function getRelationshipsFromMethods()
+    protected function getRelationshipsFromMethods($biDir = false)
     {
         $model = $this;
         $relationships = array(
@@ -244,7 +267,8 @@ trait MetadataTrait
                                 'morphOne',
                                 'morphTo',
                                 'morphMany',
-                                'morphToMany'
+                                'morphToMany',
+                                'morphedByMany'
                                 ) as $relation) {
                         $search = '$this->'.$relation.'(';
                         if ($pos = stripos($code, $search)) {
@@ -252,20 +276,32 @@ trait MetadataTrait
                             $relationObj = $model->$method();
                             if ($relationObj instanceof Relation) {
                                 $relatedModel = '\\'.get_class($relationObj->getRelated());
-                                $relations = ['hasManyThrough', 'belongsToMany', 'hasMany', 'morphMany', 'morphToMany'];
+                                $relations = [
+                                    'hasManyThrough',
+                                    'belongsToMany',
+                                    'hasMany',
+                                    'morphMany',
+                                    'morphToMany',
+                                    'morphedByMany'
+                                ];
                                 if (in_array($relation, $relations)) {
                                     //Collection or array of models (because Collection is Arrayable)
-                                    $relationships["HasMany"][$method] = $relatedModel;
+                                    $relationships["HasMany"][$method] = $biDir ? $relationObj : $relatedModel;
                                 } elseif ($relation === "morphTo") {
                                     // Model isn't specified because relation is polymorphic
                                     $relationships["UnknownPolyMorphSide"][$method] =
-                                        '\Illuminate\Database\Eloquent\Model|\Eloquent';
+                                        $biDir ? $relationObj : '\Illuminate\Database\Eloquent\Model|\Eloquent';
                                 } else {
                                     //Single model is returned
-                                    $relationships["HasOne"][$method] = $relatedModel;
+                                    $relationships["HasOne"][$method] = $biDir ? $relationObj : $relatedModel;
                                 }
-                                if (in_array($relation, ["morphMany", "morphOne"])) {
-                                    $relationships["KnownPolyMorphSide"][$method] = $relatedModel;
+                                if (in_array($relation, ["morphMany", "morphOne", "morphedByMany"])) {
+                                    $relationships["KnownPolyMorphSide"][$method] =
+                                        $biDir ? $relationObj : $relatedModel;
+                                }
+                                if (in_array($relation, ["morphToMany"])) {
+                                    $relationships["UnknownPolyMorphSide"][$method] =
+                                        $biDir ? $relationObj : $relatedModel;
                                 }
                             }
                         }
@@ -354,5 +390,145 @@ trait MetadataTrait
             $methods[] = $residual;
         }
         return $methods;
+    }
+
+    /**
+     * @param $foo
+     * @return array
+     */
+    private function polyglotKeyMethodNames($foo, $condition = false)
+    {
+        $fkMethodName = null;
+        $rkMethodName = null;
+        if ($condition) {
+            $fkMethodName = method_exists($foo, 'getQualifiedForeignKeyName')
+                ? 'getQualifiedForeignKeyName' : 'getQualifiedForeignPivotKeyName';
+            $rkMethodName = method_exists($foo, 'getQualifiedRelatedKeyName')
+                ? 'getQualifiedRelatedKeyName' : 'getQualifiedRelatedPivotKeyName';
+        }
+        return array($fkMethodName, $rkMethodName);
+    }
+
+    /**
+     * @param $hooks
+     * @param $first
+     * @param $property
+     * @param $last
+     * @param $mult
+     * @param $targ
+     */
+    private function addRelationsHook(&$hooks, $first, $property, $last, $mult, $targ)
+    {
+        if (!isset($hooks[$first])) {
+            $hooks[$first] = [];
+        }
+        $hooks[$first][$targ] = [
+            'property' => $property,
+            'local' => $last,
+            'multiplicity' => $mult
+        ];
+    }
+
+    /**
+     * @param $rels
+     * @param $hooks
+     */
+    private function getRelationshipsHasMany($rels, &$hooks)
+    {
+        foreach ($rels['HasMany'] as $property => $foo) {
+            if ($foo instanceof MorphMany || $foo instanceof MorphToMany) {
+                continue;
+            }
+            $isBelong = $foo instanceof BelongsToMany;
+            $mult = '*';
+            $targ = get_class($foo->getRelated());
+
+            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isBelong);
+
+            $keyRaw = $isBelong ? $foo->$fkMethodName() : $foo->getForeignKeyName();
+            $keySegments = explode('.', $keyRaw);
+            $keyName = $keySegments[count($keySegments) - 1];
+            $localRaw = $isBelong ? $foo->$rkMethodName() : $foo->getQualifiedParentKeyName();
+            $localSegments = explode('.', $localRaw);
+            $localName = $localSegments[count($localSegments) - 1];
+            $first = $keyName;
+            $last = $localName;
+            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
+        }
+    }
+
+    /**
+     * @param $rels
+     * @param $hooks
+     */
+    private function getRelationshipsHasOne($rels, &$hooks)
+    {
+        foreach ($rels['HasOne'] as $property => $foo) {
+            if ($foo instanceof MorphOne) {
+                continue;
+            }
+            $isBelong = $foo instanceof BelongsTo;
+            $mult = $isBelong ? '1' : '0..1';
+            $targ = get_class($foo->getRelated());
+            $keyName = $isBelong ? $foo->getForeignKey() : $foo->getForeignKeyName();
+            $localRaw = $isBelong ? $foo->getOwnerKey() : $foo->getQualifiedParentKeyName();
+            $localSegments = explode('.', $localRaw);
+            $localName = $localSegments[count($localSegments) - 1];
+            $first = $isBelong ? $localName : $keyName;
+            $last = $isBelong ? $keyName : $localName;
+            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
+        }
+    }
+
+    /**
+     * @param $rels
+     * @param $hooks
+     */
+    private function getRelationshipsKnownPolyMorph($rels, &$hooks)
+    {
+        foreach ($rels['KnownPolyMorphSide'] as $property => $foo) {
+            $isMany = $foo instanceof MorphToMany;
+            $targ = get_class($foo->getRelated());
+            $mult = $isMany ? '*' : $foo instanceof MorphMany ? '*' : '1';
+            $mult = $foo instanceof MorphOne ? '0..1' : $mult;
+
+            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isMany);
+
+            $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->getForeignKeyName();
+            $keySegments = explode('.', $keyRaw);
+            $keyName = $keySegments[count($keySegments) - 1];
+            $localRaw = $isMany ? $foo->$rkMethodName() : $foo->getQualifiedParentKeyName();
+            $localSegments = explode('.', $localRaw);
+            $localName = $localSegments[count($localSegments) - 1];
+            $first = $isMany ? $keyName : $localName;
+            $last = $isMany ? $localName : $keyName;
+            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
+        }
+    }
+
+    /**
+     * @param $rels
+     * @param $hooks
+     */
+    private function getRelationshipsUnknownPolyMorph($rels, &$hooks)
+    {
+        foreach ($rels['UnknownPolyMorphSide'] as $property => $foo) {
+            $isMany = $foo instanceof MorphToMany;
+            $targ = get_class($foo->getRelated());
+            $mult = $isMany ? '*' : '1';
+
+            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isMany);
+
+            $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->getForeignKey();
+            $keySegments = explode('.', $keyRaw);
+            $keyName = $keySegments[count($keySegments) - 1];
+            $localRaw = $isMany ? $foo->$rkMethodName() : $foo->getQualifiedParentKeyName();
+            $localSegments = explode('.', $localRaw);
+            $localName = $localSegments[count($localSegments) - 1];
+
+            $first = $keyName;
+            $last = $localName;
+            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
+        }
     }
 }

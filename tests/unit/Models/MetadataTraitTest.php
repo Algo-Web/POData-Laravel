@@ -505,6 +505,36 @@ class MetadataTraitTest extends TestCase
         $this->assertTrue(array_key_exists('morphTarget', $result['HasOne']));
     }
 
+    /**
+     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
+     */
+    public function testGetRelationshipsForMorphManyToManySource()
+    {
+        $foo = new TestMorphManyToManySource();
+        $result = $foo->getRelationshipsFromMethods();
+        $this->assertEquals(0, count($result['HasOne']));
+        $this->assertEquals(1, count($result['HasMany']));
+        $this->assertEquals(0, count($result['KnownPolyMorphSide']));
+        $this->assertEquals(1, count($result['UnknownPolyMorphSide']));
+        $this->assertTrue(array_key_exists('manySource', $result['UnknownPolyMorphSide']));
+        $this->assertTrue(array_key_exists('manySource', $result['HasMany']));
+    }
+
+    /**
+     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
+     */
+    public function testGetRelationshipsForMorphManyToManyTarget()
+    {
+        $foo = new TestMorphManyToManyTarget();
+        $result = $foo->getRelationshipsFromMethods();
+        $this->assertEquals(0, count($result['HasOne']));
+        $this->assertEquals(1, count($result['HasMany']));
+        $this->assertEquals(1, count($result['KnownPolyMorphSide']));
+        $this->assertEquals(0, count($result['UnknownPolyMorphSide']));
+        $this->assertTrue(array_key_exists('manyTarget', $result['KnownPolyMorphSide']));
+        $this->assertTrue(array_key_exists('manyTarget', $result['HasMany']));
+    }
+
     public function testGetDefaultEndpointName()
     {
         $foo = new TestModel();
