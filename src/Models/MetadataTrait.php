@@ -227,10 +227,17 @@ trait MetadataTrait
             $mult = $isMany ? '*' : $foo instanceof MorphMany ? '*' : '1';
             $mult = $foo instanceof MorphOne ? '0..1' : $mult;
 
-            $keyRaw = $isMany ? $foo->getQualifiedForeignKeyName() : $foo->getForeignKeyName();
+            if ($isMany) {
+                $fkMethodName = method_exists($foo, 'getQualifiedForeignKeyName')
+                    ? 'getQualifiedForeignKeyName' : 'getQualifiedForeignPivotKeyName';
+                $rkMethodName = method_exists($foo, 'getQualifiedRelatedKeyName')
+                    ? 'getQualifiedRelatedKeyName' : 'getQualifiedRelatedPivotKeyName';
+            }
+
+            $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->getForeignKeyName();
             $keySegments = explode('.', $keyRaw);
             $keyName = $keySegments[count($keySegments) - 1];
-            $localRaw = $isMany ? $foo->getQualifiedRelatedKeyName() : $foo->getQualifiedParentKeyName();
+            $localRaw = $isMany ? $foo->$rkMethodName() : $foo->getQualifiedParentKeyName();
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
             $first = $isMany ? $keyName : $localName;
