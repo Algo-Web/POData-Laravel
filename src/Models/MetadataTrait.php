@@ -396,12 +396,16 @@ trait MetadataTrait
      * @param $foo
      * @return array
      */
-    private function polyglotKeyMethodNames($foo)
+    private function polyglotKeyMethodNames($foo, $condition = false)
     {
-        $fkMethodName = method_exists($foo, 'getQualifiedForeignKeyName')
-            ? 'getQualifiedForeignKeyName' : 'getQualifiedForeignPivotKeyName';
-        $rkMethodName = method_exists($foo, 'getQualifiedRelatedKeyName')
-            ? 'getQualifiedRelatedKeyName' : 'getQualifiedRelatedPivotKeyName';
+        $fkMethodName = null;
+        $rkMethodName = null;
+        if ($condition) {
+            $fkMethodName = method_exists($foo, 'getQualifiedForeignKeyName')
+                ? 'getQualifiedForeignKeyName' : 'getQualifiedForeignPivotKeyName';
+            $rkMethodName = method_exists($foo, 'getQualifiedRelatedKeyName')
+                ? 'getQualifiedRelatedKeyName' : 'getQualifiedRelatedPivotKeyName';
+        }
         return array($fkMethodName, $rkMethodName);
     }
 
@@ -439,9 +443,7 @@ trait MetadataTrait
             $mult = '*';
             $targ = get_class($foo->getRelated());
 
-            if ($isBelong) {
-                list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo);
-            }
+            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isBelong);
 
             $keyRaw = $isBelong ? $foo->$fkMethodName() : $foo->getForeignKeyName();
             $keySegments = explode('.', $keyRaw);
@@ -490,9 +492,7 @@ trait MetadataTrait
             $mult = $isMany ? '*' : $foo instanceof MorphMany ? '*' : '1';
             $mult = $foo instanceof MorphOne ? '0..1' : $mult;
 
-            if ($isMany) {
-                list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo);
-            }
+            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isMany);
 
             $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->getForeignKeyName();
             $keySegments = explode('.', $keyRaw);
@@ -517,9 +517,7 @@ trait MetadataTrait
             $targ = get_class($foo->getRelated());
             $mult = $isMany ? '*' : '1';
 
-            if ($isMany) {
-                list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo);
-            }
+            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isMany);
 
             $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->getForeignKey();
             $keySegments = explode('.', $keyRaw);
