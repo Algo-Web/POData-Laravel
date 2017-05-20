@@ -205,13 +205,13 @@ trait MetadataTrait
             $first = $keyName;
             $last = $localName;
             if (!isset($hooks[$first])) {
-                $hooks[$first] = [
-                    'target' => $targ,
-                    'property' => $property,
-                    'local' => $last,
-                    'multiplicity' => $mult
-                ];
+                $hooks[$first] = [];
             }
+            $hooks[$first][$targ] = [
+                'property' => $property,
+                'local' => $last,
+                'multiplicity' => $mult
+            ];
         }
 
         foreach ($rels['KnownPolyMorphSide'] as $property => $foo) {
@@ -229,13 +229,13 @@ trait MetadataTrait
             $first = $isMany ? $keyName : $localName;
             $last = $isMany ? $localName : $keyName;
             if (!isset($hooks[$first])) {
-                $hooks[$first] = [
-                    'target' => $targ,
-                    'property' => $property,
-                    'local' => $last,
-                    'multiplicity' => $mult
-                ];
+                $hooks[$first] = [];
             }
+            $hooks[$first][$targ] = [
+                'property' => $property,
+                'local' => $last,
+                'multiplicity' => $mult
+            ];
         }
 
         foreach ($rels['HasOne'] as $property => $foo) {
@@ -252,13 +252,13 @@ trait MetadataTrait
             $first = $isBelong ? $localName : $keyName;
             $last = $isBelong ? $keyName : $localName;
             if (!isset($hooks[$first])) {
-                $hooks[$first] = [
-                    'target' => $targ,
-                    'property' => $property,
-                    'local' => $last,
-                    'multiplicity' => $mult
-                ];
+                $hooks[$first] = [];
             }
+            $hooks[$first][$targ] = [
+                'property' => $property,
+                'local' => $last,
+                'multiplicity' => $mult
+            ];
         }
         foreach ($rels['HasMany'] as $property => $foo) {
             if ($foo instanceof MorphMany || $foo instanceof MorphToMany) {
@@ -274,13 +274,13 @@ trait MetadataTrait
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
             if (!isset($hooks[$keyName])) {
-                $hooks[$keyName] = [
-                    'target' => $targ,
-                    'property' => $property,
-                    'local' => $localName,
-                    'multiplicity' => $mult
-                ];
+                $hooks[$keyName] = [];
             }
+            $hooks[$keyName][$targ] = [
+                'property' => $property,
+                'local' => $localName,
+                'multiplicity' => $mult
+            ];
         }
 
         return $hooks;

@@ -7,6 +7,8 @@ use AlgoWeb\PODataLaravel\Models\TestGetterModel;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManySource;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
@@ -118,7 +120,8 @@ class MetadataProviderTest extends TestCase
         $classen = [TestModel::class, TestGetterModel::class, TestMorphManySource::class, TestMorphOneSource::class,
             TestMorphTarget::class, TestMonomorphicManySource::class, TestMonomorphicManyTarget::class,
             TestMonomorphicSource::class, TestMonomorphicTarget::class, TestMorphManyToManySource::class,
-            TestMorphManyToManyTarget::class];
+            TestMorphManyToManyTarget::class, TestMonomorphicOneAndManySource::class,
+            TestMonomorphicOneAndManyTarget::class];
 
         foreach ($classen as $className) {
             $testModel = m::mock($className)->makePartial();
