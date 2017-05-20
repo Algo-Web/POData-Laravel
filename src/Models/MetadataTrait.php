@@ -195,10 +195,17 @@ trait MetadataTrait
             $targ = get_class($foo->getRelated());
             $mult = $isMany ? '*' : '1';
 
-            $keyRaw = $isMany ? $foo->getQualifiedForeignKeyName() : $foo->getForeignKey();
+            if ($isMany) {
+                $fkMethodName = method_exists($foo, 'getQualifiedForeignKeyName')
+                    ? 'getQualifiedForeignKeyName' : 'getQualifiedForeignPivotKeyName';
+                $rkMethodName = method_exists($foo, 'getQualifiedRelatedKeyName')
+                    ? 'getQualifiedRelatedKeyName' : 'getQualifiedRelatedPivotKeyName';
+            }
+
+            $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->getForeignKey();
             $keySegments = explode('.', $keyRaw);
             $keyName = $keySegments[count($keySegments) - 1];
-            $localRaw = $isMany ? $foo->getQualifiedRelatedKeyName() : $foo->getQualifiedParentKeyName();
+            $localRaw = $isMany ? $foo->$rkMethodName() : $foo->getQualifiedParentKeyName();
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
 
