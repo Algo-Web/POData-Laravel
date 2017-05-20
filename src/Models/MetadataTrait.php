@@ -274,10 +274,18 @@ trait MetadataTrait
             $isBelong = $foo instanceof BelongsToMany;
             $mult = '*';
             $targ = get_class($foo->getRelated());
-            $keyRaw = $isBelong ? $foo->getQualifiedForeignKeyName() : $foo->getForeignKeyName();
+
+            if ($isBelong) {
+                $fkMethodName = method_exists($foo, 'getQualifiedForeignKeyName')
+                    ? 'getQualifiedForeignKeyName' : 'getQualifiedForeignPivotKeyName';
+                $rkMethodName = method_exists($foo, 'getQualifiedRelatedKeyName')
+                    ? 'getQualifiedRelatedKeyName' : 'getQualifiedRelatedPivotKeyName';
+            }
+
+            $keyRaw = $isBelong ? $foo->$fkMethodName() : $foo->getForeignKeyName();
             $keySegments = explode('.', $keyRaw);
             $keyName = $keySegments[count($keySegments) - 1];
-            $localRaw = $isBelong ? $foo->getQualifiedRelatedKeyName() : $foo->getQualifiedParentKeyName();
+            $localRaw = $isBelong ? $foo->$rkMethodName() : $foo->getQualifiedParentKeyName();
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
             if (!isset($hooks[$keyName])) {
