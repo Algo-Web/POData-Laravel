@@ -156,8 +156,6 @@ class MetadataProvider extends MetadataBaseProvider
                     $principalMult = $deets['multiplicity'];
                     $principalProperty = $deets['property'];
                     $principalKey = $deets['local'];
-                    $dependentMult = null;
-                    $dependentProperty = null;
 
                     $foreign = $hooks[$dependentType];
                     $foreign = null != $foreign && isset($foreign[$principalKey]) ? $foreign[$principalKey] : null;
@@ -211,8 +209,6 @@ class MetadataProvider extends MetadataBaseProvider
                     $principalMult = $deets['multiplicity'];
                     $principalProperty = $deets['property'];
                     $principalKey = $deets['local'];
-                    $dependentMult = null;
-                    $dependentProperty = null;
 
                     if (!isset($remix[$dependentType])) {
                         continue;
