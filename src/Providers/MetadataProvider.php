@@ -145,7 +145,7 @@ class MetadataProvider extends MetadataBaseProvider
             $hooks[$name] = $rels;
         }
 
-        // models with non-empty relation gubbins are assembled, now the hard bit starts
+        // model relation gubbins are assembled, now the hard bit starts
         // storing assembled bidirectional relationship schema
         $rawLines = [];
         // storing unprocessed relation gubbins for second-pass processing
@@ -155,7 +155,7 @@ class MetadataProvider extends MetadataBaseProvider
         // now for second processing pass, to pick up stuff that first didn't handle
         $rawLines = $this->calculateRoundTripRelationsSecondPass($remix, $rawLines);
 
-        // now deduplicate rawLines - can't use array_unique as array value elements are themselves arrays
+        // deduplicate rawLines - can't use array_unique as array value elements are themselves arrays
         $lines = [];
         foreach ($rawLines as $line) {
             if (!in_array($line, $lines)) {
