@@ -140,20 +140,28 @@ class MetadataProvider extends MetadataBaseProvider
         foreach ($modelNames as $name) {
             $model = new $name();
             $rels = $model->getRelationships();
-            if (0 < count($rels)) {
-                $hooks[$name] = $rels;
-            }
+            // it doesn't matter if a model has no relationships here, that lack will simply be skipped over
+            // during hookup processing
+            $hooks[$name] = $rels;
         }
 
         // models with non-empty relation gubbins are assembled, now the hard bit starts
         // storing assembled bidirectional relationship schema
-        $lines = [];
+        $rawLines = [];
         // storing unprocessed relation gubbins for second-pass processing
         $remix = [];
-        $this->calculateRoundTripRelationsFirstPass($hooks, $lines, $remix);
+        $this->calculateRoundTripRelationsFirstPass($hooks, $rawLines, $remix);
 
         // now for second processing pass, to pick up stuff that first didn't handle
-        $lines = $this->calculateRoundTripRelationsSecondPass($remix, $lines);
+        $rawLines = $this->calculateRoundTripRelationsSecondPass($remix, $rawLines);
+
+        // now deduplicate rawLines - can't use array_unique as array value elements are themselves arrays
+        $lines = [];
+        foreach ($rawLines as $line) {
+            if (!in_array($line, $lines)) {
+                $lines[] = $line;
+            }
+        }
 
         return $lines;
     }
@@ -194,30 +202,19 @@ class MetadataProvider extends MetadataBaseProvider
                         in_array($principalMult, $this->multConstraints[$dependentMult]),
                         "Cannot pair multiplicities " . $principalMult . " and " . $dependentMult
                     );
+                    // generate forward and reverse relations
+                    list($forward, $reverse) = $this->calculateRoundTripRelationsGenForwardReverse(
+                        $principalType,
+                        $principalMult,
+                        $principalProperty,
+                        $dependentType,
+                        $dependentMult,
+                        $dependentProperty
+                    );
                     // add forward relation
-                    $forward = [
-                        'principalType' => $principalType,
-                        'principalMult' => $principalMult,
-                        'principalProp' => $principalProperty,
-                        'dependentType' => $dependentType,
-                        'dependentMult' => $dependentMult,
-                        'dependentProp' => $dependentProperty
-                    ];
-                    if (!in_array($forward, $lines)) {
-                        $lines[] = $forward;
-                    }
+                    $lines[] = $forward;
                     // add reverse relation
-                    $reverse = [
-                        'principalType' => $dependentType,
-                        'principalMult' => $dependentMult,
-                        'principalProp' => $dependentProperty,
-                        'dependentType' => $principalType,
-                        'dependentMult' => $principalMult,
-                        'dependentProp' => $principalProperty
-                    ];
-                    if (!in_array($reverse, $lines)) {
-                        $lines[] = $reverse;
-                    }
+                    $lines[] = $reverse;
                 }
             }
         }
@@ -253,30 +250,19 @@ class MetadataProvider extends MetadataBaseProvider
                             in_array($principalMult, $this->multConstraints[$dependentMult]),
                             "Cannot pair multiplicities " . $principalMult . " and " . $dependentMult
                         );
+                        // generate forward and reverse relations
+                        list($forward, $reverse) = $this->calculateRoundTripRelationsGenForwardReverse(
+                            $principalType,
+                            $principalMult,
+                            $principalProperty,
+                            $dependentType,
+                            $dependentMult,
+                            $dependentProperty
+                        );
                         // add forward relation
-                        $forward = [
-                            'principalType' => $principalType,
-                            'principalMult' => $principalMult,
-                            'principalProp' => $principalProperty,
-                            'dependentType' => $dependentType,
-                            'dependentMult' => $dependentMult,
-                            'dependentProp' => $dependentProperty
-                        ];
-                        if (!in_array($forward, $lines)) {
-                            $lines[] = $forward;
-                        }
+                        $lines[] = $forward;
                         // add reverse relation
-                        $reverse = [
-                            'principalType' => $dependentType,
-                            'principalMult' => $dependentMult,
-                            'principalProp' => $dependentProperty,
-                            'dependentType' => $principalType,
-                            'dependentMult' => $principalMult,
-                            'dependentProp' => $principalProperty
-                        ];
-                        if (!in_array($reverse, $lines)) {
-                            $lines[] = $reverse;
-                        }
+                        $lines[] = $reverse;
                     } else {
                         if (!isset($remix[$principalType])) {
                             $remix[$principalType] = [];
@@ -292,5 +278,41 @@ class MetadataProvider extends MetadataBaseProvider
                 }
             }
         }
+    }
+
+    /**
+     * @param $principalType
+     * @param $principalMult
+     * @param $principalProperty
+     * @param $dependentType
+     * @param $dependentMult
+     * @param $dependentProperty
+     * @return array
+     */
+    private function calculateRoundTripRelationsGenForwardReverse(
+        $principalType,
+        $principalMult,
+        $principalProperty,
+        $dependentType,
+        $dependentMult,
+        $dependentProperty
+    ) {
+        $forward = [
+            'principalType' => $principalType,
+            'principalMult' => $principalMult,
+            'principalProp' => $principalProperty,
+            'dependentType' => $dependentType,
+            'dependentMult' => $dependentMult,
+            'dependentProp' => $dependentProperty
+        ];
+        $reverse = [
+            'principalType' => $dependentType,
+            'principalMult' => $dependentMult,
+            'principalProp' => $dependentProperty,
+            'dependentType' => $principalType,
+            'dependentMult' => $principalMult,
+            'dependentProp' => $principalProperty
+        ];
+        return array($forward, $reverse);
     }
 }
