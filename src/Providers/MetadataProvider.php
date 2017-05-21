@@ -150,59 +150,21 @@ class MetadataProvider extends MetadataBaseProvider
         $lines = [];
         // storing unprocessed relation gubbins for second-pass processing
         $remix = [];
-        foreach ($hooks as $principalType => $value) {
-            foreach ($value as $fk => $localRels) {
-                foreach ($localRels as $dependentType => $deets) {
-                    $principalMult = $deets['multiplicity'];
-                    $principalProperty = $deets['property'];
-                    $principalKey = $deets['local'];
-
-                    $foreign = $hooks[$dependentType];
-                    $foreign = null != $foreign && isset($foreign[$principalKey]) ? $foreign[$principalKey] : null;
-
-                    if (null != $foreign && isset($foreign[$principalType])) {
-                        $foreign = $foreign[$principalType];
-                        $dependentMult = $foreign['multiplicity'];
-                        $dependentProperty = $foreign['property'];
-                        assert(
-                            in_array($dependentMult, $this->multConstraints[$principalMult]),
-                            "Cannot pair multiplicities ".$dependentMult. " and ".$principalMult
-                        );
-                        assert(
-                            in_array($principalMult, $this->multConstraints[$dependentMult]),
-                            "Cannot pair multiplicities ".$principalMult. " and ".$dependentMult
-                        );
-                        // add forward relation
-                        $forward = ['principalType' => $principalType, 'principalMult' => $principalMult,
-                            'principalProp' => $principalProperty, 'dependentType' => $dependentType,
-                            'dependentMult' => $dependentMult, 'dependentProp' => $dependentProperty];
-                        if (!in_array($forward, $lines)) {
-                            $lines[] = $forward;
-                        }
-                        // add reverse relation
-                        $reverse = ['principalType' => $dependentType, 'principalMult' => $dependentMult,
-                            'principalProp' => $dependentProperty, 'dependentType' => $principalType,
-                            'dependentMult' => $principalMult, 'dependentProp' => $principalProperty];
-                        if (!in_array($reverse, $lines)) {
-                            $lines[] = $reverse;
-                        }
-                    } else {
-                        if (!isset($remix[$principalType])) {
-                            $remix[$principalType] = [];
-                        }
-                        if (!isset($remix[$principalType][$fk])) {
-                            $remix[$principalType][$fk] = [];
-                        }
-                        if (!isset($remix[$principalType][$fk][$dependentType])) {
-                            $remix[$principalType][$fk][$dependentType] = $deets;
-                        }
-                        assert(isset($remix[$principalType][$fk][$dependentType]));
-                    }
-                }
-            }
-        }
+        $this->calculateRoundTripRelationsFirstPass($hooks, $lines, $remix);
 
         // now for second processing pass, to pick up stuff that first didn't handle
+        $lines = $this->calculateRoundTripRelationsSecondPass($remix, $lines);
+
+        return $lines;
+    }
+
+    /**
+     * @param $remix
+     * @param $lines
+     * @return array
+     */
+    private function calculateRoundTripRelationsSecondPass($remix, $lines)
+    {
         foreach ($remix as $principalType => $value) {
             foreach ($value as $fk => $localRels) {
                 foreach ($localRels as $dependentType => $deets) {
@@ -226,30 +188,109 @@ class MetadataProvider extends MetadataBaseProvider
                     $dependentProperty = $foreign[$dependentType]['property'];
                     assert(
                         in_array($dependentMult, $this->multConstraints[$principalMult]),
-                        "Cannot pair multiplicities ".$dependentMult. " and ".$principalMult
+                        "Cannot pair multiplicities " . $dependentMult . " and " . $principalMult
                     );
                     assert(
                         in_array($principalMult, $this->multConstraints[$dependentMult]),
-                        "Cannot pair multiplicities ".$principalMult. " and ".$dependentMult
+                        "Cannot pair multiplicities " . $principalMult . " and " . $dependentMult
                     );
                     // add forward relation
-                    $forward = ['principalType' => $principalType, 'principalMult' => $principalMult,
-                        'principalProp' => $principalProperty, 'dependentType' => $dependentType,
-                        'dependentMult' => $dependentMult, 'dependentProp' => $dependentProperty];
+                    $forward = [
+                        'principalType' => $principalType,
+                        'principalMult' => $principalMult,
+                        'principalProp' => $principalProperty,
+                        'dependentType' => $dependentType,
+                        'dependentMult' => $dependentMult,
+                        'dependentProp' => $dependentProperty
+                    ];
                     if (!in_array($forward, $lines)) {
                         $lines[] = $forward;
                     }
                     // add reverse relation
-                    $reverse = ['principalType' => $dependentType, 'principalMult' => $dependentMult,
-                        'principalProp' => $dependentProperty, 'dependentType' => $principalType,
-                        'dependentMult' => $principalMult, 'dependentProp' => $principalProperty];
+                    $reverse = [
+                        'principalType' => $dependentType,
+                        'principalMult' => $dependentMult,
+                        'principalProp' => $dependentProperty,
+                        'dependentType' => $principalType,
+                        'dependentMult' => $principalMult,
+                        'dependentProp' => $principalProperty
+                    ];
                     if (!in_array($reverse, $lines)) {
                         $lines[] = $reverse;
                     }
                 }
             }
         }
-
         return $lines;
+    }
+
+    /**
+     * @param $hooks
+     * @param $lines
+     * @param $remix
+     */
+    private function calculateRoundTripRelationsFirstPass($hooks, &$lines, &$remix)
+    {
+        foreach ($hooks as $principalType => $value) {
+            foreach ($value as $fk => $localRels) {
+                foreach ($localRels as $dependentType => $deets) {
+                    $principalMult = $deets['multiplicity'];
+                    $principalProperty = $deets['property'];
+                    $principalKey = $deets['local'];
+
+                    $foreign = $hooks[$dependentType];
+                    $foreign = null != $foreign && isset($foreign[$principalKey]) ? $foreign[$principalKey] : null;
+
+                    if (null != $foreign && isset($foreign[$principalType])) {
+                        $foreign = $foreign[$principalType];
+                        $dependentMult = $foreign['multiplicity'];
+                        $dependentProperty = $foreign['property'];
+                        assert(
+                            in_array($dependentMult, $this->multConstraints[$principalMult]),
+                            "Cannot pair multiplicities " . $dependentMult . " and " . $principalMult
+                        );
+                        assert(
+                            in_array($principalMult, $this->multConstraints[$dependentMult]),
+                            "Cannot pair multiplicities " . $principalMult . " and " . $dependentMult
+                        );
+                        // add forward relation
+                        $forward = [
+                            'principalType' => $principalType,
+                            'principalMult' => $principalMult,
+                            'principalProp' => $principalProperty,
+                            'dependentType' => $dependentType,
+                            'dependentMult' => $dependentMult,
+                            'dependentProp' => $dependentProperty
+                        ];
+                        if (!in_array($forward, $lines)) {
+                            $lines[] = $forward;
+                        }
+                        // add reverse relation
+                        $reverse = [
+                            'principalType' => $dependentType,
+                            'principalMult' => $dependentMult,
+                            'principalProp' => $dependentProperty,
+                            'dependentType' => $principalType,
+                            'dependentMult' => $principalMult,
+                            'dependentProp' => $principalProperty
+                        ];
+                        if (!in_array($reverse, $lines)) {
+                            $lines[] = $reverse;
+                        }
+                    } else {
+                        if (!isset($remix[$principalType])) {
+                            $remix[$principalType] = [];
+                        }
+                        if (!isset($remix[$principalType][$fk])) {
+                            $remix[$principalType][$fk] = [];
+                        }
+                        if (!isset($remix[$principalType][$fk][$dependentType])) {
+                            $remix[$principalType][$fk][$dependentType] = $deets;
+                        }
+                        assert(isset($remix[$principalType][$fk][$dependentType]));
+                    }
+                }
+            }
+        }
     }
 }
