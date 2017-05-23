@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
 use POData\Providers\Metadata\IMetadataProvider;
+use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema as Schema;
@@ -52,10 +53,45 @@ class MetadataProvider extends MetadataBaseProvider
 
         // now that endpoints are hooked up, tackle the relationships
         // if we'd tried earlier, we'd be guaranteed to try to hook a relation up to null, which would be bad
-        foreach ($ends as $bitter) {
-            $fqModelName = $bitter;
-            $instance = new $fqModelName();
-            $instance->hookUpRelationships($EntityTypes, $ResourceSets);
+        foreach ($biDirect as $line) {
+            $principalType = $line['principalType'];
+            $principalMult = $line['principalMult'];
+            $principalProp = $line['principalProp'];
+            $dependentType = $line['dependentType'];
+            $dependentMult = $line['dependentMult'];
+            $dependentProp = $line['dependentProp'];
+            if (!isset($EntityTypes[$principalType]) || !isset($EntityTypes[$dependentType])) {
+                continue;
+            }
+            $principal = $EntityTypes[$principalType];
+            $dependent = $EntityTypes[$dependentType];
+            //many-to-many
+            if ('*' == $principalMult && '*' == $dependentMult) {
+                $meta->addResourceSetReferencePropertyBidirectional(
+                    $principal,
+                    $dependent,
+                    $principalProp,
+                    $dependentProp
+                );
+                continue;
+            }
+            //one-to-one
+            if ('0..1' == $principalMult || '0..1' == $dependentMult) {
+                $meta->addResourceReferenceSinglePropertyBidirectional(
+                    $principal,
+                    $dependent,
+                    $principalProp,
+                    $dependentProp
+                );
+                continue;
+            }
+            //one-to-many
+            $meta->addResourceReferencePropertyBidirectional(
+                $principal,
+                $dependent,
+                $principalProp,
+                $dependentProp
+            );
         }
 
         $key = 'metadata';
@@ -234,6 +270,9 @@ class MetadataProvider extends MetadataBaseProvider
         foreach ($hooks as $principalType => $value) {
             foreach ($value as $fk => $localRels) {
                 foreach ($localRels as $dependentType => $deets) {
+                    if (!isset($hooks[$dependentType])) {
+                        continue;
+                    }
                     $principalMult = $deets['multiplicity'];
                     $principalProperty = $deets['property'];
                     $principalKey = $deets['local'];
