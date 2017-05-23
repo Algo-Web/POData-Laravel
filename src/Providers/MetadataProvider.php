@@ -46,7 +46,7 @@ class MetadataProvider extends MetadataBaseProvider
 
         $modelNames = $this->getCandidateModels();
 
-        list($EntityTypes, $ResourceSets, $ends) = $this->getEntityTypesAndResourceSets($meta, $modelNames);
+        list($EntityTypes) = $this->getEntityTypesAndResourceSets($meta, $modelNames);
 
         // need to lift EntityTypes
         $biDirect = $this->calculateRoundTripRelations();
