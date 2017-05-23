@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use POData\Providers\Metadata\ResourceSet;
+use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use Mockery as m;
 
@@ -114,7 +115,7 @@ class MetadataProviderTest extends TestCase
         $schema->shouldReceive('hasTable')->andReturn(true);
         $schema->shouldReceive('getColumnListing')->andReturn([]);
 
-        $meta = \Mockery::mock(SimpleMetadataProvider::class);
+        $meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
         App::instance('metadata', $meta);
 
         $classen = [TestModel::class, TestGetterModel::class, TestMorphManySource::class, TestMorphOneSource::class,
@@ -215,6 +216,49 @@ class MetadataProviderTest extends TestCase
         $resources = $meta->getResourceSets();
         $this->assertTrue(is_array($resources));
         $this->assertEquals(0, count($resources));
+    }
+
+    public function testBootHasMigrationsThreeDifferentRelationTypes()
+    {
+        $schema = Schema::getFacadeRoot();
+        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
+        $schema->shouldReceive('hasTable')->andReturn(true);
+        $schema->shouldReceive('getColumnListing')->andReturn([]);
+
+        $cacheStore = Cache::getFacadeRoot();
+        $cacheStore->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
+
+        $classen = [TestMonomorphicOneAndManySource::class, TestMonomorphicOneAndManyTarget::class,
+            TestMorphManyToManyTarget::class, TestMorphManyToManySource::class, TestMonomorphicSource::class,
+            TestMonomorphicTarget::class];
+
+        $types = [];
+
+        foreach ($classen as $className) {
+            $testModel = m::mock($className)->makePartial();
+            $testModel->shouldReceive('getXmlSchema')->andReturn(null);
+            $testModel->shouldReceive('metadata')->andReturn([]);
+            App::instance($className, $testModel);
+            $type = m::mock(ResourceType::class);
+            $types[$className] = $type;
+        }
+
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen);
+        $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
+        $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
+
+        $meta = \Mockery::mock(SimpleMetadataProvider::class);
+        $meta->shouldReceive('addResourceSetReferencePropertyBidirectional')
+            ->withAnyArgs()->andReturn(null)->atLeast(1);
+        $meta->shouldReceive('addResourceReferenceSinglePropertyBidirectional')
+            ->withAnyArgs()->andReturn(null)->atLeast(1);
+        $meta->shouldReceive('addResourceReferencePropertyBidirectional')
+            ->withAnyArgs()->andReturn(null)->atLeast(1);
+
+        App::instance('metadata', $meta);
+
+        $foo->boot();
     }
 
     /**
