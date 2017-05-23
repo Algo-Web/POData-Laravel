@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Model;
 
 trait MetadataTrait
 {
+    protected static $methodPrimary = [];
+    protected static $methodAlternate = [];
+
     /*
      * Array to record mapping between doctrine types and OData types
      */
@@ -398,13 +401,75 @@ trait MetadataTrait
      */
     private function polyglotKeyMethodNames($foo, $condition = false)
     {
+        $fkList = ['getQualifiedForeignKeyName', 'getForeignKey'];
+        $rkList = ['getQualifiedRelatedKeyName', 'getOtherKey', 'getOwnerKey'];
+
         $fkMethodName = null;
         $rkMethodName = null;
         if ($condition) {
-            $fkMethodName = method_exists($foo, 'getQualifiedForeignKeyName')
-                ? 'getQualifiedForeignKeyName' : 'getQualifiedForeignPivotKeyName';
-            $rkMethodName = method_exists($foo, 'getQualifiedRelatedKeyName')
-                ? 'getQualifiedRelatedKeyName' : 'getQualifiedRelatedPivotKeyName';
+            if (array_key_exists(get_class($foo), static::$methodPrimary)) {
+                $line = static::$methodPrimary[get_class($foo)];
+                $fkMethodName = $line['fk'];
+                $rkMethodName = $line['rk'];
+            } else {
+                $methodList = get_class_methods(get_class($foo));
+                $fkMethodName = 'getQualifiedForeignPivotKeyName';
+                foreach ($fkList as $option) {
+                    if (in_array($option, $methodList)) {
+                        $fkMethodName = $option;
+                        break;
+                    }
+                }
+                assert(in_array($fkMethodName, $methodList), "Selected method, ".$fkMethodName.", not in method list");
+                $rkMethodName = 'getQualifiedRelatedPivotKeyName';
+                foreach ($rkList as $option) {
+                    if (in_array($option, $methodList)) {
+                        $rkMethodName = $option;
+                        break;
+                    }
+                }
+                assert(in_array($rkMethodName, $methodList), "Selected method, ".$rkMethodName.", not in method list");
+                $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
+                static::$methodPrimary[get_class($foo)] = $line;
+            }
+
+        }
+        return array($fkMethodName, $rkMethodName);
+    }
+
+    private function polyglotKeyMethodBackupNames($foo, $condition = false)
+    {
+        $fkList = ['getForeignKey'];
+        $rkList = ['getOtherKey'];
+
+        $fkMethodName = null;
+        $rkMethodName = null;
+        if ($condition) {
+            if (array_key_exists(get_class($foo), static::$methodAlternate)) {
+                $line = static::$methodAlternate[get_class($foo)];
+                $fkMethodName = $line['fk'];
+                $rkMethodName = $line['rk'];
+            } else {
+                $methodList = get_class_methods(get_class($foo));
+                $fkMethodName = 'getForeignKeyName';
+                foreach ($fkList as $option) {
+                    if (in_array($option, $methodList)) {
+                        $fkMethodName = $option;
+                        break;
+                    }
+                }
+                assert(in_array($fkMethodName, $methodList), "Selected method, ".$fkMethodName.", not in method list");
+                $rkMethodName = 'getQualifiedParentKeyName';
+                foreach ($rkList as $option) {
+                    if (in_array($option, $methodList)) {
+                        $rkMethodName = $option;
+                        break;
+                    }
+                }
+                assert(in_array($rkMethodName, $methodList), "Selected method, ".$rkMethodName.", not in method list");
+                $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
+                static::$methodAlternate[get_class($foo)] = $line;
+            }
         }
         return array($fkMethodName, $rkMethodName);
     }
@@ -444,11 +509,12 @@ trait MetadataTrait
             $targ = get_class($foo->getRelated());
 
             list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isBelong);
+            list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, !$isBelong);
 
-            $keyRaw = $isBelong ? $foo->$fkMethodName() : $foo->getForeignKeyName();
+            $keyRaw = $isBelong ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
             $keySegments = explode('.', $keyRaw);
             $keyName = $keySegments[count($keySegments) - 1];
-            $localRaw = $isBelong ? $foo->$rkMethodName() : $foo->getQualifiedParentKeyName();
+            $localRaw = $isBelong ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
             $first = $keyName;
@@ -470,8 +536,12 @@ trait MetadataTrait
             $isBelong = $foo instanceof BelongsTo;
             $mult = $isBelong ? '1' : '0..1';
             $targ = get_class($foo->getRelated());
-            $keyName = $isBelong ? $foo->getForeignKey() : $foo->getForeignKeyName();
-            $localRaw = $isBelong ? $foo->getOwnerKey() : $foo->getQualifiedParentKeyName();
+
+            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isBelong);
+            list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, !$isBelong);
+
+            $keyName = $isBelong ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
+            $localRaw = $isBelong ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
             $first = $isBelong ? $localName : $keyName;
@@ -493,11 +563,12 @@ trait MetadataTrait
             $mult = $foo instanceof MorphOne ? '0..1' : $mult;
 
             list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isMany);
+            list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, !$isMany);
 
-            $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->getForeignKeyName();
+            $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
             $keySegments = explode('.', $keyRaw);
             $keyName = $keySegments[count($keySegments) - 1];
-            $localRaw = $isMany ? $foo->$rkMethodName() : $foo->getQualifiedParentKeyName();
+            $localRaw = $isMany ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
             $first = $isMany ? $keyName : $localName;
@@ -518,11 +589,12 @@ trait MetadataTrait
             $mult = $isMany ? '*' : '1';
 
             list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isMany);
+            list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, !$isMany);
 
-            $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->getForeignKey();
+            $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
             $keySegments = explode('.', $keyRaw);
             $keyName = $keySegments[count($keySegments) - 1];
-            $localRaw = $isMany ? $foo->$rkMethodName() : $foo->getQualifiedParentKeyName();
+            $localRaw = $isMany ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
 
