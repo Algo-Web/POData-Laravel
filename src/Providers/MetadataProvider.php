@@ -85,12 +85,22 @@ class MetadataProvider extends MetadataBaseProvider
                 );
                 continue;
             }
-            //one-to-many
+            //principal-one-to-dependent-many
+            if ('*' == $principalMult) {
+                $meta->addResourceReferencePropertyBidirectional(
+                    $principal,
+                    $dependent,
+                    $principalProp,
+                    $dependentProp
+                );
+                continue;
+            }
+            //dependent-one-to-principal-many
             $meta->addResourceReferencePropertyBidirectional(
-                $principal,
                 $dependent,
-                $principalProp,
-                $dependentProp
+                $principal,
+                $dependentProp,
+                $principalProp
             );
         }
 

@@ -2,6 +2,8 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use AlgoWeb\ODataMetadata\MetadataManager;
+use AlgoWeb\ODataMetadata\MetadataV3\edm\TEntityTypeType;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestGetterModel;
 use AlgoWeb\PODataLaravel\Models\TestModel;
@@ -24,6 +26,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceType;
+use POData\Providers\Metadata\ResourceTypeKind;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use Mockery as m;
 
@@ -260,6 +263,46 @@ class MetadataProviderTest extends TestCase
 
         $foo->boot();
     }
+
+    public function testOneToManyRelationConsistentBothWays()
+    {
+        $schema = Schema::getFacadeRoot();
+        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
+        $schema->shouldReceive('hasTable')->andReturn(true);
+        $schema->shouldReceive('getColumnListing')->andReturn([]);
+
+        $cacheStore = Cache::getFacadeRoot();
+        $cacheStore->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
+
+        $classen = [TestMorphManySource::class, TestMorphTarget::class];
+
+        $types = [];
+        $i = 0;
+        foreach ($classen as $className) {
+            $testModel = m::mock($className)->makePartial();
+            $testModel->shouldReceive('getXmlSchema')->andReturn(null);
+            $testModel->shouldReceive('metadata')->andReturn([]);
+            App::instance($className, $testModel);
+            $type = m::mock(ResourceType::class);
+            $types[$className] = $type;
+        }
+
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen);
+        $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
+        $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
+
+        $meta = \Mockery::mock(SimpleMetadataProvider::class);
+        $meta->shouldReceive('addResourceReferencePropertyBidirectional')
+            ->with(m::type(ResourceType::class), m::type(ResourceType::class), 'morphTarget', 'morph')->times(2);
+        $meta->shouldReceive('addResourceReferencePropertyBidirectional')
+            ->with(m::type(ResourceType::class), m::type(ResourceType::class), 'morph', 'morphTarget')->never();
+
+        App::instance('metadata', $meta);
+
+        $foo->boot();
+    }
+
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Providers\MetadataProvider::register
