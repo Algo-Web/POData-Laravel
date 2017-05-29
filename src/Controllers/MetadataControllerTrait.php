@@ -130,7 +130,6 @@ trait MetadataControllerTrait
 
             $detail['isRequest'] = $isRequest;
             $parmArray[$parm->name] = $detail;
-
         }
         return $parmArray;
     }
