@@ -90,6 +90,7 @@ class TestCase extends BaseTestCase
             'app.providers',
             [
                 \AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider::class,
+                \AlgoWeb\PODataLaravel\Providers\MetadataRouteProvider::class,
                 \Illuminate\View\ViewServiceProvider::class,
             ]
         );

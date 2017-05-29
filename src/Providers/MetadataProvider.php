@@ -33,7 +33,6 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
 
-        self::setupRoute();
         $isCaching = true === $this->getIsCaching();
         $hasCache = Cache::has('metadata');
 
@@ -106,15 +105,6 @@ class MetadataProvider extends MetadataBaseProvider
 
         $key = 'metadata';
         $this->handlePostBoot($isCaching, $hasCache, $key, $meta);
-    }
-
-    private static function setupRoute()
-    {
-        $valueArray = [];
-
-        Route::any('odata.svc/{section}', 'AlgoWeb\PODataLaravel\Controllers\ODataController@index')
-            ->where(['section' => '.*']);
-        Route::any('odata.svc', 'AlgoWeb\PODataLaravel\Controllers\ODataController@index');
     }
 
     /**
