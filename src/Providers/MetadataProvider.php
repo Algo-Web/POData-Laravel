@@ -59,7 +59,10 @@ class MetadataProvider extends MetadataBaseProvider
             $dependentType = $line['dependentType'];
             $dependentMult = $line['dependentMult'];
             $dependentProp = $line['dependentProp'];
-            if (!isset($EntityTypes[$principalType]) || !isset($EntityTypes[$dependentType])) {
+            if (!isset($EntityTypes[$principalType])) {
+                continue;
+            }
+            if (!isset($EntityTypes[$dependentType])) {
                 continue;
             }
             $principal = $EntityTypes[$principalType];
@@ -76,6 +79,7 @@ class MetadataProvider extends MetadataBaseProvider
             }
             //one-to-one
             if ('0..1' == $principalMult || '0..1' == $dependentMult) {
+                assert($principalMult != $dependentMult, "Cannot have both ends with 0..1 multiplicity");
                 $meta->addResourceReferenceSinglePropertyBidirectional(
                     $principal,
                     $dependent,
