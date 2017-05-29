@@ -53,58 +53,7 @@ class MetadataProvider extends MetadataBaseProvider
         // now that endpoints are hooked up, tackle the relationships
         // if we'd tried earlier, we'd be guaranteed to try to hook a relation up to null, which would be bad
         foreach ($biDirect as $line) {
-            $principalType = $line['principalType'];
-            $principalMult = $line['principalMult'];
-            $principalProp = $line['principalProp'];
-            $dependentType = $line['dependentType'];
-            $dependentMult = $line['dependentMult'];
-            $dependentProp = $line['dependentProp'];
-            if (!isset($EntityTypes[$principalType])) {
-                continue;
-            }
-            if (!isset($EntityTypes[$dependentType])) {
-                continue;
-            }
-            $principal = $EntityTypes[$principalType];
-            $dependent = $EntityTypes[$dependentType];
-            //many-to-many
-            if ('*' == $principalMult && '*' == $dependentMult) {
-                $meta->addResourceSetReferencePropertyBidirectional(
-                    $principal,
-                    $dependent,
-                    $principalProp,
-                    $dependentProp
-                );
-                continue;
-            }
-            //one-to-one
-            if ('0..1' == $principalMult || '0..1' == $dependentMult) {
-                assert($principalMult != $dependentMult, "Cannot have both ends with 0..1 multiplicity");
-                $meta->addResourceReferenceSinglePropertyBidirectional(
-                    $principal,
-                    $dependent,
-                    $principalProp,
-                    $dependentProp
-                );
-                continue;
-            }
-            //principal-one-to-dependent-many
-            if ('*' == $principalMult) {
-                $meta->addResourceReferencePropertyBidirectional(
-                    $principal,
-                    $dependent,
-                    $principalProp,
-                    $dependentProp
-                );
-                continue;
-            }
-            //dependent-one-to-principal-many
-            $meta->addResourceReferencePropertyBidirectional(
-                $dependent,
-                $principal,
-                $dependentProp,
-                $principalProp
-            );
+            $this->processRelationLine($line, $EntityTypes, $meta);
         }
 
         $key = 'metadata';
@@ -360,5 +309,62 @@ class MetadataProvider extends MetadataBaseProvider
             'dependentProp' => $principalProperty
         ];
         return array($forward, $reverse);
+    }
+
+    private function processRelationLine($line, $EntityTypes, &$meta)
+    {
+        $principalType = $line['principalType'];
+        $principalMult = $line['principalMult'];
+        $principalProp = $line['principalProp'];
+        $dependentType = $line['dependentType'];
+        $dependentMult = $line['dependentMult'];
+        $dependentProp = $line['dependentProp'];
+        if (!isset($EntityTypes[$principalType])) {
+            return;
+        }
+        if (!isset($EntityTypes[$dependentType])) {
+            return;
+        }
+        $principal = $EntityTypes[$principalType];
+        $dependent = $EntityTypes[$dependentType];
+        //many-to-many
+        if ('*' == $principalMult && '*' == $dependentMult) {
+            $meta->addResourceSetReferencePropertyBidirectional(
+                $principal,
+                $dependent,
+                $principalProp,
+                $dependentProp
+            );
+            return;
+        }
+        //one-to-one
+        if ('0..1' == $principalMult || '0..1' == $dependentMult) {
+            assert($principalMult != $dependentMult, "Cannot have both ends with 0..1 multiplicity");
+            $meta->addResourceReferenceSinglePropertyBidirectional(
+                $principal,
+                $dependent,
+                $principalProp,
+                $dependentProp
+            );
+            return;
+        }
+        //principal-one-to-dependent-many
+        if ('*' == $principalMult) {
+            $meta->addResourceReferencePropertyBidirectional(
+                $principal,
+                $dependent,
+                $principalProp,
+                $dependentProp
+            );
+            return;
+        }
+        //dependent-one-to-principal-many
+        $meta->addResourceReferencePropertyBidirectional(
+            $dependent,
+            $principal,
+            $dependentProp,
+            $principalProp
+        );
+        return;
     }
 }
