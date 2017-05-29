@@ -19,8 +19,6 @@ class MetadataRouteProvider extends ServiceProvider
 
     private static function setupRoute()
     {
-        $valueArray = [];
-
         Route::any(
             'odata.svc/{section}',
             [ 'uses' => 'AlgoWeb\PODataLaravel\Controllers\ODataController@index', 'middleware' => 'auth.basic']
