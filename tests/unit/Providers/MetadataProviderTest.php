@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\ResourceTypeKind;
@@ -242,7 +243,7 @@ class MetadataProviderTest extends TestCase
             $testModel->shouldReceive('getXmlSchema')->andReturn(null);
             $testModel->shouldReceive('metadata')->andReturn([]);
             App::instance($className, $testModel);
-            $type = m::mock(ResourceType::class);
+            $type = m::mock(ResourceEntityType::class);
             $types[$className] = $type;
         }
 

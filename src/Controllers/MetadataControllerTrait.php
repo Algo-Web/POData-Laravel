@@ -72,7 +72,7 @@ trait MetadataControllerTrait
         // enforce we're actually hooked up to a controller
         assert($this instanceof BaseController, get_class($this));
         // enforce that mapping is actually not empty
-        assert(0 < count($this->mapping), "Mapping array must not be empty");
+        assert(!empty($this->mapping), "Mapping array must not be empty");
 
         $allMappings = [];
 
@@ -130,7 +130,6 @@ trait MetadataControllerTrait
 
             $detail['isRequest'] = $isRequest;
             $parmArray[$parm->name] = $detail;
-
         }
         return $parmArray;
     }

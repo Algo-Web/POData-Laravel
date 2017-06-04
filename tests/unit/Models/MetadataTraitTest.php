@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Database\Connection;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use Mockery as m;
+use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
@@ -446,8 +447,8 @@ class MetadataTraitTest extends TestCase
         $rel['HasOne'] = [];
         $foo->shouldReceive('getRelationshipsFromMethods')->andReturn($rel)->once();
 
-        $type1 = m::mock(ResourceType::class);
-        $type2 = m::mock(ResourceType::class);
+        $type1 = m::mock(ResourceEntityType::class);
+        $type2 = m::mock(ResourceEntityType::class);
         $set1 = m::mock(ResourceSet::class);
         $set2 = m::mock(ResourceSet::class);
         $types = [$fooName => $type1, $barName => $type2];
