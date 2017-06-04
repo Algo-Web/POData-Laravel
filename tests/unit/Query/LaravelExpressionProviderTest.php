@@ -356,17 +356,16 @@ class LaravelExpressionProviderTest extends TestCase
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider::onConstantExpression
-     * @dataProvider OnConstantExpressionProvider
+     * @dataProvider onConstantExpressionProvider
      */
     public function testOnConstantExpression($type, $value, $expected)
     {
         $foo = new LaravelExpressionProvider();
-        $this->assertEquals($expected, $foo->OnConstantExpression($type,$value));
+        $this->assertEquals($expected, $foo->onConstantExpression($type, $value));
 
     }
 
-
-    public function OnConstantExpressionProvider()
+    public function onConstantExpressionProvider()
     {
         return [
             [new \POData\Providers\Metadata\Type\Null1, null, "NULL"],
@@ -388,26 +387,30 @@ class LaravelExpressionProviderTest extends TestCase
      */
     public function testOnPropertyAccessExpression()
     {
-        $topLevelProperyAccess = \Mockery::mock('POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\PropertyAccessExpression')->makePartial();
-        $SecondLevelProperyAccess = \Mockery::mock('POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\PropertyAccessExpression')->makePartial();
+        $topLevelPropertyAccess = \Mockery::mock(
+            'POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\PropertyAccessExpression'
+        )->makePartial();
+        $SecondLevelPropertyAccess = \Mockery::mock(
+            'POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\PropertyAccessExpression'
+        )->makePartial();
         $topLevelResourceProperty = \Mockery::mock('POData\Providers\Metadata\ResourceProperty')->makePartial();
         $secondLevelResourceProperty = \Mockery::mock('POData\Providers\Metadata\ResourceProperty')->makePartial();
 
 
-        $topLevelProperyAccess->shouldReceive('getParent')->andReturn($SecondLevelProperyAccess);
-        $topLevelProperyAccess->shouldReceive('getResourceProperty')->andReturn($topLevelResourceProperty);
-        $SecondLevelProperyAccess->shouldReceive('getResourceProperty')->andReturn($secondLevelResourceProperty);
+        $topLevelPropertyAccess->shouldReceive('getParent')->andReturn($SecondLevelPropertyAccess);
+        $topLevelPropertyAccess->shouldReceive('getResourceProperty')->andReturn($topLevelResourceProperty);
+        $SecondLevelPropertyAccess->shouldReceive('getResourceProperty')->andReturn($secondLevelResourceProperty);
         $topLevelResourceProperty->shouldReceive('getName')->andReturn("TopPropertyAccessor");
         $secondLevelResourceProperty->shouldReceive('getName')->andReturn("SecondPropertyAccessor");
 
 
         $foo = new LaravelExpressionProvider();
-        $fooRef= new \ReflectionObject( $foo );
-        $refProperty = $fooRef->getProperty( 'iteratorName' );
-        $refProperty->setAccessible( true );
+        $fooRef= new \ReflectionObject($foo);
+        $refProperty = $fooRef->getProperty('iteratorName');
+        $refProperty->setAccessible(true);
         $refProperty->setValue($foo, 'testIterator');
         $expected = "testIterator->SecondPropertyAccessor->TopPropertyAccessor";
-        $result = $foo->onPropertyAccessExpression($topLevelProperyAccess);
+        $result = $foo->onPropertyAccessExpression($topLevelPropertyAccess);
         $this->assertEquals($expected, $result);
     }
 
@@ -551,7 +554,6 @@ class LaravelExpressionProviderTest extends TestCase
         $expected = "substr(foo, 2)";
         $result = $foo->onFunctionCallExpression($func, [ 'foo', 2]);
         $this->assertEquals($expected, $result);
-
     }
     
     public function testOnFunctionCallExpressionStrSubstring2()
@@ -563,7 +565,6 @@ class LaravelExpressionProviderTest extends TestCase
         $expected = "substr(foo, 2, 3)";
         $result = $foo->onFunctionCallExpression($func, [ 'foo', 2, 3]);
         $this->assertEquals($expected, $result);
-
     }
 
     public function testOnFunctionCallExpressionStrSubstringOf()
