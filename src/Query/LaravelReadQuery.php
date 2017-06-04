@@ -2,9 +2,13 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
+use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
+use AlgoWeb\PODataLaravel\Enums\ActionVerb;
+use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
+use POData\Common\ODataException;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
@@ -15,6 +19,12 @@ use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 
 class LaravelReadQuery
 {
+    protected $auth;
+
+    public function __construct(AuthInterface $auth = null)
+    {
+        $this->auth = isset($auth) ? $auth : new NullAuthProvider();
+    }
 
     /**
      * Gets collection of entities belongs to an entity set
@@ -45,9 +55,13 @@ class LaravelReadQuery
         }
 
         $this->checkSourceInstance($sourceEntityInstance);
-
         if (null == $sourceEntityInstance) {
             $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
+        }
+
+        $checkInstance = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : null;
+        if (!$this->getAuth()->canAuth(ActionVerb::READ(), get_class($sourceEntityInstance), $checkInstance)) {
+            throw new ODataException("Access denied", 403);
         }
 
         $result          = new QueryResult();
@@ -179,6 +193,10 @@ class LaravelReadQuery
         assert(null != $sourceEntityInstance, "Source instance must not be null");
         $this->checkSourceInstance($sourceEntityInstance);
 
+        if (!$this->getAuth()->canAuth(ActionVerb::READ(), get_class($sourceEntityInstance), $sourceEntityInstance)) {
+            throw new ODataException("Access denied", 403);
+        }
+
         $propertyName = $targetProperty->getName();
         $results = $sourceEntityInstance->$propertyName();
 
@@ -234,6 +252,10 @@ class LaravelReadQuery
             $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
         }
 
+        if (!$this->getAuth()->canAuth(ActionVerb::READ(), get_class($sourceEntityInstance), $sourceEntityInstance)) {
+            throw new ODataException("Access denied", 403);
+        }
+
         if ($keyDescriptor) {
             foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
                 $trimValue = trim($value[0], "\"'");
@@ -269,6 +291,10 @@ class LaravelReadQuery
             throw new InvalidArgumentException('Source entity must be an Eloquent model.');
         }
         $this->checkSourceInstance($sourceEntityInstance);
+
+        if (!$this->getAuth()->canAuth(ActionVerb::READ(), get_class($sourceEntityInstance), $sourceEntityInstance)) {
+            throw new ODataException("Access denied", 403);
+        }
 
         $propertyName = $targetProperty->getName();
         return $sourceEntityInstance->$propertyName;
@@ -319,5 +345,10 @@ class LaravelReadQuery
         if (!(null == $source || $source instanceof Model || $source instanceof Relation)) {
             throw new InvalidArgumentException('Source entity instance must be null, a model, or a relation.');
         }
+    }
+
+    protected function getAuth()
+    {
+        return $this->auth;
     }
 }

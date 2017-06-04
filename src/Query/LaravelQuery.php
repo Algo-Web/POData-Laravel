@@ -33,7 +33,7 @@ class LaravelQuery implements IQueryProvider
         $this->expression = new LaravelExpressionProvider(); //PHPExpressionProvider('expression');
         $this->queryProviderClassName = get_class($this);
         $this->auth = isset($auth) ? $auth : new NullAuthProvider();
-        $this->reader = new LaravelReadQuery();
+        $this->reader = new LaravelReadQuery($this->auth);
     }
 
     /**
