@@ -3,7 +3,9 @@
 namespace AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
+use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
@@ -17,6 +19,8 @@ use POData\Providers\Metadata\ResourceProperty;
 use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use POData\Providers\Metadata\ResourceType;
+use POData\Providers\Metadata\Type\Binary;
+use POData\Providers\Metadata\Type\IType;
 use POData\Providers\Query\QueryType;
 use POData\Providers\Query\QueryResult;
 use POData\UriProcessor\QueryProcessor\ExpressionParser\FilterInfo;
@@ -751,8 +755,6 @@ class LaravelQueryTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-
-
     public function testAttemptUpdate()
     {
         $controller = new TestController();
@@ -769,8 +771,8 @@ class LaravelQueryTest extends TestCase
         $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
 
-        $std = new \StdClass();
-        $std->name = TestModel::class;
+        $std = m::mock(IType::class);
+        $std->shouldReceive('getName')->andReturn(TestModel::class);
         $mockResource = \Mockery::mock(ResourceSet::class);
         $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
@@ -816,6 +818,27 @@ class LaravelQueryTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testAttemptCreatePermissionDenied()
+    {
+        $auth = m::mock(AuthInterface::class);
+        $auth->shouldReceive('canAuth')->withAnyArgs()->andReturn(false)->once();
+        $type = new Binary();
+        $mockResource = m::mock(ResourceSet::class);
+        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($type);
+        $model = m::mock(Model::class);
+        $data = null;
+
+        $foo = new LaravelQuery($auth);
+        $expected = 'Access denied';
+        $actual = null;
+        try {
+            $result = $foo->createResourceforResourceSet($mockResource, $model, $data);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testAttemptCreate()
     {
         $controller = new TestController();
@@ -832,8 +855,8 @@ class LaravelQueryTest extends TestCase
         $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
 
-        $std = new \StdClass();
-        $std->name = TestModel::class;
+        $std = m::mock(IType::class);
+        $std->shouldReceive('getName')->andReturn(TestModel::class);
         $mockResource = \Mockery::mock(ResourceSet::class);
         $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
@@ -874,8 +897,8 @@ class LaravelQueryTest extends TestCase
         $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
 
-        $std = new \StdClass();
-        $std->name = TestModel::class;
+        $std = m::mock(IType::class);
+        $std->shouldReceive('getName')->andReturn(TestModel::class);
         $mockResource = \Mockery::mock(ResourceSet::class);
         $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
@@ -918,8 +941,8 @@ class LaravelQueryTest extends TestCase
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
-        $std = new \StdClass();
-        $std->name = TestModel::class;
+        $std = m::mock(IType::class);
+        $std->shouldReceive('getName')->andReturn(TestModel::class);
         $mockResource = \Mockery::mock(ResourceSet::class);
         $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
@@ -981,8 +1004,8 @@ class LaravelQueryTest extends TestCase
         $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
 
-        $std = new \StdClass();
-        $std->name = TestModel::class;
+        $std = m::mock(IType::class);
+        $std->shouldReceive('getName')->andReturn(TestModel::class);
         $mockResource = \Mockery::mock(ResourceSet::class);
         $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
@@ -1030,8 +1053,8 @@ class LaravelQueryTest extends TestCase
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
-        $std = new \StdClass();
-        $std->name = TestModel::class;
+        $std = m::mock(IType::class);
+        $std->shouldReceive('getName')->andReturn(TestModel::class);
         $mockResource = \Mockery::mock(ResourceSet::class);
         $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
@@ -1074,8 +1097,8 @@ class LaravelQueryTest extends TestCase
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
-        $std = new \StdClass();
-        $std->name = TestModel::class;
+        $std = m::mock(IType::class);
+        $std->shouldReceive('getName')->andReturn(TestModel::class);
         $mockResource = \Mockery::mock(ResourceSet::class);
         $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
@@ -1119,8 +1142,8 @@ class LaravelQueryTest extends TestCase
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
-        $std = new \StdClass();
-        $std->name = TestModel::class;
+        $std = m::mock(IType::class);
+        $std->shouldReceive('getName')->andReturn(TestModel::class);
         $mockResource = \Mockery::mock(ResourceSet::class);
         $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
@@ -1163,8 +1186,8 @@ class LaravelQueryTest extends TestCase
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
-        $std = new \StdClass();
-        $std->name = TestModel::class;
+        $std = m::mock(IType::class);
+        $std->shouldReceive('getName')->andReturn(TestModel::class);
         $mockResource = \Mockery::mock(ResourceSet::class);
         $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
@@ -1197,8 +1220,8 @@ class LaravelQueryTest extends TestCase
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
-        $std = new \StdClass();
-        $std->name = TestModel::class;
+        $std = m::mock(IType::class);
+        $std->shouldReceive('getName')->andReturn(TestModel::class);
         $mockResource = \Mockery::mock(ResourceSet::class);
         $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
@@ -1241,8 +1264,8 @@ class LaravelQueryTest extends TestCase
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
-        $std = new \StdClass();
-        $std->name = TestModel::class;
+        $std = m::mock(IType::class);
+        $std->shouldReceive('getName')->andReturn(TestModel::class);
         $mockResource = \Mockery::mock(ResourceSet::class);
         $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
@@ -1285,8 +1308,8 @@ class LaravelQueryTest extends TestCase
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
-        $std = new \StdClass();
-        $std->name = TestModel::class;
+        $std = m::mock(IType::class);
+        $std->shouldReceive('getName')->andReturn(TestModel::class);
         $mockResource = \Mockery::mock(ResourceSet::class);
         $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
@@ -1332,8 +1355,8 @@ class LaravelQueryTest extends TestCase
         App::instance($testName, $mockController);
         App::instance('metadataControllers', $container);
 
-        $std = new \StdClass();
-        $std->name = TestModel::class;
+        $std = m::mock(IType::class);
+        $std->shouldReceive('getName')->andReturn(TestModel::class);
         $mockResource = \Mockery::mock(ResourceSet::class);
         $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();
@@ -1377,8 +1400,8 @@ class LaravelQueryTest extends TestCase
         App::instance($testName, $mockController);
         App::instance('metadataControllers', $container);
 
-        $std = new \StdClass();
-        $std->name = TestModel::class;
+        $std = m::mock(IType::class);
+        $std->shouldReceive('getName')->andReturn(TestModel::class);
         $mockResource = \Mockery::mock(ResourceSet::class);
         $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
         $model = new TestModel();

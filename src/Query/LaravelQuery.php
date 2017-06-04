@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
+use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
@@ -26,6 +27,7 @@ class LaravelQuery implements IQueryProvider
     protected $auth;
     protected $reader;
     public $queryProviderClassName;
+    private $verbMap = [];
 
     public function __construct(AuthInterface $auth = null)
     {
@@ -34,6 +36,9 @@ class LaravelQuery implements IQueryProvider
         $this->queryProviderClassName = get_class($this);
         $this->auth = isset($auth) ? $auth : new NullAuthProvider();
         $this->reader = new LaravelReadQuery($this->auth);
+        $this->verbMap['create'] = ActionVerb::CREATE();
+        $this->verbMap['update'] = ActionVerb::UPDATE();
+        $this->verbMap['delete'] = ActionVerb::DELETE();
     }
 
     /**
@@ -252,7 +257,7 @@ class LaravelQuery implements IQueryProvider
             throw new InvalidArgumentException('Source entity must be an Eloquent model.');
         }
 
-        $class = $sourceResourceSet->getResourceType()->getInstanceType()->name;
+        $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
         $id = $sourceEntityInstance->getKey();
         $name = $sourceEntityInstance->getKeyName();
         $data = [$name => $id];
@@ -361,7 +366,10 @@ class LaravelQuery implements IQueryProvider
             throw new InvalidArgumentException('Source entity must either be null or an Eloquent model.');
         }
 
-        $class = $sourceResourceSet->getResourceType()->getInstanceType()->name;
+        $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
+        if (!$this->auth->canAuth($this->verbMap[$verb], $class, $sourceEntityInstance)) {
+            throw new ODataException("Access denied", 403);
+        }
 
         $data = $this->createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb);
 
