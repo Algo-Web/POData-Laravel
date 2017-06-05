@@ -350,8 +350,7 @@ class LaravelReadQuery
      */
     private function checkAuth($sourceEntityInstance, $checkInstance = null)
     {
-        $check = $checkInstance instanceof Model
-            ? $checkInstance
+        $check = $checkInstance instanceof Model ? $checkInstance
             : $sourceEntityInstance instanceof Model ? $sourceEntityInstance : null;
         if (!$this->getAuth()->canAuth(ActionVerb::READ(), get_class($sourceEntityInstance), $check)) {
             throw new ODataException("Access denied", 403);

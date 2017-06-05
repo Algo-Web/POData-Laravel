@@ -163,6 +163,32 @@ class LaravelQueryTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testGetResourceSetAccessDenied()
+    {
+        $query = m::mock(QueryType::class);
+        $resourceSet = m::mock(ResourceSet::class);
+        $source = new TestModel();
+
+        $auth = m::mock(AuthInterface::class);
+        $auth->shouldReceive('canAuth')->withAnyArgs()->andReturn(false)->once();
+
+        $foo = new LaravelQuery($auth);
+
+        $expected = 'Access denied';
+        $actual = null;
+        $expectedCode = 403;
+        $actualCode = null;
+
+        try {
+            $foo->getResourceSet($query, $resourceSet, null, null, null, null, $source);
+        } catch (ODataException $e) {
+            $actual = $e->getMessage();
+            $actualCode = $e->getStatusCode();
+        }
+        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expectedCode, $actualCode);
+    }
+
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getResourceSet
      */
@@ -830,12 +856,17 @@ class LaravelQueryTest extends TestCase
         $foo = new LaravelQuery($auth);
         $expected = 'Access denied';
         $actual = null;
+        $expectedCode = 403;
+        $actualCode = null;
+
         try {
             $result = $foo->createResourceforResourceSet($mockResource, $model, $data);
-        } catch (\Exception $e) {
+        } catch (ODataException $e) {
             $actual = $e->getMessage();
+            $actualCode = $e->getStatusCode();
         }
         $this->assertEquals($expected, $actual);
+        $this->assertEquals($expectedCode, $actualCode);
     }
 
     public function testAttemptCreate()
