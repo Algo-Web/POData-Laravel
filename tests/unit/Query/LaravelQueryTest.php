@@ -698,7 +698,6 @@ class LaravelQueryTest extends TestCase
 
         $result = $foo->getRelatedResourceReference($srcResource, $sourceEntity, $dstResource, $property);
         $this->assertEquals('a', $result->get()->first());
-
     }
 
     public function testGetRelatedResourceReferenceNullSourceInstance()

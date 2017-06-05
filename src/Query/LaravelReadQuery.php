@@ -60,9 +60,7 @@ class LaravelReadQuery
         }
 
         $checkInstance = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : null;
-        if (!$this->getAuth()->canAuth(ActionVerb::READ(), get_class($sourceEntityInstance), $checkInstance)) {
-            throw new ODataException("Access denied", 403);
-        }
+        $this->checkAuth($sourceEntityInstance, $checkInstance);
 
         $result          = new QueryResult();
         $result->results = null;
@@ -193,9 +191,7 @@ class LaravelReadQuery
         assert(null != $sourceEntityInstance, "Source instance must not be null");
         $this->checkSourceInstance($sourceEntityInstance);
 
-        if (!$this->getAuth()->canAuth(ActionVerb::READ(), get_class($sourceEntityInstance), $sourceEntityInstance)) {
-            throw new ODataException("Access denied", 403);
-        }
+        $this->checkAuth($sourceEntityInstance);
 
         $propertyName = $targetProperty->getName();
         $results = $sourceEntityInstance->$propertyName();
@@ -252,9 +248,7 @@ class LaravelReadQuery
             $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
         }
 
-        if (!$this->getAuth()->canAuth(ActionVerb::READ(), get_class($sourceEntityInstance), $sourceEntityInstance)) {
-            throw new ODataException("Access denied", 403);
-        }
+        $this->checkAuth($sourceEntityInstance);
 
         if ($keyDescriptor) {
             foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
@@ -292,9 +286,7 @@ class LaravelReadQuery
         }
         $this->checkSourceInstance($sourceEntityInstance);
 
-        if (!$this->getAuth()->canAuth(ActionVerb::READ(), get_class($sourceEntityInstance), $sourceEntityInstance)) {
-            throw new ODataException("Access denied", 403);
-        }
+        $this->checkAuth($sourceEntityInstance);
 
         $propertyName = $targetProperty->getName();
         return $sourceEntityInstance->$propertyName;
@@ -350,5 +342,19 @@ class LaravelReadQuery
     protected function getAuth()
     {
         return $this->auth;
+    }
+
+    /**
+     * @param $sourceEntityInstance
+     * @throws ODataException
+     */
+    private function checkAuth($sourceEntityInstance, $checkInstance = null)
+    {
+        $check = $checkInstance instanceof Model
+            ? $checkInstance
+            : $sourceEntityInstance instanceof Model ? $sourceEntityInstance : null;
+        if (!$this->getAuth()->canAuth(ActionVerb::READ(), get_class($sourceEntityInstance), $check)) {
+            throw new ODataException("Access denied", 403);
+        }
     }
 }
