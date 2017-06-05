@@ -8,8 +8,9 @@ php:
   
 before_script:
   - mkdir -p bootstrap/cache
-  - ls -al bootstrap/
   - chmod 777 bootstrap/cache
+  - ls -al bootstrap/
+  - ls -al bootstrap/cache
   - composer install
 
 script:
