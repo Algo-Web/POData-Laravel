@@ -71,11 +71,20 @@ trait MetadataTrait
             $fillable = in_array($column, $this->getFillable());
             $rawType = $rawColumn->getType();
             $type = $rawType->getName();
-            $tableData[$column] = ['type' => $type, 'nullable' => $nullable, 'fillable' => $fillable];
+            $default = $this->$column;
+            $tableData[$column] = ['type' => $type,
+                'nullable' => $nullable,
+                'fillable' => $fillable,
+                'default' => $default
+            ];
         }
 
         foreach ($getters as $get) {
-            $tableData[$get] = ['type' => 'text', 'nullable' => false, 'fillable' => false];
+            if (isset($tableData[$get])) {
+                continue;
+            }
+            $default = $this->$get;
+            $tableData[$get] = ['type' => 'text', 'nullable' => true, 'fillable' => false, 'default' => $default];
         }
 
         return $tableData;
@@ -148,7 +157,10 @@ trait MetadataTrait
                 $complex->addNamedStream($streamInfo);
                 continue;
             }
-            $metadata->addPrimitiveProperty($complex, $key, $this->mapping[$secret['type']]); // tag as isBag?
+            $nullable = $secret['fillable'];
+            $default = $secret['default'];
+            // tag as isBag?
+            $metadata->addPrimitiveProperty($complex, $key, $this->mapping[$secret['type']], $default, $nullable);
         }
 
         return $complex;

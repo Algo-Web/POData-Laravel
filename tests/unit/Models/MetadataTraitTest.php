@@ -122,8 +122,8 @@ class MetadataTraitTest extends TestCase
         $foo->shouldReceive('metadataMask')->andReturn(['id', 'name']);
 
         $expected = [];
-        $expected['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
-        $expected['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+        $expected['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $expected['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $result = $foo->metadata();
         $this->assertEquals($expected, $result);
@@ -132,12 +132,12 @@ class MetadataTraitTest extends TestCase
     public function testMetadataGenerationWithGetter()
     {
         $expected = [];
-        $expected['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
-        $expected['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-        $expected['added_at'] = ['type' => 'integer', 'nullable' => false, 'fillable' => true];
-        $expected['weight'] = ['type' => 'integer', 'nullable' => false, 'fillable' => true];
-        $expected['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-        $expected['WeightCode'] = ['type' => 'text', 'nullable' => false, 'fillable' => false];
+        $expected['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $expected['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $expected['added_at'] = ['type' => 'integer', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $expected['weight'] = ['type' => 'integer', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $expected['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $expected['WeightCode'] = ['type' => 'text', 'nullable' => true, 'fillable' => false, 'default' => ""];
 
         $intType = \Mockery::mock(\Doctrine\DBAL\Types\IntegerType::class);
         $intType->shouldReceive('getName')->andReturn('integer');
@@ -164,6 +164,7 @@ class MetadataTraitTest extends TestCase
         $connect->shouldReceive('getDoctrineSchemaManager->listTableColumns')->andReturn($columns);
 
         $foo = \Mockery::mock(TestGetterModel::class)->makePartial();
+        $foo->shouldReceive('getweightAttribute')->andReturn(null);
         $foo->shouldReceive('getConnection')->andReturn($connect);
         $result = $foo->metadata();
         $this->assertEquals(count($expected), count($result));
@@ -289,9 +290,9 @@ class MetadataTraitTest extends TestCase
         $expectedTypes['string'] = 'POData\\Providers\\Metadata\\Type\\StringType';
 
         $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $foo = new TestModel($meta);
 

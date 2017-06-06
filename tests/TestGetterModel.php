@@ -56,5 +56,10 @@ class TestGetterModel extends Model
     {
         return $this->weight . $this->code;
     }
+
+    public function getweightAttribute()
+    {
+        return $this->weight;
+    }
     
 }
