@@ -71,11 +71,20 @@ trait MetadataTrait
             $fillable = in_array($column, $this->getFillable());
             $rawType = $rawColumn->getType();
             $type = $rawType->getName();
-            $tableData[$column] = ['type' => $type, 'nullable' => $nullable, 'fillable' => $fillable];
+            $default = $this->$column;
+            $tableData[$column] = ['type' => $type,
+                'nullable' => $nullable,
+                'fillable' => $fillable,
+                'default' => $default
+            ];
         }
 
         foreach ($getters as $get) {
-            $tableData[$get] = ['type' => 'text', 'nullable' => false, 'fillable' => false];
+            if (isset($tableData[$get])) {
+                continue;
+            }
+            $default = $this->$get;
+            $tableData[$get] = ['type' => 'text', 'nullable' => true, 'fillable' => false, 'default' => $default];
         }
 
         return $tableData;
@@ -148,7 +157,10 @@ trait MetadataTrait
                 $complex->addNamedStream($streamInfo);
                 continue;
             }
-            $metadata->addPrimitiveProperty($complex, $key, $this->mapping[$secret['type']]); // tag as isBag?
+            $nullable = $secret['fillable'];
+            $default = $secret['default'];
+            // tag as isBag?
+            $metadata->addPrimitiveProperty($complex, $key, $this->mapping[$secret['type']], $default, $nullable);
         }
 
         return $complex;
@@ -320,56 +332,56 @@ trait MetadataTrait
      *
      * @return array
      */
-    public abstract function getVisible();
+    abstract public function getVisible();
 
     /**
      * Get the hidden attributes for the model.
      *
      * @return array
      */
-    public abstract function getHidden();
+    abstract public function getHidden();
 
     /**
      * Get the primary key for the model.
      *
      * @return string
      */
-    public abstract function getKeyName();
+    abstract public function getKeyName();
 
     /**
      * Get the current connection name for the model.
      *
      * @return string
      */
-    public abstract function getConnectionName();
+    abstract public function getConnectionName();
 
     /**
      * Get the database connection for the model.
      *
      * @return \Illuminate\Database\Connection
      */
-    public abstract function getConnection();
+    abstract public function getConnection();
 
     /**
      * Get all of the current attributes on the model.
      *
      * @return array
      */
-    public abstract function getAttributes();
+    abstract public function getAttributes();
 
     /**
      * Get the table associated with the model.
      *
      * @return string
      */
-    public abstract function getTable();
+    abstract public function getTable();
 
     /**
      * Get the fillable attributes for the model.
      *
      * @return array
      */
-    public abstract function getFillable();
+    abstract public function getFillable();
 
     /**
      * Dig up all defined getters on the model

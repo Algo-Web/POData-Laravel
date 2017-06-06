@@ -155,9 +155,9 @@ class MetadataProviderTest extends TestCase
     public function testBootHasMigrationsSingleModel()
     {
         $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $testModel = new TestModel($meta, null);
         App::instance(TestModel::class, $testModel);
@@ -186,15 +186,15 @@ class MetadataProviderTest extends TestCase
         $this->assertTrue(is_array($resources));
         $this->assertEquals(1, count($resources));
         $this->assertTrue($resources[0] instanceof ResourceSet);
-        $this->assertEquals('testmodel', $resources[0]->getName());
+        $this->assertEquals('TestModels', $resources[0]->getName());
     }
 
     public function testBootHasMigrationsSingleModelWithoutSchema()
     {
         $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $testModel = m::mock(TestModel::class)->makePartial();
         $testModel->shouldReceive('getXmlSchema')->andReturn(null);

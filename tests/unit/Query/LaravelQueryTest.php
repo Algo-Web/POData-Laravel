@@ -1479,11 +1479,11 @@ class LaravelQueryTest extends TestCase
     private function generateTestModelWithMetadata()
     {
         $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
-        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true];
-        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true];
-        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $instance = new TestModel($meta);
         return $instance;
