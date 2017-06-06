@@ -157,10 +157,17 @@ trait MetadataTrait
                 $complex->addNamedStream($streamInfo);
                 continue;
             }
-            $nullable = $secret['fillable'];
+            $nullable = $secret['nullable'];
             $default = $secret['default'];
             // tag as isBag?
-            $metadata->addPrimitiveProperty($complex, $key, $this->mapping[$secret['type']], $default, $nullable);
+            $metadata->addPrimitiveProperty(
+                $complex,
+                $key,
+                $this->mapping[$secret['type']],
+                false,
+                $default,
+                $nullable
+            );
         }
 
         return $complex;
