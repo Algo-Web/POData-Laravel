@@ -61,5 +61,4 @@ class TestGetterModel extends Model
     {
         return $this->weight;
     }
-    
 }

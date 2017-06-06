@@ -186,7 +186,7 @@ class MetadataProviderTest extends TestCase
         $this->assertTrue(is_array($resources));
         $this->assertEquals(1, count($resources));
         $this->assertTrue($resources[0] instanceof ResourceSet);
-        $this->assertEquals('testmodel', $resources[0]->getName());
+        $this->assertEquals('TestModels', $resources[0]->getName());
     }
 
     public function testBootHasMigrationsSingleModelWithoutSchema()

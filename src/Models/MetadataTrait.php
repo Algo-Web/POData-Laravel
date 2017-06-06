@@ -332,56 +332,56 @@ trait MetadataTrait
      *
      * @return array
      */
-    public abstract function getVisible();
+    abstract public function getVisible();
 
     /**
      * Get the hidden attributes for the model.
      *
      * @return array
      */
-    public abstract function getHidden();
+    abstract public function getHidden();
 
     /**
      * Get the primary key for the model.
      *
      * @return string
      */
-    public abstract function getKeyName();
+    abstract public function getKeyName();
 
     /**
      * Get the current connection name for the model.
      *
      * @return string
      */
-    public abstract function getConnectionName();
+    abstract public function getConnectionName();
 
     /**
      * Get the database connection for the model.
      *
      * @return \Illuminate\Database\Connection
      */
-    public abstract function getConnection();
+    abstract public function getConnection();
 
     /**
      * Get all of the current attributes on the model.
      *
      * @return array
      */
-    public abstract function getAttributes();
+    abstract public function getAttributes();
 
     /**
      * Get the table associated with the model.
      *
      * @return string
      */
-    public abstract function getTable();
+    abstract public function getTable();
 
     /**
      * Get the fillable attributes for the model.
      *
      * @return array
      */
-    public abstract function getFillable();
+    abstract public function getFillable();
 
     /**
      * Dig up all defined getters on the model
