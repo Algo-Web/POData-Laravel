@@ -106,6 +106,11 @@ class ODataControllerTest extends TestCase
      */
     public function testIndexCallToBaseServiceDumpSetButNoHeader()
     {
+        $storage = Storage::getFacadeRoot();
+        $storage->shouldReceive('put')->with('GET;-request', m::any())->andReturnNull()->once();
+        $storage->shouldReceive('put')->with('GET;-metadata', m::any())->andReturnNull()->once();
+        $storage->shouldReceive('put')->with('GET;-response', m::any())->andReturnNull()->once();
+
         $request = m::mock(Request::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $request->shouldReceive('getMethod')->andReturn('GET');
         $request->shouldReceive('getQueryString')->andReturn('');
