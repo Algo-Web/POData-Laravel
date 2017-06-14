@@ -39,8 +39,15 @@ class ODataController extends BaseController
             // iff XTest header is set, containing class and method name
             // dump outgoing odataResponse, metadata, and incoming request
             $xTest = $request->header('XTest');
-            $xTest = (null !== $xTest) ? $xTest : $request->method() . ";" . str_replace("/", "-", $request->path());
+            $xTest = (null !== $xTest) ? $xTest : $request->method() . ";" . str_replace("/", "-", $request->path()) . ";" . date("h:i:s A") . ";";
             if (null != $xTest) {
+            	$reflectionClass = new \ReflectionClass('Illuminate\Http\Request');
+            	$reflectionProperty = $reflectionClass->getProperty('userResolver');
+                $reflectionProperty->setAccessible(true);
+                $reflectionProperty->setValue($request, null);
+                $reflectionProperty = $reflectionClass->getProperty('routeResolver');
+                $reflectionProperty->setAccessible(true);
+                $reflectionProperty->setValue($request, null);
                 $cerealRequest = serialize($request);
                 $cerealMeta = serialize($meta);
                 $cerealResponse = serialize($odataResponse);
