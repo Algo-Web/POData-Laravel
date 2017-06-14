@@ -302,7 +302,7 @@ class LaravelExpressionProvider implements IExpressionProvider
             throw new \InvalidArgumentException('onFunctionCallExpression');
         }
         if (!array_key_exists($functionDescription->name, $this->functionDescriptionParsers)) {
-                throw new \InvalidArgumentException('onFunctionCallExpression');
+            throw new \InvalidArgumentException('onFunctionCallExpression');
         }
         return $this->functionDescriptionParsers[$functionDescription->name]($params);
     }

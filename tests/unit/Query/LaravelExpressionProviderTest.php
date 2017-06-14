@@ -362,7 +362,6 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
         $this->assertEquals($expected, $foo->onConstantExpression($type, $value));
-
     }
 
     public function onConstantExpressionProvider()

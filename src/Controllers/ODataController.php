@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use AlgoWeb\PODataLaravel\Controllers\Controller as BaseController;
@@ -39,8 +40,18 @@ class ODataController extends BaseController
             // iff XTest header is set, containing class and method name
             // dump outgoing odataResponse, metadata, and incoming request
             $xTest = $request->header('XTest');
-            $xTest = (null !== $xTest) ? $xTest : $request->method() . ";" . str_replace("/", "-", $request->path());
+            $date = Carbon::now(0);
+            $timeString = $date->toTimeString();
+            $xTest = (null !== $xTest) ? $xTest
+                : $request->method() . ";" . str_replace("/", "-", $request->path()) . ";" . $timeString . ";";
             if (null != $xTest) {
+                $reflectionClass = new \ReflectionClass('Illuminate\Http\Request');
+                $reflectionProperty = $reflectionClass->getProperty('userResolver');
+                $reflectionProperty->setAccessible(true);
+                $reflectionProperty->setValue($request, null);
+                $reflectionProperty = $reflectionClass->getProperty('routeResolver');
+                $reflectionProperty->setAccessible(true);
+                $reflectionProperty->setValue($request, null);
                 $cerealRequest = serialize($request);
                 $cerealMeta = serialize($meta);
                 $cerealResponse = serialize($odataResponse);

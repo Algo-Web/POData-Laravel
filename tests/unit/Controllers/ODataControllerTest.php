@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Controllers;
 
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Storage;
@@ -106,10 +107,15 @@ class ODataControllerTest extends TestCase
      */
     public function testIndexCallToBaseServiceDumpSetButNoHeader()
     {
+        $knownDate = new Carbon(2017, 6, 15, 15, 14, 19);
+        Carbon::setTestNow($knownDate);
+
+        $root = "GET;-;15:17:00;";
+
         $storage = Storage::getFacadeRoot();
-        $storage->shouldReceive('put')->with('GET;-request', m::any())->andReturnNull()->once();
-        $storage->shouldReceive('put')->with('GET;-metadata', m::any())->andReturnNull()->once();
-        $storage->shouldReceive('put')->with('GET;-response', m::any())->andReturnNull()->once();
+        $storage->shouldReceive('put')->with($root.'request', m::any())->andReturnNull()->once();
+        $storage->shouldReceive('put')->with($root.'metadata', m::any())->andReturnNull()->once();
+        $storage->shouldReceive('put')->with($root.'response', m::any())->andReturnNull()->once();
 
         $request = m::mock(Request::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $request->shouldReceive('getMethod')->andReturn('GET');

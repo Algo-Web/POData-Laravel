@@ -451,7 +451,6 @@ trait MetadataTrait
                 $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
                 static::$methodPrimary[get_class($foo)] = $line;
             }
-
         }
         return array($fkMethodName, $rkMethodName);
     }
