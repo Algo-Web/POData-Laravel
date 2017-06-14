@@ -22,7 +22,7 @@ class ODataController extends BaseController
     public function index(Request $request, $dump = false)
     {
         $dump = $dump || $this->getIsDumping();
-        $antiXss = new AntiXSS();
+        //$antiXss = new AntiXSS();
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
         $host->setServiceUri("/odata.svc/");
