@@ -21,7 +21,8 @@ class ODataController extends BaseController
      */
     public function index(Request $request, $dump = false)
     {
-        $antiXss = new AntiXSS();
+        $dump = $dump || $this->getIsDumping();
+        //$antiXss = new AntiXSS();
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
         $host->setServiceUri("/odata.svc/");
@@ -38,6 +39,7 @@ class ODataController extends BaseController
             // iff XTest header is set, containing class and method name
             // dump outgoing odataResponse, metadata, and incoming request
             $xTest = $request->header('XTest');
+            $xTest = (null !== $xTest) ? $xTest : $request->method() . ";" . str_replace("/", "-", $request->path());
             if (null != $xTest) {
                 $cerealRequest = serialize($request);
                 $cerealMeta = serialize($meta);
@@ -62,5 +64,13 @@ class ODataController extends BaseController
             }
         }
         return $response;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getIsDumping()
+    {
+        return true === env('APP_DUMP_REQUESTS', false);
     }
 }
