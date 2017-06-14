@@ -13,7 +13,7 @@ class TestApplication extends Application
 
     public function __construct(Filesystem $file)
     {
-        parent::__construct();
+        parent::__construct(dirname(__DIR__));
         $this->filesys = $file;
     }
 
