@@ -41,8 +41,8 @@ class ODataController extends BaseController
             $xTest = $request->header('XTest');
             $xTest = (null !== $xTest) ? $xTest : $request->method() . ";" . str_replace("/", "-", $request->path()) . ";" . date("h:i:s A") . ";";
             if (null != $xTest) {
-            	$reflectionClass = new \ReflectionClass('Illuminate\Http\Request');
-            	$reflectionProperty = $reflectionClass->getProperty('userResolver');
+                $reflectionClass = new \ReflectionClass('Illuminate\Http\Request');
+                $reflectionProperty = $reflectionClass->getProperty('userResolver');
                 $reflectionProperty->setAccessible(true);
                 $reflectionProperty->setValue($request, null);
                 $reflectionProperty = $reflectionClass->getProperty('routeResolver');
