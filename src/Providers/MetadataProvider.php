@@ -121,7 +121,7 @@ class MetadataProvider extends MetadataBaseProvider
             $begins[] = $bitter;
         }
 
-        return array($EntityTypes, $ResourceSets, $begins);
+        return [$EntityTypes, $ResourceSets, $begins];
     }
 
     public function calculateRoundTripRelations()

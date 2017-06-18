@@ -27,6 +27,15 @@ class ConsoleKernel extends Kernel
     ];
 
     /**
+     * The application's route middleware.
+     *
+     * @var array
+     */
+    protected $routeMiddleware = [
+        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class
+    ];
+
+    /**
      * Create a new console kernel instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
