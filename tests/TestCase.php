@@ -23,6 +23,13 @@ class TestCase extends BaseTestCase
     protected $origFacade = [];
 
     /**
+     * The base URL to use while testing the application.
+     *
+     * @var string
+     */
+    protected $baseUrl = 'http://localhost/';
+
+    /**
      *
      */
     public function setUp()
@@ -81,8 +88,11 @@ class TestCase extends BaseTestCase
         $log = \Mockery::mock(\Illuminate\Log\Writer::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $log->shouldReceive('writeLog')->withAnyArgs()->andReturnNull();
 
+        $guard = \Mockery::mock(\Illuminate\Contracts\Auth\Guard::class);
+        $guard->shouldReceive('basic')->andReturn(null);
         $auth = \Mockery::mock(\Illuminate\Auth\AuthManager::class)
             ->makePartial()->shouldAllowMockingProtectedMethods();
+        $auth->shouldReceive('guard')->withAnyArgs()->andReturn($guard);
 
         // Lifted straight out of the stock bootstrap/app.php shipped with Laravel
         // and repointed to underlying classes
@@ -148,6 +158,10 @@ class TestCase extends BaseTestCase
 
         $app->singleton('files', function () {
             return new \Illuminate\Filesystem\Filesystem();
+        });
+
+        $app->singleton('auth.basic', function () use ($auth) {
+            return new \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth($auth);
         });
 
         \Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver);
