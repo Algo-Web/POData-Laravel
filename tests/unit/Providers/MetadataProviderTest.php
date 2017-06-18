@@ -87,18 +87,10 @@ class MetadataProviderTest extends TestCase
 
     public function testBootHasMigrationsIsCached()
     {
-        $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
-        $schema->shouldReceive('hasTable')->andReturn(true);
-        $schema->shouldReceive('getColumnListing')->andReturn([]);
+        $this->setUpSchemaFacade();
 
         $meta = \Mockery::mock(SimpleMetadataProvider::class);
         App::instance('metadata', $meta);
-
-        $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
-        $schema->shouldReceive('hasTable')->andReturn(true);
-        $schema->shouldReceive('getColumnListing')->andReturn([]);
 
         $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cache->shouldReceive('has')->withArgs(['metadata'])->andReturn(true)->once();
@@ -115,10 +107,7 @@ class MetadataProviderTest extends TestCase
 
     public function testBootHasMigrationsShouldBeCached()
     {
-        $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
-        $schema->shouldReceive('hasTable')->andReturn(true);
-        $schema->shouldReceive('getColumnListing')->andReturn([]);
+        $this->setUpSchemaFacade();
 
         $meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
         App::instance('metadata', $meta);
@@ -136,10 +125,7 @@ class MetadataProviderTest extends TestCase
             App::instance($className, $testModel);
         }
 
-        $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
-        $schema->shouldReceive('hasTable')->andReturn(true);
-        $schema->shouldReceive('getColumnListing')->andReturn([]);
+        $this->setUpSchemaFacade();
 
         $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cache->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
@@ -163,10 +149,7 @@ class MetadataProviderTest extends TestCase
         $testModel = new TestModel($meta, null);
         App::instance(TestModel::class, $testModel);
 
-        $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
-        $schema->shouldReceive('hasTable')->andReturn(true);
-        $schema->shouldReceive('getColumnListing')->andReturn([]);
+        $this->setUpSchemaFacade();
 
         //$meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
         $meta = new SimpleMetadataProvider('Data', 'Data');
@@ -201,10 +184,7 @@ class MetadataProviderTest extends TestCase
         $testModel->shouldReceive('getXmlSchema')->andReturn(null);
         App::instance(TestModel::class, $testModel);
 
-        $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
-        $schema->shouldReceive('hasTable')->andReturn(true);
-        $schema->shouldReceive('getColumnListing')->andReturn([]);
+        $this->setUpSchemaFacade();
 
         $meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
         App::instance('metadata', $meta);
@@ -225,10 +205,7 @@ class MetadataProviderTest extends TestCase
 
     public function testBootHasMigrationsThreeDifferentRelationTypes()
     {
-        $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
-        $schema->shouldReceive('hasTable')->andReturn(true);
-        $schema->shouldReceive('getColumnListing')->andReturn([]);
+        $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
         $cacheStore->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
@@ -268,10 +245,7 @@ class MetadataProviderTest extends TestCase
 
     public function testOneToManyRelationConsistentBothWays()
     {
-        $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
-        $schema->shouldReceive('hasTable')->andReturn(true);
-        $schema->shouldReceive('getColumnListing')->andReturn([]);
+        $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
         $cacheStore->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
@@ -317,10 +291,7 @@ class MetadataProviderTest extends TestCase
         $testModel = new TestModel($meta, null);
         App::instance(TestModel::class, $testModel);
 
-        $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
-        $schema->shouldReceive('hasTable')->andReturn(true);
-        $schema->shouldReceive('getColumnListing')->andReturn([]);
+        $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
         $cacheStore->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
@@ -373,10 +344,7 @@ class MetadataProviderTest extends TestCase
 
         App::instance(TestModel::class, $testModel);
 
-        $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
-        $schema->shouldReceive('hasTable')->andReturn(true);
-        $schema->shouldReceive('getColumnListing')->andReturn([]);
+        $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
         $cacheStore->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
@@ -443,5 +411,13 @@ class MetadataProviderTest extends TestCase
 
         $foo->handlePostBoot(true, true, $key, $meta);
         $this->assertEquals(null, Cache::get($key));
+    }
+
+    private function setUpSchemaFacade()
+    {
+        $schema = Schema::getFacadeRoot();
+        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
+        $schema->shouldReceive('hasTable')->andReturn(true);
+        $schema->shouldReceive('getColumnListing')->andReturn([]);
     }
 }
