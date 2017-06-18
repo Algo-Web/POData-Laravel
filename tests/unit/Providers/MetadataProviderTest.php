@@ -21,6 +21,7 @@ use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -302,6 +303,108 @@ class MetadataProviderTest extends TestCase
         App::instance('metadata', $meta);
 
         $foo->boot();
+    }
+
+    public function testAddSingletonDirect()
+    {
+        $functionName = [get_class($this), 'getterSingleton'];
+
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $testModel = new TestModel($meta, null);
+        App::instance(TestModel::class, $testModel);
+
+        $schema = Schema::getFacadeRoot();
+        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
+        $schema->shouldReceive('hasTable')->andReturn(true);
+        $schema->shouldReceive('getColumnListing')->andReturn([]);
+
+        $cacheStore = Cache::getFacadeRoot();
+        $cacheStore->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
+
+        $classen = [TestGetterModel::class, TestMorphManySource::class, TestMorphOneSource::class,
+            TestMorphTarget::class, TestMonomorphicManySource::class, TestMonomorphicManyTarget::class,
+            TestMonomorphicSource::class, TestMonomorphicTarget::class, TestMorphManyToManySource::class,
+            TestMorphManyToManyTarget::class, TestMonomorphicOneAndManySource::class,
+            TestMonomorphicOneAndManyTarget::class];
+
+        $types = [];
+        $i = 0;
+        foreach ($classen as $className) {
+            $testModel = m::mock($className)->makePartial();
+            //$testModel->shouldReceive('getXmlSchema')->andReturn(null);
+            $testModel->shouldReceive('metadata')->andReturn([]);
+            App::instance($className, $testModel);
+            $type = m::mock(ResourceType::class);
+            $types[$className] = $type;
+        }
+        $classen[] = TestModel::class;
+
+        $app = App::make('app');
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen);
+        $foo->boot();
+
+        $meta = App::make('metadata');
+        $types = $meta->getTypes();
+        $type = $types[0];
+
+        $meta->createSingleton('single', $type, $functionName);
+        $result = $meta->callSingleton('single');
+        $this->assertEquals('VNV Nation', $result->name);
+    }
+
+    public function testAddSingletonOverFacade()
+    {
+        // This test, we're verifying that a singleton can be added over one of Laravel's facades - in this case,
+        // a dummied-out call to Auth::user() that returns the TestModel set up below
+        $functionName = [Auth::class, 'user'];
+
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $testModel = new TestModel($meta, null);
+        $testModel->name = 'Commence Primary Ignition';
+
+        App::instance(TestModel::class, $testModel);
+
+        $schema = Schema::getFacadeRoot();
+        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
+        $schema->shouldReceive('hasTable')->andReturn(true);
+        $schema->shouldReceive('getColumnListing')->andReturn([]);
+
+        $cacheStore = Cache::getFacadeRoot();
+        $cacheStore->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
+
+        $auth = Auth::getFacadeRoot();
+        $auth->shouldReceive('user')->andReturn($testModel)->once();
+
+        $classen = [TestModel::class];
+
+        $app = App::make('app');
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen);
+        $foo->boot();
+
+        $meta = App::make('metadata');
+        $types = $meta->getTypes();
+        $type = $types[0];
+
+        $meta->createSingleton('single', $type, $functionName);
+        $result = $meta->callSingleton('single');
+        $this->assertEquals('Commence Primary Ignition', $result->name);
+    }
+
+    public static function getterSingleton()
+    {
+        $model = new TestModel();
+        $model->name = "VNV Nation";
+        return $model;
     }
 
 

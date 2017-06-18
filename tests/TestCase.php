@@ -81,6 +81,9 @@ class TestCase extends BaseTestCase
         $log = \Mockery::mock(\Illuminate\Log\Writer::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $log->shouldReceive('writeLog')->withAnyArgs()->andReturnNull();
 
+        $auth = \Mockery::mock(\Illuminate\Auth\AuthManager::class)
+            ->makePartial()->shouldAllowMockingProtectedMethods();
+
         // Lifted straight out of the stock bootstrap/app.php shipped with Laravel
         // and repointed to underlying classes
         $app = new \AlgoWeb\PODataLaravel\Models\TestApplication($fileSys);
@@ -111,6 +114,7 @@ class TestCase extends BaseTestCase
         $app->instance('db', $database);
         $app->instance('log', $log);
         $app->instance('filesystem', $file);
+        $app->instance('auth', $auth);
 
 
         $app->singleton(
