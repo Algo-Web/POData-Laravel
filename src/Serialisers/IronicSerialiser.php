@@ -134,18 +134,15 @@ class IronicSerialiser implements IObjectSerialiser
                 '$propKind != ResourcePropertyKind::RESOURCESET_REFERENCE &&'
                 .' $propKind != ResourcePropertyKind::RESOURCE_REFERENCE'
             );
-            $propType = ResourcePropertyKind::RESOURCE_REFERENCE == $propKind ?
-                'application/atom+xml;type=entry' : 'application/atom+xml;type=feed';
+            $propTail = ResourcePropertyKind::RESOURCE_REFERENCE == $propKind ? 'entry' : 'feed';
+            $propType = 'application/atom+xml;type='.$propTail;
             $propName = $prop->getName();
             $nuLink->title = $propName;
             $nuLink->name = ODataConstants::ODATA_RELATED_NAMESPACE . $propName;
             $nuLink->url = $relativeUri . '/' . $propName;
             $nuLink->type = $propType;
 
-            $navProp = new ODataNavigationPropertyInfo(
-                $prop,
-                $this->shouldExpandSegment($propName)
-            );
+            $navProp = new ODataNavigationPropertyInfo($prop, $this->shouldExpandSegment($propName));
             if ($navProp->expanded) {
                 $nuLink->isExpanded = true;
                 $isCollection = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
