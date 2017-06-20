@@ -7,6 +7,7 @@ use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -19,10 +20,12 @@ use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\SimpleDataService as DataService;
+use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjectionNode;
 use POData\UriProcessor\RequestDescription;
 use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
-class SerialiserWriteElementTest extends TestCase
+class SerialiserWriteElementTest extends SerialiserTestBase
 {
     public function testCompareWriteSingleModelWithPropertiesNulled()
     {
@@ -59,6 +62,7 @@ class SerialiserWriteElementTest extends TestCase
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
         $model = new TestModel();
+        $model->id = 4;
         $objectResult = $object->writeTopLevelElement($model);
         $ironicResult = $ironic->writeTopLevelElement($model);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
@@ -157,32 +161,79 @@ class SerialiserWriteElementTest extends TestCase
         $this->assertEquals($objectResult, $ironicResult);
     }
 
-    private function setUpSchemaFacade()
+    public function testCompareSingleModelWithOneExpandedProperty()
     {
-        $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
-        $schema->shouldReceive('hasTable')->andReturn(true);
-        $schema->shouldReceive('getColumnListing')->andReturn([]);
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')
+            ->andReturn('/odata.svc/TestMonomorphicSources(id=42)?$expand=manySource');
+        $request->shouldReceive('fullUrl')
+            ->andReturn('http://localhost/odata.svc/TestMonomorphicSources(id=42)?$expand=manySource');
+        $request->request = new ParameterBag([ '$expand' => "manySource"]);
 
-        $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
-    }
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $source = new TestMonomorphicSource($meta, null);
+        $target = new TestMonomorphicTarget($meta, null);
 
-    /**
-     * @return m\Mock
-     */
-    protected function setUpRequest()
-    {
-        $this->setUpSchemaFacade();
-        $request = m::mock(Request::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $request->initialize();
-        $request->headers = new HeaderBag(['CONTENT_TYPE' => 'application/atom+xml']);
-        $request->setMethod('GET');
-        $request->shouldReceive('getBaseUrl')->andReturn('http://localhost/');
-        $request->shouldReceive('getQueryString')->andReturn('');
-        $request->shouldReceive('getHost')->andReturn('localhost');
-        $request->shouldReceive('isSecure')->andReturn(false);
-        $request->shouldReceive('getPort')->andReturn(80);
-        return $request;
+        App::instance(TestMonomorphicSource::class, $source);
+        App::instance(TestMonomorphicTarget::class, $target);
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri("/odata.svc/");
+
+        $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->boot();
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        $node = m::mock(ExpandedProjectionNode::class);
+        $node->shouldReceive('getPropertyName')->andReturn('manySource');
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $request = $processor->getRequest();
+        $request->getRootProjectionNode()->addNode($node);
+
+        $object = new ObjectModelSerializer($service, $request);
+        $ironic = new IronicSerialiser($service, $request);
+
+        $targ = new TestMonomorphicTarget();
+        $targ->id = 11;
+
+        $hasMany = m::mock(HasMany::class)->makePartial();
+        $hasMany->shouldReceive('getResults')->andReturn($targ);
+
+        $model = m::mock(TestMonomorphicSource::class)->makePartial();
+        $model->shouldReceive('hasMany')->andReturn($hasMany);
+        $model->id = 42;
+        $objectResult = $object->writeTopLevelElement($model);
+
+        // check that object result is properly set up - if not, no point comparing it to anything
+        $this->assertTrue($objectResult->links[1]->isExpanded);
+        $this->assertFalse($objectResult->links[1]->isCollection);
+        $ironicResult = $ironic->writeTopLevelElement($model);
+        $this->assertEquals(get_class($objectResult), get_class($ironicResult));
+        $objectResult->propertyContent = new ODataPropertyContent();
+        $ironicResult->propertyContent = new ODataPropertyContent();
+        foreach ($objectResult->links as $link) {
+            if (!isset($link->expandedResult)) {
+                continue;
+            }
+            $link->expandedResult->propertyContent = new ODataPropertyContent();
+        }
+        foreach ($ironicResult->links as $link) {
+            if (!isset($link->expandedResult)) {
+                continue;
+            }
+            $link->expandedResult->propertyContent = new ODataPropertyContent();
+        }
+
+        $this->assertEquals($objectResult, $ironicResult);
     }
 }

@@ -11,6 +11,7 @@ use POData\ObjectModel\ODataEntry;
 use POData\ObjectModel\ODataFeed;
 use POData\ObjectModel\ODataLink;
 use POData\ObjectModel\ODataMediaLink;
+use POData\ObjectModel\ODataNavigationPropertyInfo;
 use POData\ObjectModel\ODataPropertyContent;
 use POData\ObjectModel\ODataURL;
 use POData\ObjectModel\ODataURLCollection;
@@ -20,6 +21,9 @@ use POData\Providers\Metadata\ResourcePropertyKind;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\Type\IType;
+use POData\Providers\Query\QueryType;
+use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjectionNode;
+use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ProjectionNode;
 use POData\UriProcessor\RequestDescription;
 use POData\UriProcessor\SegmentStack;
 
@@ -91,6 +95,9 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeTopLevelElement($entryObject)
     {
+        if (!isset($entryObject)) {
+            return null;
+        }
         $requestTargetSource = $this->getRequest()->getTargetSource();
         $resourceType = $this->getRequest()->getTargetResourceType();
         $rawProp = $resourceType->getAllProperties();
@@ -120,13 +127,38 @@ class IronicSerialiser implements IObjectSerialiser
         $links = [];
         foreach ($relProp as $prop) {
             $nuLink = new ODataLink();
-            $propType = ResourcePropertyKind::RESOURCE_REFERENCE == $prop->getKind() ?
+            $propKind = $prop->getKind();
+            assert(
+                ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind
+                || ResourcePropertyKind::RESOURCE_REFERENCE == $propKind,
+                '$propKind != ResourcePropertyKind::RESOURCESET_REFERENCE &&'
+                .' $propKind != ResourcePropertyKind::RESOURCE_REFERENCE'
+            );
+            $propType = ResourcePropertyKind::RESOURCE_REFERENCE == $propKind ?
                 'application/atom+xml;type=entry' : 'application/atom+xml;type=feed';
             $propName = $prop->getName();
             $nuLink->title = $propName;
             $nuLink->name = ODataConstants::ODATA_RELATED_NAMESPACE . $propName;
             $nuLink->url = $relativeUri . '/' . $propName;
             $nuLink->type = $propType;
+
+            $navProp = new ODataNavigationPropertyInfo(
+                $prop,
+                $this->shouldExpandSegment($propName)
+            );
+            if ($navProp->expanded) {
+                $nuLink->isExpanded = true;
+                $isCollection = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
+                $nuLink->isCollection = $isCollection;
+                $value = $entryObject->$propName;
+                if (!$isCollection) {
+                    $expandedResult = $this->writeTopLevelElement($value);
+                } else {
+                    $expandedResult = $this->writeTopLevelElements($value);
+                }
+                $nuLink->expandedResult = $expandedResult;
+            }
+
             $links[] = $nuLink;
         }
 
@@ -154,7 +186,31 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeTopLevelElements(&$entryObjects)
     {
-        // TODO: Implement writeTopLevelElements() method.
+        assert(is_array($entryObjects), '!is_array($entryObjects)');
+        $requestTargetSource = $this->getRequest()->getTargetSource();
+
+        $title = $this->getRequest()->getContainerName();
+        $relativeUri = $this->getRequest()->getIdentifier();
+        $absoluteUri = rtrim($this->absoluteServiceUri, '/') . '/' . $relativeUri;
+
+        $selfLink = new ODataLink();
+
+        $odata = new ODataFeed();
+        $odata->title = $title;
+        $odata->id = $absoluteUri;
+        $odata->selfLink = $selfLink;
+        $odata->selfLink->name = 'self';
+        $odata->selfLink->title = $relativeUri;
+        $odata->selfLink->url = $relativeUri;
+
+        if ($this->getRequest()->queryType == QueryType::ENTITIES_WITH_COUNT()) {
+            $odata->rowCount = $this->getRequest()->getCountValue();
+        }
+        foreach ($entryObjects as $entry) {
+            $odata->entries[] = $this->writeTopLevelElement($entry);
+        }
+
+        return $odata;
     }
 
     /**
@@ -349,5 +405,82 @@ class IronicSerialiser implements IObjectSerialiser
             }
         }
         return [$mediaLink, $mediaLinks];
+    }
+
+    /**
+     * Gets collection of projection nodes under the current node.
+     *
+     * @return ProjectionNode[]|ExpandedProjectionNode[]|null List of nodes
+     *                                                        describing projections for the current segment, If this method returns
+     *                                                        null it means no projections are to be applied and the entire resource
+     *                                                        for the current segment should be serialized, If it returns non-null
+     *                                                        only the properties described by the returned projection segments should
+     *                                                        be serialized
+     */
+    protected function getProjectionNodes()
+    {
+        $expandedProjectionNode = $this->getCurrentExpandedProjectionNode();
+        if (is_null($expandedProjectionNode) || $expandedProjectionNode->canSelectAllProperties()) {
+            return null;
+        }
+
+        return $expandedProjectionNode->getChildNodes();
+    }
+
+    /**
+     * Find a 'ExpandedProjectionNode' instance in the projection tree
+     * which describes the current segment.
+     *
+     * @return ExpandedProjectionNode|null
+     */
+    protected function getCurrentExpandedProjectionNode()
+    {
+        $expandedProjectionNode = $this->getRequest()->getRootProjectionNode();
+        if (is_null($expandedProjectionNode)) {
+            return null;
+        } else {
+            $segmentNames = $this->getStack()->getSegmentNames();
+            $depth = count($segmentNames);
+            // $depth == 1 means serialization of root entry
+            //(the resource identified by resource path) is going on,
+            //so control won't get into the below for loop.
+            //we will directly return the root node,
+            //which is 'ExpandedProjectionNode'
+            // for resource identified by resource path.
+            if ($depth != 0) {
+                for ($i = 1; $i < $depth; ++$i) {
+                    $expandedProjectionNode
+                        = $expandedProjectionNode->findNode($segmentNames[$i]);
+                    assert(!is_null($expandedProjectionNode), 'is_null($expandedProjectionNode)');
+                    assert(
+                        $expandedProjectionNode instanceof ExpandedProjectionNode,
+                        '$expandedProjectionNode not instanceof ExpandedProjectionNode'
+                    );
+                }
+            }
+        }
+
+        return $expandedProjectionNode;
+    }
+
+    /**
+     * Check whether to expand a navigation property or not.
+     *
+     * @param string $navigationPropertyName Name of naviagtion property in question
+     *
+     * @return bool True if the given navigation should be
+     *              explanded otherwise false
+     */
+    protected function shouldExpandSegment($navigationPropertyName)
+    {
+        $expandedProjectionNode = $this->getCurrentExpandedProjectionNode();
+        if (is_null($expandedProjectionNode)) {
+            return false;
+        }
+
+        $expandedProjectionNode = $expandedProjectionNode->findNode($navigationPropertyName);
+
+        // null is a valid input to an instanceof call as of PHP 5.6 - will always return false
+        return $expandedProjectionNode instanceof ExpandedProjectionNode;
     }
 }
