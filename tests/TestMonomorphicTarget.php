@@ -5,6 +5,7 @@ namespace AlgoWeb\PODataLaravel\Models;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Connection as Connection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Mockery\Mockery;
 
 class TestMonomorphicTarget extends Model
@@ -31,6 +32,26 @@ class TestMonomorphicTarget extends Model
         parent::__construct();
     }
 
+    public function getTable()
+    {
+        return 'testmonomorphictarget';
+    }
+
+    public function getConnectionName()
+    {
+        return 'testconnection';
+    }
+
+    protected function getAllAttributes()
+    {
+        return ['id' => 0, 'name' => '', 'added_at' => '', 'weight' => '', 'code' => ''];
+    }
+
+    public function getFillable()
+    {
+        return [ 'name', 'added_at', 'weight', 'code'];
+    }
+
     public function manyTarget()
     {
         return $this->belongsTo(TestMonomorphicSource::class, "many_source", "many_id");
@@ -39,5 +60,22 @@ class TestMonomorphicTarget extends Model
     public function oneTarget()
     {
         return $this->belongsTo(TestMonomorphicSource::class, "one_source", "one_id");
+    }
+
+    public static function findOrFail($id, $columns = ['*'])
+    {
+        if (!is_numeric($id) || !is_int($id) || 0 >= $id) {
+            throw (new ModelNotFoundException)->setModel(TestModel::class, $id);
+        } else {
+            return new self;
+        }
+    }
+
+    public function metadata()
+    {
+        if (isset($this->metaArray)) {
+            return $this->metaArray;
+        }
+        return $this->traitmetadata();
     }
 }
