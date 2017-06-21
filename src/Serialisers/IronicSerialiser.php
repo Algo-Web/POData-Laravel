@@ -73,6 +73,11 @@ class IronicSerialiser implements IObjectSerialiser
     protected $stack;
 
     /**
+     * Lightweight stack tracking for recursive descent fill
+     */
+    private $lightStack = [];
+
+    /**
      * @param IService           $service Reference to the data service instance
      * @param RequestDescription $request Type instance describing the client submitted request
      */
@@ -96,10 +101,17 @@ class IronicSerialiser implements IObjectSerialiser
     public function writeTopLevelElement($entryObject)
     {
         if (!isset($entryObject)) {
+            array_pop($this->lightStack);
             return null;
         }
-        $requestTargetSource = $this->getRequest()->getTargetSource();
-        $resourceType = $this->getRequest()->getTargetResourceType();
+
+        if (0 == count($this->lightStack)) {
+            array_push($this->lightStack, $this->getRequest()->getTargetResourceType()->getName());
+        }
+
+        $stackCount = count($this->lightStack);
+        $topOfStack = $this->lightStack[$stackCount-1];
+        $resourceType = $this->getService()->getProvidersWrapper()->resolveResourceType($topOfStack);
         $rawProp = $resourceType->getAllProperties();
         $relProp = [];
         foreach ($rawProp as $prop) {
@@ -128,6 +140,7 @@ class IronicSerialiser implements IObjectSerialiser
         foreach ($relProp as $prop) {
             $nuLink = new ODataLink();
             $propKind = $prop->getKind();
+
             assert(
                 ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind
                 || ResourcePropertyKind::RESOURCE_REFERENCE == $propKind,
@@ -144,10 +157,12 @@ class IronicSerialiser implements IObjectSerialiser
 
             $navProp = new ODataNavigationPropertyInfo($prop, $this->shouldExpandSegment($propName));
             if ($navProp->expanded) {
+                $nextName = $prop->getResourceType()->getName();
                 $nuLink->isExpanded = true;
                 $isCollection = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
                 $nuLink->isCollection = $isCollection;
                 $value = $entryObject->$propName;
+                array_push($this->lightStack, $nextName);
                 if (!$isCollection) {
                     $expandedResult = $this->writeTopLevelElement($value);
                 } else {
@@ -171,6 +186,9 @@ class IronicSerialiser implements IObjectSerialiser
         $odata->mediaLinks = $mediaLinks;
         $odata->links = $links;
 
+        $newCount = count($this->lightStack);
+        assert($newCount == $stackCount, "Should have $stackCount elements in stack, have $newCount elements");
+        array_pop($this->lightStack);
         return $odata;
     }
 
@@ -183,6 +201,9 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeTopLevelElements(&$entryObjects)
     {
+        if (!isset($entryObjects) || !is_array($entryObjects) || 0 == count($entryObjects)) {
+            return null;
+        }
         assert(is_array($entryObjects), '!is_array($entryObjects)');
         $requestTargetSource = $this->getRequest()->getTargetSource();
 

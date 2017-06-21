@@ -7,6 +7,7 @@ use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -21,6 +22,7 @@ use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as Operati
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\SimpleDataService as DataService;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjectionNode;
+use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\RootProjectionNode;
 use POData\UriProcessor\RequestDescription;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -161,21 +163,21 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $this->assertEquals($objectResult, $ironicResult);
     }
 
-    public function testCompareSingleModelWithOneExpandedProperty()
+    public function testCompareSingleModelWithTwoExpandedProperties()
     {
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')
-            ->andReturn('/odata.svc/TestMonomorphicSources(id=42)?$expand=manySource');
+            ->andReturn('/odata.svc/TestMonomorphicSources(id=42)?$expand=oneSource,manySource');
         $request->shouldReceive('fullUrl')
-            ->andReturn('http://localhost/odata.svc/TestMonomorphicSources(id=42)?$expand=manySource');
-        $request->request = new ParameterBag([ '$expand' => "manySource"]);
+            ->andReturn('http://localhost/odata.svc/TestMonomorphicSources(id=42)?$expand=oneSource,manySource');
+        $request->request = new ParameterBag([ '$expand' => "oneSource,manySource"]);
 
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $source = new TestMonomorphicSource($meta, null);
-        $target = new TestMonomorphicTarget($meta, null);
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $source = new TestMonomorphicSource($metadata, null);
+        $target = new TestMonomorphicTarget($metadata, null);
 
         App::instance(TestMonomorphicSource::class, $source);
         App::instance(TestMonomorphicTarget::class, $target);
@@ -193,30 +195,52 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $query = m::mock(LaravelQuery::class);
 
-        $node = m::mock(ExpandedProjectionNode::class);
-        $node->shouldReceive('getPropertyName')->andReturn('manySource');
+        $expandNode = m::mock(ExpandedProjectionNode::class);
+        $expandNode->shouldReceive('canSelectAllProperties')->andReturn(true);
+        $expandNode->shouldReceive('isExpansionSpecified')->andReturn(false);
+        $expandNode->shouldReceive('findNode')->andReturn(null);
+
+        $node = m::mock(RootProjectionNode::class);
+        $node->shouldReceive('getPropertyName')->andReturn('oneSource');
+        $node->shouldReceive('isExpansionSpecified')->andReturn(true, true, true, false);
+        $node->shouldReceive('canSelectAllProperties')->andReturn(true);
+        $node->shouldReceive('findNode')->andReturn($expandNode);
+
         $service = new TestDataService($query, $meta, $host);
         $processor = $service->handleRequest();
         $request = $processor->getRequest();
-        $request->getRootProjectionNode()->addNode($node);
+        $request->setRootProjectionNode($node);
 
         $object = new ObjectModelSerializer($service, $request);
         $ironic = new IronicSerialiser($service, $request);
 
-        $targ = new TestMonomorphicTarget();
+        $belongsTo = m::mock(BelongsTo::class)->makePartial();
+        $belongsTo->shouldReceive('getResults')->andReturn(null);
+        $targ = m::mock(TestMonomorphicTarget::class)->makePartial();
+        $targ->shouldReceive('metadata')->andReturn($metadata);
+        $targ->shouldReceive('manyTarget')->andReturn($belongsTo);
+        $targ->shouldReceive('oneTarget')->andReturn($belongsTo);
         $targ->id = 11;
 
+        $hasOne = m::mock(HasMany::class)->makePartial();
+        $hasOne->shouldReceive('getResults')->andReturn($targ);
+
         $hasMany = m::mock(HasMany::class)->makePartial();
-        $hasMany->shouldReceive('getResults')->andReturn($targ);
+        $hasMany->shouldReceive('getResults')->andReturn([$targ]);
 
         $model = m::mock(TestMonomorphicSource::class)->makePartial();
-        $model->shouldReceive('hasMany')->andReturn($hasMany);
+        $model->shouldReceive('hasOne')->andReturn($hasOne);
+        $model->shouldReceive('manySource')->andReturn($hasMany);
+        $model->shouldReceive('metadata')->andReturn($metadata);
         $model->id = 42;
+
         $objectResult = $object->writeTopLevelElement($model);
 
         // check that object result is properly set up - if not, no point comparing it to anything
+        $this->assertTrue($objectResult->links[0]->isExpanded);
+        $this->assertFalse($objectResult->links[0]->isCollection);
         $this->assertTrue($objectResult->links[1]->isExpanded);
-        $this->assertFalse($objectResult->links[1]->isCollection);
+        $this->assertTrue($objectResult->links[1]->isCollection);
         $ironicResult = $ironic->writeTopLevelElement($model);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $objectResult->propertyContent = new ODataPropertyContent();
@@ -233,7 +257,6 @@ class SerialiserWriteElementTest extends SerialiserTestBase
             }
             $link->expandedResult->propertyContent = new ODataPropertyContent();
         }
-
         $this->assertEquals($objectResult, $ironicResult);
     }
 }

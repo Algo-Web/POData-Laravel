@@ -212,12 +212,13 @@ class LaravelQuery implements IQueryProvider
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty
     ) {
-        return $this->getReader()->getRelatedResourceReference(
+        $result = $this->getReader()->getRelatedResourceReference(
             $sourceResourceSet,
             $sourceEntityInstance,
             $targetResourceSet,
             $targetProperty
         );
+        return $result;
     }
 
     /**
