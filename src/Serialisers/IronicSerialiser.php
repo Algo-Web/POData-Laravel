@@ -214,9 +214,6 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeTopLevelElements(&$entryObjects)
     {
-        if (!isset($entryObjects) || !is_array($entryObjects) || 0 == count($entryObjects)) {
-            return null;
-        }
         assert(is_array($entryObjects), '!is_array($entryObjects)');
 
         if (0 == count($this->lightStack)) {
@@ -270,7 +267,19 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeUrlElement($entryObject)
     {
-        // TODO: Implement writeUrlElement() method.
+        $url = new ODataURL();
+        if (!is_null($entryObject)) {
+            $currentResourceType = $this->getCurrentResourceSetWrapper()->getResourceType();
+            $relativeUri = $this->getEntryInstanceKey(
+                $entryObject,
+                $currentResourceType,
+                $this->getCurrentResourceSetWrapper()->getName()
+            );
+
+            $url->url = rtrim($this->absoluteServiceUri, '/') . '/' . $relativeUri;
+        }
+
+        return $url;
     }
 
     /**
@@ -283,7 +292,30 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeUrlElements($entryObjects)
     {
-        // TODO: Implement writeUrlElements() method.
+        $urls = new ODataURLCollection();
+        if (!empty($entryObjects)) {
+            $i = 0;
+            foreach ($entryObjects as $entryObject) {
+                $urls->urls[$i] = $this->writeUrlElement($entryObject);
+                ++$i;
+            }
+
+            if ($i > 0 && $this->needNextPageLink(count($entryObjects))) {
+                $stackSegment = $this->getRequest()->getTargetResourceSetWrapper()->getName();
+                $lastObject = end($entryObjects);
+                $segment = $this->getNextLinkUri($lastObject, $this->getRequest()->getRequestUrl()->getUrlAsString());
+                $nextLink = new ODataLink();
+                $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
+                $nextLink->url = rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment;
+                $urls->nextPageLink = $nextLink;
+            }
+        }
+
+        if ($this->getRequest()->queryType == QueryType::ENTITIES_WITH_COUNT()) {
+            $urls->count = $this->getRequest()->getCountValue();
+        }
+
+        return $urls;
     }
 
     /**
@@ -297,10 +329,11 @@ class IronicSerialiser implements IObjectSerialiser
      *                                    complex object
      *
      * @return ODataPropertyContent
+     * @codeCoverageIgnore
      */
     public function writeTopLevelComplexObject(&$complexValue, $propertyName, ResourceType &$resourceType)
     {
-        // TODO: Implement writeTopLevelComplexObject() method.
+        // TODO: Figure out if we need to bother implementing this
     }
 
     /**
@@ -312,12 +345,12 @@ class IronicSerialiser implements IObjectSerialiser
      *                                    bag property
      * @param ResourceType &$resourceType Describes the type of
      *                                    bag object
-     *
+     * @codeCoverageIgnore
      * @return ODataPropertyContent
      */
     public function writeTopLevelBagObject(&$BagValue, $propertyName, ResourceType &$resourceType)
     {
-        // TODO: Implement writeTopLevelBagObject() method.
+        // TODO: Figure out if we need to bother implementing this
     }
 
     /**
@@ -329,12 +362,12 @@ class IronicSerialiser implements IObjectSerialiser
      *                                            describing the
      *                                            primitive property
      *                                            to be written
-     *
+     * @codeCoverageIgnore
      * @return ODataPropertyContent
      */
     public function writeTopLevelPrimitive(&$primitiveValue, ResourceProperty &$resourceProperty = null)
     {
-        // TODO: Implement writeTopLevelPrimitive() method.
+        // TODO: Figure out if we need to bother implementing this
     }
 
     /**
@@ -494,10 +527,9 @@ class IronicSerialiser implements IObjectSerialiser
             //we will directly return the root node,
             //which is 'ExpandedProjectionNode'
             // for resource identified by resource path.
-            if ($depth != 0) {
+            if (0 != $depth) {
                 for ($i = 1; $i < $depth; ++$i) {
-                    $expandedProjectionNode
-                        = $expandedProjectionNode->findNode($segmentNames[$i]);
+                    $expandedProjectionNode = $expandedProjectionNode->findNode($segmentNames[$i]);
                     assert(!is_null($expandedProjectionNode), 'is_null($expandedProjectionNode)');
                     assert(
                         $expandedProjectionNode instanceof ExpandedProjectionNode,
@@ -547,7 +579,7 @@ class IronicSerialiser implements IObjectSerialiser
         //$this->assert($recursionLevel != 0, '$recursionLevel != 0');
         $pageSize = $currentResourceSet->getResourceSetPageSize();
 
-        if ($recursionLevel == 1) {
+        if (1 == $recursionLevel) {
             //presence of $top option affect next link for root container
             $topValueCount = $this->getRequest()->getTopOptionCount();
             if (!is_null($topValueCount) && ($topValueCount <= $pageSize)) {

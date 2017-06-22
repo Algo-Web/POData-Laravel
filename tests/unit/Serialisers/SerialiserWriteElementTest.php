@@ -20,6 +20,7 @@ use POData\ObjectModel\ODataPropertyContent;
 use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
 use POData\Providers\Metadata\SimpleMetadataProvider;
+use POData\Providers\Query\QueryType;
 use POData\SimpleDataService as DataService;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjectionNode;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\RootProjectionNode;
@@ -71,6 +72,65 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $objectResult->propertyContent = new ODataPropertyContent();
         $ironicResult->propertyContent = new ODataPropertyContent();
         $this->assertEquals($objectResult, $ironicResult);
+    }
+
+    public function testCompareWriteSingleModelWithKeyPropertiesNulled()
+    {
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestModels');
+        $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestModels');
+
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $testModel = new TestModel($meta, null);
+        $testModel->id = null;
+        App::instance(TestModel::class, $testModel);
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri("/odata.svc/");
+
+        $classen = [TestModel::class];
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->boot();
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        // default data service
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $object = new ObjectModelSerializer($service, $processor->getRequest());
+        $ironic = new IronicSerialiser($service, $processor->getRequest());
+
+        $model = new TestModel();
+        $model->id = null;
+
+        $expected = null;
+        $expectedExceptionClass = null;
+        $actual = null;
+        $actualExceptionClass = null;
+
+        try {
+            $object->writeTopLevelElement($model);
+        } catch (\Exception $e) {
+            $expectedExceptionClass = get_class($e);
+            $expected = $e->getMessage();
+        }
+        try {
+            $ironic->writeTopLevelElement($model);
+        } catch (\Exception $e) {
+            $actualExceptionClass = get_class($e);
+            $actual = $e->getMessage();
+        }
+
+        $this->assertEquals($expectedExceptionClass, $actualExceptionClass);
+        $this->assertEquals($expected, $actual);
     }
 
     public function testCompareWriteSingleModelWithPropertiesNulledAndSingleRelation()
