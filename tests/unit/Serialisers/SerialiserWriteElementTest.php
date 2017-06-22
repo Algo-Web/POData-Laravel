@@ -245,18 +245,22 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $objectResult->propertyContent = new ODataPropertyContent();
         $ironicResult->propertyContent = new ODataPropertyContent();
-        foreach ($objectResult->links as $link) {
-            if (!isset($link->expandedResult)) {
-                continue;
+        $numLinks = count($objectResult->links);
+
+        for ($i = 0; $i < $numLinks; $i++) {
+            $objectResult->links[$i]->expandedResult->propertyContent = new ODataPropertyContent();
+            $ironicResult->links[$i]->expandedResult->propertyContent = new ODataPropertyContent();
+            $hasEntries = isset($objectResult->links[$i]->expandedResult->entries);
+            $entriesCount = $hasEntries ? count($objectResult->links[$i]->expandedResult->entries) : 0;
+            for ($j = 0; $j < $entriesCount; $j++) {
+                $objectResult->links[$i]->expandedResult->entries[$j]->propertyContent = new ODataPropertyContent();
             }
-            $link->expandedResult->propertyContent = new ODataPropertyContent();
-        }
-        foreach ($ironicResult->links as $link) {
-            if (!isset($link->expandedResult)) {
-                continue;
+            $hasEntries = isset($ironicResult->links[$i]->expandedResult->entries);
+            $entriesCount = $hasEntries ? count($ironicResult->links[$i]->expandedResult->entries) : 0;
+            for ($j = 0; $j < $entriesCount; $j++) {
+                $ironicResult->links[$i]->expandedResult->entries[$j]->propertyContent = new ODataPropertyContent();
             }
-            $link->expandedResult->propertyContent = new ODataPropertyContent();
         }
-        $this->assertEquals($objectResult, $ironicResult);
+        $this->assertEquals($objectResult, $ironicResult, '', 0, 20);
     }
 }

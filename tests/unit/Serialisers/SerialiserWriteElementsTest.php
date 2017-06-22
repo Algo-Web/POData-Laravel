@@ -124,4 +124,61 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
     }
+
+    public function testCompareWriteModelsOnManyEndOfRelation()
+    {
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicSources(id=1)/manySource');
+        $request->shouldReceive('fullUrl')
+            ->andReturn('http://localhost/odata.svc/TestMonomorphicSources(id=1)/manySource');
+
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $source = new TestMonomorphicSource($metadata, null);
+        $target = new TestMonomorphicTarget($metadata, null);
+
+        App::instance(TestMonomorphicSource::class, $source);
+        App::instance(TestMonomorphicTarget::class, $target);
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri("/odata.svc/");
+
+        $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->boot();
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        $targ1 = new TestMonomorphicTarget($metadata, null);
+        $targ1->id = 4;
+        $targ2 = new TestMonomorphicTarget($metadata, null);
+        $targ2->id = 5;
+
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $request = $processor->getRequest();
+
+        $object = new ObjectModelSerializer($service, $request);
+        $ironic = new IronicSerialiser($service, $request);
+
+        $blankProp = new ODataPropertyContent();
+
+        $models = [$targ1, $targ2];
+        $objectResult = $object->writeTopLevelElements($models);
+        $ironicResult = $ironic->writeTopLevelElements($models);
+        foreach ($objectResult->entries as $entry) {
+            $entry->propertyContent = $blankProp;
+        }
+        foreach ($ironicResult->entries as $entry) {
+            $entry->propertyContent = $blankProp;
+        }
+        $this->assertEquals(get_class($objectResult), get_class($ironicResult));
+        $this->assertEquals($objectResult, $ironicResult);
+    }
 }

@@ -106,12 +106,13 @@ class IronicSerialiser implements IObjectSerialiser
         }
 
         if (0 == count($this->lightStack)) {
-            array_push($this->lightStack, $this->getRequest()->getTargetResourceType()->getName());
+            $typeName = $this->getRequest()->getTargetResourceType()->getName();
+            array_push($this->lightStack, [$typeName, $typeName]);
         }
 
         $stackCount = count($this->lightStack);
         $topOfStack = $this->lightStack[$stackCount-1];
-        $resourceType = $this->getService()->getProvidersWrapper()->resolveResourceType($topOfStack);
+        $resourceType = $this->getService()->getProvidersWrapper()->resolveResourceType($topOfStack[0]);
         $rawProp = $resourceType->getAllProperties();
         $relProp = [];
         foreach ($rawProp as $prop) {
@@ -162,13 +163,22 @@ class IronicSerialiser implements IObjectSerialiser
                 $isCollection = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
                 $nuLink->isCollection = $isCollection;
                 $value = $entryObject->$propName;
-                array_push($this->lightStack, $nextName);
+                array_push($this->lightStack, [$nextName, $propName]);
                 if (!$isCollection) {
                     $expandedResult = $this->writeTopLevelElement($value);
                 } else {
                     $expandedResult = $this->writeTopLevelElements($value);
                 }
                 $nuLink->expandedResult = $expandedResult;
+                if (!isset($nuLink->expandedResult)) {
+                    $nuLink->isCollection = null;
+                    $nuLink->isExpanded = null;
+                } else {
+                    if (isset($nuLink->expandedResult->selfLink)) {
+                        $nuLink->expandedResult->selfLink->title = $propName;
+                        $nuLink->expandedResult->title = $propName;
+                    }
+                }
             }
 
             $links[] = $nuLink;
@@ -209,17 +219,17 @@ class IronicSerialiser implements IObjectSerialiser
 
         $title = $this->getRequest()->getContainerName();
         $relativeUri = $this->getRequest()->getIdentifier();
-        $absoluteUri = rtrim($this->absoluteServiceUri, '/') . '/' . $relativeUri;
+        $absoluteUri = $this->getRequest()->getRequestUrl()->getUrlAsString();
 
         $selfLink = new ODataLink();
+        $selfLink->name = 'self';
+        $selfLink->title = $relativeUri;
+        $selfLink->url = $relativeUri;
 
         $odata = new ODataFeed();
         $odata->title = $title;
         $odata->id = $absoluteUri;
         $odata->selfLink = $selfLink;
-        $odata->selfLink->name = 'self';
-        $odata->selfLink->title = $relativeUri;
-        $odata->selfLink->url = $relativeUri;
 
         if ($this->getRequest()->queryType == QueryType::ENTITIES_WITH_COUNT()) {
             $odata->rowCount = $this->getRequest()->getCountValue();
