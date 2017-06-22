@@ -15,7 +15,6 @@ class ModelSerialiser
 
     public function __construct()
     {
-
     }
 
     /**
