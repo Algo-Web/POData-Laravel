@@ -19,6 +19,7 @@ use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourcePropertyKind;
 use POData\Providers\Metadata\ResourceSet;
+use POData\Providers\Metadata\ResourceSetWrapper;
 use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\Type\IType;
 use POData\Providers\Query\QueryType;
@@ -218,6 +219,13 @@ class IronicSerialiser implements IObjectSerialiser
         }
         assert(is_array($entryObjects), '!is_array($entryObjects)');
 
+        if (0 == count($this->lightStack)) {
+            $typeName = $this->getRequest()->getTargetResourceType()->getName();
+            array_push($this->lightStack, [$typeName, $typeName]);
+        }
+        $setName = $this->getRequest()->getTargetResourceSetWrapper()->getName();
+
+
         $title = $this->getRequest()->getContainerName();
         $relativeUri = $this->getRequest()->getIdentifier();
         $absoluteUri = $this->getRequest()->getRequestUrl()->getUrlAsString();
@@ -237,6 +245,17 @@ class IronicSerialiser implements IObjectSerialiser
         }
         foreach ($entryObjects as $entry) {
             $odata->entries[] = $this->writeTopLevelElement($entry);
+        }
+
+
+        if ($this->needNextPageLink(count($entryObjects))) {
+            $stackSegment = $setName;
+            $lastObject = end($entryObjects);
+            $segment = $this->getNextLinkUri($lastObject, $absoluteUri);
+            $nextLink = new ODataLink();
+            $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
+            $nextLink->url = rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment;
+            $odata->nextPageLink = $nextLink;
         }
 
         return $odata;
@@ -510,5 +529,63 @@ class IronicSerialiser implements IObjectSerialiser
 
         // null is a valid input to an instanceof call as of PHP 5.6 - will always return false
         return $expandedProjectionNode instanceof ExpandedProjectionNode;
+    }
+
+    /**
+     * Wheter next link is needed for the current resource set (feed)
+     * being serialized.
+     *
+     * @param int $resultSetCount Number of entries in the current
+     *                            resource set
+     *
+     * @return bool true if the feed must have a next page link
+     */
+    protected function needNextPageLink($resultSetCount)
+    {
+        $currentResourceSet = $this->getCurrentResourceSetWrapper();
+        $recursionLevel = count($this->getStack()->getSegmentNames());
+        //$this->assert($recursionLevel != 0, '$recursionLevel != 0');
+        $pageSize = $currentResourceSet->getResourceSetPageSize();
+
+        if ($recursionLevel == 1) {
+            //presence of $top option affect next link for root container
+            $topValueCount = $this->getRequest()->getTopOptionCount();
+            if (!is_null($topValueCount) && ($topValueCount <= $pageSize)) {
+                return false;
+            }
+        }
+        return $resultSetCount == $pageSize;
+    }
+
+    /**
+     * Resource set wrapper for the resource being serialized.
+     *
+     * @return ResourceSetWrapper
+     */
+    protected function getCurrentResourceSetWrapper()
+    {
+        $segmentWrappers = $this->getStack()->getSegmentWrappers();
+        $count = count($segmentWrappers);
+
+        return 0 == $count ? $this->getRequest()->getTargetResourceSetWrapper() : $segmentWrappers[$count - 1];
+    }
+
+    /**
+     * Get next page link from the given entity instance.
+     *
+     * @param mixed  &$lastObject Last object serialized to be
+     *                            used for generating $skiptoken
+     * @param string $absoluteUri Absolute response URI
+     *
+     * @return string for the link for next page
+     */
+    protected function getNextLinkUri(&$lastObject, $absoluteUri)
+    {
+        $currentExpandedProjectionNode = $this->getCurrentExpandedProjectionNode();
+        $internalOrderByInfo = $currentExpandedProjectionNode->getInternalOrderByInfo();
+        $skipToken = $internalOrderByInfo->buildSkipTokenValue($lastObject);
+        assert(!is_null($skipToken), '!is_null($skipToken)');
+        $skipToken = '?$skip='.$skipToken;
+        return $skipToken;
     }
 }

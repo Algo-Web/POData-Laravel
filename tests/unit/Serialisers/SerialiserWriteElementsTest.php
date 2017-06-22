@@ -104,7 +104,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $query = m::mock(LaravelQuery::class);
 
         $service = new TestDataService($query, $meta, $host);
-        $service->maxPageSize = 1;
+        $service->maxPageSize = 300;
 
         $processor = $service->handleRequest();
         $object = new ObjectModelSerializer($service, $processor->getRequest());
@@ -113,7 +113,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $blankProp = new ODataPropertyContent();
 
         $models = [];
-        for ($i = 1; $i < 300; $i++) {
+        for ($i = 1; $i < 301; $i++) {
             $model = new TestModel($metadata, null);
             $model->id = $i;
             $models[] = $model;
