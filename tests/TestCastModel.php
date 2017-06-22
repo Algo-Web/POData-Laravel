@@ -3,38 +3,37 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
+use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Model as Model;
-use Illuminate\Database\Connection as Connection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Mockery\Mockery;
+use Illuminate\Database\Schema\Builder as SchemaBuilder;
 
-class TestMonomorphicTarget extends Model
+class TestCastModel extends Model
 {
     use MetadataTrait {
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
         // not bury ourselves under a stack overflow and segfault
-        getRelationshipsFromMethods as getRel;
     }
-    protected $metaArray;
-    protected $connect;
+    use BuildsQueries;
 
-    public function __construct(array $meta = null, Connection $connect = null)
+    protected $metaArray;
+
+    protected $casts = ['is_bool' => 'boolean'];
+
+    public function __construct(array $meta = null, $endpoint = null)
     {
         if (isset($meta)) {
             $this->metaArray = $meta;
         }
-        if (isset($connect)) {
-            $this->connect = $connect;
-        } else {
-            $connect = \Mockery::mock(Connection::class)->makePartial();
-            $this->connect = $connect;
+        if (isset($endpoint)) {
+            $this->endpoint = $endpoint;
         }
         parent::__construct();
     }
 
     public function getTable()
     {
-        return 'testmonomorphictarget';
+        return 'testmodel';
     }
 
     public function getConnectionName()
@@ -44,22 +43,12 @@ class TestMonomorphicTarget extends Model
 
     protected function getAllAttributes()
     {
-        return ['id' => 0, 'name' => '', 'added_at' => '', 'weight' => '', 'code' => ''];
+        return ['id' => 0, 'name' => '', 'added_at' => '', 'weight' => '', 'code' => '', 'is_bool' => 0];
     }
 
     public function getFillable()
     {
         return [ 'name', 'added_at', 'weight', 'code'];
-    }
-
-    public function manyTarget()
-    {
-        return $this->belongsTo(TestMonomorphicSource::class, "many_source", "many_id");
-    }
-
-    public function oneTarget()
-    {
-        return $this->belongsTo(TestMonomorphicSource::class, "one_source", "one_id");
     }
 
     public static function findOrFail($id, $columns = ['*'])

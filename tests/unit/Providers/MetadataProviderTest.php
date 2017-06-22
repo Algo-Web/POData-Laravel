@@ -5,6 +5,7 @@ namespace AlgoWeb\PODataLaravel\Providers;
 use AlgoWeb\ODataMetadata\MetadataManager;
 use AlgoWeb\ODataMetadata\MetadataV3\edm\TEntityTypeType;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use AlgoWeb\PODataLaravel\Models\TestCastModel;
 use AlgoWeb\PODataLaravel\Models\TestGetterModel;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
@@ -116,7 +117,7 @@ class MetadataProviderTest extends TestCase
             TestMorphTarget::class, TestMonomorphicManySource::class, TestMonomorphicManyTarget::class,
             TestMonomorphicSource::class, TestMonomorphicTarget::class, TestMorphManyToManySource::class,
             TestMorphManyToManyTarget::class, TestMonomorphicOneAndManySource::class,
-            TestMonomorphicOneAndManyTarget::class];
+            TestMonomorphicOneAndManyTarget::class, TestCastModel::class];
 
         foreach ($classen as $className) {
             $testModel = m::mock($className)->makePartial();
@@ -259,7 +260,7 @@ class MetadataProviderTest extends TestCase
             $testModel->shouldReceive('getXmlSchema')->andReturn(null);
             $testModel->shouldReceive('metadata')->andReturn([]);
             App::instance($className, $testModel);
-            $type = m::mock(ResourceType::class);
+            $type = m::mock(ResourceEntityType::class);
             $types[$className] = $type;
         }
 
@@ -270,9 +271,11 @@ class MetadataProviderTest extends TestCase
 
         $meta = \Mockery::mock(SimpleMetadataProvider::class);
         $meta->shouldReceive('addResourceReferencePropertyBidirectional')
-            ->with(m::type(ResourceType::class), m::type(ResourceType::class), 'morphTarget', 'morph')->times(2);
+            ->with(m::type(ResourceEntityType::class), m::type(ResourceEntityType::class), 'morphTarget', 'morph')
+            ->times(2);
         $meta->shouldReceive('addResourceReferencePropertyBidirectional')
-            ->with(m::type(ResourceType::class), m::type(ResourceType::class), 'morph', 'morphTarget')->never();
+            ->with(m::type(ResourceEntityType::class), m::type(ResourceEntityType::class), 'morph', 'morphTarget')
+            ->never();
 
         App::instance('metadata', $meta);
 

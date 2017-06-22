@@ -3,7 +3,10 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Concerns\HasAttributes;
 use Illuminate\Database\Eloquent\Model as Model;
+use Mockery as m;
 
 class TestGetterModel extends Model
 {
@@ -22,6 +25,7 @@ class TestGetterModel extends Model
         if (isset($endpoint)) {
             $this->endpoint = $endpoint;
         }
+        $this->dateFormat = 'Y-m-d H:i:s.u';
         $this->name = 'Name';
         $this->added_at = new \DateTime();
         $this->weight = 42;
@@ -59,6 +63,6 @@ class TestGetterModel extends Model
 
     public function getweightAttribute()
     {
-        return $this->weight;
+        return $this->attributes['weight'] * 10;
     }
 }
