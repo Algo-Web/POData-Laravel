@@ -176,7 +176,9 @@ class IronicSerialiser implements IObjectSerialiser
                 } else {
                     if (isset($nuLink->expandedResult->selfLink)) {
                         $nuLink->expandedResult->selfLink->title = $propName;
+                        $nuLink->expandedResult->selfLink->url = $nuLink->url;
                         $nuLink->expandedResult->title = $propName;
+                        $nuLink->expandedResult->id = rtrim($this->absoluteServiceUri, '/') . '/' . $nuLink->url;
                     }
                 }
             }

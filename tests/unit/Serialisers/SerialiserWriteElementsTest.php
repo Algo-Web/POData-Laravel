@@ -7,6 +7,8 @@ use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -178,6 +180,80 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         foreach ($ironicResult->entries as $entry) {
             $entry->propertyContent = $blankProp;
         }
+        $this->assertEquals(get_class($objectResult), get_class($ironicResult));
+        $this->assertEquals($objectResult, $ironicResult);
+    }
+
+    public function testWriteTopLevelElementsAllExpanded()
+    {
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicSources?$expand=manySource');
+        $request->shouldReceive('fullUrl')
+            ->andReturn('http://localhost/odata.svc/TestMonomorphicSources?$expand=manySource');
+
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $source = new TestMonomorphicSource($metadata, null);
+        $target = new TestMonomorphicTarget($metadata, null);
+
+        App::instance(TestMonomorphicSource::class, $source);
+        App::instance(TestMonomorphicTarget::class, $target);
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri("/odata.svc/");
+
+        $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->boot();
+
+        $belongsTo = m::mock(BelongsTo::class)->makePartial();
+        $belongsTo->shouldReceive('getResults')->andReturn(null);
+        $targ = m::mock(TestMonomorphicTarget::class)->makePartial();
+        $targ->shouldReceive('metadata')->andReturn($metadata);
+        $targ->shouldReceive('manyTarget')->andReturn($belongsTo);
+        $targ->shouldReceive('oneTarget')->andReturn($belongsTo);
+        $targ->id = 11;
+
+        $hasOne = m::mock(HasMany::class)->makePartial();
+        $hasOne->shouldReceive('getResults')->andReturn($targ);
+
+        $hasMany = m::mock(HasMany::class)->makePartial();
+        $hasMany->shouldReceive('getResults')->andReturn([$targ]);
+
+        $model = m::mock(TestMonomorphicSource::class)->makePartial();
+        $model->shouldReceive('hasOne')->andReturn($hasOne);
+        $model->shouldReceive('manySource')->andReturn($hasMany);
+        $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->id = 42;
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $request = $processor->getRequest();
+
+        $object = new ObjectModelSerializer($service, $request);
+        $ironic = new IronicSerialiser($service, $request);
+
+        $models = [$model, $model];
+
+        $blankProp = new ODataPropertyContent();
+
+        $objectResult = $object->writeTopLevelElements($models);
+        $ironicResult = $ironic->writeTopLevelElements($models);
+        foreach ($objectResult->entries as $entry) {
+            $entry->propertyContent = $blankProp;
+        }
+        foreach ($ironicResult->entries as $entry) {
+            $entry->propertyContent = $blankProp;
+        }
+
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
     }
