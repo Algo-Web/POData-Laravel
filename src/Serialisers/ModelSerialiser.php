@@ -29,13 +29,13 @@ class ModelSerialiser
         $class = get_class($model);
         assert($model instanceof Model, $class);
         // dig up metadata
-        if (!isset(static::$metadataCache[$class])) {
-            static::$metadataCache[$class] = $model->metadata();
+        if (!isset(self::$metadataCache[$class])) {
+            self::$metadataCache[$class] = $model->metadata();
         }
-        $meta = static::$metadataCache[$class];
+        $meta = self::$metadataCache[$class];
         $keys = array_keys($meta);
         // dig up getter list - we only care about the mutators that end up in metadata
-        if (!isset(static::$mutatorCache[$class])) {
+        if (!isset(self::$mutatorCache[$class])) {
             $getterz = [];
             $datez = $model->getDates();
             $castz = $model->getCasts();
@@ -44,9 +44,9 @@ class ModelSerialiser
                     $getterz[] = $key;
                 }
             }
-            static::$mutatorCache[$class] = $getterz;
+            self::$mutatorCache[$class] = $getterz;
         }
-        $getterz = static::$mutatorCache[$class];
+        $getterz = self::$mutatorCache[$class];
         $result = array_intersect_key($model->getAttributes(), $meta);
         foreach ($keys as $key) {
             if (!isset($result[$key])) {
@@ -62,7 +62,7 @@ class ModelSerialiser
 
     public function reset()
     {
-        static::$mutatorCache = [];
-        static::$metadataCache = [];
+        self::$mutatorCache = [];
+        self::$metadataCache = [];
     }
 }

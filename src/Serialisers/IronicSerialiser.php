@@ -106,10 +106,7 @@ class IronicSerialiser implements IObjectSerialiser
             return null;
         }
 
-        if (0 == count($this->lightStack)) {
-            $typeName = $this->getRequest()->getTargetResourceType()->getName();
-            array_push($this->lightStack, [$typeName, $typeName]);
-        }
+        $this->loadStackIfEmpty();
 
         $stackCount = count($this->lightStack);
         $topOfStack = $this->lightStack[$stackCount-1];
@@ -216,12 +213,8 @@ class IronicSerialiser implements IObjectSerialiser
     {
         assert(is_array($entryObjects), '!is_array($entryObjects)');
 
-        if (0 == count($this->lightStack)) {
-            $typeName = $this->getRequest()->getTargetResourceType()->getName();
-            array_push($this->lightStack, [$typeName, $typeName]);
-        }
+        $this->loadStackIfEmpty();
         $setName = $this->getRequest()->getTargetResourceSetWrapper()->getName();
-
 
         $title = $this->getRequest()->getContainerName();
         $relativeUri = $this->getRequest()->getIdentifier();
@@ -576,7 +569,6 @@ class IronicSerialiser implements IObjectSerialiser
     {
         $currentResourceSet = $this->getCurrentResourceSetWrapper();
         $recursionLevel = count($this->getStack()->getSegmentNames());
-        //$this->assert($recursionLevel != 0, '$recursionLevel != 0');
         $pageSize = $currentResourceSet->getResourceSetPageSize();
 
         if (1 == $recursionLevel) {
@@ -619,5 +611,13 @@ class IronicSerialiser implements IObjectSerialiser
         assert(!is_null($skipToken), '!is_null($skipToken)');
         $skipToken = '?$skip='.$skipToken;
         return $skipToken;
+    }
+
+    private function loadStackIfEmpty()
+    {
+        if (0 == count($this->lightStack)) {
+            $typeName = $this->getRequest()->getTargetResourceType()->getName();
+            array_push($this->lightStack, [$typeName, $typeName]);
+        }
     }
 }
