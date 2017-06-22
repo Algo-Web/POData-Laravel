@@ -217,7 +217,6 @@ class IronicSerialiser implements IObjectSerialiser
             return null;
         }
         assert(is_array($entryObjects), '!is_array($entryObjects)');
-        $requestTargetSource = $this->getRequest()->getTargetSource();
 
         $title = $this->getRequest()->getContainerName();
         $relativeUri = $this->getRequest()->getIdentifier();
