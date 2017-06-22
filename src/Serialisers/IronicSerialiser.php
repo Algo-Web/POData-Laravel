@@ -387,7 +387,6 @@ class IronicSerialiser implements IObjectSerialiser
         $keyString .= ')';
 
         return $keyString;
-
     }
 
     /**
