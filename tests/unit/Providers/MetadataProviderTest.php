@@ -259,7 +259,7 @@ class MetadataProviderTest extends TestCase
             $testModel->shouldReceive('getXmlSchema')->andReturn(null);
             $testModel->shouldReceive('metadata')->andReturn([]);
             App::instance($className, $testModel);
-            $type = m::mock(ResourceType::class);
+            $type = m::mock(ResourceEntityType::class);
             $types[$className] = $type;
         }
 
@@ -270,9 +270,11 @@ class MetadataProviderTest extends TestCase
 
         $meta = \Mockery::mock(SimpleMetadataProvider::class);
         $meta->shouldReceive('addResourceReferencePropertyBidirectional')
-            ->with(m::type(ResourceType::class), m::type(ResourceType::class), 'morphTarget', 'morph')->times(2);
+            ->with(m::type(ResourceEntityType::class), m::type(ResourceEntityType::class), 'morphTarget', 'morph')
+            ->times(2);
         $meta->shouldReceive('addResourceReferencePropertyBidirectional')
-            ->with(m::type(ResourceType::class), m::type(ResourceType::class), 'morph', 'morphTarget')->never();
+            ->with(m::type(ResourceEntityType::class), m::type(ResourceEntityType::class), 'morph', 'morphTarget')
+            ->never();
 
         App::instance('metadata', $meta);
 

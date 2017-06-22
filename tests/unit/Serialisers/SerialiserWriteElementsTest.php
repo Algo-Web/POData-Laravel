@@ -82,12 +82,12 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestModels');
         $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestModels');
 
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
-        $testModel = new TestModel($meta, null);
+        $testModel = new TestModel($metadata, null);
         App::instance(TestModel::class, $testModel);
 
         $op = new OperationContextAdapter($request);
@@ -112,9 +112,13 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
 
         $blankProp = new ODataPropertyContent();
 
-        $models = [new TestModel(), new TestModel()];
-        $models[0]->id = 1;
-        $models[1]->id = 2;
+        $models = [];
+        for ($i = 1; $i < 300; $i++) {
+            $model = new TestModel($metadata, null);
+            $model->id = $i;
+            $models[] = $model;
+        }
+
         $objectResult = $object->writeTopLevelElements($models);
         $ironicResult = $ironic->writeTopLevelElements($models);
         foreach ($objectResult->entries as $entry) {
