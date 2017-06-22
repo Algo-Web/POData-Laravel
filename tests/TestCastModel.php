@@ -3,19 +3,22 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
-use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Concerns\HasAttributes;
+use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Model as Model;
-use Mockery as m;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Schema\Builder as SchemaBuilder;
 
-class TestGetterModel extends Model
+class TestCastModel extends Model
 {
     use MetadataTrait {
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
         // not bury ourselves under a stack overflow and segfault
     }
+    use BuildsQueries;
 
     protected $metaArray;
+
+    protected $casts = ['is_bool' => 'boolean'];
 
     public function __construct(array $meta = null, $endpoint = null)
     {
@@ -25,17 +28,12 @@ class TestGetterModel extends Model
         if (isset($endpoint)) {
             $this->endpoint = $endpoint;
         }
-        $this->dateFormat = 'Y-m-d H:i:s.u';
-        $this->name = 'Name';
-        $this->added_at = new \DateTime();
-        $this->weight = 42;
-        $this->code = 'ABC';
         parent::__construct();
     }
 
     public function getTable()
     {
-        return 'testgettermodel';
+        return 'testmodel';
     }
 
     public function getConnectionName()
@@ -43,9 +41,23 @@ class TestGetterModel extends Model
         return 'testconnection';
     }
 
+    protected function getAllAttributes()
+    {
+        return ['id' => 0, 'name' => '', 'added_at' => '', 'weight' => '', 'code' => '', 'is_bool' => 0];
+    }
+
     public function getFillable()
     {
         return [ 'name', 'added_at', 'weight', 'code'];
+    }
+
+    public static function findOrFail($id, $columns = ['*'])
+    {
+        if (!is_numeric($id) || !is_int($id) || 0 >= $id) {
+            throw (new ModelNotFoundException)->setModel(TestModel::class, $id);
+        } else {
+            return new self;
+        }
     }
 
     public function metadata()
@@ -54,15 +66,5 @@ class TestGetterModel extends Model
             return $this->metaArray;
         }
         return $this->traitmetadata();
-    }
-    
-    public function getWeightCodeAttribute()
-    {
-        return $this->weight . $this->code;
-    }
-
-    public function getweightAttribute()
-    {
-        return $this->attributes['weight'] * 10;
     }
 }
