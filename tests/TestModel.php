@@ -27,6 +27,7 @@ class TestModel extends Model
             $this->endpoint = $endpoint;
         }
         parent::__construct();
+        $this->dateFormat = 'Y-m-d H:i:s.u';
     }
 
     public function getTable()
