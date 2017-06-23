@@ -38,6 +38,7 @@ class TestCase extends BaseTestCase
             define('PODATA_LARAVEL_APP_ROOT_NAMESPACE', 'AlgoWeb\PODataLaravel');
         }
         parent::setUp();
+        date_default_timezone_set('UTC');
         $this->origFacade['cache'] = Cache::getFacadeRoot();
         //$this->origFacade['schema'] = Schema::getFacadeRoot();
     }

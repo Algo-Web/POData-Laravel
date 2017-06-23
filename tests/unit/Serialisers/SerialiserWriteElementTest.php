@@ -335,6 +335,8 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
     public function testCompareSingleModelWithOffWallMetadata()
     {
+        $serialiser = new ModelSerialiser();
+        $serialiser->reset();
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestModels');
         $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestModels');
