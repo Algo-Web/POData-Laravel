@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Controllers;
 
+use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -32,6 +33,8 @@ class ODataController extends BaseController
         $meta = App::make('metadata');
 
         $service = new DataService($query, $meta, $host);
+        $cereal = new IronicSerialiser($service, null);
+        $service = new DataService($query, $meta, $host, $cereal);
         $service->handleRequest();
 
         $odataResponse = $op->outgoingResponse();
