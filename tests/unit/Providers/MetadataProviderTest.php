@@ -68,7 +68,7 @@ class MetadataProviderTest extends TestCase
     public function testBootNoMigrations()
     {
         $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(false)->once();
+        $schema->shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(false)->once();
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->boot();
@@ -419,7 +419,7 @@ class MetadataProviderTest extends TestCase
     private function setUpSchemaFacade()
     {
         $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
+        $schema->shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(true);
         $schema->shouldReceive('hasTable')->andReturn(true);
         $schema->shouldReceive('getColumnListing')->andReturn([]);
     }

@@ -26,7 +26,7 @@ class MetadataProvider extends MetadataBaseProvider
         self::$METANAMESPACE = env('ODataMetaNamespace', 'Data');
         // If we aren't migrated, there's no DB tables to pull metadata _from_, so bail out early
         try {
-            if (!Schema::hasTable('migrations')) {
+            if (!Schema::hasTable(config('database.migrations'))) {
                 return;
             }
         } catch (\Exception $e) {
