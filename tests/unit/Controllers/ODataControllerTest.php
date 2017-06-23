@@ -36,7 +36,8 @@ class ODataControllerTest extends TestCase
 //        $this->object  = \Mockery::mock('\AlgoWeb\PODataLaravel\Controllers\ODataController')->makePartial();
         $this->getMockBuilder('App\Http\Controllers\Controller')->getMock();
 //        $this->mock = \Mockery::mock('App\Http\Controllers\Controller', 'Post');
-        $this->object  = \Mockery::mock('\AlgoWeb\PODataLaravel\Controllers\ODataController')->makePartial();
+        $this->object  = \Mockery::mock('\AlgoWeb\PODataLaravel\Controllers\ODataController')
+            ->makePartial()->shouldAllowMockingProtectedMethods();
         $this->query = m::mock(LaravelQuery::class)->makePartial();
         $this->meta = m::mock(SimpleMetadataProvider::class)->makePartial();
         App::instance('odataquery', $this->query);
@@ -52,11 +53,9 @@ class ODataControllerTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Controllers\ODataController::index
-     */
     public function testIndexMalformedBaseService()
     {
+        $this->object->shouldReceive('getIsDumping')->passthru()->once();
         $request = m::mock(Request::class)->makePartial();
         $request->shouldReceive('getMethod')->andReturn('GET');
         $request->shouldReceive('getQueryString')->andReturn('http://192.168.2.1/abm-master/public/odata.svc');
