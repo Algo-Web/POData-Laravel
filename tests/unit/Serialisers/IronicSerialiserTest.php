@@ -272,4 +272,23 @@ class IronicSerialiserTest extends SerialiserTestBase
         $this->assertTrue($foo->needNextPageLink(10));
         $this->assertFalse($foo->needNextPageLink(11));
     }
+
+    public function testSetService()
+    {
+        $oldUrl = 'http://localhost/odata.svc/Models';
+        $newUrl = 'http://localhost/megamix.svc/Models';
+
+        $mockService = m::mock(IService::class);
+        $mockService->shouldReceive('getHost->getAbsoluteServiceUri->getUrlAsString')
+            ->andReturn($oldUrl);
+
+        $newService = m::mock(IService::class);
+        $newService->shouldReceive('getHost->getAbsoluteServiceUri->getUrlAsString')
+            ->andReturn($newUrl);
+
+        $foo = new IronicSerialiserDummy($mockService, null);
+        $this->assertEquals($oldUrl, $foo->getService()->getHost()->getAbsoluteServiceUri()->getUrlAsString());
+        $foo->setService($newService);
+        $this->assertEquals($newUrl, $foo->getService()->getHost()->getAbsoluteServiceUri()->getUrlAsString());
+    }
 }

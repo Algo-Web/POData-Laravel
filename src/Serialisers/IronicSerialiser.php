@@ -694,4 +694,16 @@ class IronicSerialiser implements IObjectSerialiser
             }
         }
     }
+
+    /**
+     * Gets the data service instance.
+     *
+     * @return IService
+     */
+    public function setService(IService $service)
+    {
+        $this->service = $service;
+        $this->absoluteServiceUri = $service->getHost()->getAbsoluteServiceUri()->getUrlAsString();
+        $this->absoluteServiceUriWithSlash = rtrim($this->absoluteServiceUri, '/') . '/';
+    }
 }
