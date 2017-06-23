@@ -12,6 +12,7 @@ use POData\ObjectModel\ODataFeed;
 use POData\ObjectModel\ODataLink;
 use POData\ObjectModel\ODataMediaLink;
 use POData\ObjectModel\ODataNavigationPropertyInfo;
+use POData\ObjectModel\ODataProperty;
 use POData\ObjectModel\ODataPropertyContent;
 use POData\ObjectModel\ODataURL;
 use POData\ObjectModel\ODataURLCollection;
@@ -21,7 +22,11 @@ use POData\Providers\Metadata\ResourcePropertyKind;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceSetWrapper;
 use POData\Providers\Metadata\ResourceType;
+use POData\Providers\Metadata\Type\Binary;
+use POData\Providers\Metadata\Type\Boolean;
+use POData\Providers\Metadata\Type\DateTime;
 use POData\Providers\Metadata\Type\IType;
+use POData\Providers\Metadata\Type\StringType;
 use POData\Providers\Query\QueryType;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjectionNode;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ProjectionNode;
@@ -78,6 +83,8 @@ class IronicSerialiser implements IObjectSerialiser
      */
     private $lightStack = [];
 
+    private $modelSerialiser;
+
     /**
      * @param IService           $service Reference to the data service instance
      * @param RequestDescription $request Type instance describing the client submitted request
@@ -90,6 +97,7 @@ class IronicSerialiser implements IObjectSerialiser
         $this->absoluteServiceUriWithSlash = rtrim($this->absoluteServiceUri, '/') . '/';
         $this->stack = new SegmentStack($request);
         $this->complexTypeInstanceCollection = [];
+        $this->modelSerialiser = new ModelSerialiser();
     }
 
     /**
@@ -113,9 +121,12 @@ class IronicSerialiser implements IObjectSerialiser
         $resourceType = $this->getService()->getProvidersWrapper()->resolveResourceType($topOfStack[0]);
         $rawProp = $resourceType->getAllProperties();
         $relProp = [];
+        $nonRelProp = [];
         foreach ($rawProp as $prop) {
             if ($prop->getResourceType() instanceof ResourceEntityType) {
                 $relProp[] = $prop;
+            } else {
+                $nonRelProp[$prop->getName()] = $prop;
             }
         }
 
@@ -133,7 +144,7 @@ class IronicSerialiser implements IObjectSerialiser
 
         list($mediaLink, $mediaLinks) = $this->writeMediaData($entryObject, $type, $relativeUri, $resourceType);
 
-        $propertyContent = new ODataPropertyContent();
+        $propertyContent = $this->writePrimitiveProperties($entryObject, $nonRelProp);
 
         $links = [];
         foreach ($relProp as $prop) {
@@ -156,29 +167,7 @@ class IronicSerialiser implements IObjectSerialiser
 
             $navProp = new ODataNavigationPropertyInfo($prop, $this->shouldExpandSegment($propName));
             if ($navProp->expanded) {
-                $nextName = $prop->getResourceType()->getName();
-                $nuLink->isExpanded = true;
-                $isCollection = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
-                $nuLink->isCollection = $isCollection;
-                $value = $entryObject->$propName;
-                array_push($this->lightStack, [$nextName, $propName]);
-                if (!$isCollection) {
-                    $expandedResult = $this->writeTopLevelElement($value);
-                } else {
-                    $expandedResult = $this->writeTopLevelElements($value);
-                }
-                $nuLink->expandedResult = $expandedResult;
-                if (!isset($nuLink->expandedResult)) {
-                    $nuLink->isCollection = null;
-                    $nuLink->isExpanded = null;
-                } else {
-                    if (isset($nuLink->expandedResult->selfLink)) {
-                        $nuLink->expandedResult->selfLink->title = $propName;
-                        $nuLink->expandedResult->selfLink->url = $nuLink->url;
-                        $nuLink->expandedResult->title = $propName;
-                        $nuLink->expandedResult->id = rtrim($this->absoluteServiceUri, '/') . '/' . $nuLink->url;
-                    }
-                }
+                $this->expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName);
             }
 
             $links[] = $nuLink;
@@ -618,6 +607,91 @@ class IronicSerialiser implements IObjectSerialiser
         if (0 == count($this->lightStack)) {
             $typeName = $this->getRequest()->getTargetResourceType()->getName();
             array_push($this->lightStack, [$typeName, $typeName]);
+        }
+    }
+
+    /**
+     * Convert the given primitive value to string.
+     * Note: This method will not handle null primitive value.
+     *
+     * @param IType &$primitiveResourceType        Type of the primitive property
+     *                                             whose value need to be converted
+     * @param mixed        $primitiveValue         Primitive value to convert
+     *
+     * @return string
+     */
+    private function primitiveToString(IType &$type, $primitiveValue)
+    {
+        if ($type instanceof Boolean) {
+            $stringValue = (true === $primitiveValue) ? 'true' : 'false';
+        } elseif ($type instanceof Binary) {
+            $stringValue = base64_encode($primitiveValue);
+        } elseif ($type instanceof DateTime && $primitiveValue instanceof \DateTime) {
+            $stringValue = $primitiveValue->format(\DateTime::ATOM);
+        } elseif ($type instanceof StringType) {
+            $stringValue = utf8_encode($primitiveValue);
+        } else {
+            $stringValue = strval($primitiveValue);
+        }
+
+        return $stringValue;
+    }
+
+    /**
+     * @param $entryObject
+     * @param $nonRelProp
+     * @return ODataPropertyContent
+     */
+    private function writePrimitiveProperties($entryObject, $nonRelProp)
+    {
+        $propertyContent = new ODataPropertyContent();
+        $cereal = $this->modelSerialiser->bulkSerialise($entryObject);
+        foreach ($cereal as $corn => $flake) {
+            if (!array_key_exists($corn, $nonRelProp)) {
+                continue;
+            }
+            $corn = strval($corn);
+            $rType = $nonRelProp[$corn]->getResourceType()->getInstanceType();
+            $subProp = new ODataProperty();
+            $subProp->name = $corn;
+            $subProp->value = isset($flake) ? $this->primitiveToString($rType, $flake) : null;
+            $subProp->typeName = $nonRelProp[$corn]->getResourceType()->getFullName();
+            $propertyContent->properties[] = $subProp;
+        }
+        return $propertyContent;
+    }
+
+    /**
+     * @param $entryObject
+     * @param $prop
+     * @param $nuLink
+     * @param $propKind
+     * @param $propName
+     */
+    private function expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName)
+    {
+        $nextName = $prop->getResourceType()->getName();
+        $nuLink->isExpanded = true;
+        $isCollection = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
+        $nuLink->isCollection = $isCollection;
+        $value = $entryObject->$propName;
+        array_push($this->lightStack, [$nextName, $propName]);
+        if (!$isCollection) {
+            $expandedResult = $this->writeTopLevelElement($value);
+        } else {
+            $expandedResult = $this->writeTopLevelElements($value);
+        }
+        $nuLink->expandedResult = $expandedResult;
+        if (!isset($nuLink->expandedResult)) {
+            $nuLink->isCollection = null;
+            $nuLink->isExpanded = null;
+        } else {
+            if (isset($nuLink->expandedResult->selfLink)) {
+                $nuLink->expandedResult->selfLink->title = $propName;
+                $nuLink->expandedResult->selfLink->url = $nuLink->url;
+                $nuLink->expandedResult->title = $propName;
+                $nuLink->expandedResult->id = rtrim($this->absoluteServiceUri, '/') . '/' . $nuLink->url;
+            }
         }
     }
 }

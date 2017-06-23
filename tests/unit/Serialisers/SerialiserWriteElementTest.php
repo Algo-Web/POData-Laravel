@@ -36,12 +36,12 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestModels');
         $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestModels');
 
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
-        $testModel = new TestModel($meta, null);
+        $testModel = new TestModel($metadata, null);
         $testModel->id = 1;
         App::instance(TestModel::class, $testModel);
 
@@ -64,14 +64,20 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $object = new ObjectModelSerializer($service, $processor->getRequest());
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
-        $model = new TestModel();
+        $model = new TestModel($metadata, null);
         $model->id = 4;
         $objectResult = $object->writeTopLevelElement($model);
         $ironicResult = $ironic->writeTopLevelElement($model);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
-        $objectResult->propertyContent = new ODataPropertyContent();
-        $ironicResult->propertyContent = new ODataPropertyContent();
         $this->assertEquals($objectResult, $ironicResult);
+        $numProperties = count($objectResult->propertyContent->properties);
+        for ($i = 0; $i < $numProperties; $i++) {
+            $propName = $objectResult->propertyContent->properties[$i]->name;
+            $objectVal = $objectResult->propertyContent->properties[$i]->value;
+            $ironicVal = $ironicResult->propertyContent->properties[$i]->value;
+            $this->assertEquals(isset($objectVal), isset($ironicVal), "Values for $propName differently null");
+            $this->assertEquals(is_string($objectVal), is_string($ironicVal), "Values for $propName not identical");
+        }
     }
 
     public function testCompareWriteSingleModelWithKeyPropertiesNulled()
@@ -80,12 +86,12 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestModels');
         $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestModels');
 
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
-        $testModel = new TestModel($meta, null);
+        $testModel = new TestModel($metadata, null);
         $testModel->id = null;
         App::instance(TestModel::class, $testModel);
 
@@ -108,7 +114,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $object = new ObjectModelSerializer($service, $processor->getRequest());
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
-        $model = new TestModel();
+        $model = new TestModel($metadata, null);
         $model->id = null;
 
         $expected = null;
@@ -139,12 +145,12 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicSources');
         $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestMonomorphicSources');
 
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $source = new TestMonomorphicSource($meta, null);
-        $target = new TestMonomorphicTarget($meta, null);
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $source = new TestMonomorphicSource($metadata, null);
+        $target = new TestMonomorphicTarget($metadata, null);
 
         App::instance(TestMonomorphicSource::class, $source);
         App::instance(TestMonomorphicTarget::class, $target);
@@ -168,14 +174,20 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $object = new ObjectModelSerializer($service, $processor->getRequest());
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
-        $model = new TestMonomorphicSource();
+        $model = new TestMonomorphicSource($metadata, null);
         $model->id = 42;
         $objectResult = $object->writeTopLevelElement($model);
         $ironicResult = $ironic->writeTopLevelElement($model);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
-        $objectResult->propertyContent = new ODataPropertyContent();
-        $ironicResult->propertyContent = new ODataPropertyContent();
         $this->assertEquals($objectResult, $ironicResult);
+        $numProperties = count($objectResult->propertyContent->properties);
+        for ($i = 0; $i < $numProperties; $i++) {
+            $propName = $objectResult->propertyContent->properties[$i]->name;
+            $objectVal = $objectResult->propertyContent->properties[$i]->value;
+            $ironicVal = $ironicResult->propertyContent->properties[$i]->value;
+            $this->assertEquals(isset($objectVal), isset($ironicVal), "Values for $propName differently null");
+            $this->assertEquals(is_string($objectVal), is_string($ironicVal), "Values for $propName not identical");
+        }
     }
 
     public function testCompareSingleModelAtSingletonEndOfRelation()
@@ -184,12 +196,12 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicTargets');
         $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestMonomorphicTargets');
 
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $source = new TestMonomorphicSource($meta, null);
-        $target = new TestMonomorphicTarget($meta, null);
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $source = new TestMonomorphicSource($metadata, null);
+        $target = new TestMonomorphicTarget($metadata, null);
 
         App::instance(TestMonomorphicSource::class, $source);
         App::instance(TestMonomorphicTarget::class, $target);
@@ -213,14 +225,20 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $object = new ObjectModelSerializer($service, $processor->getRequest());
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
-        $model = new TestMonomorphicTarget();
+        $model = new TestMonomorphicTarget($metadata, null);
         $model->id = 42;
         $objectResult = $object->writeTopLevelElement($model);
         $ironicResult = $ironic->writeTopLevelElement($model);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
-        $objectResult->propertyContent = new ODataPropertyContent();
-        $ironicResult->propertyContent = new ODataPropertyContent();
         $this->assertEquals($objectResult, $ironicResult);
+        $numProperties = count($objectResult->propertyContent->properties);
+        for ($i = 0; $i < $numProperties; $i++) {
+            $propName = $objectResult->propertyContent->properties[$i]->name;
+            $objectVal = $objectResult->propertyContent->properties[$i]->value;
+            $ironicVal = $ironicResult->propertyContent->properties[$i]->value;
+            $this->assertEquals(isset($objectVal), isset($ironicVal), "Values for $propName differently null");
+            $this->assertEquals(is_string($objectVal), is_string($ironicVal), "Values for $propName not identical");
+        }
     }
 
     public function testCompareSingleModelWithTwoExpandedProperties()
@@ -303,24 +321,72 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $this->assertTrue($objectResult->links[1]->isCollection);
         $ironicResult = $ironic->writeTopLevelElement($model);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
-        $objectResult->propertyContent = new ODataPropertyContent();
-        $ironicResult->propertyContent = new ODataPropertyContent();
-        $numLinks = count($objectResult->links);
-
-        for ($i = 0; $i < $numLinks; $i++) {
-            $objectResult->links[$i]->expandedResult->propertyContent = new ODataPropertyContent();
-            $ironicResult->links[$i]->expandedResult->propertyContent = new ODataPropertyContent();
-            $hasEntries = isset($objectResult->links[$i]->expandedResult->entries);
-            $entriesCount = $hasEntries ? count($objectResult->links[$i]->expandedResult->entries) : 0;
-            for ($j = 0; $j < $entriesCount; $j++) {
-                $objectResult->links[$i]->expandedResult->entries[$j]->propertyContent = new ODataPropertyContent();
-            }
-            $hasEntries = isset($ironicResult->links[$i]->expandedResult->entries);
-            $entriesCount = $hasEntries ? count($ironicResult->links[$i]->expandedResult->entries) : 0;
-            for ($j = 0; $j < $entriesCount; $j++) {
-                $ironicResult->links[$i]->expandedResult->entries[$j]->propertyContent = new ODataPropertyContent();
-            }
-        }
         $this->assertEquals($objectResult, $ironicResult, '', 0, 20);
+
+        $numProperties = count($objectResult->propertyContent->properties);
+        for ($i = 0; $i < $numProperties; $i++) {
+            $propName = $objectResult->propertyContent->properties[$i]->name;
+            $objectVal = $objectResult->propertyContent->properties[$i]->value;
+            $ironicVal = $ironicResult->propertyContent->properties[$i]->value;
+            $this->assertEquals(isset($objectVal), isset($ironicVal), "Values for $propName differently null");
+            $this->assertEquals(is_string($objectVal), is_string($ironicVal), "Values for $propName not identical");
+        }
+    }
+
+    public function testCompareSingleModelWithOffWallMetadata()
+    {
+        $serialiser = new ModelSerialiser();
+        $serialiser->reset();
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestModels');
+        $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestModels');
+
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['is_boolean'] = ['type' => 'boolean', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['created_at'] = ['type' => 'datetime', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $testModel = new TestModel($metadata, null);
+        $testModel->id = 1;
+        App::instance(TestModel::class, $testModel);
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri("/odata.svc/");
+
+        $classen = [TestModel::class];
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->boot();
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        // default data service
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $object = new ObjectModelSerializer($service, $processor->getRequest());
+        $ironic = new IronicSerialiser($service, $processor->getRequest());
+
+        $model = new TestModel($metadata, null);
+        $model->id = 4;
+        $model->name = 'Name';
+        $model->is_boolean = true;
+        $model->created_at = new \DateTime();
+        $objectResult = $object->writeTopLevelElement($model);
+        $ironicResult = $ironic->writeTopLevelElement($model);
+        $this->assertEquals(get_class($objectResult), get_class($ironicResult));
+        $this->assertEquals($objectResult, $ironicResult);
+        $numProperties = count($objectResult->propertyContent->properties);
+        for ($i = 0; $i < $numProperties; $i++) {
+            $propName = $objectResult->propertyContent->properties[$i]->name;
+            $objectVal = $objectResult->propertyContent->properties[$i]->value;
+            $ironicVal = $ironicResult->propertyContent->properties[$i]->value;
+            $this->assertEquals(isset($objectVal), isset($ironicVal), "Values for $propName differently null");
+            $this->assertEquals(is_string($objectVal), is_string($ironicVal), "Values for $propName not identical");
+        }
     }
 }

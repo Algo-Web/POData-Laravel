@@ -82,6 +82,7 @@ class ODataController extends BaseController
      */
     protected function getIsDumping()
     {
-        return true === env('APP_DUMP_REQUESTS', false);
+        $configDump = env('APP_DUMP_REQUESTS', false);
+        return true === $configDump;
     }
 }

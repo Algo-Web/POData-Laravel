@@ -62,19 +62,12 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $object = new ObjectModelSerializer($service, $processor->getRequest());
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
-        $blankProp = new ODataPropertyContent();
-
         $models = [new TestModel(), new TestModel()];
         $models[0]->id = 1;
         $models[1]->id = 2;
         $objectResult = $object->writeTopLevelElements($models);
         $ironicResult = $ironic->writeTopLevelElements($models);
-        foreach ($objectResult->entries as $entry) {
-            $entry->propertyContent = $blankProp;
-        }
-        foreach ($ironicResult->entries as $entry) {
-            $entry->propertyContent = $blankProp;
-        }
+
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
     }
@@ -124,12 +117,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
 
         $objectResult = $object->writeTopLevelElements($models);
         $ironicResult = $ironic->writeTopLevelElements($models);
-        foreach ($objectResult->entries as $entry) {
-            $entry->propertyContent = $blankProp;
-        }
-        foreach ($ironicResult->entries as $entry) {
-            $entry->propertyContent = $blankProp;
-        }
+
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
     }
@@ -176,17 +164,10 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $object = new ObjectModelSerializer($service, $request);
         $ironic = new IronicSerialiser($service, $request);
 
-        $blankProp = new ODataPropertyContent();
-
         $models = [$targ1, $targ2];
         $objectResult = $object->writeTopLevelElements($models);
         $ironicResult = $ironic->writeTopLevelElements($models);
-        foreach ($objectResult->entries as $entry) {
-            $entry->propertyContent = $blankProp;
-        }
-        foreach ($ironicResult->entries as $entry) {
-            $entry->propertyContent = $blankProp;
-        }
+
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
     }
@@ -250,16 +231,8 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
 
         $models = [$model, $model];
 
-        $blankProp = new ODataPropertyContent();
-
         $objectResult = $object->writeTopLevelElements($models);
         $ironicResult = $ironic->writeTopLevelElements($models);
-        foreach ($objectResult->entries as $entry) {
-            $entry->propertyContent = $blankProp;
-        }
-        foreach ($ironicResult->entries as $entry) {
-            $entry->propertyContent = $blankProp;
-        }
 
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
