@@ -21,12 +21,12 @@ class MetadataRouteProvider extends ServiceProvider
     {
         Route::any(
             'odata.svc/{section}',
-            [ 'uses' => 'AlgoWeb\PODataLaravel\Controllers\ODataController@index', 'middleware' => 'auth.basic']
+            [ 'uses' => 'AlgoWeb\PODataLaravel\Controllers\ODataController@index', 'middleware' => 'auth:api']
         )
             ->where(['section' => '.*']);
         Route::any(
             'odata.svc',
-            [ 'uses' => 'AlgoWeb\PODataLaravel\Controllers\ODataController@index', 'middleware' => 'auth.basic']
+            [ 'uses' => 'AlgoWeb\PODataLaravel\Controllers\ODataController@index', 'middleware' => 'auth:api']
         );
     }
 
