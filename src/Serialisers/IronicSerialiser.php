@@ -144,19 +144,7 @@ class IronicSerialiser implements IObjectSerialiser
 
         list($mediaLink, $mediaLinks) = $this->writeMediaData($entryObject, $type, $relativeUri, $resourceType);
 
-        $propertyContent = new ODataPropertyContent();
-        $cereal = $this->modelSerialiser->bulkSerialise($entryObject);
-        foreach ($cereal as $corn => $flake) {
-            if (!array_key_exists($corn, $nonRelProp)) {
-                continue;
-            }
-            $rType = $nonRelProp[$corn]->getResourceType()->getInstanceType();
-            $subProp = new ODataProperty();
-            $subProp->name = $corn;
-            $subProp->value = isset($flake) ? $this->primitiveToString($rType, $flake) : null;
-            $subProp->typeName = $nonRelProp[$corn]->getResourceType()->getFullName();
-            $propertyContent->properties[] = $subProp;
-        }
+        $propertyContent = $this->writePrimitiveProperties($entryObject, $nonRelProp);
 
         $links = [];
         foreach ($relProp as $prop) {
@@ -179,29 +167,7 @@ class IronicSerialiser implements IObjectSerialiser
 
             $navProp = new ODataNavigationPropertyInfo($prop, $this->shouldExpandSegment($propName));
             if ($navProp->expanded) {
-                $nextName = $prop->getResourceType()->getName();
-                $nuLink->isExpanded = true;
-                $isCollection = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
-                $nuLink->isCollection = $isCollection;
-                $value = $entryObject->$propName;
-                array_push($this->lightStack, [$nextName, $propName]);
-                if (!$isCollection) {
-                    $expandedResult = $this->writeTopLevelElement($value);
-                } else {
-                    $expandedResult = $this->writeTopLevelElements($value);
-                }
-                $nuLink->expandedResult = $expandedResult;
-                if (!isset($nuLink->expandedResult)) {
-                    $nuLink->isCollection = null;
-                    $nuLink->isExpanded = null;
-                } else {
-                    if (isset($nuLink->expandedResult->selfLink)) {
-                        $nuLink->expandedResult->selfLink->title = $propName;
-                        $nuLink->expandedResult->selfLink->url = $nuLink->url;
-                        $nuLink->expandedResult->title = $propName;
-                        $nuLink->expandedResult->id = rtrim($this->absoluteServiceUri, '/') . '/' . $nuLink->url;
-                    }
-                }
+                $this->expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName);
             }
 
             $links[] = $nuLink;
@@ -669,5 +635,63 @@ class IronicSerialiser implements IObjectSerialiser
         }
 
         return $stringValue;
+    }
+
+    /**
+     * @param $entryObject
+     * @param $nonRelProp
+     * @return ODataPropertyContent
+     */
+    private function writePrimitiveProperties($entryObject, $nonRelProp)
+    {
+        $propertyContent = new ODataPropertyContent();
+        $cereal = $this->modelSerialiser->bulkSerialise($entryObject);
+        foreach ($cereal as $corn => $flake) {
+            if (!array_key_exists($corn, $nonRelProp)) {
+                continue;
+            }
+            $corn = strval($corn);
+            $rType = $nonRelProp[$corn]->getResourceType()->getInstanceType();
+            $subProp = new ODataProperty();
+            $subProp->name = $corn;
+            $subProp->value = isset($flake) ? $this->primitiveToString($rType, $flake) : null;
+            $subProp->typeName = $nonRelProp[$corn]->getResourceType()->getFullName();
+            $propertyContent->properties[] = $subProp;
+        }
+        return $propertyContent;
+    }
+
+    /**
+     * @param $entryObject
+     * @param $prop
+     * @param $nuLink
+     * @param $propKind
+     * @param $propName
+     */
+    private function expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName)
+    {
+        $nextName = $prop->getResourceType()->getName();
+        $nuLink->isExpanded = true;
+        $isCollection = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
+        $nuLink->isCollection = $isCollection;
+        $value = $entryObject->$propName;
+        array_push($this->lightStack, [$nextName, $propName]);
+        if (!$isCollection) {
+            $expandedResult = $this->writeTopLevelElement($value);
+        } else {
+            $expandedResult = $this->writeTopLevelElements($value);
+        }
+        $nuLink->expandedResult = $expandedResult;
+        if (!isset($nuLink->expandedResult)) {
+            $nuLink->isCollection = null;
+            $nuLink->isExpanded = null;
+        } else {
+            if (isset($nuLink->expandedResult->selfLink)) {
+                $nuLink->expandedResult->selfLink->title = $propName;
+                $nuLink->expandedResult->selfLink->url = $nuLink->url;
+                $nuLink->expandedResult->title = $propName;
+                $nuLink->expandedResult->id = rtrim($this->absoluteServiceUri, '/') . '/' . $nuLink->url;
+            }
+        }
     }
 }
