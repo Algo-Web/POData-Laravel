@@ -17,6 +17,5 @@ class TestProvider extends MetadataBaseProvider
 
     public function register()
     {
-
     }
 }
