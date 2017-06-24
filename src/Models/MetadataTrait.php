@@ -560,6 +560,8 @@ trait MetadataTrait
             list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, !$isBelong);
 
             $keyName = $isBelong ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
+            $keySegments = explode('.', $keyName);
+            $keyName = $keySegments[count($keySegments) - 1];
             $localRaw = $isBelong ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
@@ -618,9 +620,19 @@ trait MetadataTrait
             $localName = $localSegments[count($localSegments) - 1];
 
             $first = $keyName;
-            $last = $localName;
+            $last = (isset($localName) && "" != $localName) ? $localName : $foo->getRelated()->getKeyName();
             $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
         }
+    }
+
+    /**
+     * SUpplemental function to retrieve cast array for Laravel versions that do not supply hasCasts
+     *
+     * @return array
+     */
+    public function retrieveCasts()
+    {
+        return $this->casts;
     }
 
     /**

@@ -14,4 +14,8 @@ class TestProvider extends MetadataBaseProvider
     {
         return parent::handlePostBoot($isCaching, $hasCache, $key, $meta);
     }
+
+    public function register()
+    {
+    }
 }
