@@ -14,7 +14,6 @@ class TestCastModel extends Model
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
         // not bury ourselves under a stack overflow and segfault
     }
-    use BuildsQueries;
 
     protected $metaArray;
 

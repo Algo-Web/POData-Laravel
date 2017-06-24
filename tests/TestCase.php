@@ -120,6 +120,7 @@ class TestCase extends BaseTestCase
             'database' => ':memory:',
             'prefix'   => '',
         ]]);
+        $app->config->set('app.aliases', []);
         $app->instance('cache.store', $cacheRepo);
         $app->instance('cache', $cacheStore);
         $app->instance('db', $database);
