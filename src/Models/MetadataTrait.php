@@ -16,7 +16,7 @@ trait MetadataTrait
 {
     protected static $methodPrimary = [];
     protected static $methodAlternate = [];
-    protected $eagerLoad = [];
+    protected $loadEagerRelations = [];
 
     /*
      * Array to record mapping between doctrine types and OData types
@@ -630,8 +630,8 @@ trait MetadataTrait
      */
     public function getEagerLoad()
     {
-        assert(is_array($this->eagerLoad));
-        return $this->eagerLoad;
+        assert(is_array($this->loadEagerRelations));
+        return $this->loadEagerRelations;
     }
 
     /**
@@ -643,6 +643,6 @@ trait MetadataTrait
     {
         $check = array_map('strval', $relations);
         assert($relations == $check, "All supplied relations must be resolvable to strings");
-        $this->eagerLoad = $relations;
+        $this->loadEagerRelations = $relations;
     }
 }
