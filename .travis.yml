@@ -11,7 +11,9 @@ before_script:
   - chmod 777 bootstrap/cache
   - ls -al bootstrap/
   - ls -al bootstrap/cache
+  - composer require laravel/framework:${LARAVEL_DEP} --no-update
   - composer install
+
 script:
   - mkdir -p build/logs
   - phpunit --coverage-clover build/logs/clover.xml
@@ -23,6 +25,8 @@ after_success:
   - coveralls
 
 env: # important!
+  - LARAVEL_DEP=5.1.*
+  - LARAVEL_DEP=">5.1.11"
 matrix:
   allow_failures:
   - php: nightly
