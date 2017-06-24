@@ -23,7 +23,7 @@ class ODataController extends BaseController
      */
     public function index(Request $request, $dump = false)
     {
-        $dump = $dump || $this->getIsDumping();
+        $dump = (true === $dump) || $this->getIsDumping();
         //$antiXss = new AntiXSS();
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
