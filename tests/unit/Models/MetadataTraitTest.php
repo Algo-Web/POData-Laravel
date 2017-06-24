@@ -571,4 +571,45 @@ class MetadataTraitTest extends TestCase
             $this->assertEquals($expected[$i], $result[$i]);
         }
     }
+
+    public function testGetSetEagerLoadGoodData()
+    {
+        $foo = new TestMonomorphicSource();
+        $relations = ['manySource', 'oneSource'];
+        $foo->setEagerLoad($relations);
+        $result = $foo->getEagerLoad();
+        $this->assertEquals($relations, $result);
+    }
+
+    public function testSetEagerLoadBadDataIsObject()
+    {
+        $foo = new TestMonomorphicSource();
+        $relations = [new \DateTime()];
+
+        $expected = "Object of class DateTime could not be converted to string";
+        $actual = null;
+
+        try {
+            $foo->setEagerLoad($relations);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testSetEagerLoadBadDataIsArray()
+    {
+        $foo = new TestMonomorphicSource();
+        $relations = [[]];
+
+        $expected = "Array to string conversion";
+        $actual = null;
+
+        try {
+            $foo->setEagerLoad($relations);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
 }

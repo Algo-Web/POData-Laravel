@@ -16,6 +16,7 @@ trait MetadataTrait
 {
     protected static $methodPrimary = [];
     protected static $methodAlternate = [];
+    protected $loadEagerRelations = [];
 
     /*
      * Array to record mapping between doctrine types and OData types
@@ -620,5 +621,28 @@ trait MetadataTrait
             $last = $localName;
             $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
         }
+    }
+
+    /**
+     * Return list of relations to be eager-loaded by Laravel query provider
+     *
+     * @return array
+     */
+    public function getEagerLoad()
+    {
+        assert(is_array($this->loadEagerRelations));
+        return $this->loadEagerRelations;
+    }
+
+    /**
+     * Set list of relations to be eager-loaded
+     *
+     * @param array $relations
+     */
+    public function setEagerLoad(array $relations)
+    {
+        $check = array_map('strval', $relations);
+        assert($relations == $check, "All supplied relations must be resolvable to strings");
+        $this->loadEagerRelations = $relations;
     }
 }
