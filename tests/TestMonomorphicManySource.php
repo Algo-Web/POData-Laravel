@@ -25,7 +25,11 @@ class TestMonomorphicManySource extends Model
         if (isset($connect)) {
             $this->connect = $connect;
         } else {
+            $this->processor = \Mockery::mock(\Illuminate\Database\Query\Processors\Processor::class)->makePartial();
+            $this->grammar = \Mockery::mock(\Illuminate\Database\Query\Grammars\Grammar::class)->makePartial();
             $connect = \Mockery::mock(Connection::class)->makePartial();
+            $connect->shouldReceive('getQueryGrammar')->andReturn($this->grammar);
+            $connect->shouldReceive('getPostProcessor')->andReturn($this->processor);
             $this->connect = $connect;
         }
         parent::__construct();
@@ -44,6 +48,11 @@ class TestMonomorphicManySource extends Model
     public function getConnectionName()
     {
         return 'testconnection';
+    }
+
+    public function getConnection()
+    {
+        return $this->connect;
     }
 
     public function metadata()
