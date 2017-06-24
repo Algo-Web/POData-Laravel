@@ -37,7 +37,7 @@ class ModelSerialiser
         if (!isset(self::$mutatorCache[$class])) {
             $getterz = [];
             $datez = $model->getDates();
-            $castz = method_exists($model, 'getCasts') ? $model->getCasts() : [];
+            $castz = $model->retrieveCasts();
             foreach ($keys as $key) {
                 if ($model->hasGetMutator($key) || in_array($key, $datez) || array_key_exists($key, $castz)) {
                     $getterz[] = $key;

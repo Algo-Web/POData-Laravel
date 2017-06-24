@@ -1008,7 +1008,7 @@ class LaravelQueryTest extends TestCase
         $key = m::mock(KeyDescriptor::class);
 
         $foo = new LaravelQuery();
-        $expected = 'No query results for model [AlgoWeb\\PODataLaravel\\Models\\TestModel] -1';
+        $expected = 'No query results for model [AlgoWeb\\PODataLaravel\\Models\\TestModel]';
         $actual = null;
         $expectedCode = 500;
         $actualCode = null;
@@ -1018,7 +1018,7 @@ class LaravelQueryTest extends TestCase
             $actual = $e->getMessage();
             $actualCode = $e->getStatusCode();
         }
-        $this->assertEquals($expected, $actual);
+        $this->assertStringStartsWith($expected, $actual);
         $this->assertEquals($expectedCode, $actualCode);
     }
 
