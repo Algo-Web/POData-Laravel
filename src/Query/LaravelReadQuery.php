@@ -106,7 +106,7 @@ class LaravelReadQuery
 
         if ($nullFilter) {
             // default no-filter case, palm processing off to database engine - is a lot faster
-            $resultSet = $sourceEntityInstance->skip($skipToken)->take($top)->get();
+            $resultSet = $sourceEntityInstance->skip($skipToken)->take($top)->with($eagerLoad)->get();
             $resultCount = $bulkSetCount;
         } elseif ($bigSet) {
             assert(isset($isvalid), "Filter closure not set");
@@ -137,7 +137,10 @@ class LaravelReadQuery
             $resultSet = $resultSet->slice($skipToken);
             $resultCount = $rawCount;
         } else {
-            $resultSet = $sourceEntityInstance->get();
+            if ($sourceEntityInstance instanceof Model) {
+                $sourceEntityInstance = $sourceEntityInstance->getQuery();
+            }
+            $resultSet = $sourceEntityInstance->with($eagerLoad)->get();
             $resultSet = $resultSet->filter($isvalid);
             $resultCount = $resultSet->count();
 

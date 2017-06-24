@@ -209,18 +209,18 @@ class LaravelQueryTest extends TestCase
 
         $rawResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class)
             ->makePartial();
-        $rawResult->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']))->never();
+        $rawResult->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']))->once();
         $rawResult->setQuery($rawBuilder);
+        $rawResult->shouldReceive('take')->andReturnSelf()->once();
+        $rawResult->shouldReceive('with')->andReturnSelf()->once();
         $this->assertTrue(null != ($rawResult->getQuery()->getProcessor()));
 
         $sourceEntity = \Mockery::mock(TestMorphManySource::class);
         $sourceEntity->shouldReceive('getEagerLoad')->andReturn([]);
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
         $sourceEntity->shouldReceive('newQuery')->andReturnSelf()->never();
-        $sourceEntity->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']))->once();
         $sourceEntity->shouldReceive('count')->andReturn(3)->once();
-        $sourceEntity->shouldReceive('skip')->andReturn($sourceEntity)->once();
-        $sourceEntity->shouldReceive('take')->andReturn($sourceEntity)->once();
+        $sourceEntity->shouldReceive('skip')->andReturn($rawResult)->once();
         App::instance($instanceType->name, $sourceEntity);
 
         $reader = new LaravelReadQuery();
@@ -238,11 +238,14 @@ class LaravelQueryTest extends TestCase
 
     public function testGetResourceSetWithNoInstance()
     {
+        $rawResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class)
+            ->makePartial();
+        $rawResult->shouldReceive('take')->andReturnSelf()->once();
+        $rawResult->shouldReceive('get')->andReturn(collect(['a', 'b']))->once();
+
         $testModel = m::mock(TestModel::class)->makePartial();
         $testModel->shouldReceive('count')->andReturn(2)->once();
-        $testModel->shouldReceive('skip')->andReturn($testModel)->once();
-        $testModel->shouldReceive('take')->andReturn($testModel)->once();
-        $testModel->shouldReceive('get')->andReturn(collect(['a', 'b']))->once();
+        $testModel->shouldReceive('skip')->andReturn($rawResult)->once();
         App::instance(TestModel::class, $testModel);
 
         $instance = new \StdClass();
@@ -316,19 +319,29 @@ class LaravelQueryTest extends TestCase
 
         $rawBuilder = $this->getBuilder();
 
+        $morphTarg = new TestMorphTarget();
+
         $rawResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class)
             ->makePartial();
         $rawResult->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']));
         $rawResult->setQuery($rawBuilder);
+        $rawResult->shouldReceive('with')->andReturnSelf()->never();
         $this->assertTrue(null != ($rawResult->getQuery()->getProcessor()));
 
         $resultSet = m::mock(\Illuminate\Support\Collection::class)->makePartial();
+        $resultSet->shouldReceive('get')->andReturn(collect([$morphTarg, $morphTarg, $morphTarg]));
         $resultSet->shouldReceive('count')->andReturn(3);
         $resultSet->shouldReceive('slice')->andReturnSelf()->once();
         $resultSet->shouldReceive('take')->andReturnSelf()->once();
         $resultSet->shouldReceive('filter')->andReturnSelf()->once();
 
+        $newQuery = m::mock(Builder::class)->makePartial();
+        $newQuery->shouldReceive('with')->andReturnSelf()->once();
+        $newQuery->shouldReceive('getModels')->andReturn([$morphTarg, $morphTarg, $morphTarg]);
+        $newQuery->shouldReceive('get')->andReturn($resultSet);
+
         $sourceEntity = \Mockery::mock(TestMorphManySource::class);
+        $sourceEntity->shouldReceive('getQuery')->andReturn($newQuery);
         $sourceEntity->shouldReceive('getEagerLoad')->andReturn([]);
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
         $sourceEntity->shouldReceive('orderBy')->withArgs(['hammer', 'asc'])->andReturnSelf()->once();
@@ -336,7 +349,6 @@ class LaravelQueryTest extends TestCase
         $sourceEntity->shouldReceive('count')->andReturn(3)->once();
         $sourceEntity->shouldReceive('skip')->andReturn($sourceEntity)->never();
         $sourceEntity->shouldReceive('take')->andReturn($sourceEntity)->never();
-        $sourceEntity->shouldReceive('get')->andReturn($resultSet)->once();
 
         $subPathSegment = m::mock(OrderBySubPathSegment::class);
         $subPathSegment->shouldReceive('getName')->andReturn('hammer');
@@ -359,7 +371,7 @@ class LaravelQueryTest extends TestCase
         $foo->shouldReceive('getReader')->andReturn($reader);
         $foo->shouldReceive('getSourceEntityInstance')->andReturn($rawResult);
 
-        $result = $foo->getResourceSet($queryType, $mockResource, $filter, $order, 5, 'skipToken', $sourceEntity);
+        $result = $foo->getResourceSet($queryType, $mockResource, $filter, $order, 5, 2, $sourceEntity);
         $this->assertTrue($result instanceof QueryResult);
         $this->assertEquals(3, $result->count);
         $this->assertEquals(null, $result->results);
@@ -381,11 +393,15 @@ class LaravelQueryTest extends TestCase
 
         $related = new TestMorphManySource();
 
+        $rawResult = \Mockery::mock(\Illuminate\Database\Eloquent\Builder::class)
+            ->makePartial();
+        $rawResult->shouldReceive('with')->andReturnSelf()->once();
+        $rawResult->shouldReceive('get')->andReturn(collect(['a']))->once();
+
         $source = m::mock(HasMany::class)->makePartial();
         $source->shouldReceive('getRelated')->andReturn($related);
-        $source->shouldReceive('get')->andReturn(collect(['a']))->once();
         $source->shouldReceive('skip')->andReturn($source)->once();
-        $source->shouldReceive('take')->andReturn($source)->once();
+        $source->shouldReceive('take')->andReturn($rawResult)->once();
         $source->shouldReceive('count')->andReturn(1)->once();
 
         $auth = new NullAuthProvider();
