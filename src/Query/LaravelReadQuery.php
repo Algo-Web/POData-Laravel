@@ -54,9 +54,17 @@ class LaravelReadQuery
             throw new InvalidArgumentException('Filter info must be either null or instance of FilterInfo.');
         }
 
+        $eagerLoad = [];
+
         $this->checkSourceInstance($sourceEntityInstance);
         if (null == $sourceEntityInstance) {
             $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
+        }
+
+        if ($sourceEntityInstance instanceof Model) {
+            $eagerLoad = $sourceEntityInstance->getEagerLoad();
+        } elseif ($sourceEntityInstance instanceof Relation) {
+            $eagerLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
         }
 
         $checkInstance = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : null;

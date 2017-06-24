@@ -214,6 +214,7 @@ class LaravelQueryTest extends TestCase
         $this->assertTrue(null != ($rawResult->getQuery()->getProcessor()));
 
         $sourceEntity = \Mockery::mock(TestMorphManySource::class);
+        $sourceEntity->shouldReceive('getEagerLoad')->andReturn([]);
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
         $sourceEntity->shouldReceive('newQuery')->andReturnSelf()->never();
         $sourceEntity->shouldReceive('get')->andReturn(collect(['eins', 'zwei', 'polizei']))->once();
@@ -328,6 +329,7 @@ class LaravelQueryTest extends TestCase
         $resultSet->shouldReceive('filter')->andReturnSelf()->once();
 
         $sourceEntity = \Mockery::mock(TestMorphManySource::class);
+        $sourceEntity->shouldReceive('getEagerLoad')->andReturn([]);
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
         $sourceEntity->shouldReceive('orderBy')->withArgs(['hammer', 'asc'])->andReturnSelf()->once();
         $sourceEntity->shouldReceive('orderBy')->withArgs(['hammer', 'desc'])->andReturnSelf()->once();
@@ -377,7 +379,10 @@ class LaravelQueryTest extends TestCase
 
         $queryType = QueryType::ENTITIES_WITH_COUNT();
 
+        $related = new TestMorphManySource();
+
         $source = m::mock(HasMany::class)->makePartial();
+        $source->shouldReceive('getRelated')->andReturn($related);
         $source->shouldReceive('get')->andReturn(collect(['a']))->once();
         $source->shouldReceive('skip')->andReturn($source)->once();
         $source->shouldReceive('take')->andReturn($source)->once();
