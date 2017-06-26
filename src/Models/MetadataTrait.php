@@ -401,8 +401,10 @@ trait MetadataTrait
         $getterz = [];
         $methods = get_class_methods($this);
         foreach ($methods as $method) {
-            if (starts_with($method, 'get') && ends_with($method, 'Attribute') && 'getAttribute' != $method) {
-                $getterz[] = $method;
+            if (12 < strlen($method) && 'get' == substr($method, 0, 3)) {
+                if ('Attribute' == substr($method, -9)) {
+                    $getterz[] = $method;
+                }
             }
         }
         $methods = [];
