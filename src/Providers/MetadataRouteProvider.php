@@ -47,9 +47,15 @@ class MetadataRouteProvider extends ServiceProvider
     {
         $auth_middleware = 'auth.basic';
 
-        $manager = App::make(\Illuminate\Contracts\Auth\Factory::class);
-        if ($manager->guard('api')) {
-            $auth_middleware = 'auth:api';
+        try {
+            if (class_exists(\Illuminate\Contracts\Auth\Factory::class)) {
+                $manager = App::make(\Illuminate\Contracts\Auth\Factory::class);
+                if ($manager->guard('api')) {
+                    $auth_middleware = 'auth:api';
+                }
+            }
+        } catch (\Exception $e) {
+
         }
 
         return $auth_middleware;
