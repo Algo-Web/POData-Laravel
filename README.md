@@ -48,59 +48,63 @@ retain cached metadata
 (thanks to @renanwilliam for the initial version of this list)
 
 * [ ] Full CRUD Support
-* [ ] $count
-* [ ] $filter
-  * [ ] Comparison Operators
-    * [ ] eq
-    * [ ] ne
-    * [ ] lt
-    * [ ] le
-    * [ ] gt
-    * [ ] ge
-  * [ ] Logical Operators
-    * [ ] and
-    * [ ] or
-    * [ ] not
-  * [ ] Comparison Operators
-    * [ ] has
-  * [ ] String Functions
-    * [ ] indexof
-    * [ ] contains
-    * [ ] endswith
-    * [ ] startswith
-    * [ ] length
-    * [ ] substring
-    * [ ] tolower
-    * [ ] toupper
-    * [ ] trim
-    * [ ] concat
-  * [ ] Arithmetic Operators
-    * [ ] add
-    * [ ] sub
-    * [ ] mul
-    * [ ] div
-    * [ ] mod
-  * [ ] Date Functions
-    * [ ] year
-    * [ ] month
-    * [ ] day
-    * [ ] hour
-    * [ ] minute
-    * [ ] second
-    * [ ] fractionalseconds
-    * [ ] date
-    * [ ] time
-    * [ ] totaloffsetminutes
-    * [ ] now
-    * [ ] mindatetime
-    * [ ] maxdatetime
-  * [ ] Math Functions
-    * [ ] round
-    * [ ] floor
-    * [ ] ceiling
+* [x] $count
+* [x] $filter
+  * [x] Comparison Operators
+    * [x] eq
+    * [x] ne
+    * [x] lt
+    * [x] le
+    * [x] gt
+    * [x] ge
+  * [x] Logical Operators
+    * [x] and
+    * [x] or
+    * [x] not
+  * [x] Comparison Operators
+    * [x] has
+  * [x] String Functions
+    * [x] indexof
+    * [x] contains
+    * [x] endswith
+    * [x] startswith
+    * [x] length
+    * [x] substring
+    * [x] tolower
+    * [x] toupper
+    * [x] trim
+    * [x] concat
+  * [x] Arithmetic Operators
+    * [x] add
+    * [x] sub
+    * [x] mul
+    * [x] div
+    * [x] mod
+  * [x] Date Functions
+    * [x] year
+    * [x] month
+    * [x] day
+    * [x] hour
+    * [x] minute
+    * [x] second
+    * [x] fractionalseconds
+    * [x] date
+    * [x] time
+    * [x] totaloffsetminutes
+    * [x] now
+    * [x] mindatetime
+    * [x] maxdatetime
+  * [x] Math Functions
+    * [x] round
+    * [x] floor
+    * [x] ceiling
 * [x] $select
 * [x] $top
 * [x] $skip
+* [ ] $skiptoken
 * [x] $orderby
 * [x] $expand
 * [ ] $metadata generation (Nonstandard)
+
+The capabilities under $filter currently rely on the deprecated-in-PHP-7.2
+create_function capability.
