@@ -104,7 +104,6 @@ retain cached metadata
 * [ ] $skiptoken
 * [x] $orderby
 * [x] $expand
-* [ ] $metadata generation (Nonstandard)
 
 The capabilities under $filter currently rely on the deprecated-in-PHP-7.2
 create_function capability.
