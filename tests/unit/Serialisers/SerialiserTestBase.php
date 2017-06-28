@@ -14,7 +14,7 @@ class SerialiserTestBase extends TestCase
     protected function setUpSchemaFacade()
     {
         $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs(['migrations'])->andReturn(true);
+        $schema->shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(true);
         $schema->shouldReceive('hasTable')->andReturn(true);
         $schema->shouldReceive('getColumnListing')->andReturn([]);
 

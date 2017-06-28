@@ -1,5 +1,8 @@
 Unreleased
 ----------
+   * Add capability to use Laravel's passport authentication (if available)
+        Thank you to Renan William Alves de Paula
+        (renan@4success.com.br) for the patch
    * Add functionality to customise endpoint names
    * Only squash cli provider exceptions
    * Handle Laravel accessor methods (getFooAttribute)
