@@ -42,6 +42,10 @@ of the colliding models.
 * APP_METADATA_CACHE_DURATION - If caching, how long (in minutes) to
 retain cached metadata
 
+## Contributing
+
+See CONTRIBUTING.md for the details.
+
 
 ## Features Supported
 
