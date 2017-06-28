@@ -41,3 +41,66 @@ of the colliding models.
 * APP_METADATA_CACHING - Whether or not to turn model metadata caching on
 * APP_METADATA_CACHE_DURATION - If caching, how long (in minutes) to
 retain cached metadata
+
+
+## Features Supported
+
+(thanks to @renanwilliam for the initial version of this list)
+
+* [ ] Full CRUD Support
+* [ ] $count
+* [ ] $filter
+  * [ ] Comparison Operators
+    * [ ] eq
+    * [ ] ne
+    * [ ] lt
+    * [ ] le
+    * [ ] gt
+    * [ ] ge
+  * [ ] Logical Operators
+    * [ ] and
+    * [ ] or
+    * [ ] not
+  * [ ] Comparison Operators
+    * [ ] has
+  * [ ] String Functions
+    * [ ] indexof
+    * [ ] contains
+    * [ ] endswith
+    * [ ] startswith
+    * [ ] length
+    * [ ] substring
+    * [ ] tolower
+    * [ ] toupper
+    * [ ] trim
+    * [ ] concat
+  * [ ] Arithmetic Operators
+    * [ ] add
+    * [ ] sub
+    * [ ] mul
+    * [ ] div
+    * [ ] mod
+  * [ ] Date Functions
+    * [ ] year
+    * [ ] month
+    * [ ] day
+    * [ ] hour
+    * [ ] minute
+    * [ ] second
+    * [ ] fractionalseconds
+    * [ ] date
+    * [ ] time
+    * [ ] totaloffsetminutes
+    * [ ] now
+    * [ ] mindatetime
+    * [ ] maxdatetime
+  * [ ] Math Functions
+    * [ ] round
+    * [ ] floor
+    * [ ] ceiling
+* [x] $select
+* [x] $top
+* [x] $skip
+* [x] $orderby
+* [x] $expand
+* [ ] $metadata generation (Nonstandard)
