@@ -94,7 +94,6 @@ class MetadataProviderTest extends TestCase
         App::instance('metadata', $meta);
 
         $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
-        $cache->shouldReceive('has')->withArgs(['metadata'])->andReturn(true)->once();
         $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn('aybabtu')->once();
         Cache::swap($cache);
 
@@ -129,8 +128,7 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
-        $cache->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
-        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn('aybabtu')->never();
+        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->once();
         Cache::swap($cache);
 
@@ -157,7 +155,7 @@ class MetadataProviderTest extends TestCase
         App::instance('metadata', $meta);
 
         $cacheStore = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
-        $cacheStore->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
+        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cacheStore->shouldReceive('forget')->withArgs(['metadata'])->andReturnNull()->once();
         Cache::swap($cacheStore);
 
@@ -191,7 +189,7 @@ class MetadataProviderTest extends TestCase
         App::instance('metadata', $meta);
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
+        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCandidateModels')->andReturn([TestModel::class]);
@@ -209,7 +207,7 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
+        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
 
         $classen = [TestMonomorphicOneAndManySource::class, TestMonomorphicOneAndManyTarget::class,
             TestMorphManyToManyTarget::class, TestMorphManyToManySource::class, TestMonomorphicSource::class,
@@ -249,7 +247,7 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
+        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
 
         $classen = [TestMorphManySource::class, TestMorphTarget::class];
 
@@ -297,7 +295,7 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
+        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
 
         $classen = [TestGetterModel::class, TestMorphManySource::class, TestMorphOneSource::class,
             TestMorphTarget::class, TestMonomorphicManySource::class, TestMonomorphicManyTarget::class,
@@ -350,7 +348,7 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('has')->withArgs(['metadata'])->andReturn(false)->once();
+        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
 
         $auth = Auth::getFacadeRoot();
         $auth->shouldReceive('user')->andReturn($testModel)->once();
