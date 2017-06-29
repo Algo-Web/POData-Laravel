@@ -34,10 +34,10 @@ class MetadataProvider extends MetadataBaseProvider
         }
 
         $isCaching = true === $this->getIsCaching();
-        $hasCache = Cache::has('metadata');
+        $meta = Cache::get('metadata');
+        $hasCache = null != $meta;
 
         if ($isCaching && $hasCache) {
-            $meta = Cache::get('metadata');
             App::instance('metadata', $meta);
             return;
         }
