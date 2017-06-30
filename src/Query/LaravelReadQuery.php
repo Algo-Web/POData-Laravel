@@ -93,12 +93,12 @@ class LaravelReadQuery
             $skip = 0;
         }
 
-        if (null == $filterInfo && null == $orderBy && null == $top && 0 == $skip && null != $skipToken) {
-            $skip = $sourceEntityInstance->where($sourceEntityInstance->getKeyName(), '<', $skipToken)->count();
-        }
-
         if (!isset($top)) {
             $top = PHP_INT_MAX;
+        }
+
+        if (null == $filterInfo && null == $orderBy && 0 == $skip && null != $skipToken) {
+            $skip = $sourceEntityInstance->where($sourceEntityInstance->getKeyName(), '<', $skipToken)->count();
         }
 
         $nullFilter = true;
