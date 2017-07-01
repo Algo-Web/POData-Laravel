@@ -137,7 +137,7 @@ class LaravelQueryTest extends TestCase
         $actual = null;
 
         try {
-            $foo->getResourceSet($query, $resourceSet, null, null, null, null, $source);
+            $foo->getResourceSet($query, $resourceSet, null, null, null, null, null, $source);
         } catch (InvalidArgumentException $e) {
             $actual = $e->getMessage();
         }
@@ -156,7 +156,7 @@ class LaravelQueryTest extends TestCase
         $actual = null;
 
         try {
-            $foo->getResourceSet($query, $resourceSet, null, null, null, null, $source);
+            $foo->getResourceSet($query, $resourceSet, null, null, null, null, null, $source);
         } catch (InvalidArgumentException $e) {
             $actual = $e->getMessage();
         }
@@ -180,7 +180,7 @@ class LaravelQueryTest extends TestCase
         $actualCode = null;
 
         try {
-            $foo->getResourceSet($query, $resourceSet, null, null, null, null, $source);
+            $foo->getResourceSet($query, $resourceSet, null, null, null, null, null, $source);
         } catch (ODataException $e) {
             $actual = $e->getMessage();
             $actualCode = $e->getStatusCode();
@@ -371,7 +371,7 @@ class LaravelQueryTest extends TestCase
         $foo->shouldReceive('getReader')->andReturn($reader);
         $foo->shouldReceive('getSourceEntityInstance')->andReturn($rawResult);
 
-        $result = $foo->getResourceSet($queryType, $mockResource, $filter, $order, 5, 2, $sourceEntity);
+        $result = $foo->getResourceSet($queryType, $mockResource, $filter, $order, 5, 2, null, $sourceEntity);
         $this->assertTrue($result instanceof QueryResult);
         $this->assertEquals(3, $result->count);
         $this->assertEquals(null, $result->results);
@@ -408,7 +408,7 @@ class LaravelQueryTest extends TestCase
         $foo = m::mock(LaravelReadQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getAuth')->andReturn($auth);
 
-        $result = $foo->getResourceSet($queryType, $mockResource, null, null, null, null, $source);
+        $result = $foo->getResourceSet($queryType, $mockResource, null, null, null, null, null, $source);
         $this->assertEquals(1, $result->count);
         $this->assertEquals(1, count($result->results));
     }
@@ -444,7 +444,7 @@ class LaravelQueryTest extends TestCase
         $foo = m::mock(LaravelReadQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getAuth')->andReturn($auth);
 
-        $result = $foo->getResourceSet($queryType, $mockResource, $filter, null, 2, 1, $source);
+        $result = $foo->getResourceSet($queryType, $mockResource, $filter, null, 2, 1, null, $source);
         $this->assertEquals(4, $result->count);
         $this->assertEquals(2, count($result->results));
         $res = $result->results;

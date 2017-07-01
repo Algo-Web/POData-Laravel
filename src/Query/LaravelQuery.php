@@ -87,7 +87,7 @@ class LaravelQuery implements IQueryProvider
      * @param int                       $top         number of records which need to be retrieved
      * @param int                       $skip        number of records which need to be skipped
      * @param SkipTokenInfo|null        $skipToken   value indicating what records to skip
-     * @param Model|Relation|null $sourceEntityInstance Starting point of query
+     * @param Model|Relation|null       $sourceEntityInstance Starting point of query
      *
      * @return QueryResult
      */
