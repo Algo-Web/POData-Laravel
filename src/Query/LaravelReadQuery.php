@@ -97,7 +97,9 @@ class LaravelReadQuery
             $top = PHP_INT_MAX;
         }
 
-        if (null == $filterInfo && null == $orderBy && 0 == $skip && null != $skipToken) {
+        $hasSkipToken = null !== $skipToken && is_string($skipToken) && !empty($skipToken);
+
+        if (null == $filterInfo && null == $orderBy && 0 == $skip && $hasSkipToken) {
             $skip = $sourceEntityInstance->where($sourceEntityInstance->getKeyName(), '<', $skipToken)->count();
         }
 
