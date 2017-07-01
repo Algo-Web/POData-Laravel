@@ -193,7 +193,8 @@ class LaravelReadQuery
         $filter = null,
         $orderBy = null,
         $top = null,
-        $skip = null
+        $skip = null,
+        $skipToken = null
     ) {
         if (!($sourceEntityInstance instanceof Model)) {
             throw new InvalidArgumentException('Source entity must be an Eloquent model.');
