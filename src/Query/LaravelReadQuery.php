@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use POData\Common\ODataException;
+use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
+use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
@@ -31,12 +33,13 @@ class LaravelReadQuery
      * IE: http://host/EntitySet
      *  http://host/EntitySet?$skip=10&$top=5&filter=Prop gt Value
      *
-     * @param QueryType $queryType indicates if this is a query for a count, entities, or entities with a count
-     * @param ResourceSet $resourceSet The entity set containing the entities to fetch
-     * @param FilterInfo $filterInfo represents the $filter parameter of the OData query.  NULL if no $filter specified
-     * @param mixed $orderBy sorted order if we want to get the data in some specific order
-     * @param int $top number of records which  need to be skip
-     * @param String $skipToken value indicating what records to skip
+     * @param QueryType                 $queryType   indicates if this is a query for a count, entities, or entities with a count
+     * @param ResourceSet               $resourceSet The entity set containing the entities to fetch
+     * @param FilterInfo                $filterInfo  represents the $filter parameter of the OData query.  NULL if no $filter specified
+     * @param null|InternalOrderByInfo  $orderBy     sorted order if we want to get the data in some specific order
+     * @param int                       $top         number of records which need to be retrieved
+     * @param int                       $skip        number of records which need to be skipped
+     * @param SkipTokenInfo|null        $skipToken   value indicating what records to skip
      * @param Model|Relation|null $sourceEntityInstance Starting point of query
      *
      * @return QueryResult
@@ -47,6 +50,7 @@ class LaravelReadQuery
         $filterInfo = null,
         $orderBy = null,
         $top = null,
+        $skip = null,
         $skipToken = null,
         $sourceEntityInstance = null
     ) {
@@ -85,8 +89,8 @@ class LaravelReadQuery
             }
         }
 
-        if (!isset($skipToken)) {
-            $skipToken = 0;
+        if (!isset($skip)) {
+            $skip = 0;
         }
         if (!isset($top)) {
             $top = PHP_INT_MAX;
@@ -106,7 +110,7 @@ class LaravelReadQuery
 
         if ($nullFilter) {
             // default no-filter case, palm processing off to database engine - is a lot faster
-            $resultSet = $sourceEntityInstance->skip($skipToken)->take($top)->with($eagerLoad)->get();
+            $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($eagerLoad)->get();
             $resultCount = $bulkSetCount;
         } elseif ($bigSet) {
             assert(isset($isvalid), "Filter closure not set");
@@ -117,24 +121,24 @@ class LaravelReadQuery
             // loop thru, chunk by chunk, to reduce chances of exhausting memory
             $sourceEntityInstance->chunk(
                 5000,
-                function ($results) use ($isvalid, &$skipToken, &$resultSet, &$rawCount, $rawTop) {
+                function ($results) use ($isvalid, &$skip, &$resultSet, &$rawCount, $rawTop) {
                     // apply filter
                     $results = $results->filter($isvalid);
                     // need to iterate through full result set to find count of items matching filter,
                     // so we can't bail out early
                     $rawCount += $results->count();
                     // now bolt on filtrate to accumulating result set if we haven't accumulated enough bitz
-                    if ($rawTop > $resultSet->count() + $skipToken) {
+                    if ($rawTop > $resultSet->count() + $skip) {
                         $resultSet = collect(array_merge($resultSet->all(), $results->all()));
-                        $sliceAmount = min($skipToken, $resultSet->count());
+                        $sliceAmount = min($skip, $resultSet->count());
                         $resultSet = $resultSet->slice($sliceAmount);
-                        $skipToken -= $sliceAmount;
+                        $skip -= $sliceAmount;
                     }
                 }
             );
 
             // clean up residual to-be-skipped records
-            $resultSet = $resultSet->slice($skipToken);
+            $resultSet = $resultSet->slice($skip);
             $resultCount = $rawCount;
         } else {
             if ($sourceEntityInstance instanceof Model) {
@@ -144,8 +148,8 @@ class LaravelReadQuery
             $resultSet = $resultSet->filter($isvalid);
             $resultCount = $resultSet->count();
 
-            if (isset($skipToken)) {
-                $resultSet = $resultSet->slice($skipToken);
+            if (isset($skip)) {
+                $resultSet = $resultSet->slice($skip);
             }
         }
 
@@ -193,7 +197,8 @@ class LaravelReadQuery
         $filter = null,
         $orderBy = null,
         $top = null,
-        $skip = null
+        $skip = null,
+        $skipToken = null
     ) {
         if (!($sourceEntityInstance instanceof Model)) {
             throw new InvalidArgumentException('Source entity must be an Eloquent model.');
