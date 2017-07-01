@@ -65,10 +65,17 @@ class LaravelReadQuery
             $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
         }
 
+        $hasSkipToken = null !== $skipToken && is_string($skipToken) && !empty($skipToken);
+        $skipTokenColumn = null;
+        $skipTokenDirection = '<';
+
         if ($sourceEntityInstance instanceof Model) {
             $eagerLoad = $sourceEntityInstance->getEagerLoad();
+            $skipTokenColumn = $hasSkipToken ? $sourceEntityInstance->getKeyName() : null;
+
         } elseif ($sourceEntityInstance instanceof Relation) {
             $eagerLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
+            $skipTokenColumn = $hasSkipToken ? $sourceEntityInstance->getRelated()->getKeyName() : null;
         }
 
         $checkInstance = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : null;
@@ -97,10 +104,8 @@ class LaravelReadQuery
             $top = PHP_INT_MAX;
         }
 
-        $hasSkipToken = null !== $skipToken && is_string($skipToken) && !empty($skipToken);
-
         if (null == $filterInfo && null == $orderBy && 0 == $skip && $hasSkipToken) {
-            $skip = $sourceEntityInstance->where($sourceEntityInstance->getKeyName(), '<', $skipToken)->count();
+            $skip = $sourceEntityInstance->where($skipTokenColumn, $skipTokenDirection, $skipToken)->count();
         }
 
         $nullFilter = true;
