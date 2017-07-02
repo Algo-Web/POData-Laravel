@@ -57,6 +57,9 @@ class LaravelReadQuery
         if (null != $filterInfo && !($filterInfo instanceof FilterInfo)) {
             throw new InvalidArgumentException('Filter info must be either null or instance of FilterInfo.');
         }
+        if (null != $skipToken && !($filterInfo instanceof SkipTokenInfo)) {
+            throw new InvalidArgumentException('Skip token must be either null or instance of SkipTokenInfo.');
+        }
 
         $eagerLoad = [];
 
