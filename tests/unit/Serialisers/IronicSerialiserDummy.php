@@ -23,4 +23,9 @@ class IronicSerialiserDummy extends IronicSerialiser
     {
         return parent::needNextPageLink($resultSetCount);
     }
+
+    public function getNextLinkUri(&$lastObject, $absoluteUri)
+    {
+        return parent::getNextLinkUri($lastObject, $absoluteUri);
+    }
 }
