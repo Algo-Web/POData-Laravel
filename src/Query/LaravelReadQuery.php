@@ -101,9 +101,10 @@ class LaravelReadQuery
             $parameters = [];
             $segments = $skipToken->getOrderByInfo()->getOrderByPathSegments();
             $values = $skipToken->getOrderByKeysInToken();
-            assert(count($values) == count($segments));
+            $numValues = count($values);
+            assert($numValues == count($segments));
 
-            for ($i = 0; $i < count($values); $i++) {
+            for ($i = 0; $i < $numValues; $i++) {
                 $relation = $segments[$i]->isAscending() ? '>=' : '<=';
                 $name = $segments[$i]->getSubPathSegments()[0]->getName();
                 $line = ['direction' => $relation, 'value' => $values[$i][0]];

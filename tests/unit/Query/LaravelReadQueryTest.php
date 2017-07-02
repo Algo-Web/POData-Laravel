@@ -35,7 +35,7 @@ class LaravelReadQueryTest extends TestCase
 
     public function testSkipTokenWithSegmentValueCountMismatch()
     {
-        $expected = 'assert(): assert(count($values) == count($segments)) failed';
+        $expected = 'assert():';
         $actual = null;
 
         $source = m::mock(TestModel::class)->makePartial();
@@ -55,7 +55,7 @@ class LaravelReadQueryTest extends TestCase
         } catch (\Exception $e) {
             $actual = $e->getMessage();
         }
-        $this->assertEquals($expected, $actual);
+        $this->assertStringStartsWith($expected, $actual);
     }
 
     public function testSkipTokenWithRootValueExcludedCountMismatch()
