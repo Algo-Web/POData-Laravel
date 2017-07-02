@@ -251,6 +251,7 @@ class LaravelReadQuery
             $orderBy,
             $top,
             $skip,
+            $skipToken,
             $results
         );
     }
