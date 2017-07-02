@@ -596,6 +596,7 @@ class IronicSerialiser implements IObjectSerialiser
     {
         $currentExpandedProjectionNode = $this->getCurrentExpandedProjectionNode();
         $internalOrderByInfo = $currentExpandedProjectionNode->getInternalOrderByInfo();
+        assert(null != $internalOrderByInfo);
         $numSegments = count($internalOrderByInfo->getOrderByPathSegments());
         $skipToken = $internalOrderByInfo->buildSkipTokenValue($lastObject);
         assert(!is_null($skipToken), '!is_null($skipToken)');

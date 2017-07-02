@@ -7,6 +7,7 @@ use POData\IService;
 use POData\Providers\Metadata\ResourceSetWrapper;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjectionNode;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\RootProjectionNode;
+use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
 use POData\UriProcessor\RequestDescription;
 
 class IronicSerialiserTest extends SerialiserTestBase
@@ -290,5 +291,43 @@ class IronicSerialiserTest extends SerialiserTestBase
         $this->assertEquals($oldUrl, $foo->getService()->getHost()->getAbsoluteServiceUri()->getUrlAsString());
         $foo->setService($newService);
         $this->assertEquals($newUrl, $foo->getService()->getHost()->getAbsoluteServiceUri()->getUrlAsString());
+    }
+
+    public function testGenerateNextLinkUrlNeedsPlainSkippage()
+    {
+        $object = new \stdClass();
+
+        $internalInfo = m::mock(InternalOrderByInfo::class)->makePartial();
+        $internalInfo->shouldReceive('buildSkipTokenValue')->andReturn('200');
+        $internalInfo->shouldReceive('getOrderByPathSegments')->andReturn(['a'])->once();
+
+        $node = m::mock(ExpandedProjectionNode::class)->makePartial();
+        $node->shouldReceive('getInternalOrderByInfo')->andReturn($internalInfo)->once();
+
+        $foo = m::mock(IronicSerialiserDummy::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $foo->shouldReceive('getCurrentExpandedProjectionNode')->andReturn($node)->once();
+
+        $expected = '?$skip=200';
+        $actual = $foo->getNextLinkUri($object, ' ');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGenerateNextLinkUrlNeedsSkipToken()
+    {
+        $object = new \stdClass();
+
+        $internalInfo = m::mock(InternalOrderByInfo::class)->makePartial();
+        $internalInfo->shouldReceive('buildSkipTokenValue')->andReturn('\'University+of+Loamshire\'');
+        $internalInfo->shouldReceive('getOrderByPathSegments')->andReturn(['a', 'b'])->once();
+
+        $node = m::mock(ExpandedProjectionNode::class)->makePartial();
+        $node->shouldReceive('getInternalOrderByInfo')->andReturn($internalInfo)->once();
+
+        $foo = m::mock(IronicSerialiserDummy::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $foo->shouldReceive('getCurrentExpandedProjectionNode')->andReturn($node)->once();
+
+        $expected = '?$skiptoken=\'University+of+Loamshire\'';
+        $actual = $foo->getNextLinkUri($object, ' ');
+        $this->assertEquals($expected, $actual);
     }
 }
