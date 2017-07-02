@@ -216,6 +216,7 @@ class LaravelQueryTest extends TestCase
         $this->assertTrue(null != ($rawResult->getQuery()->getProcessor()));
 
         $sourceEntity = \Mockery::mock(TestMorphManySource::class);
+        $sourceEntity->shouldReceive('getKeyName')->andReturn('id');
         $sourceEntity->shouldReceive('getEagerLoad')->andReturn([]);
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
         $sourceEntity->shouldReceive('newQuery')->andReturnSelf()->never();
@@ -341,6 +342,7 @@ class LaravelQueryTest extends TestCase
         $newQuery->shouldReceive('get')->andReturn($resultSet);
 
         $sourceEntity = \Mockery::mock(TestMorphManySource::class);
+        $sourceEntity->shouldReceive('getKeyName')->andReturn('id');
         $sourceEntity->shouldReceive('getQuery')->andReturn($newQuery);
         $sourceEntity->shouldReceive('getEagerLoad')->andReturn([]);
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
