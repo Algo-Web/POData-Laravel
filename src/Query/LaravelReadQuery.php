@@ -57,6 +57,9 @@ class LaravelReadQuery
         if (null != $filterInfo && !($filterInfo instanceof FilterInfo)) {
             throw new InvalidArgumentException('Filter info must be either null or instance of FilterInfo.');
         }
+        if (null != $skipToken && !($skipToken instanceof SkipTokenInfo)) {
+            throw new InvalidArgumentException('Skip token must be either null or instance of SkipTokenInfo.');
+        }
 
         $eagerLoad = [];
 
@@ -65,11 +68,15 @@ class LaravelReadQuery
             $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
         }
 
+        $keyName = null;
         if ($sourceEntityInstance instanceof Model) {
             $eagerLoad = $sourceEntityInstance->getEagerLoad();
+            $keyName = $sourceEntityInstance->getKeyName();
         } elseif ($sourceEntityInstance instanceof Relation) {
             $eagerLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
+            $keyName = $sourceEntityInstance->getRelated()->getKeyName();
         }
+        assert(isset($keyName));
 
         $checkInstance = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : null;
         $this->checkAuth($sourceEntityInstance, $checkInstance);
@@ -86,6 +93,31 @@ class LaravelReadQuery
                         $order->isAscending() ? 'asc' : 'desc'
                     );
                 }
+            }
+        }
+
+        // throttle up for trench run
+        if (null != $skipToken) {
+            $parameters = [];
+            $segments = $skipToken->getOrderByInfo()->getOrderByPathSegments();
+            $values = $skipToken->getOrderByKeysInToken();
+            $numValues = count($values);
+            assert($numValues == count($segments));
+
+            for ($i = 0; $i < $numValues; $i++) {
+                $relation = $segments[$i]->isAscending() ? '>=' : '<=';
+                $name = $segments[$i]->getSubPathSegments()[0]->getName();
+                $line = ['direction' => $relation, 'value' => $values[$i][0]];
+                $parameters[$name] = $line;
+            }
+
+            foreach ($parameters as $name => $line) {
+                $direction = $line['direction'];
+                if ($keyName == $name) {
+                    $direction = '!=';
+                }
+                $value = trim($line['value'], "\'");
+                $sourceEntityInstance = $sourceEntityInstance->where($name, $direction, $value);
             }
         }
 
