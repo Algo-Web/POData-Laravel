@@ -3,8 +3,11 @@
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use Mockery as m;
+use POData\Common\ODataConstants;
 use POData\IService;
+use POData\OperationContext\ServiceHost;
 use POData\Providers\Metadata\ResourceSetWrapper;
+use POData\SimpleDataService;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjectionNode;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\RootProjectionNode;
 use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
@@ -297,6 +300,25 @@ class IronicSerialiserTest extends SerialiserTestBase
     {
         $object = new \stdClass();
 
+        $host = m::mock(ServiceHost::class);
+        $host->shouldReceive('getQueryStringItem')
+            ->withArgs([ODataConstants::HTTPQUERY_STRING_FILTER])->andReturn(null)->once();
+        $host->shouldReceive('getQueryStringItem')
+            ->withArgs([ODataConstants::HTTPQUERY_STRING_EXPAND])->andReturn(null)->once();
+        $host->shouldReceive('getQueryStringItem')
+            ->withArgs([ODataConstants::HTTPQUERY_STRING_ORDERBY])->andReturn('CustomerTitle')->once();
+        $host->shouldReceive('getQueryStringItem')
+            ->withArgs([ODataConstants::HTTPQUERY_STRING_INLINECOUNT])->andReturn('all')->once();
+        $host->shouldReceive('getQueryStringItem')
+            ->withArgs([ODataConstants::HTTPQUERY_STRING_SELECT])->andReturn(null)->once();
+
+        $service = m::mock(SimpleDataService::class);
+        $service->shouldReceive('getHost')->andReturn($host);
+
+        $request = m::mock(RequestDescription::class);
+        $request->shouldReceive('getTopOptionCount')->andReturn(400)->once();
+        $request->shouldReceive('getTopCount')->andReturn(200)->once();
+
         $internalInfo = m::mock(InternalOrderByInfo::class)->makePartial();
         $internalInfo->shouldReceive('buildSkipTokenValue')->andReturn('200');
         $internalInfo->shouldReceive('getOrderByPathSegments')->andReturn(['a'])->once();
@@ -306,8 +328,10 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $foo = m::mock(IronicSerialiserDummy::class)->shouldAllowMockingProtectedMethods()->makePartial();
         $foo->shouldReceive('getCurrentExpandedProjectionNode')->andReturn($node)->once();
+        $foo->shouldReceive('getService')->andReturn($service);
+        $foo->shouldReceive('getRequest')->andReturn($request);
 
-        $expected = '?$skip=200';
+        $expected = '?$orderby=CustomerTitle&$inlinecount=all&$top=200&$skip=200';
         $actual = $foo->getNextLinkUri($object, ' ');
         $this->assertEquals($expected, $actual);
     }
@@ -315,6 +339,24 @@ class IronicSerialiserTest extends SerialiserTestBase
     public function testGenerateNextLinkUrlNeedsSkipToken()
     {
         $object = new \stdClass();
+
+        $host = m::mock(ServiceHost::class);
+        $host->shouldReceive('getQueryStringItem')
+            ->withArgs([ODataConstants::HTTPQUERY_STRING_FILTER])->andReturn(null)->once();
+        $host->shouldReceive('getQueryStringItem')
+            ->withArgs([ODataConstants::HTTPQUERY_STRING_EXPAND])->andReturn(null)->once();
+        $host->shouldReceive('getQueryStringItem')
+            ->withArgs([ODataConstants::HTTPQUERY_STRING_ORDERBY])->andReturn('CustomerTitle')->once();
+        $host->shouldReceive('getQueryStringItem')
+            ->withArgs([ODataConstants::HTTPQUERY_STRING_INLINECOUNT])->andReturn('all')->once();
+        $host->shouldReceive('getQueryStringItem')
+            ->withArgs([ODataConstants::HTTPQUERY_STRING_SELECT])->andReturn(null)->once();
+
+        $service = m::mock(SimpleDataService::class);
+        $service->shouldReceive('getHost')->andReturn($host);
+
+        $request = m::mock(RequestDescription::class);
+        $request->shouldReceive('getTopOptionCount')->andReturn(null)->once();
 
         $internalInfo = m::mock(InternalOrderByInfo::class)->makePartial();
         $internalInfo->shouldReceive('buildSkipTokenValue')->andReturn('\'University+of+Loamshire\'');
@@ -325,8 +367,10 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $foo = m::mock(IronicSerialiserDummy::class)->shouldAllowMockingProtectedMethods()->makePartial();
         $foo->shouldReceive('getCurrentExpandedProjectionNode')->andReturn($node)->once();
+        $foo->shouldReceive('getService')->andReturn($service);
+        $foo->shouldReceive('getRequest')->andReturn($request);
 
-        $expected = '?$skiptoken=\'University+of+Loamshire\'';
+        $expected = '?$orderby=CustomerTitle&$inlinecount=all&$skiptoken=\'University+of+Loamshire\'';
         $actual = $foo->getNextLinkUri($object, ' ');
         $this->assertEquals($expected, $actual);
     }
