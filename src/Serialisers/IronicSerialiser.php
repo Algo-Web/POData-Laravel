@@ -598,11 +598,58 @@ class IronicSerialiser implements IObjectSerialiser
         $internalOrderByInfo = $currentExpandedProjectionNode->getInternalOrderByInfo();
         assert(null != $internalOrderByInfo);
         $numSegments = count($internalOrderByInfo->getOrderByPathSegments());
+        $queryParameterString = $this->getNextPageLinkQueryParametersForRootResourceSet();
+
         $skipToken = $internalOrderByInfo->buildSkipTokenValue($lastObject);
         assert(!is_null($skipToken), '!is_null($skipToken)');
-        $token = (1 < $numSegments) ? '?$skiptoken=' : '?$skip=';
-        $skipToken = $token.$skipToken;
+        $token = (1 < $numSegments) ? '$skiptoken=' : '$skip=';
+        $skipToken = '?'.$queryParameterString.$token.$skipToken;
+
         return $skipToken;
+    }
+
+    /**
+     * Builds the string corresponding to query parameters for top level results
+     * (result set identified by the resource path) to be put in next page link.
+     *
+     * @return string|null string representing the query parameters in the URI
+     *                     query parameter format, NULL if there
+     *                     is no query parameters
+     *                     required for the next link of top level result set
+     */
+    protected function getNextPageLinkQueryParametersForRootResourceSet()
+    {
+        $queryParameterString = null;
+        foreach ([ODataConstants::HTTPQUERY_STRING_FILTER,
+                     ODataConstants::HTTPQUERY_STRING_EXPAND,
+                     ODataConstants::HTTPQUERY_STRING_ORDERBY,
+                     ODataConstants::HTTPQUERY_STRING_INLINECOUNT,
+                     ODataConstants::HTTPQUERY_STRING_SELECT, ] as $queryOption) {
+            $value = $this->getService()->getHost()->getQueryStringItem($queryOption);
+            if (!is_null($value)) {
+                if (!is_null($queryParameterString)) {
+                    $queryParameterString = $queryParameterString . '&';
+                }
+
+                $queryParameterString .= $queryOption . '=' . $value;
+            }
+        }
+
+        $topCountValue = $this->getRequest()->getTopOptionCount();
+        if (!is_null($topCountValue)) {
+            $remainingCount = $topCountValue - $this->getRequest()->getTopCount();
+            if (!is_null($queryParameterString)) {
+                $queryParameterString .= '&';
+            }
+
+            $queryParameterString .= ODataConstants::HTTPQUERY_STRING_TOP . '=' . $remainingCount;
+        }
+
+        if (!is_null($queryParameterString)) {
+            $queryParameterString .= '&';
+        }
+
+        return $queryParameterString;
     }
 
     private function loadStackIfEmpty()
