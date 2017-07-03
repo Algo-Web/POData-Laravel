@@ -12,6 +12,7 @@ use POData\ObjectModel\ObjectModelSerializer;
 use POData\ObjectModel\ODataPropertyContent;
 use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
+use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
 
 class SerialiserWriteUrlTest extends SerialiserTestBase
@@ -53,8 +54,11 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
         $model = new TestModel();
         $model->id = 4;
 
-        $objectResult = $object->writeUrlElement($model);
-        $ironicResult = $ironic->writeUrlElement($model);
+        $result = new QueryResult();
+        $result->results = $model;
+
+        $objectResult = $object->writeUrlElement($result);
+        $ironicResult = $ironic->writeUrlElement($result);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
     }
@@ -98,8 +102,14 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
         $model = new TestModel();
         $model->id = 4;
 
-        $objectResult = $object->writeUrlElements([$model]);
-        $ironicResult = $ironic->writeUrlElements([$model]);
+        $result = new QueryResult();
+        $result->results = $model;
+
+        $collection = new QueryResult();
+        $collection->results = [$result];
+
+        $objectResult = $object->writeUrlElements($collection);
+        $ironicResult = $ironic->writeUrlElements($collection);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
     }
@@ -144,8 +154,15 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
         $model = new TestModel();
         $model->id = 4;
 
-        $objectResult = $object->writeUrlElements([$model]);
-        $ironicResult = $ironic->writeUrlElements([$model]);
+        $result = new QueryResult();
+        $result->results = $model;
+
+        $collection = new QueryResult();
+        $collection->results = [$result];
+        $collection->hasMore = true;
+
+        $objectResult = $object->writeUrlElements($collection);
+        $ironicResult = $ironic->writeUrlElements($collection);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
     }

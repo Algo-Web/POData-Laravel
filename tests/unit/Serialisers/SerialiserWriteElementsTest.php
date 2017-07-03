@@ -20,6 +20,7 @@ use POData\ObjectModel\ODataPropertyContent;
 use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
 use POData\Providers\Metadata\SimpleMetadataProvider;
+use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
 use POData\SimpleDataService as DataService;
 use POData\UriProcessor\RequestDescription;
@@ -33,12 +34,12 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestModels');
         $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestModels');
 
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
-        $testModel = new TestModel($meta, null);
+        $testModel = new TestModel($metadata, null);
         App::instance(TestModel::class, $testModel);
 
         $op = new OperationContextAdapter($request);
@@ -62,11 +63,19 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $object = new ObjectModelSerializer($service, $processor->getRequest());
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
-        $models = [new TestModel(), new TestModel()];
+        $models = [new TestModel($metadata, null), new TestModel($metadata, null)];
         $models[0]->id = 1;
         $models[1]->id = 2;
-        $objectResult = $object->writeTopLevelElements($models);
-        $ironicResult = $ironic->writeTopLevelElements($models);
+
+        $results = [new QueryResult(), new QueryResult()];
+        $results[0]->results = $models[0];
+        $results[1]->results = $models[1];
+
+        $collection = new QueryResult();
+        $collection->results = $results;
+
+        $objectResult = $object->writeTopLevelElements($collection);
+        $ironicResult = $ironic->writeTopLevelElements($collection);
 
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
@@ -106,17 +115,19 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $object = new ObjectModelSerializer($service, $processor->getRequest());
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
-        $blankProp = new ODataPropertyContent();
-
-        $models = [];
+        $results = new QueryResult();
+        $results->hasMore = true;
+        $results->results = [];
         for ($i = 1; $i < 301; $i++) {
             $model = new TestModel($metadata, null);
             $model->id = $i;
-            $models[] = $model;
+            $res = new QueryResult();
+            $res->results = $model;
+            $results->results[] = $res;
         }
 
-        $objectResult = $object->writeTopLevelElements($models);
-        $ironicResult = $ironic->writeTopLevelElements($models);
+        $objectResult = $object->writeTopLevelElements($results);
+        $ironicResult = $ironic->writeTopLevelElements($results);
 
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
@@ -157,6 +168,13 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $targ2 = new TestMonomorphicTarget($metadata, null);
         $targ2->id = 5;
 
+        $results = [new QueryResult(), new QueryResult()];
+        $results[0]->results = $targ1;
+        $results[1]->results = $targ2;
+
+        $collection = new QueryResult();
+        $collection->results = $results;
+
         $service = new TestDataService($query, $meta, $host);
         $processor = $service->handleRequest();
         $request = $processor->getRequest();
@@ -164,9 +182,8 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $object = new ObjectModelSerializer($service, $request);
         $ironic = new IronicSerialiser($service, $request);
 
-        $models = [$targ1, $targ2];
-        $objectResult = $object->writeTopLevelElements($models);
-        $ironicResult = $ironic->writeTopLevelElements($models);
+        $objectResult = $object->writeTopLevelElements($collection);
+        $ironicResult = $ironic->writeTopLevelElements($collection);
 
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
@@ -229,10 +246,15 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $object = new ObjectModelSerializer($service, $request);
         $ironic = new IronicSerialiser($service, $request);
 
-        $models = [$model, $model];
+        $results = [new QueryResult(), new QueryResult()];
+        $results[0]->results = $model;
+        $results[1]->results = $model;
 
-        $objectResult = $object->writeTopLevelElements($models);
-        $ironicResult = $ironic->writeTopLevelElements($models);
+        $collection = new QueryResult();
+        $collection->results = $results;
+
+        $objectResult = $object->writeTopLevelElements($collection);
+        $ironicResult = $ironic->writeTopLevelElements($collection);
 
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
@@ -271,6 +293,9 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $object = new ObjectModelSerializer($service, $processor->getRequest());
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
+        $collection = new QueryResult();
+        $collection->results = null;
+
         $models = null;
         $expected = null;
         $expectedExceptionClass = null;
@@ -278,13 +303,13 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $actualExceptionClass = null;
 
         try {
-            $object->writeTopLevelElements($models);
+            $object->writeTopLevelElements($collection);
         } catch (\Exception $e) {
             $expectedExceptionClass = get_class($e);
             $expected = $e->getMessage();
         }
         try {
-            $ironic->writeTopLevelElements($models);
+            $ironic->writeTopLevelElements($collection);
         } catch (\Exception $e) {
             $actualExceptionClass = get_class($e);
             $actual = $e->getMessage();

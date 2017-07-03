@@ -199,6 +199,8 @@ class LaravelReadQuery
         if (QueryType::COUNT() == $queryType || QueryType::ENTITIES_WITH_COUNT() == $queryType) {
             $result->count = $resultCount;
         }
+        $hazMore = $bulkSetCount > $skip + count($resultSet);
+        $result->hasMore = $hazMore;
         return $result;
     }
 

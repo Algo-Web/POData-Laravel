@@ -27,9 +27,11 @@ use POData\Providers\Metadata\Type\Boolean;
 use POData\Providers\Metadata\Type\DateTime;
 use POData\Providers\Metadata\Type\IType;
 use POData\Providers\Metadata\Type\StringType;
+use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjectionNode;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ProjectionNode;
+use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
 use POData\UriProcessor\RequestDescription;
 use POData\UriProcessor\SegmentStack;
 
@@ -107,9 +109,9 @@ class IronicSerialiser implements IObjectSerialiser
      *
      * @return ODataEntry
      */
-    public function writeTopLevelElement($entryObject)
+    public function writeTopLevelElement(QueryResult $entryObject)
     {
-        if (!isset($entryObject)) {
+        if (!isset($entryObject->results)) {
             array_pop($this->lightStack);
             return null;
         }
@@ -136,15 +138,15 @@ class IronicSerialiser implements IObjectSerialiser
         $type = $resourceType->getFullName();
 
         $relativeUri = $this->getEntryInstanceKey(
-            $entryObject,
+            $entryObject->results,
             $resourceType,
             $resourceSet->getName()
         );
         $absoluteUri = rtrim($this->absoluteServiceUri, '/') . '/' . $relativeUri;
 
-        list($mediaLink, $mediaLinks) = $this->writeMediaData($entryObject, $type, $relativeUri, $resourceType);
+        list($mediaLink, $mediaLinks) = $this->writeMediaData($entryObject->results, $type, $relativeUri, $resourceType);
 
-        $propertyContent = $this->writePrimitiveProperties($entryObject, $nonRelProp);
+        $propertyContent = $this->writePrimitiveProperties($entryObject->results, $nonRelProp);
 
         $links = [];
         foreach ($relProp as $prop) {
@@ -198,9 +200,9 @@ class IronicSerialiser implements IObjectSerialiser
      *
      * @return ODataFeed
      */
-    public function writeTopLevelElements(&$entryObjects)
+    public function writeTopLevelElements(QueryResult &$entryObjects)
     {
-        assert(is_array($entryObjects), '!is_array($entryObjects)');
+        assert(is_array($entryObjects->results), '!is_array($entryObjects->results)');
 
         $this->loadStackIfEmpty();
         $setName = $this->getRequest()->getTargetResourceSetWrapper()->getName();
@@ -222,14 +224,19 @@ class IronicSerialiser implements IObjectSerialiser
         if ($this->getRequest()->queryType == QueryType::ENTITIES_WITH_COUNT()) {
             $odata->rowCount = $this->getRequest()->getCountValue();
         }
-        foreach ($entryObjects as $entry) {
-            $odata->entries[] = $this->writeTopLevelElement($entry);
+        foreach ($entryObjects->results as $entry) {
+            if (!$entry instanceof QueryResult) {
+                $query = new QueryResult();
+                $query->results = $entry;
+            } else {
+                $query = $entry;
+            }
+            $odata->entries[] = $this->writeTopLevelElement($query);
         }
 
-
-        if ($this->needNextPageLink(count($entryObjects))) {
+        if (true === $entryObjects->hasMore) {
             $stackSegment = $setName;
-            $lastObject = end($entryObjects);
+            $lastObject = end($entryObjects->results);
             $segment = $this->getNextLinkUri($lastObject, $absoluteUri);
             $nextLink = new ODataLink();
             $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
@@ -247,13 +254,13 @@ class IronicSerialiser implements IObjectSerialiser
      *
      * @return ODataURL
      */
-    public function writeUrlElement($entryObject)
+    public function writeUrlElement(QueryResult $entryObject)
     {
         $url = new ODataURL();
-        if (!is_null($entryObject)) {
+        if (!is_null($entryObject->results)) {
             $currentResourceType = $this->getCurrentResourceSetWrapper()->getResourceType();
             $relativeUri = $this->getEntryInstanceKey(
-                $entryObject,
+                $entryObject->results,
                 $currentResourceType,
                 $this->getCurrentResourceSetWrapper()->getName()
             );
@@ -272,19 +279,19 @@ class IronicSerialiser implements IObjectSerialiser
      *
      * @return ODataURLCollection
      */
-    public function writeUrlElements($entryObjects)
+    public function writeUrlElements(QueryResult $entryObjects)
     {
         $urls = new ODataURLCollection();
-        if (!empty($entryObjects)) {
+        if (!empty($entryObjects->results)) {
             $i = 0;
-            foreach ($entryObjects as $entryObject) {
+            foreach ($entryObjects->results as $entryObject) {
                 $urls->urls[$i] = $this->writeUrlElement($entryObject);
                 ++$i;
             }
 
-            if ($i > 0 && $this->needNextPageLink(count($entryObjects))) {
+            if ($i > 0 && true === $entryObjects->hasMore) {
                 $stackSegment = $this->getRequest()->getTargetResourceSetWrapper()->getName();
-                $lastObject = end($entryObjects);
+                $lastObject = end($entryObjects->results);
                 $segment = $this->getNextLinkUri($lastObject, $this->getRequest()->getRequestUrl()->getUrlAsString());
                 $nextLink = new ODataLink();
                 $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
@@ -313,7 +320,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @return ODataPropertyContent
      * @codeCoverageIgnore
      */
-    public function writeTopLevelComplexObject(&$complexValue, $propertyName, ResourceType &$resourceType)
+    public function writeTopLevelComplexObject(QueryResult &$complexValue, $propertyName, ResourceType &$resourceType)
     {
         // TODO: Figure out if we need to bother implementing this
     }
@@ -330,7 +337,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @codeCoverageIgnore
      * @return ODataPropertyContent
      */
-    public function writeTopLevelBagObject(&$BagValue, $propertyName, ResourceType &$resourceType)
+    public function writeTopLevelBagObject(QueryResult &$BagValue, $propertyName, ResourceType &$resourceType)
     {
         // TODO: Figure out if we need to bother implementing this
     }
@@ -347,7 +354,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @codeCoverageIgnore
      * @return ODataPropertyContent
      */
-    public function writeTopLevelPrimitive(&$primitiveValue, ResourceProperty &$resourceProperty = null)
+    public function writeTopLevelPrimitive(QueryResult &$primitiveValue, ResourceProperty &$resourceProperty = null)
     {
         // TODO: Figure out if we need to bother implementing this
     }
@@ -597,6 +604,8 @@ class IronicSerialiser implements IObjectSerialiser
         $currentExpandedProjectionNode = $this->getCurrentExpandedProjectionNode();
         $internalOrderByInfo = $currentExpandedProjectionNode->getInternalOrderByInfo();
         assert(null != $internalOrderByInfo);
+        assert(is_object($internalOrderByInfo));
+        assert($internalOrderByInfo instanceof InternalOrderByInfo, get_class($internalOrderByInfo));
         $numSegments = count($internalOrderByInfo->getOrderByPathSegments());
         $queryParameterString = $this->getNextPageLinkQueryParametersForRootResourceSet();
 
@@ -718,18 +727,20 @@ class IronicSerialiser implements IObjectSerialiser
      * @param $propKind
      * @param $propName
      */
-    private function expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName)
+    private function expandNavigationProperty(QueryResult $entryObject, $prop, $nuLink, $propKind, $propName)
     {
         $nextName = $prop->getResourceType()->getName();
         $nuLink->isExpanded = true;
         $isCollection = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
         $nuLink->isCollection = $isCollection;
-        $value = $entryObject->$propName;
+        $value = $entryObject->results->$propName;
+        $result = new QueryResult();
+        $result->results = $value;
         array_push($this->lightStack, [$nextName, $propName]);
         if (!$isCollection) {
-            $expandedResult = $this->writeTopLevelElement($value);
+            $expandedResult = $this->writeTopLevelElement($result);
         } else {
-            $expandedResult = $this->writeTopLevelElements($value);
+            $expandedResult = $this->writeTopLevelElements($result);
         }
         $nuLink->expandedResult = $expandedResult;
         if (!isset($nuLink->expandedResult)) {
