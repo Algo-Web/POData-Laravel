@@ -20,6 +20,7 @@ use POData\ObjectModel\ODataPropertyContent;
 use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
 use POData\Providers\Metadata\SimpleMetadataProvider;
+use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
 use POData\SimpleDataService as DataService;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjectionNode;
@@ -66,8 +67,12 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $model = new TestModel($metadata, null);
         $model->id = 4;
-        $objectResult = $object->writeTopLevelElement($model);
-        $ironicResult = $ironic->writeTopLevelElement($model);
+
+        $result = new QueryResult();
+        $result->results = $model;
+
+        $objectResult = $object->writeTopLevelElement($result);
+        $ironicResult = $ironic->writeTopLevelElement($result);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
         $numProperties = count($objectResult->propertyContent->properties);
@@ -117,19 +122,22 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $model = new TestModel($metadata, null);
         $model->id = null;
 
+        $result = new QueryResult();
+        $result->results = $model;
+
         $expected = null;
         $expectedExceptionClass = null;
         $actual = null;
         $actualExceptionClass = null;
 
         try {
-            $object->writeTopLevelElement($model);
+            $object->writeTopLevelElement($result);
         } catch (\Exception $e) {
             $expectedExceptionClass = get_class($e);
             $expected = $e->getMessage();
         }
         try {
-            $ironic->writeTopLevelElement($model);
+            $ironic->writeTopLevelElement($result);
         } catch (\Exception $e) {
             $actualExceptionClass = get_class($e);
             $actual = $e->getMessage();
@@ -176,8 +184,12 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $model = new TestMonomorphicSource($metadata, null);
         $model->id = 42;
-        $objectResult = $object->writeTopLevelElement($model);
-        $ironicResult = $ironic->writeTopLevelElement($model);
+
+        $result = new QueryResult();
+        $result->results = $model;
+
+        $objectResult = $object->writeTopLevelElement($result);
+        $ironicResult = $ironic->writeTopLevelElement($result);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
         $numProperties = count($objectResult->propertyContent->properties);
@@ -227,8 +239,12 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $model = new TestMonomorphicTarget($metadata, null);
         $model->id = 42;
-        $objectResult = $object->writeTopLevelElement($model);
-        $ironicResult = $ironic->writeTopLevelElement($model);
+
+        $result = new QueryResult();
+        $result->results = $model;
+
+        $objectResult = $object->writeTopLevelElement($result);
+        $ironicResult = $ironic->writeTopLevelElement($result);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
         $numProperties = count($objectResult->propertyContent->properties);
@@ -312,14 +328,18 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $model->shouldReceive('metadata')->andReturn($metadata);
         $model->id = 42;
 
-        $objectResult = $object->writeTopLevelElement($model);
+        $result = new QueryResult();
+        $result->results = $model;
+
+        $objectResult = $object->writeTopLevelElement($result);
 
         // check that object result is properly set up - if not, no point comparing it to anything
         $this->assertTrue($objectResult->links[0]->isExpanded);
         $this->assertFalse($objectResult->links[0]->isCollection);
         $this->assertTrue($objectResult->links[1]->isExpanded);
         $this->assertTrue($objectResult->links[1]->isCollection);
-        $ironicResult = $ironic->writeTopLevelElement($model);
+
+        $ironicResult = $ironic->writeTopLevelElement($result);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult, '', 0, 20);
 
@@ -376,8 +396,12 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $model->name = 'Name';
         $model->is_boolean = true;
         $model->created_at = new \DateTime();
-        $objectResult = $object->writeTopLevelElement($model);
-        $ironicResult = $ironic->writeTopLevelElement($model);
+
+        $result = new QueryResult();
+        $result->results = $model;
+
+        $objectResult = $object->writeTopLevelElement($result);
+        $ironicResult = $ironic->writeTopLevelElement($result);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
         $numProperties = count($objectResult->propertyContent->properties);
