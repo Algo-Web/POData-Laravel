@@ -647,11 +647,13 @@ class IronicSerialiser implements IObjectSerialiser
         $topCountValue = $this->getRequest()->getTopOptionCount();
         if (!is_null($topCountValue)) {
             $remainingCount = $topCountValue - $this->getRequest()->getTopCount();
-            if (!is_null($queryParameterString)) {
-                $queryParameterString .= '&';
-            }
+            if (0 < $remainingCount) {
+                if (!is_null($queryParameterString)) {
+                    $queryParameterString .= '&';
+                }
 
-            $queryParameterString .= ODataConstants::HTTPQUERY_STRING_TOP . '=' . $remainingCount;
+                $queryParameterString .= ODataConstants::HTTPQUERY_STRING_TOP . '=' . $remainingCount;
+            }
         }
 
         if (!is_null($queryParameterString)) {
