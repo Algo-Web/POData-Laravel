@@ -234,7 +234,12 @@ class IronicSerialiser implements IObjectSerialiser
             $odata->entries[] = $this->writeTopLevelElement($query);
         }
 
-        if (true === $entryObjects->hasMore) {
+        $resourceSet = $this->getRequest()->getTargetResourceSetWrapper()->getResourceSet();
+        $requestTop = $this->getRequest()->getTopOptionCount();
+        $pageSize = $this->getService()->getConfiguration()->getEntitySetPageSize($resourceSet);
+        $requestTop = (null == $requestTop) ? $pageSize + 1 : $requestTop;
+
+        if (true === $entryObjects->hasMore && $requestTop > $pageSize) {
             $stackSegment = $setName;
             $lastObject = end($entryObjects->results);
             $segment = $this->getNextLinkUri($lastObject, $absoluteUri);

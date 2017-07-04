@@ -109,7 +109,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $query = m::mock(LaravelQuery::class);
 
         $service = new TestDataService($query, $meta, $host);
-        $service->maxPageSize = 300;
+        $service->maxPageSize = 50;
 
         $processor = $service->handleRequest();
         $object = new ObjectModelSerializer($service, $processor->getRequest());
