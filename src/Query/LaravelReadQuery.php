@@ -99,6 +99,7 @@ class LaravelReadQuery
         // throttle up for trench run
         if (null != $skipToken) {
             $parameters = [];
+            $processed = [];
             $segments = $skipToken->getOrderByInfo()->getOrderByPathSegments();
             $values = $skipToken->getOrderByKeysInToken();
             $numValues = count($values);
