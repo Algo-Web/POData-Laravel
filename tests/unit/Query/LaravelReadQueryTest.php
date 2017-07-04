@@ -98,7 +98,7 @@ class LaravelReadQueryTest extends TestCase
     public function testSkipTokenWithTwoEffectiveColumns()
     {
         $source = $this->generateTestModelWithMetadata();
-        $source->getConnection()->shouldReceive('select')->andReturn(collect([]));
+        $source->getConnection()->shouldReceive('select')->andReturn([]);
 
         $query = QueryType::ENTITIES_WITH_COUNT();
         $resource = m::mock(ResourceSet::class);
