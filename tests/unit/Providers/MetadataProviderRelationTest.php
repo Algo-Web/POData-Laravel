@@ -36,18 +36,18 @@ class MetadataProviderRelationTest extends TestCase
         ];
         $expected[] = [
             "principalType" => TestMonomorphicSource::class,
-            "principalMult" => "0..1",
+            "principalMult" => "1",
             "principalProp" => "oneSource",
             "dependentType" => TestMonomorphicTarget::class,
-            "dependentMult" => "1",
+            "dependentMult" => "0..1",
             "dependentProp" => "oneTarget"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicSource::class,
-            "principalMult" => "*",
+            "principalMult" => "1",
             "principalProp" => "manySource",
             "dependentType" => TestMonomorphicTarget::class,
-            "dependentMult" => "1",
+            "dependentMult" => "*",
             "dependentProp" => "manyTarget"
         ];
         $expected[] = [
@@ -60,26 +60,26 @@ class MetadataProviderRelationTest extends TestCase
         ];
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
-            "principalMult" => "*",
+            "principalMult" => "1",
             "principalProp" => "manyTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
-            "dependentMult" => "1",
+            "dependentMult" => "*",
             "dependentProp" => "manySource"
         ];
         $expected[] = [
             "principalType" => TestMorphManySource::class,
-            "principalMult" => "*",
+            "principalMult" => "1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
-            "dependentMult" => "1",
+            "dependentMult" => "*",
             "dependentProp" => "morph"
         ];
         $expected[] = [
             "principalType" => TestMorphOneSource::class,
-            "principalMult" => "0..1",
+            "principalMult" => "1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
-            "dependentMult" => "1",
+            "dependentMult" => "0..1",
             "dependentProp" => "morph"
         ];
 

@@ -294,18 +294,18 @@ class MetadataProvider extends MetadataBaseProvider
     ) {
         $forward = [
             'principalType' => $principalType,
-            'principalMult' => $principalMult,
+            'principalMult' => $dependentMult,
             'principalProp' => $principalProperty,
             'dependentType' => $dependentType,
-            'dependentMult' => $dependentMult,
+            'dependentMult' => $principalMult,
             'dependentProp' => $dependentProperty
         ];
         $reverse = [
             'principalType' => $dependentType,
-            'principalMult' => $dependentMult,
+            'principalMult' => $principalMult,
             'principalProp' => $dependentProperty,
             'dependentType' => $principalType,
-            'dependentMult' => $principalMult,
+            'dependentMult' => $dependentMult,
             'dependentProp' => $principalProperty
         ];
         return array($forward, $reverse);

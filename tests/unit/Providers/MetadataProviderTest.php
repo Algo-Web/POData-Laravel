@@ -270,10 +270,10 @@ class MetadataProviderTest extends TestCase
         $meta = \Mockery::mock(SimpleMetadataProvider::class);
         $meta->shouldReceive('addResourceReferencePropertyBidirectional')
             ->with(m::type(ResourceEntityType::class), m::type(ResourceEntityType::class), 'morphTarget', 'morph')
-            ->times(2);
+            ->never();
         $meta->shouldReceive('addResourceReferencePropertyBidirectional')
             ->with(m::type(ResourceEntityType::class), m::type(ResourceEntityType::class), 'morph', 'morphTarget')
-            ->never();
+            ->times(2);
 
         App::instance('metadata', $meta);
 
