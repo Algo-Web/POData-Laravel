@@ -23,15 +23,9 @@ class MetadataRouteProvider extends ServiceProvider
         $auth_middleware = self::getAuthMiddleware();
         $controllerMethod = 'AlgoWeb\PODataLaravel\Controllers\ODataController@index';
 
-        Route::any(
-            'odata.svc/{section}',
-            ['uses' => $controllerMethod, 'middleware' => $auth_middleware]
-        )
+        Route::any('odata.svc/{section}', ['uses' => $controllerMethod, 'middleware' => $auth_middleware])
             ->where(['section' => '.*']);
-        Route::any(
-            'odata.svc',
-            ['uses' => $controllerMethod, 'middleware' => $auth_middleware]
-        );
+        Route::any('odata.svc', ['uses' => $controllerMethod, 'middleware' => $auth_middleware]);
     }
 
     /**
@@ -41,7 +35,6 @@ class MetadataRouteProvider extends ServiceProvider
      */
     public function register()
     {
-        //
     }
 
     private static function getAuthMiddleware()
