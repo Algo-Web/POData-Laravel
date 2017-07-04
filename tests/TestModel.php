@@ -6,7 +6,9 @@ use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
+use Illuminate\Database\Connection as Connection;
 
 class TestModel extends Model
 {
@@ -16,6 +18,9 @@ class TestModel extends Model
     }
 
     protected $metaArray;
+    protected $connect;
+    protected $grammar;
+    protected $processor;
 
     public function __construct(array $meta = null, $endpoint = null)
     {
@@ -26,6 +31,14 @@ class TestModel extends Model
             $this->endpoint = $endpoint;
         }
         parent::__construct();
+        $this->processor = \Mockery::mock(\Illuminate\Database\Query\Processors\Processor::class)->makePartial();
+        $this->grammar = \Mockery::mock(\Illuminate\Database\Query\Grammars\Grammar::class)->makePartial();
+        $connect = \Mockery::mock(Connection::class)->makePartial();
+        $connect->shouldReceive('getQueryGrammar')->andReturn($this->grammar);
+        $connect->shouldReceive('getPostProcessor')->andReturn($this->processor);
+        $this->connect = $connect;
+        $builder = new Builder($this->connect, $this->grammar, $this->processor);
+        $this->setQuery($builder);
         $this->dateFormat = 'Y-m-d H:i:s.u';
     }
 
@@ -37,6 +50,11 @@ class TestModel extends Model
     public function getConnectionName()
     {
         return 'testconnection';
+    }
+
+    public function getConnection()
+    {
+        return $this->connect;
     }
 
     protected function getAllAttributes()

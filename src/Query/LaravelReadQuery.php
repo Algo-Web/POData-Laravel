@@ -99,25 +99,29 @@ class LaravelReadQuery
         // throttle up for trench run
         if (null != $skipToken) {
             $parameters = [];
+            $processed = [];
             $segments = $skipToken->getOrderByInfo()->getOrderByPathSegments();
             $values = $skipToken->getOrderByKeysInToken();
             $numValues = count($values);
             assert($numValues == count($segments));
 
             for ($i = 0; $i < $numValues; $i++) {
-                $relation = $segments[$i]->isAscending() ? '>=' : '<=';
+                $relation = $segments[$i]->isAscending() ? '>' : '<';
                 $name = $segments[$i]->getSubPathSegments()[0]->getName();
-                $line = ['direction' => $relation, 'value' => $values[$i][0]];
-                $parameters[$name] = $line;
+                $parameters[$name] = ['direction' => $relation, 'value' => trim($values[$i][0], "\'")];
             }
 
             foreach ($parameters as $name => $line) {
-                $direction = $line['direction'];
-                if ($keyName == $name) {
-                    $direction = '!=';
-                }
-                $value = trim($line['value'], "\'");
-                $sourceEntityInstance = $sourceEntityInstance->where($name, $direction, $value);
+                $processed[$name] = ['direction' => $line['direction'], 'value' => $line['value']];
+                $sourceEntityInstance = $sourceEntityInstance
+                    ->orWhere(function ($query) use ($processed) {
+                        foreach ($processed as $key => $proc) {
+                            $query->where($key, $proc['direction'], $proc['value']);
+                        }
+                    });
+                // now we've handled the later-in-order segment for this key, drop it back to equality in prep
+                // for next key - same-in-order for processed keys and later-in-order for next
+                $processed[$name]['direction'] = '=';
             }
         }
 
@@ -188,7 +192,6 @@ class LaravelReadQuery
         if (isset($top)) {
             $resultSet = $resultSet->take($top);
         }
-
 
         if (QueryType::ENTITIES() == $queryType || QueryType::ENTITIES_WITH_COUNT() == $queryType) {
             $result->results = array();
