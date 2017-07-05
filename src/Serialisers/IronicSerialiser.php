@@ -356,12 +356,26 @@ class IronicSerialiser implements IObjectSerialiser
      *                                            describing the
      *                                            primitive property
      *                                            to be written
-     * @codeCoverageIgnore
      * @return ODataPropertyContent
      */
     public function writeTopLevelPrimitive(QueryResult &$primitiveValue, ResourceProperty &$resourceProperty = null)
     {
-        // TODO: Figure out if we need to bother implementing this
+        assert(null != $resourceProperty, "Resource property must not be null");
+        $propertyContent = new ODataPropertyContent();
+
+        $odataProperty = new ODataProperty();
+        $odataProperty->name = $resourceProperty->getName();
+        $odataProperty->typeName = $resourceProperty->getInstanceType()->getFullTypeName();
+        if (null == $primitiveValue->results) {
+            $odataProperty->value = null;
+        } else {
+            $rType = $resourceProperty->getResourceType()->getInstanceType();
+            $odataProperty->value = $this->primitiveToString($rType, $primitiveValue->results);
+        }
+
+        $propertyContent->properties[] = $odataProperty;
+
+        return $propertyContent;
     }
 
     /**
