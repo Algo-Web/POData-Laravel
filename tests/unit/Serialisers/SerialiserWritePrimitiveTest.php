@@ -15,6 +15,7 @@ use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\Type\Binary;
 use POData\Providers\Metadata\Type\DateTime;
 use POData\Providers\Metadata\Type\Int32;
+use POData\Providers\Metadata\Type\IType;
 use POData\Providers\Metadata\Type\StringType;
 use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
@@ -86,9 +87,12 @@ class SerialiserWritePrimitiveTest extends SerialiserTestBase
         $collection = new QueryResult();
         $collection->results = null;
 
+        $iType = m::mock(IType::class);
+        $iType->shouldReceive('getFullTypeName')->andReturn('String');
+
         $resProp = m::mock(ResourceProperty::class);
         $resProp->shouldReceive('getName')->andReturn('DesertWithNoName');
-        $resProp->shouldReceive('getInstanceType->getFullTypeName')->andReturn('String');
+        $resProp->shouldReceive('getInstanceType')->andReturn($iType);
 
         $objectResult = $object->writeTopLevelPrimitive($collection, $resProp);
         $ironicResult = $ironic->writeTopLevelPrimitive($collection, $resProp);
@@ -122,10 +126,13 @@ class SerialiserWritePrimitiveTest extends SerialiserTestBase
         $rType->shouldReceive('getFullTypeName')->andReturn('String');
         $rType->shouldReceive('getInstanceType')->andReturn($iType);
 
+        $iType = m::mock(IType::class);
+        $iType->shouldReceive('getFullTypeName')->andReturn('String');
+
         $resProp = m::mock(ResourceProperty::class);
         $resProp->shouldReceive('getName')->andReturn('DesertWithNoName');
         $resProp->shouldReceive('getResourceType')->andReturn($rType);
-        $resProp->shouldReceive('getInstanceType->getFullTypeName')->andReturn('String');
+        $resProp->shouldReceive('getInstanceType')->andReturn($iType);
 
         $objectResult = $object->writeTopLevelPrimitive($collection, $resProp);
         $ironicResult = $ironic->writeTopLevelPrimitive($collection, $resProp);
@@ -159,10 +166,13 @@ class SerialiserWritePrimitiveTest extends SerialiserTestBase
         $rType->shouldReceive('getFullTypeName')->andReturn('String');
         $rType->shouldReceive('getInstanceType')->andReturn($iType);
 
+        $iType = m::mock(IType::class);
+        $iType->shouldReceive('getFullTypeName')->andReturn('String');
+
         $resProp = m::mock(ResourceProperty::class);
         $resProp->shouldReceive('getName')->andReturn('DesertWithNoName');
         $resProp->shouldReceive('getResourceType')->andReturn($rType);
-        $resProp->shouldReceive('getInstanceType->getFullTypeName')->andReturn('String');
+        $resProp->shouldReceive('getInstanceType')->andReturn($iType);
 
         $objectResult = $object->writeTopLevelPrimitive($collection, $resProp);
         $ironicResult = $ironic->writeTopLevelPrimitive($collection, $resProp);
@@ -196,10 +206,13 @@ class SerialiserWritePrimitiveTest extends SerialiserTestBase
         $rType->shouldReceive('getFullTypeName')->andReturn('String');
         $rType->shouldReceive('getInstanceType')->andReturn($iType);
 
+        $iType = m::mock(IType::class);
+        $iType->shouldReceive('getFullTypeName')->andReturn('String');
+
         $resProp = m::mock(ResourceProperty::class);
         $resProp->shouldReceive('getName')->andReturn('DesertWithNoName');
         $resProp->shouldReceive('getResourceType')->andReturn($rType);
-        $resProp->shouldReceive('getInstanceType->getFullTypeName')->andReturn('String');
+        $resProp->shouldReceive('getInstanceType')->andReturn($iType);
 
         $objectResult = $object->writeTopLevelPrimitive($collection, $resProp);
         $ironicResult = $ironic->writeTopLevelPrimitive($collection, $resProp);
@@ -233,10 +246,13 @@ class SerialiserWritePrimitiveTest extends SerialiserTestBase
         $rType->shouldReceive('getFullTypeName')->andReturn('String');
         $rType->shouldReceive('getInstanceType')->andReturn($iType);
 
+        $iType = m::mock(IType::class);
+        $iType->shouldReceive('getFullTypeName')->andReturn('String');
+
         $resProp = m::mock(ResourceProperty::class);
         $resProp->shouldReceive('getName')->andReturn('DesertWithNoName');
         $resProp->shouldReceive('getResourceType')->andReturn($rType);
-        $resProp->shouldReceive('getInstanceType->getFullTypeName')->andReturn('String');
+        $resProp->shouldReceive('getInstanceType')->andReturn($iType);
 
         $objectResult = $object->writeTopLevelPrimitive($collection, $resProp);
         $ironicResult = $ironic->writeTopLevelPrimitive($collection, $resProp);

@@ -386,7 +386,9 @@ class IronicSerialiser implements IObjectSerialiser
 
         $odataProperty = new ODataProperty();
         $odataProperty->name = $resourceProperty->getName();
-        $odataProperty->typeName = $resourceProperty->getInstanceType()->getFullTypeName();
+        $iType = $resourceProperty->getInstanceType();
+        assert($iType instanceof IType, get_class($iType));
+        $odataProperty->typeName = $iType->getFullTypeName();
         if (null == $primitiveValue->results) {
             $odataProperty->value = null;
         } else {
@@ -832,6 +834,7 @@ class IronicSerialiser implements IObjectSerialiser
             if (isset($value)) {
                 if (ResourceTypeKind::PRIMITIVE == $typeKind) {
                     $instance = $resourceType->getInstanceType();
+                    assert($instance instanceof IType, get_class($instance));
                     $bag->propertyContents[] = $this->primitiveToString($instance, $value);
                 } elseif (ResourceTypeKind::COMPLEX == $typeKind) {
                     $bag->propertyContents[] = $this->writeComplexValue($resourceType, $value);
@@ -872,6 +875,7 @@ class IronicSerialiser implements IObjectSerialiser
             $internalProperty->name = $propName;
             if (static::isMatchPrimitive($resourceKind)) {
                 $iType = $prop->getInstanceType();
+                assert($iType instanceof IType, get_class($iType));
                 $internalProperty->typeName = $iType->getFullTypeName();
 
                 $rType = $prop->getResourceType()->getInstanceType();
