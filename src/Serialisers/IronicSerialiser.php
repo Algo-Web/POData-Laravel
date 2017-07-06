@@ -7,6 +7,7 @@ use POData\Common\ODataConstants;
 use POData\Common\ODataException;
 use POData\IService;
 use POData\ObjectModel\IObjectSerialiser;
+use POData\ObjectModel\ODataBagContent;
 use POData\ObjectModel\ODataEntry;
 use POData\ObjectModel\ODataFeed;
 use POData\ObjectModel\ODataLink;
@@ -323,11 +324,38 @@ class IronicSerialiser implements IObjectSerialiser
      *                                    complex object
      *
      * @return ODataPropertyContent
-     * @codeCoverageIgnore
      */
     public function writeTopLevelComplexObject(QueryResult &$complexValue, $propertyName, ResourceType &$resourceType)
     {
-        // TODO: Figure out if we need to bother implementing this
+        $result = $complexValue->results;
+
+        $propertyContent = new ODataPropertyContent();
+        $odataProperty = new ODataProperty();
+        $odataProperty->name = $propertyName;
+        $odataProperty->typeName = $resourceType->getFullName();
+        if (null != $result) {
+            $internalContent = new ODataPropertyContent();
+            $resourceProperties = $resourceType->getAllProperties();
+            // first up, handle primitive properties
+            foreach ($resourceProperties as $prop) {
+                $propName = $prop->getName();
+                $internalProperty = new ODataProperty();
+                $internalProperty->name = $propName;
+                $iType = $prop->getInstanceType();
+                $internalProperty->typeName = $iType->getFullTypeName();
+
+                $rType = $prop->getResourceType()->getInstanceType();
+                $internalProperty->value = $this->primitiveToString($rType, $result->$propName);
+                $internalContent->properties[] = $internalProperty;
+            }
+
+
+            $odataProperty->value = $internalContent;
+        }
+
+        $propertyContent->properties[] = $odataProperty;
+
+        return $propertyContent;
     }
 
     /**
@@ -339,12 +367,29 @@ class IronicSerialiser implements IObjectSerialiser
      *                                    bag property
      * @param ResourceType &$resourceType Describes the type of
      *                                    bag object
-     * @codeCoverageIgnore
      * @return ODataPropertyContent
      */
     public function writeTopLevelBagObject(QueryResult &$BagValue, $propertyName, ResourceType &$resourceType)
     {
-        // TODO: Figure out if we need to bother implementing this
+        $result = $BagValue->results;
+
+        $propertyContent = new ODataPropertyContent();
+        $odataProperty = new ODataProperty();
+        $odataProperty->name = $propertyName;
+        $odataProperty->typeName = 'Collection('.$resourceType->getFullName().')';
+        if (null != $result) {
+            $result = array_diff($result, [null]);
+            $bag = new ODataBagContent();
+            $instance = $resourceType->getInstanceType();
+            foreach ($result as $value) {
+                $bag->propertyContents[] = $this->primitiveToString($instance, $value);
+            }
+
+            $odataProperty->value = $bag;
+        }
+
+        $propertyContent->properties[] = $odataProperty;
+        return $propertyContent;
     }
 
     /**
