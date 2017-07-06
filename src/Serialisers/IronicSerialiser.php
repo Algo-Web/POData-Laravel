@@ -336,7 +336,6 @@ class IronicSerialiser implements IObjectSerialiser
         $odataProperty->typeName = $resourceType->getFullName();
         if (null != $result) {
             $internalContent = $this->writeComplexValue($resourceType, $result);
-
             $odataProperty->value = $internalContent;
         }
 
@@ -373,12 +372,10 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level primitive value.
      *
-     * @param mixed &$primitiveValue The primitve value to be
+     * @param mixed &$primitiveValue              The primitive value to be
      *                                            written
-     * @param ResourceProperty &$resourceProperty Resource property
-     *                                            describing the
-     *                                            primitive property
-     *                                            to be written
+     * @param ResourceProperty &$resourceProperty Resource property describing the
+     *                                            primitive property to be written
      * @return ODataPropertyContent
      */
     public function writeTopLevelPrimitive(QueryResult &$primitiveValue, ResourceProperty &$resourceProperty = null)
@@ -845,25 +842,47 @@ class IronicSerialiser implements IObjectSerialiser
 
     /**
      * @param ResourceType $resourceType
-     * @param $result
+     * @param object $result
      * @return ODataPropertyContent
      */
     protected function writeComplexValue(ResourceType &$resourceType, $result)
     {
+        assert(is_object($result), 'Supplied $customObject must be an object');
         $internalContent = new ODataPropertyContent();
         $resourceProperties = $resourceType->getAllProperties();
         // first up, handle primitive properties
         foreach ($resourceProperties as $prop) {
+            $resourceKind = $prop->getKind();
             $propName = $prop->getName();
             $internalProperty = new ODataProperty();
             $internalProperty->name = $propName;
-            $iType = $prop->getInstanceType();
-            $internalProperty->typeName = $iType->getFullTypeName();
+            if (static::isMatchPrimitive($resourceKind)) {
+                $iType = $prop->getInstanceType();
+                $internalProperty->typeName = $iType->getFullTypeName();
 
-            $rType = $prop->getResourceType()->getInstanceType();
-            $internalProperty->value = $this->primitiveToString($rType, $result->$propName);
-            $internalContent->properties[] = $internalProperty;
+                $rType = $prop->getResourceType()->getInstanceType();
+                $internalProperty->value = $this->primitiveToString($rType, $result->$propName);
+
+                $internalContent->properties[] = $internalProperty;
+            } elseif (ResourcePropertyKind::COMPLEX_TYPE == $resourceKind) {
+                $rType = $prop->getResourceType();
+                $internalProperty->typeName = $rType->getFullName();
+                $internalProperty->value = $this->writeComplexValue($rType, $result->$propName);
+
+                $internalContent->properties[] = $internalProperty;
+            }
         }
         return $internalContent;
+    }
+
+    public static function isMatchPrimitive($resourceKind)
+    {
+        if (16 > $resourceKind) {
+            return false;
+        }
+        if (28 < $resourceKind) {
+            return false;
+        }
+        return 0 == ($resourceKind % 4);
     }
 }
