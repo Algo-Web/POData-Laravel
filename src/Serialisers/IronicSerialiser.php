@@ -334,21 +334,7 @@ class IronicSerialiser implements IObjectSerialiser
         $odataProperty->name = $propertyName;
         $odataProperty->typeName = $resourceType->getFullName();
         if (null != $result) {
-            $internalContent = new ODataPropertyContent();
-            $resourceProperties = $resourceType->getAllProperties();
-            // first up, handle primitive properties
-            foreach ($resourceProperties as $prop) {
-                $propName = $prop->getName();
-                $internalProperty = new ODataProperty();
-                $internalProperty->name = $propName;
-                $iType = $prop->getInstanceType();
-                $internalProperty->typeName = $iType->getFullTypeName();
-
-                $rType = $prop->getResourceType()->getInstanceType();
-                $internalProperty->value = $this->primitiveToString($rType, $result->$propName);
-                $internalContent->properties[] = $internalProperty;
-            }
-
+            $internalContent = $this->writeComplexValue($resourceType, $result);
 
             $odataProperty->value = $internalContent;
         }
@@ -378,12 +364,7 @@ class IronicSerialiser implements IObjectSerialiser
         $odataProperty->name = $propertyName;
         $odataProperty->typeName = 'Collection('.$resourceType->getFullName().')';
         if (null != $result) {
-            $result = array_diff($result, [null]);
-            $bag = new ODataBagContent();
-            $instance = $resourceType->getInstanceType();
-            foreach ($result as $value) {
-                $bag->propertyContents[] = $this->primitiveToString($instance, $value);
-            }
+            $bag = $this->writeBagValue($resourceType, $result);
 
             $odataProperty->value = $bag;
         }
@@ -832,5 +813,45 @@ class IronicSerialiser implements IObjectSerialiser
         $this->service = $service;
         $this->absoluteServiceUri = $service->getHost()->getAbsoluteServiceUri()->getUrlAsString();
         $this->absoluteServiceUriWithSlash = rtrim($this->absoluteServiceUri, '/') . '/';
+    }
+
+    /**
+     * @param ResourceType $resourceType
+     * @param $result
+     * @return ODataBagContent
+     */
+    protected function writeBagValue(ResourceType &$resourceType, $result)
+    {
+        $result = array_diff($result, [null]);
+        $bag = new ODataBagContent();
+        $instance = $resourceType->getInstanceType();
+        foreach ($result as $value) {
+            $bag->propertyContents[] = $this->primitiveToString($instance, $value);
+        }
+        return $bag;
+    }
+
+    /**
+     * @param ResourceType $resourceType
+     * @param $result
+     * @return ODataPropertyContent
+     */
+    protected function writeComplexValue(ResourceType &$resourceType, $result)
+    {
+        $internalContent = new ODataPropertyContent();
+        $resourceProperties = $resourceType->getAllProperties();
+        // first up, handle primitive properties
+        foreach ($resourceProperties as $prop) {
+            $propName = $prop->getName();
+            $internalProperty = new ODataProperty();
+            $internalProperty->name = $propName;
+            $iType = $prop->getInstanceType();
+            $internalProperty->typeName = $iType->getFullTypeName();
+
+            $rType = $prop->getResourceType()->getInstanceType();
+            $internalProperty->value = $this->primitiveToString($rType, $result->$propName);
+            $internalContent->properties[] = $internalProperty;
+        }
+        return $internalContent;
     }
 }
