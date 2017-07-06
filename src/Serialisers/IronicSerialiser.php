@@ -2,11 +2,13 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use POData\Common\InvalidOperationException;
 use POData\Common\Messages;
 use POData\Common\ODataConstants;
 use POData\Common\ODataException;
 use POData\IService;
 use POData\ObjectModel\IObjectSerialiser;
+use POData\ObjectModel\ODataBagContent;
 use POData\ObjectModel\ODataEntry;
 use POData\ObjectModel\ODataFeed;
 use POData\ObjectModel\ODataLink;
@@ -22,6 +24,7 @@ use POData\Providers\Metadata\ResourcePropertyKind;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceSetWrapper;
 use POData\Providers\Metadata\ResourceType;
+use POData\Providers\Metadata\ResourceTypeKind;
 use POData\Providers\Metadata\Type\Binary;
 use POData\Providers\Metadata\Type\Boolean;
 use POData\Providers\Metadata\Type\DateTime;
@@ -323,11 +326,23 @@ class IronicSerialiser implements IObjectSerialiser
      *                                    complex object
      *
      * @return ODataPropertyContent
-     * @codeCoverageIgnore
      */
     public function writeTopLevelComplexObject(QueryResult &$complexValue, $propertyName, ResourceType &$resourceType)
     {
-        // TODO: Figure out if we need to bother implementing this
+        $result = $complexValue->results;
+
+        $propertyContent = new ODataPropertyContent();
+        $odataProperty = new ODataProperty();
+        $odataProperty->name = $propertyName;
+        $odataProperty->typeName = $resourceType->getFullName();
+        if (null != $result) {
+            $internalContent = $this->writeComplexValue($resourceType, $result);
+            $odataProperty->value = $internalContent;
+        }
+
+        $propertyContent->properties[] = $odataProperty;
+
+        return $propertyContent;
     }
 
     /**
@@ -339,29 +354,51 @@ class IronicSerialiser implements IObjectSerialiser
      *                                    bag property
      * @param ResourceType &$resourceType Describes the type of
      *                                    bag object
-     * @codeCoverageIgnore
      * @return ODataPropertyContent
      */
     public function writeTopLevelBagObject(QueryResult &$BagValue, $propertyName, ResourceType &$resourceType)
     {
-        // TODO: Figure out if we need to bother implementing this
+        $result = $BagValue->results;
+
+        $propertyContent = new ODataPropertyContent();
+        $odataProperty = new ODataProperty();
+        $odataProperty->name = $propertyName;
+        $odataProperty->typeName = 'Collection('.$resourceType->getFullName().')';
+        $odataProperty->value = $this->writeBagValue($resourceType, $result);
+
+        $propertyContent->properties[] = $odataProperty;
+        return $propertyContent;
     }
 
     /**
      * Write top level primitive value.
      *
-     * @param mixed &$primitiveValue The primitve value to be
+     * @param mixed &$primitiveValue              The primitive value to be
      *                                            written
-     * @param ResourceProperty &$resourceProperty Resource property
-     *                                            describing the
-     *                                            primitive property
-     *                                            to be written
-     * @codeCoverageIgnore
+     * @param ResourceProperty &$resourceProperty Resource property describing the
+     *                                            primitive property to be written
      * @return ODataPropertyContent
      */
     public function writeTopLevelPrimitive(QueryResult &$primitiveValue, ResourceProperty &$resourceProperty = null)
     {
-        // TODO: Figure out if we need to bother implementing this
+        assert(null != $resourceProperty, "Resource property must not be null");
+        $propertyContent = new ODataPropertyContent();
+
+        $odataProperty = new ODataProperty();
+        $odataProperty->name = $resourceProperty->getName();
+        $iType = $resourceProperty->getInstanceType();
+        assert($iType instanceof IType, get_class($iType));
+        $odataProperty->typeName = $iType->getFullTypeName();
+        if (null == $primitiveValue->results) {
+            $odataProperty->value = null;
+        } else {
+            $rType = $resourceProperty->getResourceType()->getInstanceType();
+            $odataProperty->value = $this->primitiveToString($rType, $primitiveValue->results);
+        }
+
+        $propertyContent->properties[] = $odataProperty;
+
+        return $propertyContent;
     }
 
     /**
@@ -773,5 +810,99 @@ class IronicSerialiser implements IObjectSerialiser
         $this->service = $service;
         $this->absoluteServiceUri = $service->getHost()->getAbsoluteServiceUri()->getUrlAsString();
         $this->absoluteServiceUriWithSlash = rtrim($this->absoluteServiceUri, '/') . '/';
+    }
+
+    /**
+     * @param ResourceType $resourceType
+     * @param $result
+     * @return ODataBagContent
+     */
+    protected function writeBagValue(ResourceType &$resourceType, $result)
+    {
+        assert(null == $result || is_array($result), 'Bag parameter must be null or array');
+        $typeKind = $resourceType->getResourceTypeKind();
+        assert(
+            ResourceTypeKind::PRIMITIVE == $typeKind || ResourceTypeKind::COMPLEX == $typeKind,
+            '$bagItemResourceTypeKind != ResourceTypeKind::PRIMITIVE'
+            .' && $bagItemResourceTypeKind != ResourceTypeKind::COMPLEX'
+        );
+        if (null == $result) {
+            return null;
+        }
+        $bag = new ODataBagContent();
+        foreach ($result as $value) {
+            if (isset($value)) {
+                if (ResourceTypeKind::PRIMITIVE == $typeKind) {
+                    $instance = $resourceType->getInstanceType();
+                    assert($instance instanceof IType, get_class($instance));
+                    $bag->propertyContents[] = $this->primitiveToString($instance, $value);
+                } elseif (ResourceTypeKind::COMPLEX == $typeKind) {
+                    $bag->propertyContents[] = $this->writeComplexValue($resourceType, $value);
+                }
+            }
+        }
+        return $bag;
+    }
+
+    /**
+     * @param ResourceType $resourceType
+     * @param object $result
+     * @param string $propertyName
+     * @return ODataPropertyContent
+     */
+    protected function writeComplexValue(ResourceType &$resourceType, &$result, $propertyName = null)
+    {
+        assert(is_object($result), 'Supplied $customObject must be an object');
+
+        $count = count($this->complexTypeInstanceCollection);
+        for ($i = 0; $i < $count; ++$i) {
+            if ($this->complexTypeInstanceCollection[$i] === $result) {
+                throw new InvalidOperationException(
+                    Messages::objectModelSerializerLoopsNotAllowedInComplexTypes($propertyName)
+                );
+            }
+        }
+
+        $this->complexTypeInstanceCollection[$count] = &$result;
+
+        $internalContent = new ODataPropertyContent();
+        $resourceProperties = $resourceType->getAllProperties();
+        // first up, handle primitive properties
+        foreach ($resourceProperties as $prop) {
+            $resourceKind = $prop->getKind();
+            $propName = $prop->getName();
+            $internalProperty = new ODataProperty();
+            $internalProperty->name = $propName;
+            if (static::isMatchPrimitive($resourceKind)) {
+                $iType = $prop->getInstanceType();
+                assert($iType instanceof IType, get_class($iType));
+                $internalProperty->typeName = $iType->getFullTypeName();
+
+                $rType = $prop->getResourceType()->getInstanceType();
+                $internalProperty->value = $this->primitiveToString($rType, $result->$propName);
+
+                $internalContent->properties[] = $internalProperty;
+            } elseif (ResourcePropertyKind::COMPLEX_TYPE == $resourceKind) {
+                $rType = $prop->getResourceType();
+                $internalProperty->typeName = $rType->getFullName();
+                $internalProperty->value = $this->writeComplexValue($rType, $result->$propName, $propName);
+
+                $internalContent->properties[] = $internalProperty;
+            }
+        }
+
+        unset($this->complexTypeInstanceCollection[$count]);
+        return $internalContent;
+    }
+
+    public static function isMatchPrimitive($resourceKind)
+    {
+        if (16 > $resourceKind) {
+            return false;
+        }
+        if (28 < $resourceKind) {
+            return false;
+        }
+        return 0 == ($resourceKind % 4);
     }
 }
