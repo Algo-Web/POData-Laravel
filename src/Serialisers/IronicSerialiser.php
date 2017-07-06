@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use POData\Common\InvalidOperationException;
 use POData\Common\Messages;
 use POData\Common\ODataConstants;
 use POData\Common\ODataException;
@@ -843,11 +844,24 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * @param ResourceType $resourceType
      * @param object $result
+     * @param string $propertyName
      * @return ODataPropertyContent
      */
-    protected function writeComplexValue(ResourceType &$resourceType, $result)
+    protected function writeComplexValue(ResourceType &$resourceType, &$result, $propertyName = null)
     {
         assert(is_object($result), 'Supplied $customObject must be an object');
+
+        $count = count($this->complexTypeInstanceCollection);
+        for ($i = 0; $i < $count; ++$i) {
+            if ($this->complexTypeInstanceCollection[$i] === $result) {
+                throw new InvalidOperationException(
+                    Messages::objectModelSerializerLoopsNotAllowedInComplexTypes($propertyName)
+                );
+            }
+        }
+
+        $this->complexTypeInstanceCollection[$count] = &$result;
+
         $internalContent = new ODataPropertyContent();
         $resourceProperties = $resourceType->getAllProperties();
         // first up, handle primitive properties
@@ -867,11 +881,13 @@ class IronicSerialiser implements IObjectSerialiser
             } elseif (ResourcePropertyKind::COMPLEX_TYPE == $resourceKind) {
                 $rType = $prop->getResourceType();
                 $internalProperty->typeName = $rType->getFullName();
-                $internalProperty->value = $this->writeComplexValue($rType, $result->$propName);
+                $internalProperty->value = $this->writeComplexValue($rType, $result->$propName, $propName);
 
                 $internalContent->properties[] = $internalProperty;
             }
         }
+
+        unset($this->complexTypeInstanceCollection[$count]);
         return $internalContent;
     }
 
