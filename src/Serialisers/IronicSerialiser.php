@@ -23,6 +23,7 @@ use POData\Providers\Metadata\ResourcePropertyKind;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceSetWrapper;
 use POData\Providers\Metadata\ResourceType;
+use POData\Providers\Metadata\ResourceTypeKind;
 use POData\Providers\Metadata\Type\Binary;
 use POData\Providers\Metadata\Type\Boolean;
 use POData\Providers\Metadata\Type\DateTime;
@@ -363,11 +364,7 @@ class IronicSerialiser implements IObjectSerialiser
         $odataProperty = new ODataProperty();
         $odataProperty->name = $propertyName;
         $odataProperty->typeName = 'Collection('.$resourceType->getFullName().')';
-        if (null != $result) {
-            $bag = $this->writeBagValue($resourceType, $result);
-
-            $odataProperty->value = $bag;
-        }
+        $odataProperty->value = $this->writeBagValue($resourceType, $result);
 
         $propertyContent->properties[] = $odataProperty;
         return $propertyContent;
@@ -822,11 +819,26 @@ class IronicSerialiser implements IObjectSerialiser
      */
     protected function writeBagValue(ResourceType &$resourceType, $result)
     {
-        $result = array_diff($result, [null]);
+        assert(null == $result || is_array($result), 'Bag parameter must be null or array');
+        $typeKind = $resourceType->getResourceTypeKind();
+        assert(
+            ResourceTypeKind::PRIMITIVE == $typeKind || ResourceTypeKind::COMPLEX == $typeKind,
+            '$bagItemResourceTypeKind != ResourceTypeKind::PRIMITIVE'
+            .' && $bagItemResourceTypeKind != ResourceTypeKind::COMPLEX'
+        );
+        if (null == $result) {
+            return null;
+        }
         $bag = new ODataBagContent();
-        $instance = $resourceType->getInstanceType();
         foreach ($result as $value) {
-            $bag->propertyContents[] = $this->primitiveToString($instance, $value);
+            if (isset($value)) {
+                if (ResourceTypeKind::PRIMITIVE == $typeKind) {
+                    $instance = $resourceType->getInstanceType();
+                    $bag->propertyContents[] = $this->primitiveToString($instance, $value);
+                } elseif (ResourceTypeKind::COMPLEX == $typeKind) {
+                    $bag->propertyContents[] = $this->writeComplexValue($resourceType, $value);
+                }
+            }
         }
         return $bag;
     }

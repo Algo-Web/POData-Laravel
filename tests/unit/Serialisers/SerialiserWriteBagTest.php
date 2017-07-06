@@ -54,6 +54,100 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         $this->assertEquals($objectResult, $ironicResult);
     }
 
+    public function testWriteBadBagObject()
+    {
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestModels');
+        $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestModels');
+
+        list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
+
+        // default data service
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
+        $processor->getRequest()->setCountValue(1);
+        $object = new ObjectModelSerializer($service, $processor->getRequest());
+        $ironic = new IronicSerialiser($service, $processor->getRequest());
+
+        $propName = 'makeItPhunkee';
+        $rType = m::mock(ResourceType::class);
+        $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
+        $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX);
+
+        $collection = new QueryResult();
+        $collection->results = 'NARF!';
+
+        $expected = null;
+        $expectedExceptionClass = null;
+        $actual = null;
+        $actualExceptionClass = null;
+
+        try {
+            $object->writeTopLevelBagObject($collection, $propName, $rType);
+        } catch (\Exception $e) {
+            $expectedExceptionClass = get_class($e);
+            $expected = $e->getMessage();
+        }
+        try {
+            $ironic->writeTopLevelBagObject($collection, $propName, $rType);
+        } catch (\Exception $e) {
+            $actualExceptionClass = get_class($e);
+            $actual = $e->getMessage();
+        }
+
+        $this->assertEquals($expectedExceptionClass, $actualExceptionClass);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testWriteBagObjectWithInconsistentType()
+    {
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestModels');
+        $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestModels');
+
+        list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
+
+        // default data service
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
+        $processor->getRequest()->setCountValue(1);
+        $object = new ObjectModelSerializer($service, $processor->getRequest());
+        $ironic = new IronicSerialiser($service, $processor->getRequest());
+
+        $propName = 'makeItPhunkee';
+        $rType = m::mock(ResourceType::class);
+        $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
+        $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::ENTITY);
+
+        $collection = new QueryResult();
+        $collection->results = null;
+
+        $expected = null;
+        $expectedExceptionClass = null;
+        $actual = null;
+        $actualExceptionClass = null;
+
+        try {
+            $object->writeTopLevelBagObject($collection, $propName, $rType);
+        } catch (\Exception $e) {
+            $expectedExceptionClass = get_class($e);
+            $expected = $e->getMessage();
+        }
+        try {
+            $ironic->writeTopLevelBagObject($collection, $propName, $rType);
+        } catch (\Exception $e) {
+            $actualExceptionClass = get_class($e);
+            $actual = $e->getMessage();
+        }
+
+        $this->assertEquals($expectedExceptionClass, $actualExceptionClass);
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testWriteEmptyBagObject()
     {
         $request = $this->setUpRequest();
@@ -148,6 +242,61 @@ class SerialiserWriteBagTest extends SerialiserTestBase
 
         $collection = new QueryResult();
         $collection->results = ['eins', null, 'zwei', null, 'polizei'];
+
+        $objectResult = $object->writeTopLevelBagObject($collection, $propName, $rType);
+        $ironicResult = $ironic->writeTopLevelBagObject($collection, $propName, $rType);
+
+        $this->assertEquals(get_class($objectResult), get_class($ironicResult));
+        $this->assertEquals($objectResult, $ironicResult);
+    }
+
+    public function testWriteBagObjectOfComplexObject()
+    {
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestModels');
+        $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestModels');
+
+        list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
+
+        // default data service
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
+        $processor->getRequest()->setCountValue(1);
+        $object = new ObjectModelSerializer($service, $processor->getRequest());
+        $ironic = new IronicSerialiser($service, $processor->getRequest());
+
+        $iType = new StringType();
+
+        $subType1 = m::mock(ResourceType::class);
+        $subType1->shouldReceive('getInstanceType')->andReturn(new StringType());
+        $subType1->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE);
+
+        $rProp1 = m::mock(ResourceProperty::class);
+        $rProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE);
+        $rProp1->shouldReceive('getName')->andReturn('name');
+        $rProp1->shouldReceive('getInstanceType')->andReturn(new StringType());
+        $rProp1->shouldReceive('getResourceType')->andReturn($subType1);
+
+        $rProp2 = m::mock(ResourceProperty::class);
+        $rProp2->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE);
+        $rProp2->shouldReceive('getName')->andReturn('type');
+        $rProp2->shouldReceive('getInstanceType')->andReturn(new StringType());
+        $rProp2->shouldReceive('getResourceType')->andReturn($subType1);
+
+        $propName = 'makeItPhunkee';
+        $rType = m::mock(ResourceType::class);
+        $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
+        $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX);
+        $rType->shouldReceive('getAllProperties')->andReturn([$rProp1, $rProp2]);
+
+        $model = new reusableEntityClass1();
+        $model->name = 'name';
+        $model->type = 'type';
+
+        $collection = new QueryResult();
+        $collection->results = [$model];
 
         $objectResult = $object->writeTopLevelBagObject($collection, $propName, $rType);
         $ironicResult = $ironic->writeTopLevelBagObject($collection, $propName, $rType);
