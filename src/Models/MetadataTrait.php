@@ -253,12 +253,12 @@ trait MetadataTrait
     protected function getRelationshipsFromMethods($biDir = false)
     {
         $model = $this;
-        $relationships = array(
-            "HasOne" => array(),
-            "UnknownPolyMorphSide"=>array(),
-            "HasMany"=>array(),
-            "KnownPolyMorphSide"=>array()
-        );
+        $relationships = [
+            "HasOne" => [],
+            "UnknownPolyMorphSide"=> [],
+            "HasMany"=> [],
+            "KnownPolyMorphSide"=> []
+        ];
         $methods = get_class_methods($model);
         if (!empty($methods)) {
             foreach ($methods as $method) {
@@ -281,7 +281,7 @@ trait MetadataTrait
                     $code = substr($code, $begin, strrpos($code, '}')-$begin+1);
                     $lastCode = $code[strlen($code)-1];
                     assert("}" == $lastCode, "Final character of function definition must be closing brace");
-                    foreach (array(
+                    foreach ([
                                 'hasMany',
                                 'hasManyThrough',
                                 'belongsToMany',
@@ -292,7 +292,7 @@ trait MetadataTrait
                                 'morphMany',
                                 'morphToMany',
                                 'morphedByMany'
-                                ) as $relation) {
+                                ] as $relation) {
                         $search = '$this->'.$relation.'(';
                         if ($pos = stripos($code, $search)) {
                             //Resolve the relation's model to a Relation object.
@@ -455,7 +455,7 @@ trait MetadataTrait
                 static::$methodPrimary[get_class($foo)] = $line;
             }
         }
-        return array($fkMethodName, $rkMethodName);
+        return [$fkMethodName, $rkMethodName];
     }
 
     private function polyglotKeyMethodBackupNames($foo, $condition = false)
@@ -492,7 +492,7 @@ trait MetadataTrait
                 static::$methodAlternate[get_class($foo)] = $line;
             }
         }
-        return array($fkMethodName, $rkMethodName);
+        return [$fkMethodName, $rkMethodName];
     }
 
     /**

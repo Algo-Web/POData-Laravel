@@ -11,6 +11,7 @@ before_script:
   - chmod 777 bootstrap/cache
   - ls -al bootstrap/
   - ls -al bootstrap/cache
+  - composer global require hirak/prestissimo
   - composer require laravel/framework:${LARAVEL_DEP} --no-update
   - composer install
 
