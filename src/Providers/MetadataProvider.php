@@ -223,9 +223,7 @@ class MetadataProvider extends MetadataBaseProvider
         foreach ($hooks as $principalType => $value) {
             foreach ($value as $fk => $localRels) {
                 foreach ($localRels as $dependentType => $deets) {
-                    if (!isset($hooks[$dependentType])) {
-                        continue;
-                    }
+
                     $principalMult = $deets['multiplicity'];
                     $principalProperty = $deets['property'];
                     $principalKey = $deets['local'];
@@ -319,10 +317,7 @@ class MetadataProvider extends MetadataBaseProvider
         $dependentType = $line['dependentType'];
         $dependentMult = $line['dependentMult'];
         $dependentProp = $line['dependentProp'];
-        if (!isset($EntityTypes[$principalType])) {
-            return;
-        }
-        if (!isset($EntityTypes[$dependentType])) {
+        if (!isset($EntityTypes[$principalType]) || !isset($EntityTypes[$dependentType])) {
             return;
         }
         $principal = $EntityTypes[$principalType];
