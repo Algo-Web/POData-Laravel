@@ -194,7 +194,7 @@ class LaravelReadQuery
         }
 
         if (QueryType::ENTITIES() == $queryType || QueryType::ENTITIES_WITH_COUNT() == $queryType) {
-            $result->results = array();
+            $result->results = [];
             foreach ($resultSet as $res) {
                 $result->results[] = $res;
             }

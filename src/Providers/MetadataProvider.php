@@ -308,7 +308,7 @@ class MetadataProvider extends MetadataBaseProvider
             'dependentMult' => $dependentMult,
             'dependentProp' => $principalProperty
         ];
-        return array($forward, $reverse);
+        return [$forward, $reverse];
     }
 
     private function processRelationLine($line, $EntityTypes, &$meta)
