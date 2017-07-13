@@ -304,12 +304,7 @@ class LaravelReadQuery
 
         $this->checkAuth($sourceEntityInstance);
 
-        if ($keyDescriptor) {
-            foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
-                $trimValue = trim($value[0], "\"'");
-                $sourceEntityInstance = $sourceEntityInstance->where($key, $trimValue);
-            }
-        }
+        $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
         foreach ($whereCondition as $fieldName => $fieldValue) {
             $sourceEntityInstance = $sourceEntityInstance->where($fieldName, $fieldValue);
         }
@@ -369,7 +364,19 @@ class LaravelReadQuery
             throw new InvalidArgumentException('Source entity must be an Eloquent model.');
         }
         $propertyName = $targetProperty->getName();
-        return $this->getResource(null, $keyDescriptor, [], $sourceEntityInstance->$propertyName);
+        if (!method_exists($sourceEntityInstance, $propertyName)) {
+            $msg = 'Relation method, '.$propertyName.', does not exist on supplied entity.';
+            throw new InvalidArgumentException($msg);
+        }
+        // take key descriptor and turn it into where clause here, rather than in getResource call
+        $sourceEntityInstance = $sourceEntityInstance->$propertyName();
+        $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
+        $result = $this->getResource(null, null, [], $sourceEntityInstance);
+        assert(
+            $result instanceof Model || null == $result,
+            'GetResourceFromRelatedResourceSet must return an entity or null'
+        );
+        return $result;
     }
 
 
@@ -411,6 +418,21 @@ class LaravelReadQuery
                         : null;
         if (!$this->getAuth()->canAuth(ActionVerb::READ(), get_class($sourceEntityInstance), $check)) {
             throw new ODataException("Access denied", 403);
+        }
+    }
+
+    /**
+     * @param $sourceEntityInstance
+     * @param KeyDescriptor $keyDescriptor
+     * @throws \POData\Common\InvalidOperationException
+     */
+    private function processKeyDescriptor(&$sourceEntityInstance, KeyDescriptor $keyDescriptor = null)
+    {
+        if ($keyDescriptor) {
+            foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
+                $trimValue = trim($value[0], "\"'");
+                $sourceEntityInstance = $sourceEntityInstance->where($key, $trimValue);
+            }
         }
     }
 }

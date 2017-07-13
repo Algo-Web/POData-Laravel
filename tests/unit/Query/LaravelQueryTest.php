@@ -660,11 +660,13 @@ class LaravelQueryTest extends TestCase
         $property = m::mock(ResourceProperty::class);
         $property->shouldReceive('getName')->andReturn('name');
         $key = m::mock(KeyDescriptor::class);
+        $key->shouldReceive('getValidatedNamedValues')->andReturn([])->never();
         $sourceEntity = \Mockery::mock(TestMorphManySource::class)->makePartial();
+        $sourceEntity->shouldReceive('where')->andReturnSelf();
 
         $foo = new LaravelQuery();
 
-        $expected = 'Must supply at least one of a resource set and source entity.';
+        $expected = 'Relation method, name, does not exist on supplied entity.';
         $actual = null;
 
         try {
@@ -675,7 +677,7 @@ class LaravelQueryTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testGetResourceFromRelatedResourceSetNonNullSourceInstance()
+    public function testGetResourceFromRelatedResourceSetNonNullSourceInstanceRemix()
     {
         $srcResource = m::mock(ResourceSet::class);
         $dstResource = m::mock(ResourceSet::class);
@@ -693,16 +695,33 @@ class LaravelQueryTest extends TestCase
         $rawResult->shouldReceive('get')->withAnyArgs()->andReturn($finalResult);
         $rawResult->shouldReceive('getRelated')->andReturn(TestMorphTarget::class);
 
+        $targSource = m::mock(TestMorphTarget::class);
+
         $sourceEntity = \Mockery::mock(TestMorphManySource::class)->makePartial();
         $sourceEntity->shouldReceive('where')->andReturnSelf();
         $sourceEntity->shouldReceive('orderBy')->andReturnSelf();
-        $sourceEntity->shouldReceive('getAttribute')->withArgs(['morphTarget'])->andReturnSelf()->once();
-        $sourceEntity->shouldReceive('get')->andReturn(collect(['a']))->once();
+        $sourceEntity->shouldReceive('morphTarget')->andReturnSelf()->once();
+        $sourceEntity->shouldReceive('get')->andReturn(collect([$targSource]))->once();
 
         $foo = new LaravelQuery();
 
         $result = $foo->getResourceFromRelatedResourceSet($srcResource, $sourceEntity, $dstResource, $property, $key);
-        $this->assertEquals('a', $result);
+        $this->assertTrue($result instanceof TestMorphTarget);
+    }
+
+    public function testGetResourceWithNullResourceSetAndEntityInstance()
+    {
+        $foo = new LaravelReadQuery();
+
+        $expected = 'Must supply at least one of a resource set and source entity.';
+        $actual = null;
+
+        try {
+            $foo->getResource();
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 
     /**
