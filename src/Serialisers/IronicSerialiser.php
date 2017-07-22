@@ -398,6 +398,7 @@ class IronicSerialiser implements IObjectSerialiser
             $odataProperty->value = null;
         } else {
             $rType = $resourceProperty->getResourceType()->getInstanceType();
+            assert($rType instanceof IType, get_class($rType));
             $odataProperty->value = $this->primitiveToString($rType, $primitiveValue->results);
         }
 
@@ -883,6 +884,7 @@ class IronicSerialiser implements IObjectSerialiser
                 $internalProperty->typeName = $iType->getFullTypeName();
 
                 $rType = $prop->getResourceType()->getInstanceType();
+                assert($rType instanceof IType, get_class($rType));
                 $internalProperty->value = $this->primitiveToString($rType, $result->$propName);
 
                 $internalContent->properties[] = $internalProperty;
