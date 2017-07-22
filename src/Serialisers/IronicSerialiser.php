@@ -111,7 +111,7 @@ class IronicSerialiser implements IObjectSerialiser
      *
      * @param QueryResult $entryObject Reference to the entry object to be written
      *
-     * @return ODataEntry
+     * @return ODataEntry|null
      */
     public function writeTopLevelElement(QueryResult $entryObject)
     {
@@ -547,7 +547,7 @@ class IronicSerialiser implements IObjectSerialiser
      * Find a 'ExpandedProjectionNode' instance in the projection tree
      * which describes the current segment.
      *
-     * @return RootProjectionNode|ExpandedProjectionNode|null
+     * @return null|RootProjectionNode|ExpandedProjectionNode
      */
     protected function getCurrentExpandedProjectionNode()
     {
@@ -583,8 +583,7 @@ class IronicSerialiser implements IObjectSerialiser
      *
      * @param string $navigationPropertyName Name of naviagtion property in question
      *
-     * @return bool True if the given navigation should be
-     *              explanded otherwise false
+     * @return bool True if the given navigation should be expanded, otherwise false
      */
     protected function shouldExpandSegment($navigationPropertyName)
     {
@@ -808,7 +807,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Gets the data service instance.
      *
-     * @return IService
+     * @return void
      */
     public function setService(IService $service)
     {
@@ -820,7 +819,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * @param ResourceType $resourceType
      * @param $result
-     * @return ODataBagContent
+     * @return ODataBagContent|null
      */
     protected function writeBagValue(ResourceType &$resourceType, $result)
     {

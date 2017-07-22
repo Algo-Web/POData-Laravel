@@ -271,7 +271,7 @@ class LaravelReadQuery
      * @param ResourceSet           $resourceSet    The entity set containing the entity to fetch
      * @param KeyDescriptor|null    $keyDescriptor  The key identifying the entity to fetch
      *
-     * @return object|null Returns entity instance if found else null
+     * @return Model|null Returns entity instance if found else null
      */
     public function getResourceFromResourceSet(
         ResourceSet $resourceSet,
@@ -355,7 +355,7 @@ class LaravelReadQuery
      * @param ResourceProperty $targetProperty The metadata of the target property.
      * @param KeyDescriptor $keyDescriptor The key identifying the entity to fetch
      *
-     * @return object|null Returns entity instance if found else null
+     * @return Model|null Returns entity instance if found else null
      */
     public function getResourceFromRelatedResourceSet(
         ResourceSet $sourceResourceSet,
