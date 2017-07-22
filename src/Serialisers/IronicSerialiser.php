@@ -34,6 +34,7 @@ use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjectionNode;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ProjectionNode;
+use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\RootProjectionNode;
 use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
 use POData\UriProcessor\RequestDescription;
 use POData\UriProcessor\SegmentStack;
@@ -481,7 +482,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @param $type
      * @param $relativeUri
      * @param $resourceType
-     * @return array
+     * @return array<ODataMediaLink|null|array>
      */
     protected function writeMediaData($entryObject, $type, $relativeUri, ResourceType $resourceType)
     {
@@ -546,7 +547,7 @@ class IronicSerialiser implements IObjectSerialiser
      * Find a 'ExpandedProjectionNode' instance in the projection tree
      * which describes the current segment.
      *
-     * @return ExpandedProjectionNode|null
+     * @return RootProjectionNode|ExpandedProjectionNode|null
      */
     protected function getCurrentExpandedProjectionNode()
     {

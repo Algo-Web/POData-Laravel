@@ -9,7 +9,7 @@ abstract class MetadataBaseProvider extends ServiceProvider
 {
 
     /**
-     * @return mixed
+     * @return bool
      */
     protected function getIsCaching()
     {

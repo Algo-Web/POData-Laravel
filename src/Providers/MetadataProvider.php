@@ -93,7 +93,7 @@ class MetadataProvider extends MetadataBaseProvider
     /**
      * @param $meta
      * @param $ends
-     * @return array
+     * @return array[]
      */
     protected function getEntityTypesAndResourceSets($meta, $ends)
     {
@@ -282,7 +282,7 @@ class MetadataProvider extends MetadataBaseProvider
      * @param $dependentType
      * @param $dependentMult
      * @param $dependentProperty
-     * @return array
+     * @return array[]
      */
     private function calculateRoundTripRelationsGenForwardReverse(
         $principalType,
