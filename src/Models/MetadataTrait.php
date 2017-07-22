@@ -29,7 +29,7 @@ trait MetadataTrait
         'decimal' => EdmPrimitiveType::DECIMAL,
         'text' => EdmPrimitiveType::STRING,
         'boolean' => EdmPrimitiveType::BOOLEAN,
-        'blob' => "stream"
+        'blob' => 'stream'
     ];
 
     /*
@@ -130,8 +130,10 @@ trait MetadataTrait
 
     /*
      * Assemble this model's OData metadata as xml schema
+     *
+     * @return ResourceEntityType
      */
-    public function getXmlSchema($MetaNamespace = "Data")
+    public function getXmlSchema($metaNamespace = 'Data')
     {
         $raw = $this->metadata();
         if ([] == $raw) {
@@ -140,8 +142,8 @@ trait MetadataTrait
 
         $metadata = App::make('metadata');
 
-        $rf = new \ReflectionClass(get_class($this));
-        $complex = $metadata->addEntityType($rf, $rf->getShortName(), $MetaNamespace);
+        $reflec = new \ReflectionClass(get_class($this));
+        $complex = $metadata->addEntityType($reflec, $reflec->getShortName(), $metaNamespace);
         $keyName = $this->getKeyName();
         if (null != $keyName) {
             $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);
@@ -151,7 +153,7 @@ trait MetadataTrait
             if ($key == $keyName) {
                 continue;
             }
-            if ($secret['type'] == "blob") {
+            if ($secret['type'] == 'blob') {
                 $complex->setMediaLinkEntry(true);
                 $streamInfo = new ResourceStreamInfo($key);
                 assert($complex->isMediaLinkEntry());
@@ -176,7 +178,7 @@ trait MetadataTrait
 
     public function hookUpRelationships($entityTypes, $resourceSets)
     {
-        assert(is_array($entityTypes) && is_array($resourceSets), "Both entityTypes and resourceSets must be arrays");
+        assert(is_array($entityTypes) && is_array($resourceSets), 'Both entityTypes and resourceSets must be arrays');
         $metadata = App::make('metadata');
         $rel = $this->getRelationshipsFromMethods();
         $thisClass = get_class($this);
@@ -190,14 +192,14 @@ trait MetadataTrait
         $resourceType = $entityTypes[$thisClass];
         // if $r is in $combined keys, then its in keyspaces of both $entityTypes and $resourceSets
         $combinedKeys = array_intersect(array_keys($entityTypes), array_keys($resourceSets));
-        foreach ($rel["HasOne"] as $n => $r) {
+        foreach ($rel['HasOne'] as $n => $r) {
             $r = trim($r, '\\');
             if (in_array($r, $combinedKeys)) {
                 $targResourceSet = $resourceSets[$r];
                 $metadata->addResourceReferenceProperty($resourceType, $n, $targResourceSet);
             }
         }
-        foreach ($rel["HasMany"] as $n => $r) {
+        foreach ($rel['HasMany'] as $n => $r) {
             $r = trim($r, '\\');
             if (in_array($r, $combinedKeys)) {
                 $targResourceSet = $resourceSets[$r];
@@ -207,6 +209,11 @@ trait MetadataTrait
         return $rel;
     }
 
+    /**
+     * Get model's relationships
+     *
+     * @return array
+     */
     public function getRelationships()
     {
         $hooks = [];
@@ -254,10 +261,10 @@ trait MetadataTrait
     {
         $model = $this;
         $relationships = [
-            "HasOne" => [],
-            "UnknownPolyMorphSide"=> [],
-            "HasMany"=> [],
-            "KnownPolyMorphSide"=> []
+            'HasOne' => [],
+            'UnknownPolyMorphSide'=> [],
+            'HasMany'=> [],
+            'KnownPolyMorphSide'=> []
         ];
         $methods = get_class_methods($model);
         if (!empty($methods)) {
@@ -280,7 +287,7 @@ trait MetadataTrait
                     $begin = strpos($code, 'function(');
                     $code = substr($code, $begin, strrpos($code, '}')-$begin+1);
                     $lastCode = $code[strlen($code)-1];
-                    assert("}" == $lastCode, "Final character of function definition must be closing brace");
+                    assert('}' == $lastCode, 'Final character of function definition must be closing brace');
                     foreach ([
                                 'hasMany',
                                 'hasManyThrough',
@@ -309,21 +316,21 @@ trait MetadataTrait
                                 ];
                                 if (in_array($relation, $relations)) {
                                     //Collection or array of models (because Collection is Arrayable)
-                                    $relationships["HasMany"][$method] = $biDir ? $relationObj : $relatedModel;
-                                } elseif ($relation === "morphTo") {
+                                    $relationships['HasMany'][$method] = $biDir ? $relationObj : $relatedModel;
+                                } elseif ('morphTo' === $relation) {
                                     // Model isn't specified because relation is polymorphic
-                                    $relationships["UnknownPolyMorphSide"][$method] =
+                                    $relationships['UnknownPolyMorphSide'][$method] =
                                         $biDir ? $relationObj : '\Illuminate\Database\Eloquent\Model|\Eloquent';
                                 } else {
                                     //Single model is returned
-                                    $relationships["HasOne"][$method] = $biDir ? $relationObj : $relatedModel;
+                                    $relationships['HasOne'][$method] = $biDir ? $relationObj : $relatedModel;
                                 }
-                                if (in_array($relation, ["morphMany", "morphOne", "morphedByMany"])) {
-                                    $relationships["KnownPolyMorphSide"][$method] =
+                                if (in_array($relation, ['morphMany', 'morphOne', 'morphedByMany'])) {
+                                    $relationships['KnownPolyMorphSide'][$method] =
                                         $biDir ? $relationObj : $relatedModel;
                                 }
-                                if (in_array($relation, ["morphToMany"])) {
-                                    $relationships["UnknownPolyMorphSide"][$method] =
+                                if (in_array($relation, ['morphToMany'])) {
+                                    $relationships['UnknownPolyMorphSide'][$method] =
                                         $biDir ? $relationObj : $relatedModel;
                                 }
                             }
@@ -442,7 +449,7 @@ trait MetadataTrait
                         break;
                     }
                 }
-                assert(in_array($fkMethodName, $methodList), "Selected method, ".$fkMethodName.", not in method list");
+                assert(in_array($fkMethodName, $methodList), 'Selected method, '.$fkMethodName.', not in method list');
                 $rkMethodName = 'getQualifiedRelatedPivotKeyName';
                 foreach ($rkList as $option) {
                     if (in_array($option, $methodList)) {
@@ -450,7 +457,7 @@ trait MetadataTrait
                         break;
                     }
                 }
-                assert(in_array($rkMethodName, $methodList), "Selected method, ".$rkMethodName.", not in method list");
+                assert(in_array($rkMethodName, $methodList), 'Selected method, '.$rkMethodName.', not in method list');
                 $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
                 static::$methodPrimary[get_class($foo)] = $line;
             }
@@ -479,7 +486,7 @@ trait MetadataTrait
                         break;
                     }
                 }
-                assert(in_array($fkMethodName, $methodList), "Selected method, ".$fkMethodName.", not in method list");
+                assert(in_array($fkMethodName, $methodList), 'Selected method, '.$fkMethodName.', not in method list');
                 $rkMethodName = 'getQualifiedParentKeyName';
                 foreach ($rkList as $option) {
                     if (in_array($option, $methodList)) {
@@ -487,7 +494,7 @@ trait MetadataTrait
                         break;
                     }
                 }
-                assert(in_array($rkMethodName, $methodList), "Selected method, ".$rkMethodName.", not in method list");
+                assert(in_array($rkMethodName, $methodList), 'Selected method, '.$rkMethodName.', not in method list');
                 $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
                 static::$methodAlternate[get_class($foo)] = $line;
             }
@@ -622,7 +629,7 @@ trait MetadataTrait
             $localName = $localSegments[count($localSegments) - 1];
 
             $first = $keyName;
-            $last = (isset($localName) && "" != $localName) ? $localName : $foo->getRelated()->getKeyName();
+            $last = (isset($localName) && '' != $localName) ? $localName : $foo->getRelated()->getKeyName();
             $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
         }
     }
@@ -656,7 +663,7 @@ trait MetadataTrait
     public function setEagerLoad(array $relations)
     {
         $check = array_map('strval', $relations);
-        assert($relations == $check, "All supplied relations must be resolvable to strings");
+        assert($relations == $check, 'All supplied relations must be resolvable to strings');
         $this->loadEagerRelations = $relations;
     }
 }

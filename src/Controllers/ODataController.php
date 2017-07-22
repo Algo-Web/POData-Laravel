@@ -24,10 +24,10 @@ class ODataController extends BaseController
     public function index(Request $request, $dump = false)
     {
         $dump = (true === $dump) || $this->getIsDumping();
-        //$antiXss = new AntiXSS();
-        $op = new OperationContextAdapter($request);
-        $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+
+        $context = new OperationContextAdapter($request);
+        $host = new ServiceHost($context, $request);
+        $host->setServiceUri('/odata.svc/');
 
         $query = App::make('odataquery');
         $meta = App::make('metadata');
@@ -37,7 +37,7 @@ class ODataController extends BaseController
         $service = new DataService($query, $meta, $host, $cereal);
         $service->handleRequest();
 
-        $odataResponse = $op->outgoingResponse();
+        $odataResponse = $context->outgoingResponse();
 
         if (true === $dump) {
             // iff XTest header is set, containing class and method name
@@ -46,7 +46,7 @@ class ODataController extends BaseController
             $date = Carbon::now(0);
             $timeString = $date->toTimeString();
             $xTest = (null !== $xTest) ? $xTest
-                : $request->method() . ";" . str_replace("/", "-", $request->path()) . ";" . $timeString . ";";
+                : $request->method() . ';' . str_replace('/', '-', $request->path()) . ';' . $timeString . ';';
             if (null != $xTest) {
                 $reflectionClass = new \ReflectionClass('Illuminate\Http\Request');
                 $reflectionProperty = $reflectionClass->getProperty('userResolver');
@@ -65,12 +65,12 @@ class ODataController extends BaseController
         }
 
         $content = $odataResponse->getStream();
-        //$content = $antiXss->xss_clean($content);
+
         $headers = $odataResponse->getHeaders();
         $responseCode = $headers[\POData\Common\ODataConstants::HTTPRESPONSE_HEADER_STATUS_CODE];
         $responseCode = isset($responseCode) ? intval($responseCode) : 200;
         $response = new Response($content, $responseCode);
-        $response->setStatusCode($headers["Status"]);
+        $response->setStatusCode($headers['Status']);
 
         foreach ($headers as $headerName => $headerValue) {
             if (!is_null($headerValue)) {
@@ -81,7 +81,7 @@ class ODataController extends BaseController
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     protected function getIsDumping()
     {

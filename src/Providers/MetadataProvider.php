@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Schema as Schema;
 class MetadataProvider extends MetadataBaseProvider
 {
     protected $multConstraints = [ '0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
-    protected static $METANAMESPACE = "Data";
+    protected static $metaNAMESPACE = 'Data';
 
     /**
      * Bootstrap the application services.  Post-boot.
@@ -23,7 +23,7 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function boot()
     {
-        self::$METANAMESPACE = env('ODataMetaNamespace', 'Data');
+        self::$metaNAMESPACE = env('ODataMetaNamespace', 'Data');
         // If we aren't migrated, there's no DB tables to pull metadata _from_, so bail out early
         try {
             if (!Schema::hasTable(config('database.migrations'))) {
@@ -45,7 +45,7 @@ class MetadataProvider extends MetadataBaseProvider
 
         $modelNames = $this->getCandidateModels();
 
-        list($EntityTypes) = $this->getEntityTypesAndResourceSets($meta, $modelNames);
+        list($entityTypes) = $this->getEntityTypesAndResourceSets($meta, $modelNames);
 
         // need to lift EntityTypes
         $biDirect = $this->calculateRoundTripRelations();
@@ -53,7 +53,7 @@ class MetadataProvider extends MetadataBaseProvider
         // now that endpoints are hooked up, tackle the relationships
         // if we'd tried earlier, we'd be guaranteed to try to hook a relation up to null, which would be bad
         foreach ($biDirect as $line) {
-            $this->processRelationLine($line, $EntityTypes, $meta);
+            $this->processRelationLine($line, $entityTypes, $meta);
         }
 
         $key = 'metadata';
@@ -68,7 +68,7 @@ class MetadataProvider extends MetadataBaseProvider
     public function register()
     {
         $this->app->singleton('metadata', function ($app) {
-            return new SimpleMetadataProvider('Data', self::$METANAMESPACE);
+            return new SimpleMetadataProvider('Data', self::$metaNAMESPACE);
         });
     }
 
@@ -77,12 +77,12 @@ class MetadataProvider extends MetadataBaseProvider
      */
     protected function getCandidateModels()
     {
-        $Classes = $this->getClassMap();
+        $classes = $this->getClassMap();
         $ends = [];
-        $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : "App";
-        foreach ($Classes as $name) {
+        $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : 'App';
+        foreach ($classes as $name) {
             if (\Illuminate\Support\Str::startsWith($name, $startName)) {
-                if (in_array("AlgoWeb\\PODataLaravel\\Models\\MetadataTrait", class_uses($name))) {
+                if (in_array('AlgoWeb\\PODataLaravel\\Models\\MetadataTrait', class_uses($name))) {
                     $ends[] = $name;
                 }
             }
@@ -93,13 +93,13 @@ class MetadataProvider extends MetadataBaseProvider
     /**
      * @param $meta
      * @param $ends
-     * @return array
+     * @return array[]
      */
     protected function getEntityTypesAndResourceSets($meta, $ends)
     {
         assert($meta instanceof IMetadataProvider, get_class($meta));
-        $EntityTypes = [];
-        $ResourceSets = [];
+        $entityTypes = [];
+        $resourceSets = [];
         $begins = [];
         $numEnds = count($ends);
 
@@ -116,12 +116,12 @@ class MetadataProvider extends MetadataBaseProvider
             if (null == $metaSchema) {
                 continue;
             }
-            $EntityTypes[$fqModelName] = $metaSchema;
-            $ResourceSets[$fqModelName] = $meta->addResourceSet($name, $metaSchema);
+            $entityTypes[$fqModelName] = $metaSchema;
+            $resourceSets[$fqModelName] = $meta->addResourceSet($name, $metaSchema);
             $begins[] = $bitter;
         }
 
-        return [$EntityTypes, $ResourceSets, $begins];
+        return [$entityTypes, $resourceSets, $begins];
     }
 
     public function calculateRoundTripRelations()
@@ -188,11 +188,11 @@ class MetadataProvider extends MetadataBaseProvider
                     $dependentProperty = $foreign[$dependentType]['property'];
                     assert(
                         in_array($dependentMult, $this->multConstraints[$principalMult]),
-                        "Cannot pair multiplicities " . $dependentMult . " and " . $principalMult
+                        'Cannot pair multiplicities ' . $dependentMult . ' and ' . $principalMult
                     );
                     assert(
                         in_array($principalMult, $this->multConstraints[$dependentMult]),
-                        "Cannot pair multiplicities " . $principalMult . " and " . $dependentMult
+                        'Cannot pair multiplicities ' . $principalMult . ' and ' . $dependentMult
                     );
                     // generate forward and reverse relations
                     list($forward, $reverse) = $this->calculateRoundTripRelationsGenForwardReverse(
@@ -239,11 +239,11 @@ class MetadataProvider extends MetadataBaseProvider
                         $dependentProperty = $foreign['property'];
                         assert(
                             in_array($dependentMult, $this->multConstraints[$principalMult]),
-                            "Cannot pair multiplicities " . $dependentMult . " and " . $principalMult
+                            'Cannot pair multiplicities ' . $dependentMult . ' and ' . $principalMult
                         );
                         assert(
                             in_array($principalMult, $this->multConstraints[$dependentMult]),
-                            "Cannot pair multiplicities " . $principalMult . " and " . $dependentMult
+                            'Cannot pair multiplicities ' . $principalMult . ' and ' . $dependentMult
                         );
                         // generate forward and reverse relations
                         list($forward, $reverse) = $this->calculateRoundTripRelationsGenForwardReverse(
@@ -282,7 +282,7 @@ class MetadataProvider extends MetadataBaseProvider
      * @param $dependentType
      * @param $dependentMult
      * @param $dependentProperty
-     * @return array
+     * @return array[]
      */
     private function calculateRoundTripRelationsGenForwardReverse(
         $principalType,
@@ -311,7 +311,7 @@ class MetadataProvider extends MetadataBaseProvider
         return [$forward, $reverse];
     }
 
-    private function processRelationLine($line, $EntityTypes, &$meta)
+    private function processRelationLine($line, $entityTypes, &$meta)
     {
         $principalType = $line['principalType'];
         $principalMult = $line['principalMult'];
@@ -319,11 +319,11 @@ class MetadataProvider extends MetadataBaseProvider
         $dependentType = $line['dependentType'];
         $dependentMult = $line['dependentMult'];
         $dependentProp = $line['dependentProp'];
-        if (!isset($EntityTypes[$principalType]) || !isset($EntityTypes[$dependentType])) {
+        if (!isset($entityTypes[$principalType]) || !isset($entityTypes[$dependentType])) {
             return;
         }
-        $principal = $EntityTypes[$principalType];
-        $dependent = $EntityTypes[$dependentType];
+        $principal = $entityTypes[$principalType];
+        $dependent = $entityTypes[$dependentType];
         //many-to-many
         if ('*' == $principalMult && '*' == $dependentMult) {
             $meta->addResourceSetReferencePropertyBidirectional(
@@ -336,7 +336,7 @@ class MetadataProvider extends MetadataBaseProvider
         }
         //one-to-one
         if ('0..1' == $principalMult || '0..1' == $dependentMult) {
-            assert($principalMult != $dependentMult, "Cannot have both ends with 0..1 multiplicity");
+            assert($principalMult != $dependentMult, 'Cannot have both ends with 0..1 multiplicity');
             $meta->addResourceReferenceSinglePropertyBidirectional(
                 $principal,
                 $dependent,
@@ -345,7 +345,7 @@ class MetadataProvider extends MetadataBaseProvider
             );
             return;
         }
-        assert($principalMult != $dependentMult, "Cannot have both ends same multiplicity for 1:N relation");
+        assert($principalMult != $dependentMult, 'Cannot have both ends same multiplicity for 1:N relation');
         //principal-one-to-dependent-many
         if ('*' == $principalMult) {
             $meta->addResourceReferencePropertyBidirectional(

@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\UriProcessor\QueryProcessor\Expression\Parser\IExpressionProvider;
@@ -80,13 +81,13 @@ class LaravelQuery implements IQueryProvider
      * IE: http://host/EntitySet
      *  http://host/EntitySet?$skip=10&$top=5&filter=Prop gt Value
      *
-     * @param QueryType                 $queryType   indicates if this is a query for a count, entities, or entities with a count
-     * @param ResourceSet               $resourceSet The entity set containing the entities to fetch
-     * @param FilterInfo                $filterInfo  represents the $filter parameter of the OData query.  NULL if no $filter specified
-     * @param null|InternalOrderByInfo  $orderBy     sorted order if we want to get the data in some specific order
-     * @param int                       $top         number of records which need to be retrieved
-     * @param int                       $skip        number of records which need to be skipped
-     * @param SkipTokenInfo|null        $skipToken   value indicating what records to skip
+     * @param QueryType                $queryType   Is this is a query for a count, entities, or entities-with-count
+     * @param ResourceSet              $resourceSet The entity set containing the entities to fetch
+     * @param FilterInfo|null          $filterInfo  The $filter parameter of the OData query.  NULL if none specified
+     * @param null|InternalOrderByInfo $orderBy     sorted order if we want to get the data in some specific order
+     * @param integer|null             $top         number of records which need to be retrieved
+     * @param integer|null             $skip        number of records which need to be skipped
+     * @param SkipTokenInfo|null       $skipToken   value indicating what records to skip
      * @param Model|Relation|null       $sourceEntityInstance Starting point of query
      *
      * @return QueryResult
@@ -117,10 +118,10 @@ class LaravelQuery implements IQueryProvider
      * IE: http://host/EntitySet(1L)
      * http://host/EntitySet(KeyA=2L,KeyB='someValue')
      *
-     * @param ResourceSet $resourceSet The entity set containing the entity to fetch
-     * @param KeyDescriptor $keyDescriptor The key identifying the entity to fetch
+     * @param ResourceSet           $resourceSet    The entity set containing the entity to fetch
+     * @param KeyDescriptor|null    $keyDescriptor  The key identifying the entity to fetch
      *
-     * @return object|null Returns entity instance if found else null
+     * @return Model|null Returns entity instance if found else null
      */
     public function getResourceFromResourceSet(
         ResourceSet $resourceSet,
@@ -184,7 +185,7 @@ class LaravelQuery implements IQueryProvider
      * @param ResourceProperty $targetProperty The metadata of the target property.
      * @param KeyDescriptor $keyDescriptor The key identifying the entity to fetch
      *
-     * @return object|null Returns entity instance if found else null
+     * @return Model|null Returns entity instance if found else null
      */
     public function getResourceFromRelatedResourceSet(
         ResourceSet $sourceResourceSet,
@@ -252,7 +253,7 @@ class LaravelQuery implements IQueryProvider
     }
     /**
      * Delete resource from a resource set.
-     * @param ResourceSet|null $sourceResourceSet
+     * @param ResourceSet      $sourceResourceSet
      * @param object           $sourceEntityInstance
      *
      * return bool true if resources sucessfully deteled, otherwise false.
@@ -302,7 +303,7 @@ class LaravelQuery implements IQueryProvider
      * @param string $verb
      * @return array|mixed
      * @throws ODataException
-     * @throws \POData\Common\InvalidOperationException
+     * @throws InvalidOperationException
      */
     private function createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb)
     {
@@ -319,11 +320,13 @@ class LaravelQuery implements IQueryProvider
             );
         }
 
-        assert($data != null, "Data must not be null");
+        assert(null !== $data, 'Data must not be null');
         if (is_object($data)) {
-            $data = (array) $data;
+            $arrayData = (array) $data;
+        } else {
+            $arrayData = $data;
         }
-        if (!is_array($data)) {
+        if (!is_array($arrayData)) {
             throw \POData\Common\ODataException::createPreConditionFailedError(
                 'Data not resolvable to key-value array.'
             );
@@ -333,7 +336,7 @@ class LaravelQuery implements IQueryProvider
         $method = $goal['method'];
         $paramList = $goal['parameters'];
         $controller = App::make($controlClass);
-        $parms = $this->createUpdateDeleteProcessInput($sourceEntityInstance, $data, $paramList);
+        $parms = $this->createUpdateDeleteProcessInput($sourceEntityInstance, $arrayData, $paramList);
         unset($data);
 
         $result = call_user_func_array(array($controller, $method), $parms);
@@ -377,7 +380,7 @@ class LaravelQuery implements IQueryProvider
 
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
         if (!$this->auth->canAuth($this->verbMap[$verb], $class, $sourceEntityInstance)) {
-            throw new ODataException("Access denied", 403);
+            throw new ODataException('Access denied', 403);
         }
 
         $data = $this->createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb);

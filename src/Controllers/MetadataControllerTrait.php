@@ -32,15 +32,13 @@ trait MetadataControllerTrait
         // enforce we're actually hooked up to a controller
         assert($this instanceof BaseController, get_class($this));
         // enforce that mapping is actually not empty
-        assert(0 < count($this->mapping), "Mapping array must not be empty");
+        assert(0 < count($this->mapping), 'Mapping array must not be empty');
 
         if (!array_key_exists($modelName, $this->mapping)) {
             throw new \Exception('Metadata mapping for model '.$modelName.' not defined');
         }
 
-        if (!in_array(strtolower($crudVerb), $this->crudVerbs)) {
-            throw new \Exception('CRUD verb '.$crudVerb.' not defined');
-        }
+        $this->checkCrudVerbDefined($crudVerb);
 
         $lookup = $this->mapping[$modelName];
         if (!is_array($lookup)) {
@@ -72,7 +70,7 @@ trait MetadataControllerTrait
         // enforce we're actually hooked up to a controller
         assert($this instanceof BaseController, get_class($this));
         // enforce that mapping is actually not empty
-        assert(!empty($this->mapping), "Mapping array must not be empty");
+        assert(!empty($this->mapping), 'Mapping array must not be empty');
 
         $allMappings = [];
 
@@ -82,9 +80,7 @@ trait MetadataControllerTrait
                 throw new \Exception('Metadata mapping for model '.$key.' not an array');
             }
             foreach ($map as $verb => $method) {
-                if (!in_array(strtolower($verb), $this->crudVerbs)) {
-                    throw new \Exception('CRUD verb '.$verb.' not defined');
-                }
+                $this->checkCrudVerbDefined($verb);
                 if (!isset($method)) {
                     throw new \Exception('Metadata mapping for CRUD verb '.$verb.' on model '.$key.' null');
                 }
@@ -113,8 +109,8 @@ trait MetadataControllerTrait
     protected function getParameterNames($result)
     {
         $parmArray = [];
-        $r = new \ReflectionMethod($this, $result);
-        $params = $r->getParameters();
+        $reflec = new \ReflectionMethod($this, $result);
+        $params = $reflec->getParameters();
         foreach ($params as $parm) {
             $detail = [];
             $detail['name'] = $parm->name;
@@ -132,5 +128,17 @@ trait MetadataControllerTrait
             $parmArray[$parm->name] = $detail;
         }
         return $parmArray;
+    }
+
+    /**
+     * @param string $crudVerb
+     * @throws \Exception
+     */
+    private function checkCrudVerbDefined($crudVerb)
+    {
+        assert(is_string($crudVerb));
+        if (!in_array(strtolower($crudVerb), $this->crudVerbs)) {
+            throw new \Exception('CRUD verb ' . $crudVerb . ' not defined');
+        }
     }
 }

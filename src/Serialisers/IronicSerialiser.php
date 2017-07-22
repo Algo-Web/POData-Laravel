@@ -34,6 +34,7 @@ use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjectionNode;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ProjectionNode;
+use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\RootProjectionNode;
 use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
 use POData\UriProcessor\RequestDescription;
 use POData\UriProcessor\SegmentStack;
@@ -91,8 +92,8 @@ class IronicSerialiser implements IObjectSerialiser
     private $modelSerialiser;
 
     /**
-     * @param IService           $service Reference to the data service instance
-     * @param RequestDescription $request Type instance describing the client submitted request
+     * @param IService                  $service    Reference to the data service instance
+     * @param RequestDescription|null   $request    Type instance describing the client submitted request
      */
     public function __construct(IService $service, RequestDescription $request = null)
     {
@@ -108,9 +109,9 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write a top level entry resource.
      *
-     * @param mixed $entryObject Reference to the entry object to be written
+     * @param QueryResult $entryObject Reference to the entry object to be written
      *
-     * @return ODataEntry
+     * @return ODataEntry|null
      */
     public function writeTopLevelElement(QueryResult $entryObject)
     {
@@ -147,7 +148,12 @@ class IronicSerialiser implements IObjectSerialiser
         );
         $absoluteUri = rtrim($this->absoluteServiceUri, '/') . '/' . $relativeUri;
 
-        list($mediaLink, $mediaLinks) = $this->writeMediaData($entryObject->results, $type, $relativeUri, $resourceType);
+        list($mediaLink, $mediaLinks) = $this->writeMediaData(
+            $entryObject->results,
+            $type,
+            $relativeUri,
+            $resourceType
+        );
 
         $propertyContent = $this->writePrimitiveProperties($entryObject->results, $nonRelProp);
 
@@ -191,7 +197,10 @@ class IronicSerialiser implements IObjectSerialiser
         $odata->links = $links;
 
         $newCount = count($this->lightStack);
-        assert($newCount == $stackCount, "Should have $stackCount elements in stack, have $newCount elements");
+        assert(
+            $newCount == $stackCount,
+            'Should have ' . $stackCount . 'elements in stack, have ' . $newCount . 'elements'
+        );
         array_pop($this->lightStack);
         return $odata;
     }
@@ -199,7 +208,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level feed element.
      *
-     * @param array &$entryObjects Array of entry resources to be written
+     * @param QueryResult &$entryObjects Array of entry resources to be written
      *
      * @return ODataFeed
      */
@@ -258,7 +267,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level url element.
      *
-     * @param mixed $entryObject The entry resource whose url to be written
+     * @param QueryResult $entryObject The entry resource whose url to be written
      *
      * @return ODataURL
      */
@@ -282,8 +291,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level url collection.
      *
-     * @param array $entryObjects Array of entry resources
-     *                            whose url to be written
+     * @param QueryResult $entryObjects Array of entry resources whose url to be written
      *
      * @return ODataURLCollection
      */
@@ -318,12 +326,9 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level complex resource.
      *
-     * @param mixed &$complexValue The complex object to be
-     *                                    written
-     * @param string $propertyName The name of the
-     *                                    complex property
-     * @param ResourceType &$resourceType Describes the type of
-     *                                    complex object
+     * @param QueryResult &$complexValue The complex object to be written
+     * @param string $propertyName The name of the complex property
+     * @param ResourceType &$resourceType Describes the type of complex object
      *
      * @return ODataPropertyContent
      */
@@ -348,7 +353,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level bag resource.
      *
-     * @param mixed &$BagValue The bag object to be
+     * @param QueryResult &$BagValue The bag object to be
      *                                    written
      * @param string $propertyName The name of the
      *                                    bag property
@@ -373,7 +378,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level primitive value.
      *
-     * @param mixed &$primitiveValue              The primitive value to be
+     * @param QueryResult &$primitiveValue              The primitive value to be
      *                                            written
      * @param ResourceProperty &$resourceProperty Resource property describing the
      *                                            primitive property to be written
@@ -381,7 +386,7 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeTopLevelPrimitive(QueryResult &$primitiveValue, ResourceProperty &$resourceProperty = null)
     {
-        assert(null != $resourceProperty, "Resource property must not be null");
+        assert(null != $resourceProperty, 'Resource property must not be null');
         $propertyContent = new ODataPropertyContent();
 
         $odataProperty = new ODataProperty();
@@ -393,6 +398,7 @@ class IronicSerialiser implements IObjectSerialiser
             $odataProperty->value = null;
         } else {
             $rType = $resourceProperty->getResourceType()->getInstanceType();
+            assert($rType instanceof IType, get_class($rType));
             $odataProperty->value = $this->primitiveToString($rType, $primitiveValue->results);
         }
 
@@ -477,13 +483,13 @@ class IronicSerialiser implements IObjectSerialiser
      * @param $type
      * @param $relativeUri
      * @param $resourceType
-     * @return array
+     * @return array<ODataMediaLink|null|array>
      */
     protected function writeMediaData($entryObject, $type, $relativeUri, ResourceType $resourceType)
     {
         $context = $this->getService()->getOperationContext();
         $streamProviderWrapper = $this->getService()->getStreamProviderWrapper();
-        assert(null != $streamProviderWrapper, "Retrieved stream provider must not be null");
+        assert(null != $streamProviderWrapper, 'Retrieved stream provider must not be null');
 
         $mediaLink = null;
         if ($resourceType->isMediaLinkEntry()) {
@@ -521,12 +527,12 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Gets collection of projection nodes under the current node.
      *
-     * @return ProjectionNode[]|ExpandedProjectionNode[]|null List of nodes
-     *                                                        describing projections for the current segment, If this method returns
-     *                                                        null it means no projections are to be applied and the entire resource
-     *                                                        for the current segment should be serialized, If it returns non-null
-     *                                                        only the properties described by the returned projection segments should
-     *                                                        be serialized
+     * @return ProjectionNode[]|ExpandedProjectionNode[]|null List of nodes describing projections for the current
+     *                                                        segment, If this method returns null it means no
+     *                                                        projections are to be applied and the entire resource for
+     *                                                        the current segment should be serialized, If it returns
+     *                                                        non-null only the properties described by the returned
+     *                                                        projection segments should be serialized
      */
     protected function getProjectionNodes()
     {
@@ -542,7 +548,7 @@ class IronicSerialiser implements IObjectSerialiser
      * Find a 'ExpandedProjectionNode' instance in the projection tree
      * which describes the current segment.
      *
-     * @return ExpandedProjectionNode|null
+     * @return null|RootProjectionNode|ExpandedProjectionNode
      */
     protected function getCurrentExpandedProjectionNode()
     {
@@ -578,8 +584,7 @@ class IronicSerialiser implements IObjectSerialiser
      *
      * @param string $navigationPropertyName Name of naviagtion property in question
      *
-     * @return bool True if the given navigation should be
-     *              explanded otherwise false
+     * @return bool True if the given navigation should be expanded, otherwise false
      */
     protected function shouldExpandSegment($navigationPropertyName)
     {
@@ -803,7 +808,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Gets the data service instance.
      *
-     * @return IService
+     * @return void
      */
     public function setService(IService $service)
     {
@@ -815,7 +820,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * @param ResourceType $resourceType
      * @param $result
-     * @return ODataBagContent
+     * @return ODataBagContent|null
      */
     protected function writeBagValue(ResourceType &$resourceType, $result)
     {
@@ -845,9 +850,9 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param ResourceType $resourceType
-     * @param object $result
-     * @param string $propertyName
+     * @param ResourceType  $resourceType
+     * @param object        $result
+     * @param string|null   $propertyName
      * @return ODataPropertyContent
      */
     protected function writeComplexValue(ResourceType &$resourceType, &$result, $propertyName = null)
@@ -879,6 +884,7 @@ class IronicSerialiser implements IObjectSerialiser
                 $internalProperty->typeName = $iType->getFullTypeName();
 
                 $rType = $prop->getResourceType()->getInstanceType();
+                assert($rType instanceof IType, get_class($rType));
                 $internalProperty->value = $this->primitiveToString($rType, $result->$propName);
 
                 $internalContent->properties[] = $internalProperty;

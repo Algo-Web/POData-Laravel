@@ -8,6 +8,7 @@ use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
+use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
 use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
 use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
@@ -33,13 +34,13 @@ class LaravelReadQuery
      * IE: http://host/EntitySet
      *  http://host/EntitySet?$skip=10&$top=5&filter=Prop gt Value
      *
-     * @param QueryType                 $queryType   indicates if this is a query for a count, entities, or entities with a count
-     * @param ResourceSet               $resourceSet The entity set containing the entities to fetch
-     * @param FilterInfo                $filterInfo  represents the $filter parameter of the OData query.  NULL if no $filter specified
-     * @param null|InternalOrderByInfo  $orderBy     sorted order if we want to get the data in some specific order
-     * @param int                       $top         number of records which need to be retrieved
-     * @param int                       $skip        number of records which need to be skipped
-     * @param SkipTokenInfo|null        $skipToken   value indicating what records to skip
+     * @param QueryType                $queryType   Is this is a query for a count, entities, or entities-with-count
+     * @param ResourceSet              $resourceSet The entity set containing the entities to fetch
+     * @param FilterInfo|null          $filterInfo  The $filter parameter of the OData query.  NULL if none specified
+     * @param null|InternalOrderByInfo $orderBy     sorted order if we want to get the data in some specific order
+     * @param integer|null             $top         number of records which need to be retrieved
+     * @param integer|null             $skip        number of records which need to be skipped
+     * @param SkipTokenInfo|null       $skipToken   value indicating what records to skip
      * @param Model|Relation|null $sourceEntityInstance Starting point of query
      *
      * @return QueryResult
@@ -108,7 +109,7 @@ class LaravelReadQuery
             for ($i = 0; $i < $numValues; $i++) {
                 $relation = $segments[$i]->isAscending() ? '>' : '<';
                 $name = $segments[$i]->getSubPathSegments()[0]->getName();
-                $parameters[$name] = ['direction' => $relation, 'value' => trim($values[$i][0], "\'")];
+                $parameters[$name] = ['direction' => $relation, 'value' => trim($values[$i][0], '\'')];
             }
 
             foreach ($parameters as $name => $line) {
@@ -135,8 +136,8 @@ class LaravelReadQuery
         $nullFilter = true;
         $isvalid = null;
         if (isset($filterInfo)) {
-            $method = "return ".$filterInfo->getExpressionAsString().";";
-            $clln = "$".$resourceSet->getResourceType()->getName();
+            $method = 'return '.$filterInfo->getExpressionAsString().';';
+            $clln = '$'.$resourceSet->getResourceType()->getName();
             $isvalid = create_function($clln, $method);
             $nullFilter = false;
         }
@@ -149,7 +150,7 @@ class LaravelReadQuery
             $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($eagerLoad)->get();
             $resultCount = $bulkSetCount;
         } elseif ($bigSet) {
-            assert(isset($isvalid), "Filter closure not set");
+            assert(isset($isvalid), 'Filter closure not set');
             $resultSet = collect([]);
             $rawCount = 0;
             $rawTop = null === $top ? $bulkSetCount : $top;
@@ -212,15 +213,16 @@ class LaravelReadQuery
      * IE: http://host/EntitySet(1L)/NavigationPropertyToCollection
      * http://host/EntitySet?$expand=NavigationPropertyToCollection
      *
-     * @param QueryType $queryType indicates if this is a query for a count, entities, or entities with a count
-     * @param ResourceSet $sourceResourceSet The entity set containing the source entity
-     * @param object $sourceEntityInstance The source entity instance.
-     * @param ResourceSet $targetResourceSet The resource set of containing the target of the navigation property
-     * @param ResourceProperty $targetProperty The navigation property to retrieve
-     * @param FilterInfo $filter represents the $filter parameter of the OData query.  NULL if no $filter specified
-     * @param mixed $orderBy sorted order if we want to get the data in some specific order
-     * @param int $top number of records which  need to be skip
-     * @param String $skip value indicating what records to skip
+     * @param QueryType          $queryType            Is this is a query for a count, entities, or entities-with-count
+     * @param ResourceSet        $sourceResourceSet    The entity set containing the source entity
+     * @param object             $sourceEntityInstance The source entity instance
+     * @param ResourceSet        $targetResourceSet    The resource set pointed to by the navigation property
+     * @param ResourceProperty   $targetProperty       The navigation property to retrieve
+     * @param FilterInfo|null    $filter               The $filter parameter of the OData query.  NULL if none specified
+     * @param mixed|null         $orderBy              sorted order if we want to get the data in some specific order
+     * @param integer|null       $top                  number of records which need to be retrieved
+     * @param integer|null       $skip                 number of records which need to be skipped
+     * @param SkipTokenInfo|null $skipToken            value indicating what records to skip
      *
      * @return QueryResult
      *
@@ -231,17 +233,17 @@ class LaravelReadQuery
         $sourceEntityInstance,
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty,
-        $filter = null,
+        FilterInfo $filter = null,
         $orderBy = null,
         $top = null,
         $skip = null,
-        $skipToken = null
+        SkipTokenInfo $skipToken = null
     ) {
         if (!($sourceEntityInstance instanceof Model)) {
             throw new InvalidArgumentException('Source entity must be an Eloquent model.');
         }
 
-        assert(null != $sourceEntityInstance, "Source instance must not be null");
+        assert(null != $sourceEntityInstance, 'Source instance must not be null');
         $this->checkSourceInstance($sourceEntityInstance);
 
         $this->checkAuth($sourceEntityInstance);
@@ -266,10 +268,10 @@ class LaravelReadQuery
      * IE: http://host/EntitySet(1L)
      * http://host/EntitySet(KeyA=2L,KeyB='someValue')
      *
-     * @param ResourceSet $resourceSet The entity set containing the entity to fetch
-     * @param KeyDescriptor $keyDescriptor The key identifying the entity to fetch
+     * @param ResourceSet           $resourceSet    The entity set containing the entity to fetch
+     * @param KeyDescriptor|null    $keyDescriptor  The key identifying the entity to fetch
      *
-     * @return object|null Returns entity instance if found else null
+     * @return Model|null Returns entity instance if found else null
      */
     public function getResourceFromResourceSet(
         ResourceSet $resourceSet,
@@ -281,9 +283,11 @@ class LaravelReadQuery
 
     /**
      * Common method for getResourceFromRelatedResourceSet() and getResourceFromResourceSet()
-     * @param ResourceSet|null $resourceSet
-     * @param KeyDescriptor|null $keyDescriptor
-     * @param Model|Relation|null $sourceEntityInstance Starting point of query
+     * @param ResourceSet|null      $resourceSet
+     * @param KeyDescriptor|null    $keyDescriptor
+     * @param Model|Relation|null   $sourceEntityInstance   Starting point of query
+     *
+     * @return Model|null
      */
     public function getResource(
         ResourceSet $resourceSet = null,
@@ -351,7 +355,7 @@ class LaravelReadQuery
      * @param ResourceProperty $targetProperty The metadata of the target property.
      * @param KeyDescriptor $keyDescriptor The key identifying the entity to fetch
      *
-     * @return object|null Returns entity instance if found else null
+     * @return Model|null Returns entity instance if found else null
      */
     public function getResourceFromRelatedResourceSet(
         ResourceSet $sourceResourceSet,
@@ -417,20 +421,20 @@ class LaravelReadQuery
                     : $sourceEntityInstance instanceof Relation ? $sourceEntityInstance
                         : null;
         if (!$this->getAuth()->canAuth(ActionVerb::READ(), get_class($sourceEntityInstance), $check)) {
-            throw new ODataException("Access denied", 403);
+            throw new ODataException('Access denied', 403);
         }
     }
 
     /**
      * @param $sourceEntityInstance
-     * @param KeyDescriptor $keyDescriptor
-     * @throws \POData\Common\InvalidOperationException
+     * @param KeyDescriptor|null    $keyDescriptor
+     * @throws InvalidOperationException
      */
     private function processKeyDescriptor(&$sourceEntityInstance, KeyDescriptor $keyDescriptor = null)
     {
         if ($keyDescriptor) {
             foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
-                $trimValue = trim($value[0], "\"'");
+                $trimValue = trim($value[0], '\'');
                 $sourceEntityInstance = $sourceEntityInstance->where($key, $trimValue);
             }
         }

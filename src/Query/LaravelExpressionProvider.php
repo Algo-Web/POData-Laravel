@@ -52,80 +52,81 @@ class LaravelExpressionProvider implements IExpressionProvider
     public function __construct()
     {
         $this->functionDescriptionParsers[ODataConstants::STRFUN_COMPARE] = function ($params) {
-            return "strcmp($params[0], $params[1])";
+            return 'strcmp('.$params[0].', '.$params[1].')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_ENDSWITH] = function ($params) {
-            return "(strcmp(substr($params[0], strlen($params[0]) - strlen($params[1])), $params[1]) === 0)";
+            return '(strcmp(substr('.$params[0].', strlen('.$params[0].') - strlen('.$params[1].')), '
+                   .$params[1].') === 0)';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_INDEXOF] = function ($params) {
-            return "strpos($params[0], $params[1])";
+            return 'strpos('.$params[0].', '.$params[1].')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_REPLACE] = function ($params) {
-            return "str_replace($params[1], $params[2], $params[0])";
+            return 'str_replace('.$params[1].', '.$params[2].', '.$params[0].')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_STARTSWITH] = function ($params) {
-            return "(strpos($params[0], $params[1]) === 0)";
+            return '(strpos('.$params[0].', '.$params[1].') === 0)';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_TOLOWER] = function ($params) {
-            return "strtolower($params[0])";
+            return 'strtolower('.$params[0].')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_TOUPPER] = function ($params) {
-            return "strtoupper($params[0])";
+            return 'strtoupper('.$params[0].')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_TRIM] = function ($params) {
-            return "trim($params[0])";
+            return 'trim('.$params[0].')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_SUBSTRING] = function ($params) {
             return count($params) == 3 ?
-                "substr($params[0], $params[1], $params[2])" : "substr($params[0], $params[1])";
+                'substr('.$params[0].', '.$params[1].', '.$params[2].')' : 'substr('.$params[0].', '.$params[1].')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_SUBSTRINGOF] = function ($params) {
-            return "(strpos($params[1], $params[0]) !== false)";
+            return '(strpos('.$params[1].', '.$params[0].') !== false)';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_CONCAT] = function ($params) {
             return $params[0].' . '.$params[1];
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_LENGTH] = function ($params) {
-            return "strlen($params[0])";
+            return 'strlen('.$params[0].')';
         };
         $this->functionDescriptionParsers[ODataConstants::GUIDFUN_EQUAL] = function ($params) {
-            return self::TYPE_NAMESPACE."Guid::guidEqual($params[0], $params[1])";
+            return self::TYPE_NAMESPACE.'Guid::guidEqual('.$params[0].', '.$params[1].')';
         };
         $this->functionDescriptionParsers[ODataConstants::DATETIME_COMPARE] = function ($params) {
-            return self::TYPE_NAMESPACE."DateTime::dateTimeCmp($params[0], $params[1])";
+            return self::TYPE_NAMESPACE.'DateTime::dateTimeCmp('.$params[0].', '.$params[1].')';
         };
         $this->functionDescriptionParsers[ODataConstants::DATETIME_YEAR] = function ($params) {
-            return self::TYPE_NAMESPACE."DateTime::year($params[0])";
+            return self::TYPE_NAMESPACE.'DateTime::year('.$params[0].')';
         };
         $this->functionDescriptionParsers[ODataConstants::DATETIME_MONTH] = function ($params) {
-            return self::TYPE_NAMESPACE."DateTime::month($params[0])";
+            return self::TYPE_NAMESPACE.'DateTime::month('.$params[0].')';
         };
         $this->functionDescriptionParsers[ODataConstants::DATETIME_DAY] = function ($params) {
-            return self::TYPE_NAMESPACE."DateTime::day($params[0])";
+            return self::TYPE_NAMESPACE.'DateTime::day('.$params[0].')';
         };
         $this->functionDescriptionParsers[ODataConstants::DATETIME_HOUR] = function ($params) {
-            return self::TYPE_NAMESPACE."DateTime::hour($params[0])";
+            return self::TYPE_NAMESPACE.'DateTime::hour('.$params[0].')';
         };
         $this->functionDescriptionParsers[ODataConstants::DATETIME_MINUTE] = function ($params) {
-            return self::TYPE_NAMESPACE."DateTime::minute($params[0])";
+            return self::TYPE_NAMESPACE.'DateTime::minute('.$params[0].')';
         };
         $this->functionDescriptionParsers[ODataConstants::DATETIME_SECOND] = function ($params) {
-            return self::TYPE_NAMESPACE."DateTime::second($params[0])";
+            return self::TYPE_NAMESPACE.'DateTime::second('.$params[0].')';
         };
         $this->functionDescriptionParsers[ODataConstants::MATHFUN_ROUND] = function ($params) {
-            return "round($params[0])";
+            return 'round('.$params[0].')';
         };
         $this->functionDescriptionParsers[ODataConstants::MATHFUN_CEILING] = function ($params) {
-            return "ceil($params[0])";
+            return 'ceil('.$params[0].')';
         };
         $this->functionDescriptionParsers[ODataConstants::MATHFUN_FLOOR] = function ($params) {
-            return "floor($params[0])";
+            return 'floor('.$params[0].')';
         };
         $this->functionDescriptionParsers[ODataConstants::BINFUL_EQUAL] = function ($params) {
-            return self::TYPE_NAMESPACE."Binary::binaryEqual($params[0], $params[1])";
+            return self::TYPE_NAMESPACE.'Binary::binaryEqual('.$params[0].', '.$params[1].')';
         };
         $this->functionDescriptionParsers['is_null'] = function ($params) {
-            return "is_null($params[0])";
+            return 'is_null('.$params[0].')';
         };
     }
     /**
@@ -156,7 +157,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function setResourceType(ResourceType $resourceType)
     {
-        $this->iteratorName = "$".$resourceType->getName();
+        $this->iteratorName = '$'.$resourceType->getName();
         $this->resourceType = $resourceType;
     }
     /**
@@ -172,9 +173,9 @@ class LaravelExpressionProvider implements IExpressionProvider
     {
         switch ($expressionType) {
             case ExpressionType::AND_LOGICAL:
-                return $this->_prepareBinaryExpression(self::LOGICAL_AND, $left, $right);
+                return $this->prepareBinaryExpression(self::LOGICAL_AND, $left, $right);
             case ExpressionType::OR_LOGICAL:
-                return $this->_prepareBinaryExpression(self::LOGICAL_OR, $left, $right);
+                return $this->prepareBinaryExpression(self::LOGICAL_OR, $left, $right);
             default:
                 throw new \InvalidArgumentException('onLogicalExpression');
         }
@@ -192,15 +193,15 @@ class LaravelExpressionProvider implements IExpressionProvider
     {
         switch ($expressionType) {
             case ExpressionType::MULTIPLY:
-                return $this->_prepareBinaryExpression(self::MULTIPLY, $left, $right);
+                return $this->prepareBinaryExpression(self::MULTIPLY, $left, $right);
             case ExpressionType::DIVIDE:
-                return $this->_prepareBinaryExpression(self::DIVIDE, $left, $right);
+                return $this->prepareBinaryExpression(self::DIVIDE, $left, $right);
             case ExpressionType::MODULO:
-                return $this->_prepareBinaryExpression(self::MODULO, $left, $right);
+                return $this->prepareBinaryExpression(self::MODULO, $left, $right);
             case ExpressionType::ADD:
-                return $this->_prepareBinaryExpression(self::ADD, $left, $right);
+                return $this->prepareBinaryExpression(self::ADD, $left, $right);
             case ExpressionType::SUBTRACT:
-                return $this->_prepareBinaryExpression(self::SUBTRACT, $left, $right);
+                return $this->prepareBinaryExpression(self::SUBTRACT, $left, $right);
             default:
                 throw new \InvalidArgumentException('onArithmeticExpression');
         }
@@ -218,17 +219,17 @@ class LaravelExpressionProvider implements IExpressionProvider
     {
         switch ($expressionType) {
             case ExpressionType::GREATERTHAN:
-                return $this->_prepareBinaryExpression(self::GREATER_THAN, $left, $right);
+                return $this->prepareBinaryExpression(self::GREATER_THAN, $left, $right);
             case ExpressionType::GREATERTHAN_OR_EQUAL:
-                return $this->_prepareBinaryExpression(self::GREATER_THAN_OR_EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::GREATER_THAN_OR_EQUAL, $left, $right);
             case ExpressionType::LESSTHAN:
-                return $this->_prepareBinaryExpression(self::LESS_THAN, $left, $right);
+                return $this->prepareBinaryExpression(self::LESS_THAN, $left, $right);
             case ExpressionType::LESSTHAN_OR_EQUAL:
-                return $this->_prepareBinaryExpression(self::LESS_THAN_OR_EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::LESS_THAN_OR_EQUAL, $left, $right);
             case ExpressionType::EQUAL:
-                return $this->_prepareBinaryExpression(self::EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::EQUAL, $left, $right);
             case ExpressionType::NOTEQUAL:
-                return $this->_prepareBinaryExpression(self::NOT_EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::NOT_EQUAL, $left, $right);
             default:
                 throw new \InvalidArgumentException('onRelationalExpression');
         }
@@ -245,9 +246,9 @@ class LaravelExpressionProvider implements IExpressionProvider
     {
         switch ($expressionType) {
             case ExpressionType::NEGATE:
-                return $this->_prepareUnaryExpression(self::NEGATE, $child);
+                return $this->prepareUnaryExpression(self::NEGATE, $child);
             case ExpressionType::NOT_LOGICAL:
-                return $this->_prepareUnaryExpression(self::LOGICAL_NOT, $child);
+                return $this->prepareUnaryExpression(self::LOGICAL_NOT, $child);
             default:
                 throw new \InvalidArgumentException('onUnaryExpression');
         }
@@ -315,10 +316,9 @@ class LaravelExpressionProvider implements IExpressionProvider
      *
      * @return string
      */
-    private function _prepareBinaryExpression($operator, $left, $right)
+    private function prepareBinaryExpression($operator, $left, $right)
     {
-        return
-            self::OPEN_BRACKET.$left.' '.$operator.' '.$right.self::CLOSE_BRACKET;
+        return self::OPEN_BRACKET.$left.' '.$operator.' '.$right.self::CLOSE_BRACKET;
     }
     /**
      * To format unary expression.
@@ -328,7 +328,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      *
      * @return string
      */
-    private function _prepareUnaryExpression($operator, $child)
+    private function prepareUnaryExpression($operator, $child)
     {
         return $operator.self::OPEN_BRACKET.$child.self::CLOSE_BRACKET;
     }
