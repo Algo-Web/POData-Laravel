@@ -850,9 +850,9 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param ResourceType $resourceType
-     * @param object $result
-     * @param string $propertyName
+     * @param ResourceType  $resourceType
+     * @param object        $result
+     * @param string|null   $propertyName
      * @return ODataPropertyContent
      */
     protected function writeComplexValue(ResourceType &$resourceType, &$result, $propertyName = null)

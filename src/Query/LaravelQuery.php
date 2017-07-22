@@ -117,8 +117,8 @@ class LaravelQuery implements IQueryProvider
      * IE: http://host/EntitySet(1L)
      * http://host/EntitySet(KeyA=2L,KeyB='someValue')
      *
-     * @param ResourceSet $resourceSet The entity set containing the entity to fetch
-     * @param KeyDescriptor $keyDescriptor The key identifying the entity to fetch
+     * @param ResourceSet           $resourceSet    The entity set containing the entity to fetch
+     * @param KeyDescriptor|null    $keyDescriptor  The key identifying the entity to fetch
      *
      * @return object|null Returns entity instance if found else null
      */
