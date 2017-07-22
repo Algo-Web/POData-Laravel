@@ -73,7 +73,7 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         $rType = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
-        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX);
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
 
         $collection = new QueryResult();
         $collection->results = [ 'foo' ];
@@ -136,7 +136,7 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         $rType = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
-        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX);
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
         $rType->shouldReceive('getAllProperties')->andReturn([$rProp1, $rProp2]);
 
         $model = new TestMonomorphicTarget();
@@ -189,7 +189,7 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         $rType = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
-        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX);
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
         $rType->shouldReceive('getAllProperties')->andReturn([$rProp1, $rProp2]);
 
         $model = new reusableEntityClass1();
@@ -239,7 +239,7 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         $subProp2->shouldReceive('getResourceType')->andReturn($rTypeBase);
 
         $subType2 = m::mock(ResourceType::class);
-        $subType2->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX);
+        $subType2->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
         $subType2->shouldReceive('getInstanceType')->andReturn(new StringType());
         $subType2->shouldReceive('getFullName')->andReturn('paintItBlack');
         $subType2->shouldReceive('getAllProperties')->andReturn([$subProp1, $subProp2]);
@@ -262,7 +262,7 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         $rType = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
-        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX);
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
         $rType->shouldReceive('getAllProperties')->andReturn([$rProp1, $rProp2]);
 
         $zoidberg = new reusableEntityClass1();
@@ -301,7 +301,7 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
 
         $subType1 = m::mock(ResourceType::class);
         $subType1->shouldReceive('getInstanceType')->andReturn(new Int32());
-        $subType1->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE);
+        $subType1->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE());
 
         $rProp1 = m::mock(ResourceProperty::class);
         $rProp1->shouldReceive('isKindOf')->withArgs([ResourcePropertyKind::BAG])->andReturn(false);
@@ -319,7 +319,7 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         $rType = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
-        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX);
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
         $rType->shouldReceive('getAllProperties')->andReturn([$rProp1, $rProp2]);
         $rProp2->shouldReceive('getResourceType')->andReturn($rType);
 

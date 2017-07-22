@@ -42,7 +42,7 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         $rType = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
-        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX);
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
 
         $collection = new QueryResult();
         $collection->results = null;
@@ -74,7 +74,7 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         $rType = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
-        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX);
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
 
         $collection = new QueryResult();
         $collection->results = 'NARF!';
@@ -121,7 +121,7 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         $rType = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
-        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::ENTITY);
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::ENTITY());
 
         $collection = new QueryResult();
         $collection->results = null;
@@ -168,7 +168,7 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         $rType = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
-        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE);
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE());
 
         $collection = new QueryResult();
         $collection->results = [];
@@ -202,7 +202,7 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         $rType = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
-        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE);
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE());
         $rType->shouldReceive('getInstanceType')->andReturn($iType);
 
         $collection = new QueryResult();
@@ -237,7 +237,7 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         $rType = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
-        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE);
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE());
         $rType->shouldReceive('getInstanceType')->andReturn($iType);
 
         $collection = new QueryResult();
@@ -270,7 +270,7 @@ class SerialiserWriteBagTest extends SerialiserTestBase
 
         $subType1 = m::mock(ResourceType::class);
         $subType1->shouldReceive('getInstanceType')->andReturn(new StringType());
-        $subType1->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE);
+        $subType1->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE());
 
         $rProp1 = m::mock(ResourceProperty::class);
         $rProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE);
@@ -288,7 +288,7 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         $rType = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
-        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX);
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
         $rType->shouldReceive('getAllProperties')->andReturn([$rProp1, $rProp2]);
 
         $model = new reusableEntityClass1();

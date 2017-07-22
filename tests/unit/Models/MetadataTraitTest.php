@@ -420,8 +420,8 @@ class MetadataTraitTest extends TestCase
         $rel['HasMany'] = [];
         $foo->shouldReceive('getRelationshipsFromMethods')->andReturn($rel)->once();
 
-        $type1 = m::mock(ResourceType::class);
-        $type2 = m::mock(ResourceType::class);
+        $type1 = m::mock(ResourceEntityType::class);
+        $type2 = m::mock(ResourceEntityType::class);
         $set1 = m::mock(ResourceSet::class);
         $set2 = m::mock(ResourceSet::class);
         $types = [$fooName => $type1, $barName => $type2];
