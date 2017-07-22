@@ -38,7 +38,6 @@ class MetadataControllerProvider extends MetadataBaseProvider
 
         // now process each class that uses the metadata controller trait and stick results in $metamix
         $metamix = [];
-        $map = null;
         foreach ($ends as $end) {
             $map = $end->getMappings();
             // verify uniqueness - must be exactly one mapping for model-verb combo - different verb mappings for
