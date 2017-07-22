@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\UriProcessor\QueryProcessor\Expression\Parser\IExpressionProvider;
@@ -120,7 +121,7 @@ class LaravelQuery implements IQueryProvider
      * @param ResourceSet           $resourceSet    The entity set containing the entity to fetch
      * @param KeyDescriptor|null    $keyDescriptor  The key identifying the entity to fetch
      *
-     * @return Modelnull Returns entity instance if found else null
+     * @return Model|null Returns entity instance if found else null
      */
     public function getResourceFromResourceSet(
         ResourceSet $resourceSet,
@@ -302,7 +303,7 @@ class LaravelQuery implements IQueryProvider
      * @param string $verb
      * @return array|mixed
      * @throws ODataException
-     * @throws \POData\Common\InvalidOperationException
+     * @throws InvalidOperationException
      */
     private function createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb)
     {
@@ -319,11 +320,13 @@ class LaravelQuery implements IQueryProvider
             );
         }
 
-        assert($data != null, 'Data must not be null');
+        assert(null !== $data, 'Data must not be null');
         if (is_object($data)) {
-            $data = (array) $data;
+            $arrayData = (array) $data;
+        } else {
+            $arrayData = $data;
         }
-        if (!is_array($data)) {
+        if (!is_array($arrayData)) {
             throw \POData\Common\ODataException::createPreConditionFailedError(
                 'Data not resolvable to key-value array.'
             );
@@ -333,7 +336,7 @@ class LaravelQuery implements IQueryProvider
         $method = $goal['method'];
         $paramList = $goal['parameters'];
         $controller = App::make($controlClass);
-        $parms = $this->createUpdateDeleteProcessInput($sourceEntityInstance, $data, $paramList);
+        $parms = $this->createUpdateDeleteProcessInput($sourceEntityInstance, $arrayData, $paramList);
         unset($data);
 
         $result = call_user_func_array(array($controller, $method), $parms);
