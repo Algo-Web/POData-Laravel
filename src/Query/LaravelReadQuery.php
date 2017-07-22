@@ -286,6 +286,8 @@ class LaravelReadQuery
      * @param ResourceSet|null      $resourceSet
      * @param KeyDescriptor|null    $keyDescriptor
      * @param Model|Relation|null   $sourceEntityInstance   Starting point of query
+     *
+     * @return Model|null
      */
     public function getResource(
         ResourceSet $resourceSet = null,

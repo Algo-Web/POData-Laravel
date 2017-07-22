@@ -130,6 +130,8 @@ trait MetadataTrait
 
     /*
      * Assemble this model's OData metadata as xml schema
+     *
+     * @return ResourceEntityType
      */
     public function getXmlSchema($metaNamespace = 'Data')
     {
@@ -207,6 +209,11 @@ trait MetadataTrait
         return $rel;
     }
 
+    /**
+     * Get model's relationships
+     *
+     * @return array
+     */
     public function getRelationships()
     {
         $hooks = [];
