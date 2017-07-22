@@ -191,7 +191,10 @@ class IronicSerialiser implements IObjectSerialiser
         $odata->links = $links;
 
         $newCount = count($this->lightStack);
-        assert($newCount == $stackCount, "Should have $stackCount elements in stack, have $newCount elements");
+        assert(
+            $newCount == $stackCount,
+            'Should have ' . $stackCount . 'elements in stack, have ' . $newCount . 'elements'
+        );
         array_pop($this->lightStack);
         return $odata;
     }
@@ -377,7 +380,7 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeTopLevelPrimitive(QueryResult &$primitiveValue, ResourceProperty &$resourceProperty = null)
     {
-        assert(null != $resourceProperty, "Resource property must not be null");
+        assert(null != $resourceProperty, 'Resource property must not be null');
         $propertyContent = new ODataPropertyContent();
 
         $odataProperty = new ODataProperty();
@@ -479,7 +482,7 @@ class IronicSerialiser implements IObjectSerialiser
     {
         $context = $this->getService()->getOperationContext();
         $streamProviderWrapper = $this->getService()->getStreamProviderWrapper();
-        assert(null != $streamProviderWrapper, "Retrieved stream provider must not be null");
+        assert(null != $streamProviderWrapper, 'Retrieved stream provider must not be null');
 
         $mediaLink = null;
         if ($resourceType->isMediaLinkEntry()) {

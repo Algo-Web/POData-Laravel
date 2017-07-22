@@ -45,7 +45,7 @@ abstract class MetadataBaseProvider extends ServiceProvider
         $classes = get_declared_classes();
         $AutoClass = null;
         foreach ($classes as $class) {
-            if (\Illuminate\Support\Str::startsWith($class, "Composer\\Autoload\\ComposerStaticInit")) {
+            if (\Illuminate\Support\Str::startsWith($class, 'Composer\\Autoload\\ComposerStaticInit')) {
                 $AutoClass = $class;
             }
         }

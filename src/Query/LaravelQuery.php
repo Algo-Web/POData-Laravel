@@ -319,7 +319,7 @@ class LaravelQuery implements IQueryProvider
             );
         }
 
-        assert($data != null, "Data must not be null");
+        assert($data != null, 'Data must not be null');
         if (is_object($data)) {
             $data = (array) $data;
         }
@@ -377,7 +377,7 @@ class LaravelQuery implements IQueryProvider
 
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
         if (!$this->auth->canAuth($this->verbMap[$verb], $class, $sourceEntityInstance)) {
-            throw new ODataException("Access denied", 403);
+            throw new ODataException('Access denied', 403);
         }
 
         $data = $this->createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb);

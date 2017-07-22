@@ -27,7 +27,7 @@ class ODataController extends BaseController
         //$antiXss = new AntiXSS();
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $query = App::make('odataquery');
         $meta = App::make('metadata');
@@ -46,7 +46,7 @@ class ODataController extends BaseController
             $date = Carbon::now(0);
             $timeString = $date->toTimeString();
             $xTest = (null !== $xTest) ? $xTest
-                : $request->method() . ";" . str_replace("/", "-", $request->path()) . ";" . $timeString . ";";
+                : $request->method() . ';' . str_replace('/', '-', $request->path()) . ';' . $timeString . ';';
             if (null != $xTest) {
                 $reflectionClass = new \ReflectionClass('Illuminate\Http\Request');
                 $reflectionProperty = $reflectionClass->getProperty('userResolver');
@@ -70,7 +70,7 @@ class ODataController extends BaseController
         $responseCode = $headers[\POData\Common\ODataConstants::HTTPRESPONSE_HEADER_STATUS_CODE];
         $responseCode = isset($responseCode) ? intval($responseCode) : 200;
         $response = new Response($content, $responseCode);
-        $response->setStatusCode($headers["Status"]);
+        $response->setStatusCode($headers['Status']);
 
         foreach ($headers as $headerName => $headerValue) {
             if (!is_null($headerValue)) {

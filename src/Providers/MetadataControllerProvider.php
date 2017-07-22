@@ -86,7 +86,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
     protected function getCandidateControllers($Classes)
     {
         $ends = [];
-        $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : "App";
+        $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : 'App';
         foreach ($Classes as $name) {
             // not in app namespace, keep moving
             if (!\Illuminate\Support\Str::startsWith($name, $startName)) {
@@ -100,7 +100,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
                 if (in_array(MetadataControllerTrait::class, class_uses($name, false))) {
                     $result = App::make($name);
                     $ends[] = $result;
-                    assert($result instanceof Controller, "Resolved result not a controller");
+                    assert($result instanceof Controller, 'Resolved result not a controller');
                 }
             } catch (\Exception $e) {
                 if (!App::runningInConsole()) {

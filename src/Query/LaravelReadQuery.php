@@ -108,7 +108,7 @@ class LaravelReadQuery
             for ($i = 0; $i < $numValues; $i++) {
                 $relation = $segments[$i]->isAscending() ? '>' : '<';
                 $name = $segments[$i]->getSubPathSegments()[0]->getName();
-                $parameters[$name] = ['direction' => $relation, 'value' => trim($values[$i][0], "\'")];
+                $parameters[$name] = ['direction' => $relation, 'value' => trim($values[$i][0], '\'')];
             }
 
             foreach ($parameters as $name => $line) {
@@ -135,8 +135,8 @@ class LaravelReadQuery
         $nullFilter = true;
         $isvalid = null;
         if (isset($filterInfo)) {
-            $method = "return ".$filterInfo->getExpressionAsString().";";
-            $clln = "$".$resourceSet->getResourceType()->getName();
+            $method = 'return '.$filterInfo->getExpressionAsString().';';
+            $clln = '$'.$resourceSet->getResourceType()->getName();
             $isvalid = create_function($clln, $method);
             $nullFilter = false;
         }
@@ -149,7 +149,7 @@ class LaravelReadQuery
             $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($eagerLoad)->get();
             $resultCount = $bulkSetCount;
         } elseif ($bigSet) {
-            assert(isset($isvalid), "Filter closure not set");
+            assert(isset($isvalid), 'Filter closure not set');
             $resultSet = collect([]);
             $rawCount = 0;
             $rawTop = null === $top ? $bulkSetCount : $top;
@@ -241,7 +241,7 @@ class LaravelReadQuery
             throw new InvalidArgumentException('Source entity must be an Eloquent model.');
         }
 
-        assert(null != $sourceEntityInstance, "Source instance must not be null");
+        assert(null != $sourceEntityInstance, 'Source instance must not be null');
         $this->checkSourceInstance($sourceEntityInstance);
 
         $this->checkAuth($sourceEntityInstance);
@@ -417,7 +417,7 @@ class LaravelReadQuery
                     : $sourceEntityInstance instanceof Relation ? $sourceEntityInstance
                         : null;
         if (!$this->getAuth()->canAuth(ActionVerb::READ(), get_class($sourceEntityInstance), $check)) {
-            throw new ODataException("Access denied", 403);
+            throw new ODataException('Access denied', 403);
         }
     }
 
@@ -430,7 +430,7 @@ class LaravelReadQuery
     {
         if ($keyDescriptor) {
             foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
-                $trimValue = trim($value[0], "\"'");
+                $trimValue = trim($value[0], '\'');
                 $sourceEntityInstance = $sourceEntityInstance->where($key, $trimValue);
             }
         }

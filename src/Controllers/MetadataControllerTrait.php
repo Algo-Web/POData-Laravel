@@ -32,7 +32,7 @@ trait MetadataControllerTrait
         // enforce we're actually hooked up to a controller
         assert($this instanceof BaseController, get_class($this));
         // enforce that mapping is actually not empty
-        assert(0 < count($this->mapping), "Mapping array must not be empty");
+        assert(0 < count($this->mapping), 'Mapping array must not be empty');
 
         if (!array_key_exists($modelName, $this->mapping)) {
             throw new \Exception('Metadata mapping for model '.$modelName.' not defined');
@@ -72,7 +72,7 @@ trait MetadataControllerTrait
         // enforce we're actually hooked up to a controller
         assert($this instanceof BaseController, get_class($this));
         // enforce that mapping is actually not empty
-        assert(!empty($this->mapping), "Mapping array must not be empty");
+        assert(!empty($this->mapping), 'Mapping array must not be empty');
 
         $allMappings = [];
 

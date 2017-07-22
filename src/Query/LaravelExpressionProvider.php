@@ -156,7 +156,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function setResourceType(ResourceType $resourceType)
     {
-        $this->iteratorName = "$".$resourceType->getName();
+        $this->iteratorName = '$'.$resourceType->getName();
         $this->resourceType = $resourceType;
     }
     /**
@@ -317,8 +317,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     private function _prepareBinaryExpression($operator, $left, $right)
     {
-        return
-            self::OPEN_BRACKET.$left.' '.$operator.' '.$right.self::CLOSE_BRACKET;
+        return self::OPEN_BRACKET.$left.' '.$operator.' '.$right.self::CLOSE_BRACKET;
     }
     /**
      * To format unary expression.

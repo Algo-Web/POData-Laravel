@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Schema as Schema;
 class MetadataProvider extends MetadataBaseProvider
 {
     protected $multConstraints = [ '0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
-    protected static $METANAMESPACE = "Data";
+    protected static $METANAMESPACE = 'Data';
 
     /**
      * Bootstrap the application services.  Post-boot.
@@ -79,10 +79,10 @@ class MetadataProvider extends MetadataBaseProvider
     {
         $Classes = $this->getClassMap();
         $ends = [];
-        $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : "App";
+        $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : 'App';
         foreach ($Classes as $name) {
             if (\Illuminate\Support\Str::startsWith($name, $startName)) {
-                if (in_array("AlgoWeb\\PODataLaravel\\Models\\MetadataTrait", class_uses($name))) {
+                if (in_array('AlgoWeb\\PODataLaravel\\Models\\MetadataTrait', class_uses($name))) {
                     $ends[] = $name;
                 }
             }
@@ -188,11 +188,11 @@ class MetadataProvider extends MetadataBaseProvider
                     $dependentProperty = $foreign[$dependentType]['property'];
                     assert(
                         in_array($dependentMult, $this->multConstraints[$principalMult]),
-                        "Cannot pair multiplicities " . $dependentMult . " and " . $principalMult
+                        'Cannot pair multiplicities ' . $dependentMult . ' and ' . $principalMult
                     );
                     assert(
                         in_array($principalMult, $this->multConstraints[$dependentMult]),
-                        "Cannot pair multiplicities " . $principalMult . " and " . $dependentMult
+                        'Cannot pair multiplicities ' . $principalMult . ' and ' . $dependentMult
                     );
                     // generate forward and reverse relations
                     list($forward, $reverse) = $this->calculateRoundTripRelationsGenForwardReverse(
@@ -239,11 +239,11 @@ class MetadataProvider extends MetadataBaseProvider
                         $dependentProperty = $foreign['property'];
                         assert(
                             in_array($dependentMult, $this->multConstraints[$principalMult]),
-                            "Cannot pair multiplicities " . $dependentMult . " and " . $principalMult
+                            'Cannot pair multiplicities ' . $dependentMult . ' and ' . $principalMult
                         );
                         assert(
                             in_array($principalMult, $this->multConstraints[$dependentMult]),
-                            "Cannot pair multiplicities " . $principalMult . " and " . $dependentMult
+                            'Cannot pair multiplicities ' . $principalMult . ' and ' . $dependentMult
                         );
                         // generate forward and reverse relations
                         list($forward, $reverse) = $this->calculateRoundTripRelationsGenForwardReverse(
@@ -336,7 +336,7 @@ class MetadataProvider extends MetadataBaseProvider
         }
         //one-to-one
         if ('0..1' == $principalMult || '0..1' == $dependentMult) {
-            assert($principalMult != $dependentMult, "Cannot have both ends with 0..1 multiplicity");
+            assert($principalMult != $dependentMult, 'Cannot have both ends with 0..1 multiplicity');
             $meta->addResourceReferenceSinglePropertyBidirectional(
                 $principal,
                 $dependent,
@@ -345,7 +345,7 @@ class MetadataProvider extends MetadataBaseProvider
             );
             return;
         }
-        assert($principalMult != $dependentMult, "Cannot have both ends same multiplicity for 1:N relation");
+        assert($principalMult != $dependentMult, 'Cannot have both ends same multiplicity for 1:N relation');
         //principal-one-to-dependent-many
         if ('*' == $principalMult) {
             $meta->addResourceReferencePropertyBidirectional(
