@@ -252,7 +252,7 @@ class LaravelQuery implements IQueryProvider
     }
     /**
      * Delete resource from a resource set.
-     * @param ResourceSet|null $sourceResourceSet
+     * @param ResourceSet      $sourceResourceSet
      * @param object           $sourceEntityInstance
      *
      * return bool true if resources sucessfully deteled, otherwise false.

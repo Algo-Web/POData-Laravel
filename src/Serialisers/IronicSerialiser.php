@@ -91,8 +91,8 @@ class IronicSerialiser implements IObjectSerialiser
     private $modelSerialiser;
 
     /**
-     * @param IService           $service Reference to the data service instance
-     * @param RequestDescription $request Type instance describing the client submitted request
+     * @param IService                  $service    Reference to the data service instance
+     * @param RequestDescription|null   $request    Type instance describing the client submitted request
      */
     public function __construct(IService $service, RequestDescription $request = null)
     {
@@ -108,7 +108,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write a top level entry resource.
      *
-     * @param mixed $entryObject Reference to the entry object to be written
+     * @param QueryResult $entryObject Reference to the entry object to be written
      *
      * @return ODataEntry
      */
@@ -199,7 +199,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level feed element.
      *
-     * @param array &$entryObjects Array of entry resources to be written
+     * @param QueryResult &$entryObjects Array of entry resources to be written
      *
      * @return ODataFeed
      */
@@ -258,7 +258,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level url element.
      *
-     * @param mixed $entryObject The entry resource whose url to be written
+     * @param QueryResult $entryObject The entry resource whose url to be written
      *
      * @return ODataURL
      */
@@ -282,8 +282,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level url collection.
      *
-     * @param array $entryObjects Array of entry resources
-     *                            whose url to be written
+     * @param QueryResult $entryObjects Array of entry resources whose url to be written
      *
      * @return ODataURLCollection
      */
@@ -318,12 +317,9 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level complex resource.
      *
-     * @param mixed &$complexValue The complex object to be
-     *                                    written
-     * @param string $propertyName The name of the
-     *                                    complex property
-     * @param ResourceType &$resourceType Describes the type of
-     *                                    complex object
+     * @param QueryResult &$complexValue The complex object to be written
+     * @param string $propertyName The name of the complex property
+     * @param ResourceType &$resourceType Describes the type of complex object
      *
      * @return ODataPropertyContent
      */
@@ -348,7 +344,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level bag resource.
      *
-     * @param mixed &$BagValue The bag object to be
+     * @param QueryResult &$BagValue The bag object to be
      *                                    written
      * @param string $propertyName The name of the
      *                                    bag property
@@ -373,7 +369,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level primitive value.
      *
-     * @param mixed &$primitiveValue              The primitive value to be
+     * @param QueryResult &$primitiveValue              The primitive value to be
      *                                            written
      * @param ResourceProperty &$resourceProperty Resource property describing the
      *                                            primitive property to be written
@@ -521,12 +517,12 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Gets collection of projection nodes under the current node.
      *
-     * @return ProjectionNode[]|ExpandedProjectionNode[]|null List of nodes
-     *                                                        describing projections for the current segment, If this method returns
-     *                                                        null it means no projections are to be applied and the entire resource
-     *                                                        for the current segment should be serialized, If it returns non-null
-     *                                                        only the properties described by the returned projection segments should
-     *                                                        be serialized
+     * @return ProjectionNode[]|ExpandedProjectionNode[]|null List of nodes describing projections for the current
+     *                                                        segment, If this method returns null it means no
+     *                                                        projections are to be applied and the entire resource for
+     *                                                        the current segment should be serialized, If it returns
+     *                                                        non-null only the properties described by the returned
+     *                                                        projection segments should be serialized
      */
     protected function getProjectionNodes()
     {
