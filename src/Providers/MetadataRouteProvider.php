@@ -20,12 +20,12 @@ class MetadataRouteProvider extends ServiceProvider
 
     private static function setupRoute()
     {
-        $auth_middleware = self::getAuthMiddleware();
+        $authMiddleware = self::getAuthMiddleware();
         $controllerMethod = 'AlgoWeb\PODataLaravel\Controllers\ODataController@index';
 
-        Route::any('odata.svc/{section}', ['uses' => $controllerMethod, 'middleware' => $auth_middleware])
+        Route::any('odata.svc/{section}', ['uses' => $controllerMethod, 'middleware' => $authMiddleware])
             ->where(['section' => '.*']);
-        Route::any('odata.svc', ['uses' => $controllerMethod, 'middleware' => $auth_middleware]);
+        Route::any('odata.svc', ['uses' => $controllerMethod, 'middleware' => $authMiddleware]);
     }
 
     /**
@@ -39,13 +39,13 @@ class MetadataRouteProvider extends ServiceProvider
 
     private static function getAuthMiddleware()
     {
-        $auth_middleware = 'auth.basic';
+        $authMiddleware = 'auth.basic';
 
         if (interface_exists(\Illuminate\Contracts\Auth\Factory::class)) {
             $manager = App::make(\Illuminate\Contracts\Auth\Factory::class);
-            $auth_middleware = $manager->guard('api') ? 'auth:api' : $auth_middleware;
+            $authMiddleware = $manager->guard('api') ? 'auth:api' : $authMiddleware;
         }
 
-        return $auth_middleware;
+        return $authMiddleware;
     }
 }

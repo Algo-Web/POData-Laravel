@@ -43,14 +43,14 @@ abstract class MetadataBaseProvider extends ServiceProvider
     protected function getClassMap()
     {
         $classes = get_declared_classes();
-        $AutoClass = null;
+        $autoClass = null;
         foreach ($classes as $class) {
             if (\Illuminate\Support\Str::startsWith($class, 'Composer\\Autoload\\ComposerStaticInit')) {
-                $AutoClass = $class;
+                $autoClass = $class;
             }
         }
 
-        $Classes = $AutoClass::$classMap;
-        return array_keys($Classes);
+        $classes = $autoClass::$classMap;
+        return array_keys($classes);
     }
 }

@@ -173,9 +173,9 @@ class LaravelExpressionProvider implements IExpressionProvider
     {
         switch ($expressionType) {
             case ExpressionType::AND_LOGICAL:
-                return $this->_prepareBinaryExpression(self::LOGICAL_AND, $left, $right);
+                return $this->prepareBinaryExpression(self::LOGICAL_AND, $left, $right);
             case ExpressionType::OR_LOGICAL:
-                return $this->_prepareBinaryExpression(self::LOGICAL_OR, $left, $right);
+                return $this->prepareBinaryExpression(self::LOGICAL_OR, $left, $right);
             default:
                 throw new \InvalidArgumentException('onLogicalExpression');
         }
@@ -193,15 +193,15 @@ class LaravelExpressionProvider implements IExpressionProvider
     {
         switch ($expressionType) {
             case ExpressionType::MULTIPLY:
-                return $this->_prepareBinaryExpression(self::MULTIPLY, $left, $right);
+                return $this->prepareBinaryExpression(self::MULTIPLY, $left, $right);
             case ExpressionType::DIVIDE:
-                return $this->_prepareBinaryExpression(self::DIVIDE, $left, $right);
+                return $this->prepareBinaryExpression(self::DIVIDE, $left, $right);
             case ExpressionType::MODULO:
-                return $this->_prepareBinaryExpression(self::MODULO, $left, $right);
+                return $this->prepareBinaryExpression(self::MODULO, $left, $right);
             case ExpressionType::ADD:
-                return $this->_prepareBinaryExpression(self::ADD, $left, $right);
+                return $this->prepareBinaryExpression(self::ADD, $left, $right);
             case ExpressionType::SUBTRACT:
-                return $this->_prepareBinaryExpression(self::SUBTRACT, $left, $right);
+                return $this->prepareBinaryExpression(self::SUBTRACT, $left, $right);
             default:
                 throw new \InvalidArgumentException('onArithmeticExpression');
         }
@@ -219,17 +219,17 @@ class LaravelExpressionProvider implements IExpressionProvider
     {
         switch ($expressionType) {
             case ExpressionType::GREATERTHAN:
-                return $this->_prepareBinaryExpression(self::GREATER_THAN, $left, $right);
+                return $this->prepareBinaryExpression(self::GREATER_THAN, $left, $right);
             case ExpressionType::GREATERTHAN_OR_EQUAL:
-                return $this->_prepareBinaryExpression(self::GREATER_THAN_OR_EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::GREATER_THAN_OR_EQUAL, $left, $right);
             case ExpressionType::LESSTHAN:
-                return $this->_prepareBinaryExpression(self::LESS_THAN, $left, $right);
+                return $this->prepareBinaryExpression(self::LESS_THAN, $left, $right);
             case ExpressionType::LESSTHAN_OR_EQUAL:
-                return $this->_prepareBinaryExpression(self::LESS_THAN_OR_EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::LESS_THAN_OR_EQUAL, $left, $right);
             case ExpressionType::EQUAL:
-                return $this->_prepareBinaryExpression(self::EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::EQUAL, $left, $right);
             case ExpressionType::NOTEQUAL:
-                return $this->_prepareBinaryExpression(self::NOT_EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::NOT_EQUAL, $left, $right);
             default:
                 throw new \InvalidArgumentException('onRelationalExpression');
         }
@@ -246,9 +246,9 @@ class LaravelExpressionProvider implements IExpressionProvider
     {
         switch ($expressionType) {
             case ExpressionType::NEGATE:
-                return $this->_prepareUnaryExpression(self::NEGATE, $child);
+                return $this->prepareUnaryExpression(self::NEGATE, $child);
             case ExpressionType::NOT_LOGICAL:
-                return $this->_prepareUnaryExpression(self::LOGICAL_NOT, $child);
+                return $this->prepareUnaryExpression(self::LOGICAL_NOT, $child);
             default:
                 throw new \InvalidArgumentException('onUnaryExpression');
         }
@@ -316,7 +316,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      *
      * @return string
      */
-    private function _prepareBinaryExpression($operator, $left, $right)
+    private function prepareBinaryExpression($operator, $left, $right)
     {
         return self::OPEN_BRACKET.$left.' '.$operator.' '.$right.self::CLOSE_BRACKET;
     }
@@ -328,7 +328,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      *
      * @return string
      */
-    private function _prepareUnaryExpression($operator, $child)
+    private function prepareUnaryExpression($operator, $child)
     {
         return $operator.self::OPEN_BRACKET.$child.self::CLOSE_BRACKET;
     }

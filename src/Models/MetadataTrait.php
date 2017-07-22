@@ -131,7 +131,7 @@ trait MetadataTrait
     /*
      * Assemble this model's OData metadata as xml schema
      */
-    public function getXmlSchema($MetaNamespace = 'Data')
+    public function getXmlSchema($metaNamespace = 'Data')
     {
         $raw = $this->metadata();
         if ([] == $raw) {
@@ -141,7 +141,7 @@ trait MetadataTrait
         $metadata = App::make('metadata');
 
         $reflec = new \ReflectionClass(get_class($this));
-        $complex = $metadata->addEntityType($reflec, $reflec->getShortName(), $MetaNamespace);
+        $complex = $metadata->addEntityType($reflec, $reflec->getShortName(), $metaNamespace);
         $keyName = $this->getKeyName();
         if (null != $keyName) {
             $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);

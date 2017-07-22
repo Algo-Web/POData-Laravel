@@ -33,8 +33,8 @@ class MetadataControllerProvider extends MetadataBaseProvider
 
         $meta = App::make('metadataControllers');
 
-        $Classes = $this->getClassMap();
-        $ends = $this->getCandidateControllers($Classes);
+        $classes = $this->getClassMap();
+        $ends = $this->getCandidateControllers($classes);
 
         // now process each class that uses the metadata controller trait and stick results in $metamix
         $metamix = [];
@@ -79,15 +79,15 @@ class MetadataControllerProvider extends MetadataBaseProvider
     }
 
     /**
-     * @param $Classes
+     * @param $classes
      * @return array
      * @throws \Exception
      */
-    protected function getCandidateControllers($Classes)
+    protected function getCandidateControllers($classes)
     {
         $ends = [];
         $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : 'App';
-        foreach ($Classes as $name) {
+        foreach ($classes as $name) {
             // not in app namespace, keep moving
             if (!\Illuminate\Support\Str::startsWith($name, $startName)) {
                 continue;
