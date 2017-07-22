@@ -147,7 +147,12 @@ class IronicSerialiser implements IObjectSerialiser
         );
         $absoluteUri = rtrim($this->absoluteServiceUri, '/') . '/' . $relativeUri;
 
-        list($mediaLink, $mediaLinks) = $this->writeMediaData($entryObject->results, $type, $relativeUri, $resourceType);
+        list($mediaLink, $mediaLinks) = $this->writeMediaData(
+            $entryObject->results,
+            $type,
+            $relativeUri,
+            $resourceType
+        );
 
         $propertyContent = $this->writePrimitiveProperties($entryObject->results, $nonRelProp);
 
