@@ -822,7 +822,7 @@ class IronicSerialiser implements IObjectSerialiser
         assert(null == $result || is_array($result), 'Bag parameter must be null or array');
         $typeKind = $resourceType->getResourceTypeKind();
         assert(
-            ResourceTypeKind::PRIMITIVE == $typeKind || ResourceTypeKind::COMPLEX == $typeKind,
+            ResourceTypeKind::PRIMITIVE() == $typeKind || ResourceTypeKind::COMPLEX() == $typeKind,
             '$bagItemResourceTypeKind != ResourceTypeKind::PRIMITIVE'
             .' && $bagItemResourceTypeKind != ResourceTypeKind::COMPLEX'
         );
@@ -832,11 +832,11 @@ class IronicSerialiser implements IObjectSerialiser
         $bag = new ODataBagContent();
         foreach ($result as $value) {
             if (isset($value)) {
-                if (ResourceTypeKind::PRIMITIVE == $typeKind) {
+                if (ResourceTypeKind::PRIMITIVE() == $typeKind) {
                     $instance = $resourceType->getInstanceType();
                     assert($instance instanceof IType, get_class($instance));
                     $bag->propertyContents[] = $this->primitiveToString($instance, $value);
-                } elseif (ResourceTypeKind::COMPLEX == $typeKind) {
+                } elseif (ResourceTypeKind::COMPLEX() == $typeKind) {
                     $bag->propertyContents[] = $this->writeComplexValue($resourceType, $value);
                 }
             }
