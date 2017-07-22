@@ -113,8 +113,8 @@ trait MetadataControllerTrait
     protected function getParameterNames($result)
     {
         $parmArray = [];
-        $r = new \ReflectionMethod($this, $result);
-        $params = $r->getParameters();
+        $reflec = new \ReflectionMethod($this, $result);
+        $params = $reflec->getParameters();
         foreach ($params as $parm) {
             $detail = [];
             $detail['name'] = $parm->name;

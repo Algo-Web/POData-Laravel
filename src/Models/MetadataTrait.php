@@ -140,8 +140,8 @@ trait MetadataTrait
 
         $metadata = App::make('metadata');
 
-        $rf = new \ReflectionClass(get_class($this));
-        $complex = $metadata->addEntityType($rf, $rf->getShortName(), $MetaNamespace);
+        $reflec = new \ReflectionClass(get_class($this));
+        $complex = $metadata->addEntityType($reflec, $reflec->getShortName(), $MetaNamespace);
         $keyName = $this->getKeyName();
         if (null != $keyName) {
             $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);
@@ -622,7 +622,7 @@ trait MetadataTrait
             $localName = $localSegments[count($localSegments) - 1];
 
             $first = $keyName;
-            $last = (isset($localName) && "" != $localName) ? $localName : $foo->getRelated()->getKeyName();
+            $last = (isset($localName) && '' != $localName) ? $localName : $foo->getRelated()->getKeyName();
             $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
         }
     }
