@@ -112,6 +112,7 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
+        $meta->shouldReceive('addEntityType')->andReturnNull()->once();
         App::instance('metadata', $meta);
 
         $classen = [TestModel::class, TestGetterModel::class, TestMorphManySource::class, TestMorphOneSource::class,
@@ -189,6 +190,7 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
+        $meta->shouldReceive('addEntityType')->andReturnNull()->once();
         App::instance('metadata', $meta);
 
         $cacheStore = Cache::getFacadeRoot();
@@ -233,6 +235,7 @@ class MetadataProviderTest extends TestCase
         $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
 
         $meta = \Mockery::mock(SimpleMetadataProvider::class);
+        $meta->shouldReceive('addEntityType')->andReturnNull()->atLeast(1);
         $meta->shouldReceive('addResourceSetReferencePropertyBidirectional')
             ->withAnyArgs()->andReturn(null)->atLeast(1);
         $meta->shouldReceive('addResourceReferenceSinglePropertyBidirectional')
@@ -271,6 +274,7 @@ class MetadataProviderTest extends TestCase
         $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
 
         $meta = \Mockery::mock(SimpleMetadataProvider::class);
+        $meta->shouldReceive('addEntityType')->andReturnNull()->atLeast(1);
         $meta->shouldReceive('addResourceReferencePropertyBidirectional')
             ->with(m::type(ResourceEntityType::class), m::type(ResourceEntityType::class), 'morphTarget', 'morph')
             ->never();

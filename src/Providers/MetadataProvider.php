@@ -45,7 +45,7 @@ class MetadataProvider extends MetadataBaseProvider
         $meta = App::make('metadata');
 
         $stdRef = new \ReflectionClass(new \stdClass());
-        $abstract = $meta->addEntityType($stdRef, 'polyMorphicPlaceholder', true, null);
+        $meta->addEntityType($stdRef, 'polyMorphicPlaceholder', true, null);
 
         $modelNames = $this->getCandidateModels();
 
@@ -53,6 +53,8 @@ class MetadataProvider extends MetadataBaseProvider
 
         // need to lift EntityTypes
         $biDirect = $this->calculateRoundTripRelations();
+
+        $groups = $this->getPolymorphicRelationGroups();
 
         // now that endpoints are hooked up, tackle the relationships
         // if we'd tried earlier, we'd be guaranteed to try to hook a relation up to null, which would be bad
