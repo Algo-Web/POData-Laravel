@@ -192,6 +192,141 @@ class MetadataProviderRelationTest extends TestCase
         $this->assertEquals(4, count($result));
     }
 
+    public function testRelationGroupingTwoArmedPolymorphicRelation()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $this->setUpSchemaFacade();
+
+        $simple = new SimpleMetadataProvider('Data', 'Data');
+        App::instance('metadata', $simple);
+
+        $classen = [ TestMorphManySource::class, TestMorphManySourceAlternate::class, TestMorphTarget::class];
+
+        foreach ($classen as $className) {
+            $testModel = new $className($meta);
+            App::instance($className, $testModel);
+        }
+
+        $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
+        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->never();
+        $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        Cache::swap($cache);
+
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getIsCaching')->andReturn(false);
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen)->once();
+
+        $expected = [];
+        $expected[TestMorphTarget::class] = [];
+        $expected[TestMorphTarget::class][TestMorphManySource::class] = ['morphTarget'];
+        $expected[TestMorphTarget::class][TestMorphManySourceAlternate::class] = ['morphTarget'];
+        $actual = $foo->getPolymorphicRelationGroups();
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testRelationGroupingMonomorphicRelation()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $this->setUpSchemaFacade();
+
+        $simple = new SimpleMetadataProvider('Data', 'Data');
+        App::instance('metadata', $simple);
+
+        $classen = [ TestMonomorphicSource::class, TestMonomorphicTarget::class];
+
+        foreach ($classen as $className) {
+            $testModel = new $className($meta);
+            App::instance($className, $testModel);
+        }
+
+        $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
+        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->never();
+        $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        Cache::swap($cache);
+
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getIsCaching')->andReturn(false);
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen)->once();
+
+        $expected = [];
+        $actual = $foo->getPolymorphicRelationGroups();
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testRelationGroupingMonomorphicRelationWithSingleKnownSide()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $this->setUpSchemaFacade();
+
+        $simple = new SimpleMetadataProvider('Data', 'Data');
+        App::instance('metadata', $simple);
+
+        $classen = [ TestMonomorphicSource::class, TestMonomorphicTarget::class, TestMorphManyToManyTarget::class];
+
+        foreach ($classen as $className) {
+            $testModel = new $className($meta);
+            App::instance($className, $testModel);
+        }
+
+        $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
+        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->never();
+        $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        Cache::swap($cache);
+
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getIsCaching')->andReturn(false);
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen)->once();
+
+        $expected = [];
+        $actual = $foo->getPolymorphicRelationGroups();
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testRelationGroupingMonomorphicRelationWithSingleUnknownSide()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $this->setUpSchemaFacade();
+
+        $simple = new SimpleMetadataProvider('Data', 'Data');
+        App::instance('metadata', $simple);
+
+        $classen = [ TestMonomorphicSource::class, TestMonomorphicTarget::class, TestMorphManyToManySource::class];
+
+        foreach ($classen as $className) {
+            $testModel = new $className($meta);
+            App::instance($className, $testModel);
+        }
+
+        $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
+        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->never();
+        $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        Cache::swap($cache);
+
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getIsCaching')->andReturn(false);
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen)->once();
+
+        $expected = [];
+        $actual = $foo->getPolymorphicRelationGroups();
+        $this->assertEquals($expected, $actual);
+    }
+
     private function setUpSchemaFacade()
     {
         $schema = Schema::getFacadeRoot();

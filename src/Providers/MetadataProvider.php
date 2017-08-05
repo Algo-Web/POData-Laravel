@@ -158,6 +158,61 @@ class MetadataProvider extends MetadataBaseProvider
         return $lines;
     }
 
+    public function getPolymorphicRelationGroups()
+    {
+        $modelNames = $this->getCandidateModels();
+
+        $knownSide = [];
+        $unknownSide = [];
+
+        $hooks = [];
+        // fish out list of polymorphic-affected models for further processing
+        foreach ($modelNames as $name) {
+            $model = new $name();
+            $isPoly = false;
+            if ($model->isKnownPolymorphSide()) {
+                $knownSide[$name] = [];
+                $isPoly = true;
+            }
+            if ($model->isUnknownPolymorphSide()) {
+                $unknownSide[$name] = [];
+                $isPoly = true;
+            }
+            if (false === $isPoly) {
+                continue;
+            }
+
+            $rels = $model->getRelationships();
+            // it doesn't matter if a model has no relationships here, that lack will simply be skipped over
+            // during hookup processing
+            $hooks[$name] = $rels;
+        }
+        // if either list is empty, bail out - there's nothing to do
+        if (0 === count($knownSide) || 0 === count($unknownSide)) {
+            return [];
+        }
+
+        // commence primary ignition
+        $knownKeys = array_keys($knownSide);
+        $unknownKeys = array_keys($unknownSide);
+        foreach ($unknownKeys as $key) {
+            assert(isset($hooks[$key]));
+            $hook = $hooks[$key];
+            foreach ($hook as $barb) {
+                foreach ($barb as $knownType => $propData) {
+                    if (in_array($knownType, $knownKeys)) {
+                        if (!isset($knownSide[$knownType][$key])) {
+                            $knownSide[$knownType][$key] = [];
+                        }
+                        $knownSide[$knownType][$key][] = $propData['property'];
+                    }
+                }
+            }
+        }
+
+        return $knownSide;
+    }
+
     /**
      * @param $remix
      * @param $lines
