@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 
 trait MetadataTrait
 {
+    protected static $relationHooks = [];
     protected static $relationCategories = [];
     protected static $methodPrimary = [];
     protected static $methodAlternate = [];
@@ -217,19 +218,23 @@ trait MetadataTrait
      */
     public function getRelationships()
     {
-        $hooks = [];
+        if (empty(static::$relationHooks)) {
+            $hooks = [];
 
-        $rels = $this->getRelationshipsFromMethods(true);
+            $rels = $this->getRelationshipsFromMethods(true);
 
-        $this->getRelationshipsUnknownPolyMorph($rels, $hooks);
+            $this->getRelationshipsUnknownPolyMorph($rels, $hooks);
 
-        $this->getRelationshipsKnownPolyMorph($rels, $hooks);
+            $this->getRelationshipsKnownPolyMorph($rels, $hooks);
 
-        $this->getRelationshipsHasOne($rels, $hooks);
+            $this->getRelationshipsHasOne($rels, $hooks);
 
-        $this->getRelationshipsHasMany($rels, $hooks);
+            $this->getRelationshipsHasMany($rels, $hooks);
 
-        return $hooks;
+            static::$relationHooks = $hooks;
+        }
+
+        return static::$relationHooks;
     }
 
     protected function getAllAttributes()
