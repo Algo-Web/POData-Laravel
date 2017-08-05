@@ -178,6 +178,11 @@ trait MetadataTrait
         return $complex;
     }
 
+    /**
+     * @param $entityTypes
+     * @param $resourceSets
+     * @return array
+     */
     public function hookUpRelationships($entityTypes, $resourceSets)
     {
         assert(is_array($entityTypes) && is_array($resourceSets), 'Both entityTypes and resourceSets must be arrays');
@@ -263,6 +268,10 @@ trait MetadataTrait
         return $attributes;
     }
 
+    /**
+     * @param bool $biDir
+     * @return array
+     */
     protected function getRelationshipsFromMethods($biDir = false)
     {
         $biDirVal = intval($biDir);
