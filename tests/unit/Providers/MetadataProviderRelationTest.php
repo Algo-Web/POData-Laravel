@@ -10,12 +10,17 @@ use AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
+use AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate;
 use AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
+use AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Mockery as m;
+use POData\Providers\Metadata\SimpleMetadataProvider;
 
 class MetadataProviderRelationTest extends TestCase
 {
@@ -61,6 +66,14 @@ class MetadataProviderRelationTest extends TestCase
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
             "principalMult" => "1",
+            "principalProp" => "oneTarget",
+            "dependentType" => TestMonomorphicOneAndManyTarget::class,
+            "dependentMult" => "0..1",
+            "dependentProp" => "manySource"
+        ];
+        $expected[] = [
+            "principalType" => TestMonomorphicOneAndManySource::class,
+            "principalMult" => "1",
             "principalProp" => "manyTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentMult" => "*",
@@ -75,7 +88,23 @@ class MetadataProviderRelationTest extends TestCase
             "dependentProp" => "morph"
         ];
         $expected[] = [
+            "principalType" => TestMorphManySourceAlternate::class,
+            "principalMult" => "1",
+            "principalProp" => "morphTarget",
+            "dependentType" => TestMorphTarget::class,
+            "dependentMult" => "*",
+            "dependentProp" => "morph"
+        ];
+        $expected[] = [
             "principalType" => TestMorphOneSource::class,
+            "principalMult" => "1",
+            "principalProp" => "morphTarget",
+            "dependentType" => TestMorphTarget::class,
+            "dependentMult" => "0..1",
+            "dependentProp" => "morph"
+        ];
+        $expected[] = [
+            "principalType" => TestMorphOneSourceAlternate::class,
             "principalMult" => "1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
@@ -86,7 +115,6 @@ class MetadataProviderRelationTest extends TestCase
         $actual = $foo->calculateRoundTripRelations();
         $this->assertTrue(is_array($actual), "Bidirectional relations result not an array");
         $this->assertEquals(2 * count($expected), count($actual));
-        $reverse = [];
         foreach ($expected as $forward) {
             $this->assertTrue(in_array($forward, $actual));
             $reverse = $forward;
@@ -98,5 +126,77 @@ class MetadataProviderRelationTest extends TestCase
             $reverse['dependentProp'] = $forward['principalProp'];
             $this->assertTrue(in_array($reverse, $actual));
         }
+    }
+
+    public function testCalcRoundTripFromTwoArmedPolymorphicRelationBothOneToOne()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $this->setUpSchemaFacade();
+
+        $simple = new SimpleMetadataProvider('Data', 'Data');
+        App::instance('metadata', $simple);
+
+        $classen = [ TestMorphOneSource::class, TestMorphOneSourceAlternate::class, TestMorphTarget::class];
+
+        foreach ($classen as $className) {
+            $testModel = new $className($meta);
+            App::instance($className, $testModel);
+        }
+
+        $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
+        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
+        $cache->shouldReceive('put')->with('metadata', m::any(), 10);
+        Cache::swap($cache);
+
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getIsCaching')->andReturn(false);
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen)->once();
+
+        $result = $foo->calculateRoundTripRelations();
+        $this->assertEquals(4, count($result));
+    }
+
+    public function testCalcRoundTripFromTwoArmedPolymorphicRelationBothOneToMany()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $this->setUpSchemaFacade();
+
+        $simple = new SimpleMetadataProvider('Data', 'Data');
+        App::instance('metadata', $simple);
+
+        $classen = [ TestMorphManySource::class, TestMorphManySourceAlternate::class, TestMorphTarget::class];
+
+        foreach ($classen as $className) {
+            $testModel = new $className($meta);
+            App::instance($className, $testModel);
+        }
+
+        $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
+        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->never();
+        $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        Cache::swap($cache);
+
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getIsCaching')->andReturn(false);
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen)->once();
+
+        $result = $foo->calculateRoundTripRelations();
+        $this->assertEquals(4, count($result));
+    }
+
+    private function setUpSchemaFacade()
+    {
+        $schema = Schema::getFacadeRoot();
+        $schema->shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(true);
+        $schema->shouldReceive('hasTable')->andReturn(true);
+        $schema->shouldReceive('getColumnListing')->andReturn([]);
     }
 }

@@ -180,10 +180,6 @@ class MetadataProvider extends MetadataBaseProvider
                         continue;
                     }
                     $foreign = $foreign[$principalKey];
-                    $dependentKey = $foreign[$dependentType]['local'];
-                    if ($fk != $dependentKey) {
-                        continue;
-                    }
                     $dependentMult = $foreign[$dependentType]['multiplicity'];
                     $dependentProperty = $foreign[$dependentType]['property'];
                     assert(

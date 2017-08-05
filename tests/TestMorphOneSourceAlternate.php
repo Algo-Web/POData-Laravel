@@ -2,12 +2,10 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
-use AlgoWeb\PODataLaravel\Models\MetadataTrait;
-use Illuminate\Database\Eloquent\Model as Model;
-use Illuminate\Database\Connection as Connection;
-use Mockery\Mockery;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Model;
 
-class TestMorphOneSource extends Model
+class TestMorphOneSourceAlternate extends Model
 {
     use MetadataTrait {
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
@@ -23,6 +21,8 @@ class TestMorphOneSource extends Model
      * @var array
      */
     protected $fillable = ['*'];
+
+    public $primaryKey = 'alternate_id';
 
     public function __construct(array $meta = null, Connection $connect = null)
     {
@@ -40,7 +40,7 @@ class TestMorphOneSource extends Model
 
     public function getTable()
     {
-        return 'testmorphonesource';
+        return 'testmorphonesourcealternate';
     }
 
     public function getConnectionName()
