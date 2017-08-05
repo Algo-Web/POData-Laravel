@@ -516,9 +516,9 @@ class MetadataTraitTest extends TestCase
         $result = $foo->getRelationshipsFromMethods();
         $this->assertEquals(0, count($result['HasOne']));
         $this->assertEquals(1, count($result['HasMany']));
-        $this->assertEquals(0, count($result['KnownPolyMorphSide']));
-        $this->assertEquals(1, count($result['UnknownPolyMorphSide']));
-        $this->assertTrue(array_key_exists('manySource', $result['UnknownPolyMorphSide']));
+        $this->assertEquals(1, count($result['KnownPolyMorphSide']));
+        $this->assertEquals(0, count($result['UnknownPolyMorphSide']));
+        $this->assertTrue(array_key_exists('manySource', $result['KnownPolyMorphSide']));
         $this->assertTrue(array_key_exists('manySource', $result['HasMany']));
     }
 
@@ -531,9 +531,9 @@ class MetadataTraitTest extends TestCase
         $result = $foo->getRelationshipsFromMethods();
         $this->assertEquals(0, count($result['HasOne']));
         $this->assertEquals(1, count($result['HasMany']));
-        $this->assertEquals(1, count($result['KnownPolyMorphSide']));
-        $this->assertEquals(0, count($result['UnknownPolyMorphSide']));
-        $this->assertTrue(array_key_exists('manyTarget', $result['KnownPolyMorphSide']));
+        $this->assertEquals(0, count($result['KnownPolyMorphSide']));
+        $this->assertEquals(1, count($result['UnknownPolyMorphSide']));
+        $this->assertTrue(array_key_exists('manyTarget', $result['UnknownPolyMorphSide']));
         $this->assertTrue(array_key_exists('manyTarget', $result['HasMany']));
     }
 
@@ -611,5 +611,69 @@ class MetadataTraitTest extends TestCase
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @dataProvider knownSideProvider
+     */
+    public function testCheckKnownSide($modelName, $expected)
+    {
+        $foo = new $modelName();
+        $actual = $foo->isKnownPolymorphSide();
+        $this->assertTrue($expected === $actual);
+    }
+
+    public function knownSideProvider()
+    {
+        return [
+            [TestCastModel::class, false],
+            [TestGetterModel::class, false],
+            [TestModel::class, false],
+            [TestMonomorphicManySource::class, false],
+            [TestMonomorphicManyTarget::class, false],
+            [TestMonomorphicOneAndManySource::class, false],
+            [TestMonomorphicOneAndManyTarget::class, false],
+            [TestMonomorphicSource::class, false],
+            [TestMonomorphicTarget::class, false],
+            [TestMorphManySource::class, false],
+            [TestMorphManySourceAlternate::class, false],
+            [TestMorphManyToManySource::class, false],
+            [TestMorphManyToManyTarget::class, true],
+            [TestMorphOneSource::class, false],
+            [TestMorphOneSourceAlternate::class, false],
+            [TestMorphTarget::class, true],
+        ];
+    }
+
+    /**
+     * @dataProvider unknownSideProvider
+     */
+    public function testCheckUnknownSide($modelName, $expected)
+    {
+        $foo = new $modelName();
+        $actual = $foo->isUnknownPolymorphSide();
+        $this->assertTrue($expected === $actual);
+    }
+
+    public function unknownSideProvider()
+    {
+        return [
+            [TestCastModel::class, false],
+            [TestGetterModel::class, false],
+            [TestModel::class, false],
+            [TestMonomorphicManySource::class, false],
+            [TestMonomorphicManyTarget::class, false],
+            [TestMonomorphicOneAndManySource::class, false],
+            [TestMonomorphicOneAndManyTarget::class, false],
+            [TestMonomorphicSource::class, false],
+            [TestMonomorphicTarget::class, false],
+            [TestMorphManySource::class, true],
+            [TestMorphManySourceAlternate::class, true],
+            [TestMorphManyToManySource::class, true],
+            [TestMorphManyToManyTarget::class, false],
+            [TestMorphOneSource::class, true],
+            [TestMorphOneSourceAlternate::class, true],
+            [TestMorphTarget::class, false],
+        ];
     }
 }

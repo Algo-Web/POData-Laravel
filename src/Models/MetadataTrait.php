@@ -332,11 +332,11 @@ trait MetadataTrait
                                         //Single model is returned
                                         $relationships['HasOne'][$method] = $biDir ? $relationObj : $relatedModel;
                                     }
-                                    if (in_array($relation, ['morphMany', 'morphOne', 'morphedByMany'])) {
+                                    if (in_array($relation, ['morphMany', 'morphOne', 'morphToMany'])) {
                                         $relationships['KnownPolyMorphSide'][$method] =
                                             $biDir ? $relationObj : $relatedModel;
                                     }
-                                    if (in_array($relation, ['morphToMany'])) {
+                                    if (in_array($relation, ['morphedByMany'])) {
                                         $relationships['UnknownPolyMorphSide'][$method] =
                                             $biDir ? $relationObj : $relatedModel;
                                     }
@@ -674,5 +674,23 @@ trait MetadataTrait
         $check = array_map('strval', $relations);
         assert($relations == $check, 'All supplied relations must be resolvable to strings');
         $this->loadEagerRelations = $relations;
+    }
+
+    /*
+     * Is this model the known side of at least one polymorphic relation?
+     */
+    public function isKnownPolymorphSide()
+    {
+        $rels = $this->getRelationshipsFromMethods();
+        return !empty($rels['UnknownPolyMorphSide']);
+    }
+
+    /*
+     * Is this model on the unknown side of at least one polymorphic relation?
+     */
+    public function isUnknownPolymorphSide()
+    {
+        $rels = $this->getRelationshipsFromMethods();
+        return !empty($rels['KnownPolyMorphSide']);
     }
 }
