@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 
 trait MetadataTrait
 {
+    protected static $relationCategories = [];
     protected static $methodPrimary = [];
     protected static $methodAlternate = [];
     protected $loadEagerRelations = [];
@@ -259,87 +260,95 @@ trait MetadataTrait
 
     protected function getRelationshipsFromMethods($biDir = false)
     {
-        $model = $this;
-        $relationships = [
-            'HasOne' => [],
-            'UnknownPolyMorphSide'=> [],
-            'HasMany'=> [],
-            'KnownPolyMorphSide'=> []
-        ];
-        $methods = get_class_methods($model);
-        if (!empty($methods)) {
-            foreach ($methods as $method) {
-                if (!method_exists('Illuminate\Database\Eloquent\Model', $method)
-                ) {
-                    //Use reflection to inspect the code, based on Illuminate/Support/SerializableClosure.php
-                    $reflection = new \ReflectionMethod($model, $method);
+        $biDirVal = intval($biDir);
+        $isCached = isset(static::$relationCategories[$biDirVal]) && !empty(static::$relationCategories[$biDirVal]);
+        if (!$isCached) {
+            $model = $this;
+            $relationships = [
+                'HasOne' => [],
+                'UnknownPolyMorphSide' => [],
+                'HasMany' => [],
+                'KnownPolyMorphSide' => []
+            ];
+            $methods = get_class_methods($model);
+            if (!empty($methods)) {
+                foreach ($methods as $method) {
+                    if (!method_exists('Illuminate\Database\Eloquent\Model', $method)
+                    ) {
+                        //Use reflection to inspect the code, based on Illuminate/Support/SerializableClosure.php
+                        $reflection = new \ReflectionMethod($model, $method);
 
-                    $file = new \SplFileObject($reflection->getFileName());
-                    $file->seek($reflection->getStartLine()-1);
-                    $code = '';
-                    while ($file->key() < $reflection->getEndLine()) {
-                        $code .= $file->current();
-                        $file->next();
-                    }
+                        $file = new \SplFileObject($reflection->getFileName());
+                        $file->seek($reflection->getStartLine() - 1);
+                        $code = '';
+                        while ($file->key() < $reflection->getEndLine()) {
+                            $code .= $file->current();
+                            $file->next();
+                        }
 
-                    $code = trim(preg_replace('/\s\s+/', '', $code));
-                    assert(false !== stripos($code, 'function'), 'Function definition must have keyword \'function\'');
-                    $begin = strpos($code, 'function(');
-                    $code = substr($code, $begin, strrpos($code, '}')-$begin+1);
-                    $lastCode = $code[strlen($code)-1];
-                    assert('}' == $lastCode, 'Final character of function definition must be closing brace');
-                    foreach ([
-                                'hasMany',
-                                'hasManyThrough',
-                                'belongsToMany',
-                                'hasOne',
-                                'belongsTo',
-                                'morphOne',
-                                'morphTo',
-                                'morphMany',
-                                'morphToMany',
-                                'morphedByMany'
-                                ] as $relation) {
-                        $search = '$this->'.$relation.'(';
-                        if ($pos = stripos($code, $search)) {
-                            //Resolve the relation's model to a Relation object.
-                            $relationObj = $model->$method();
-                            if ($relationObj instanceof Relation) {
-                                $relatedModel = '\\'.get_class($relationObj->getRelated());
-                                $relations = [
-                                    'hasManyThrough',
-                                    'belongsToMany',
-                                    'hasMany',
-                                    'morphMany',
-                                    'morphToMany',
-                                    'morphedByMany'
-                                ];
-                                if (in_array($relation, $relations)) {
-                                    //Collection or array of models (because Collection is Arrayable)
-                                    $relationships['HasMany'][$method] = $biDir ? $relationObj : $relatedModel;
-                                } elseif ('morphTo' === $relation) {
-                                    // Model isn't specified because relation is polymorphic
-                                    $relationships['UnknownPolyMorphSide'][$method] =
-                                        $biDir ? $relationObj : '\Illuminate\Database\Eloquent\Model|\Eloquent';
-                                } else {
-                                    //Single model is returned
-                                    $relationships['HasOne'][$method] = $biDir ? $relationObj : $relatedModel;
-                                }
-                                if (in_array($relation, ['morphMany', 'morphOne', 'morphedByMany'])) {
-                                    $relationships['KnownPolyMorphSide'][$method] =
-                                        $biDir ? $relationObj : $relatedModel;
-                                }
-                                if (in_array($relation, ['morphToMany'])) {
-                                    $relationships['UnknownPolyMorphSide'][$method] =
-                                        $biDir ? $relationObj : $relatedModel;
+                        $code = trim(preg_replace('/\s\s+/', '', $code));
+                        assert(
+                            false !== stripos($code, 'function'),
+                            'Function definition must have keyword \'function\''
+                        );
+                        $begin = strpos($code, 'function(');
+                        $code = substr($code, $begin, strrpos($code, '}') - $begin + 1);
+                        $lastCode = $code[strlen($code) - 1];
+                        assert('}' == $lastCode, 'Final character of function definition must be closing brace');
+                        foreach ([
+                                     'hasMany',
+                                     'hasManyThrough',
+                                     'belongsToMany',
+                                     'hasOne',
+                                     'belongsTo',
+                                     'morphOne',
+                                     'morphTo',
+                                     'morphMany',
+                                     'morphToMany',
+                                     'morphedByMany'
+                                 ] as $relation) {
+                            $search = '$this->' . $relation . '(';
+                            if ($pos = stripos($code, $search)) {
+                                //Resolve the relation's model to a Relation object.
+                                $relationObj = $model->$method();
+                                if ($relationObj instanceof Relation) {
+                                    $relatedModel = '\\' . get_class($relationObj->getRelated());
+                                    $relations = [
+                                        'hasManyThrough',
+                                        'belongsToMany',
+                                        'hasMany',
+                                        'morphMany',
+                                        'morphToMany',
+                                        'morphedByMany'
+                                    ];
+                                    if (in_array($relation, $relations)) {
+                                        //Collection or array of models (because Collection is Arrayable)
+                                        $relationships['HasMany'][$method] = $biDir ? $relationObj : $relatedModel;
+                                    } elseif ('morphTo' === $relation) {
+                                        // Model isn't specified because relation is polymorphic
+                                        $relationships['UnknownPolyMorphSide'][$method] =
+                                            $biDir ? $relationObj : '\Illuminate\Database\Eloquent\Model|\Eloquent';
+                                    } else {
+                                        //Single model is returned
+                                        $relationships['HasOne'][$method] = $biDir ? $relationObj : $relatedModel;
+                                    }
+                                    if (in_array($relation, ['morphMany', 'morphOne', 'morphedByMany'])) {
+                                        $relationships['KnownPolyMorphSide'][$method] =
+                                            $biDir ? $relationObj : $relatedModel;
+                                    }
+                                    if (in_array($relation, ['morphToMany'])) {
+                                        $relationships['UnknownPolyMorphSide'][$method] =
+                                            $biDir ? $relationObj : $relatedModel;
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+            static::$relationCategories[$biDirVal] = $relationships;
         }
-        return $relationships;
+        return static::$relationCategories[$biDirVal];
     }
 
     /**
