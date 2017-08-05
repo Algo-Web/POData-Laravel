@@ -187,14 +187,18 @@ class MetadataProvider extends MetadataBaseProvider
             // during hookup processing
             $hooks[$name] = $rels;
         }
+        // ensure we've only loaded up polymorphic-affected models
+        $knownKeys = array_keys($knownSide);
+        $unknownKeys = array_keys($unknownSide);
+        $dualKeys = array_intersect($knownKeys, $unknownKeys);
+        assert(count($hooks) == (count($unknownKeys) + count($knownKeys) - count($dualKeys)));
         // if either list is empty, bail out - there's nothing to do
         if (0 === count($knownSide) || 0 === count($unknownSide)) {
             return [];
         }
 
         // commence primary ignition
-        $knownKeys = array_keys($knownSide);
-        $unknownKeys = array_keys($unknownSide);
+
         foreach ($unknownKeys as $key) {
             assert(isset($hooks[$key]));
             $hook = $hooks[$key];
@@ -204,6 +208,7 @@ class MetadataProvider extends MetadataBaseProvider
                         if (!isset($knownSide[$knownType][$key])) {
                             $knownSide[$knownType][$key] = [];
                         }
+                        assert(isset($knownSide[$knownType][$key]));
                         $knownSide[$knownType][$key][] = $propData['property'];
                     }
                 }
