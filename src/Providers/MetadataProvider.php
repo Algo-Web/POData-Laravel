@@ -17,6 +17,7 @@ class MetadataProvider extends MetadataBaseProvider
 {
     protected $multConstraints = [ '0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
     protected static $metaNAMESPACE = 'Data';
+    const POLYMORPHIC = 'polyMorphicPlaceholder';
 
     /**
      * Bootstrap the application services.  Post-boot.
@@ -46,12 +47,12 @@ class MetadataProvider extends MetadataBaseProvider
         $meta = App::make('metadata');
 
         $stdRef = new \ReflectionClass(new \stdClass());
-        $abstract = $meta->addEntityType($stdRef, 'polyMorphicPlaceholder', true, null);
+        $abstract = $meta->addEntityType($stdRef, static::POLYMORPHIC, true, null);
 
         $modelNames = $this->getCandidateModels();
 
         list($entityTypes) = $this->getEntityTypesAndResourceSets($meta, $modelNames);
-        $entityTypes['polyMorphicPlaceholder'] = $abstract;
+        $entityTypes[static::POLYMORPHIC] = $abstract;
 
         // need to lift EntityTypes, adjust for polymorphic-affected relations, etc
         $biDirect = $this->getRepairedRoundTripRelations();
@@ -238,7 +239,7 @@ class MetadataProvider extends MetadataBaseProvider
             return $rels;
         }
 
-        $placeholder = 'polyMorphicPlaceholder';
+        $placeholder = static::POLYMORPHIC;
 
         $groupKeys = array_keys($groups);
 
@@ -436,6 +437,49 @@ class MetadataProvider extends MetadataBaseProvider
         }
         $principal = $entityTypes[$principalType];
         $dependent = $entityTypes[$dependentType];
+        $isPoly = static::POLYMORPHIC == $principalType || static::POLYMORPHIC == $dependentType;
+        if ($isPoly) {
+            $this->attachReferencePolymorphic(
+                $meta,
+                $principalMult,
+                $dependentMult,
+                $principal,
+                $dependent,
+                $principalProp,
+                $dependentProp
+            );
+            return;
+        }
+        $this->attachReferenceNonPolymorphic(
+            $meta,
+            $principalMult,
+            $dependentMult,
+            $principal,
+            $dependent,
+            $principalProp,
+            $dependentProp
+        );
+
+    }
+
+    /**
+     * @param $meta
+     * @param $principalMult
+     * @param $dependentMult
+     * @param $principal
+     * @param $dependent
+     * @param $principalProp
+     * @param $dependentProp
+     */
+    private function attachReferenceNonPolymorphic(
+        &$meta,
+        $principalMult,
+        $dependentMult,
+        $principal,
+        $dependent,
+        $principalProp,
+        $dependentProp
+    ) {
         //many-to-many
         if ('*' == $principalMult && '*' == $dependentMult) {
             $meta->addResourceSetReferencePropertyBidirectional(
@@ -475,6 +519,37 @@ class MetadataProvider extends MetadataBaseProvider
             $dependentProp,
             $principalProp
         );
+        return;
+    }
+
+    /**
+     * @param $meta
+     * @param $principalMult
+     * @param $dependentMult
+     * @param $principal
+     * @param $dependent
+     * @param $principalProp
+     * @param $dependentProp
+     */
+    private function attachReferencePolymorphic(
+        &$meta,
+        $principalMult,
+        $dependentMult,
+        $principal,
+        $dependent,
+        $principalProp,
+        $dependentProp
+    ) {
+        if ('*' == $principalMult) {
+            $meta->addResourceSetReferenceProperty($principal, $principalProp, $dependent->getCustomState());
+        } else {
+            $meta->addResourceReferenceProperty($principal, $principalProp, $dependent->getCustomState());
+        }
+        if ('*' == $dependentMult) {
+            $meta->addResourceSetReferenceProperty($dependent, $dependentProp, $principal->getCustomState());
+        } else {
+            $meta->addResourceReferenceProperty($dependent, $dependentProp, $principal->getCustomState());
+        }
         return;
     }
 }
