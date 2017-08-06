@@ -6,8 +6,10 @@ use AlgoWeb\PODataLaravel\Models\TestMorphOneParent;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use POData\Providers\Metadata\IMetadataProvider;
 use POData\Providers\Metadata\ResourceEntityType;
+use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +20,7 @@ class MetadataProvider extends MetadataBaseProvider
     protected $multConstraints = [ '0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
     protected static $metaNAMESPACE = 'Data';
     const POLYMORPHIC = 'polyMorphicPlaceholder';
+    const POLYMORPHIC_PLURAL = 'polyMorphicPlaceholders';
 
     /**
      * Bootstrap the application services.  Post-boot.
@@ -48,6 +51,7 @@ class MetadataProvider extends MetadataBaseProvider
 
         $stdRef = new \ReflectionClass(new \stdClass());
         $abstract = $meta->addEntityType($stdRef, static::POLYMORPHIC, true, null);
+        $abstractSet = $meta->addResourceSet(static::POLYMORPHIC, $abstract);
 
         $modelNames = $this->getCandidateModels();
 
@@ -271,7 +275,7 @@ class MetadataProvider extends MetadataBaseProvider
                 $msg = 'Specified unknown-side property ' . $targProperty . ' not found in polymorphic relation map';
                 assert(in_array($targProperty, $targUnknown), $msg);
 
-                $targType = $principalPoly ? 'dependentType' : 'principalType';
+                $targType = $principalPoly ? 'dependentRSet' : 'principalRSet';
                 $otherType = $principalPoly ? 'principalType' : 'dependentType';
                 $rels[$i][$targType] = $placeholder;
                 continue;
@@ -435,15 +439,17 @@ class MetadataProvider extends MetadataBaseProvider
         $principalType = $line['principalType'];
         $principalMult = $line['principalMult'];
         $principalProp = $line['principalProp'];
+        $principalRSet = $line['principalRSet'];
         $dependentType = $line['dependentType'];
         $dependentMult = $line['dependentMult'];
         $dependentProp = $line['dependentProp'];
+        $dependentRSet = $line['dependentRSet'];
         if (!isset($entityTypes[$principalType]) || !isset($entityTypes[$dependentType])) {
             return;
         }
         $principal = $entityTypes[$principalType];
         $dependent = $entityTypes[$dependentType];
-        $isPoly = static::POLYMORPHIC == $principalType || static::POLYMORPHIC == $dependentType;
+        $isPoly = static::POLYMORPHIC == $principalRSet || static::POLYMORPHIC == $dependentRSet;
         if ($isPoly) {
             $this->attachReferencePolymorphic(
                 $meta,
@@ -452,7 +458,9 @@ class MetadataProvider extends MetadataBaseProvider
                 $principal,
                 $dependent,
                 $principalProp,
-                $dependentProp
+                $dependentProp,
+                $principalRSet,
+                $dependentRSet
             );
             return null;
         }
@@ -544,17 +552,34 @@ class MetadataProvider extends MetadataBaseProvider
         $principal,
         $dependent,
         $principalProp,
-        $dependentProp
+        $dependentProp,
+        $principalRSet,
+        $dependentRSet
     ) {
-        if ('*' == $principalMult) {
-            $meta->addResourceSetReferenceProperty($principal, $principalProp, $dependent->getCustomState());
-        } else {
-            $meta->addResourceReferenceProperty($principal, $principalProp, $dependent->getCustomState());
+        $prinPoly = static::POLYMORPHIC == $principalRSet;
+        $depPoly = static::POLYMORPHIC == $dependentRSet;
+        $principalSet = (!$prinPoly) ? $principal->getCustomState()
+            : $meta->resolveResourceSet(static::POLYMORPHIC_PLURAL);
+        $dependentSet = (!$depPoly) ? $dependent->getCustomState()
+            : $meta->resolveResourceSet(static::POLYMORPHIC_PLURAL);
+        assert($principalSet instanceof ResourceSet, $principalRSet);
+        assert($dependentSet instanceof ResourceSet, $dependentRSet);
+        $isPrincipalAdded = null !== $principal->resolveProperty($principalProp);
+        $isDependentAdded = null !== $dependent->resolveProperty($dependentProp);
+
+        if (!$isPrincipalAdded) {
+            if ('*' == $principalMult) {
+                $meta->addResourceSetReferenceProperty($principal, $principalProp, $dependentSet);
+            } else {
+                $meta->addResourceReferenceProperty($principal, $principalProp, $dependentSet);
+            }
         }
-        if ('*' == $dependentMult) {
-            $meta->addResourceSetReferenceProperty($dependent, $dependentProp, $principal->getCustomState());
-        } else {
-            $meta->addResourceReferenceProperty($dependent, $dependentProp, $principal->getCustomState());
+        if (!$isDependentAdded) {
+            if ('*' == $dependentMult) {
+                $meta->addResourceSetReferenceProperty($dependent, $dependentProp, $principalSet);
+            } else {
+                $meta->addResourceReferenceProperty($dependent, $dependentProp, $principalSet);
+            }
         }
         return;
     }

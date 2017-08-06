@@ -111,8 +111,11 @@ class MetadataProviderTest extends TestCase
     {
         $this->setUpSchemaFacade();
 
+        $abstract = $this->createAbstractMockType();
+
         $meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
-        $meta->shouldReceive('addEntityType')->andReturnNull()->once();
+        $meta->shouldReceive('addEntityType')->andReturn($abstract)->once();
+        $meta->shouldReceive('addResourceSet')->andReturnNull()->once();
         App::instance('metadata', $meta);
 
         $classen = [TestModel::class, TestGetterModel::class, TestMorphManySource::class, TestMorphOneSource::class,
@@ -171,7 +174,7 @@ class MetadataProviderTest extends TestCase
 
         $resources = $meta->getResourceSets();
         $this->assertTrue(is_array($resources));
-        $this->assertEquals(1, count($resources));
+        $this->assertEquals(2, count($resources));
         $this->assertTrue($resources[0] instanceof ResourceSet);
         $this->assertEquals('TestModels', $resources[0]->getName());
     }
@@ -189,8 +192,10 @@ class MetadataProviderTest extends TestCase
 
         $this->setUpSchemaFacade();
 
+        $abstract = $this->createAbstractMockType();
+
         $meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
-        $meta->shouldReceive('addEntityType')->andReturnNull()->once();
+        $meta->shouldReceive('addEntityType')->andReturn($abstract)->once();
         App::instance('metadata', $meta);
 
         $cacheStore = Cache::getFacadeRoot();
@@ -204,7 +209,7 @@ class MetadataProviderTest extends TestCase
 
         $resources = $meta->getResourceSets();
         $this->assertTrue(is_array($resources));
-        $this->assertEquals(0, count($resources));
+        $this->assertEquals(1, count($resources));
     }
 
     public function testBootHasMigrationsThreeDifferentRelationTypes()
@@ -226,17 +231,30 @@ class MetadataProviderTest extends TestCase
             $testModel->shouldReceive('metadata')->andReturn([]);
             App::instance($className, $testModel);
             $type = m::mock(ResourceEntityType::class);
+            $type->shouldReceive('getCustomState')->andReturn(m::mock(ResourceSet::class));
+            $type->shouldReceive('resolveProperty')->andReturn(null);
             $types[$className] = $type;
         }
+
+        $placeholder = m::mock(ResourceSet::class);
+
+        $morphTarget = m::mock(ResourceSet::class);
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCandidateModels')->andReturn($classen);
         $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
         $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
 
+        $abstract = $this->createAbstractMockType();
+
         $meta = \Mockery::mock(SimpleMetadataProvider::class);
-        $meta->shouldReceive('addEntityType')->andReturnNull()->atLeast(1);
-        $meta->shouldReceive('addResourceSetReferencePropertyBidirectional')
+        $meta->shouldReceive('addResourceSet')->andReturnNull()->once();
+        $meta->shouldReceive('resolveResourceSet')
+            ->withArgs(['polyMorphicPlaceholders'])->andReturn($placeholder);
+        $meta->shouldReceive('resolveResourceSet')
+            ->withArgs([TestMorphManyToManyTarget::class])->andReturn($morphTarget);
+        $meta->shouldReceive('addEntityType')->andReturn($abstract)->atLeast(1);
+        $meta->shouldReceive('addResourceSetReferenceProperty')
             ->withAnyArgs()->andReturn(null)->atLeast(1);
         $meta->shouldReceive('addResourceReferenceSinglePropertyBidirectional')
             ->withAnyArgs()->andReturn(null)->atLeast(1);
@@ -265,8 +283,13 @@ class MetadataProviderTest extends TestCase
             $testModel->shouldReceive('metadata')->andReturn([]);
             App::instance($className, $testModel);
             $type = m::mock(ResourceEntityType::class);
+            $type->shouldReceive('getCustomState')->andReturn(m::mock(ResourceSet::class));
+            $type->shouldReceive('resolveProperty')->andReturn(null);
             $types[$className] = $type;
         }
+
+        $abstract = $this->createAbstractMockType();
+        $placeholder = $abstract->getCustomState();
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCandidateModels')->andReturn($classen);
@@ -274,13 +297,16 @@ class MetadataProviderTest extends TestCase
         $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
 
         $meta = \Mockery::mock(SimpleMetadataProvider::class);
-        $meta->shouldReceive('addEntityType')->andReturnNull()->atLeast(1);
-        $meta->shouldReceive('addResourceReferencePropertyBidirectional')
-            ->with(m::type(ResourceEntityType::class), m::type(ResourceEntityType::class), 'morphTarget', 'morph')
-            ->never();
-        $meta->shouldReceive('addResourceReferencePropertyBidirectional')
-            ->with(m::type(ResourceEntityType::class), m::type(ResourceEntityType::class), 'morph', 'morphTarget')
-            ->never();
+        $meta->shouldReceive('resolveResourceSet')
+            ->withArgs(['polyMorphicPlaceholders'])->andReturn($placeholder);
+        $meta->shouldReceive('addResourceSet')->andReturnNull()->once();
+        $meta->shouldReceive('addEntityType')->andReturn($abstract)->atLeast(1);
+        $meta->shouldReceive('addResourceReferenceProperty')
+            ->with(m::type(ResourceEntityType::class), 'morphTarget', m::any())
+            ->atLeast(1);
+        $meta->shouldReceive('addResourceSetReferenceProperty')
+            ->with(m::type(ResourceEntityType::class), 'morph', m::any())
+            ->atLeast(1);
 
         App::instance('metadata', $meta);
 
@@ -427,5 +453,20 @@ class MetadataProviderTest extends TestCase
         $schema->shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(true);
         $schema->shouldReceive('hasTable')->andReturn(true);
         $schema->shouldReceive('getColumnListing')->andReturn([]);
+    }
+
+    /**
+     * @return m\MockInterface
+     */
+    private function createAbstractMockType()
+    {
+        $abstractSet = m::mock(ResourceSet::class);
+
+        $abstract = m::mock(ResourceEntityType::class);
+        $abstract->shouldReceive('isAbstract')->andReturn(true);
+        $abstract->shouldReceive('getFullName')->andReturn('polyMorphicPlaceholder');
+        $abstract->shouldReceive('setCustomState')->andReturnNull();
+        $abstract->shouldReceive('getCustomState')->andReturn($abstractSet);
+        return $abstract;
     }
 }

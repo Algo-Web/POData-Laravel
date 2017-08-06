@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 use POData\Providers\Metadata\ResourceEntityType;
+use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 
 class MetadataProviderRelationTest extends TestCase
@@ -382,10 +383,10 @@ class MetadataProviderRelationTest extends TestCase
 
         $rels = $foo->calculateRoundTripRelations();
         $expected = $foo->calculateRoundTripRelations();
-        $expected[4]['principalType'] = 'polyMorphicPlaceholder';
-        $expected[6]['principalType'] = 'polyMorphicPlaceholder';
-        $expected[5]['dependentType'] = 'polyMorphicPlaceholder';
-        $expected[7]['dependentType'] = 'polyMorphicPlaceholder';
+        $expected[4]['principalRSet'] = 'polyMorphicPlaceholder';
+        $expected[6]['principalRSet'] = 'polyMorphicPlaceholder';
+        $expected[5]['dependentRSet'] = 'polyMorphicPlaceholder';
+        $expected[7]['dependentRSet'] = 'polyMorphicPlaceholder';
 
         // if groups is empty, bail right back out - nothing to do
         // else - need to loop through rels
@@ -437,8 +438,13 @@ class MetadataProviderRelationTest extends TestCase
             $types[$className] = $testType;
         }
 
+        $abstractSet = m::mock(ResourceSet::class);
+
         $abstract = m::mock(ResourceEntityType::class);
         $abstract->shouldReceive('isAbstract')->andReturn(true)->atLeast(1);
+        $abstract->shouldReceive('getFullName')->andReturn('polyMorphicPlaceholder');
+        $abstract->shouldReceive('setCustomState')->andReturn(null);
+        $abstract->shouldReceive('getCustomState')->andReturn($abstractSet);
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCandidateModels')->andReturn($classen);
