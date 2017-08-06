@@ -15,8 +15,6 @@ use AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
-use AlgoWeb\PODataLaravel\Models\TestMorphOneParent;
-use AlgoWeb\PODataLaravel\Models\TestMorphOneGrandParent;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -35,82 +33,103 @@ class MetadataProviderRelationTest extends TestCase
         // only add one side of the expected relationships here, and explicitly reverse expected before checking for
         // reversed actual
         $expected = [];
-        $expected[] = ["principalType" => TestMonomorphicManySource::class,
+        $expected[] = [
+            "principalType" => TestMonomorphicManySource::class,
+            "principalRSet" => TestMonomorphicManySource::class,
             "principalMult" => "*",
             "principalProp" => "manySource",
             "dependentType" => TestMonomorphicManyTarget::class,
+            "dependentRSet" => TestMonomorphicManyTarget::class,
             "dependentMult" => "*",
             "dependentProp" => "manyTarget"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicSource::class,
+            "principalRSet" => TestMonomorphicSource::class,
             "principalMult" => "1",
             "principalProp" => "oneSource",
             "dependentType" => TestMonomorphicTarget::class,
+            "dependentRSet" => TestMonomorphicTarget::class,
             "dependentMult" => "0..1",
             "dependentProp" => "oneTarget"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicSource::class,
+            "principalRSet" => TestMonomorphicSource::class,
             "principalMult" => "1",
             "principalProp" => "manySource",
             "dependentType" => TestMonomorphicTarget::class,
+            "dependentRSet" => TestMonomorphicTarget::class,
             "dependentMult" => "*",
             "dependentProp" => "manyTarget"
         ];
         $expected[] = [
             "principalType" => TestMorphManyToManySource::class,
+            "principalRSet" => TestMorphManyToManySource::class,
             "principalMult" => "*",
             "principalProp" => "manySource",
             "dependentType" => TestMorphManyToManyTarget::class,
+            "dependentRSet" => TestMorphManyToManyTarget::class,
             "dependentMult" => "*",
             "dependentProp" => "manyTarget"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
+            "principalRSet" => TestMonomorphicOneAndManySource::class,
             "principalMult" => "1",
             "principalProp" => "oneTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
+            "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
             "dependentMult" => "0..1",
             "dependentProp" => "manySource"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
+            "principalRSet" => TestMonomorphicOneAndManySource::class,
             "principalMult" => "1",
             "principalProp" => "manyTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
+            "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
             "dependentMult" => "*",
             "dependentProp" => "manySource"
         ];
         $expected[] = [
             "principalType" => TestMorphManySource::class,
+            "principalRSet" => TestMorphManySource::class,
             "principalMult" => "1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
+            "dependentRSet" => TestMorphTarget::class,
             "dependentMult" => "*",
             "dependentProp" => "morph"
         ];
         $expected[] = [
             "principalType" => TestMorphManySourceAlternate::class,
+            "principalRSet" => TestMorphManySourceAlternate::class,
             "principalMult" => "1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
+            "dependentRSet" => TestMorphTarget::class,
             "dependentMult" => "*",
             "dependentProp" => "morph"
         ];
         $expected[] = [
             "principalType" => TestMorphOneSource::class,
+            "principalRSet" => TestMorphOneSource::class,
             "principalMult" => "1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
+            "dependentRSet" => TestMorphTarget::class,
             "dependentMult" => "0..1",
             "dependentProp" => "morph"
         ];
         $expected[] = [
             "principalType" => TestMorphOneSourceAlternate::class,
+            "principalRSet" => TestMorphOneSourceAlternate::class,
             "principalMult" => "1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
+            "dependentRSet" => TestMorphTarget::class,
             "dependentMult" => "0..1",
             "dependentProp" => "morph"
         ];
@@ -124,9 +143,11 @@ class MetadataProviderRelationTest extends TestCase
             $reverse['principalType'] = $forward['dependentType'];
             $reverse['principalMult'] = $forward['dependentMult'];
             $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
             $reverse['dependentType'] = $forward['principalType'];
             $reverse['dependentMult'] = $forward['principalMult'];
             $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
             $this->assertTrue(in_array($reverse, $actual));
         }
     }

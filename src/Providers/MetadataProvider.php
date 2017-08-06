@@ -154,6 +154,12 @@ class MetadataProvider extends MetadataBaseProvider
         // now for second processing pass, to pick up stuff that first didn't handle
         $rawLines = $this->calculateRoundTripRelationsSecondPass($remix, $rawLines);
 
+        $numLines = count($rawLines);
+        for ($i = 0; $i < $numLines; $i++) {
+            $rawLines[$i]['principalRSet'] = $rawLines[$i]['principalType'];
+            $rawLines[$i]['dependentRSet'] = $rawLines[$i]['dependentType'];
+        }
+
         // deduplicate rawLines - can't use array_unique as array value elements are themselves arrays
         $lines = [];
         foreach ($rawLines as $line) {
@@ -448,7 +454,7 @@ class MetadataProvider extends MetadataBaseProvider
                 $principalProp,
                 $dependentProp
             );
-            return;
+            return null;
         }
         $this->attachReferenceNonPolymorphic(
             $meta,
@@ -459,7 +465,7 @@ class MetadataProvider extends MetadataBaseProvider
             $principalProp,
             $dependentProp
         );
-
+        return null;
     }
 
     /**
