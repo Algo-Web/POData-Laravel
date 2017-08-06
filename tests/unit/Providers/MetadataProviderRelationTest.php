@@ -15,6 +15,8 @@ use AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
+use AlgoWeb\PODataLaravel\Models\TestMorphOneParent;
+use AlgoWeb\PODataLaravel\Models\TestMorphOneGrandParent;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -324,6 +326,69 @@ class MetadataProviderRelationTest extends TestCase
 
         $expected = [];
         $actual = $foo->getPolymorphicRelationGroups();
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testPolymorphicRelationUpdateWithTwoArmedPolymorphicAndSingleMonomorphicRelation()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $this->setUpSchemaFacade();
+
+        $simple = new SimpleMetadataProvider('Data', 'Data');
+        App::instance('metadata', $simple);
+
+        $classen = [ TestMorphManySource::class, TestMorphManySourceAlternate::class, TestMorphTarget::class,
+            TestMonomorphicSource::class, TestMonomorphicTarget::class];
+
+        foreach ($classen as $className) {
+            $testModel = new $className($meta);
+            App::instance($className, $testModel);
+        }
+
+        $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
+        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->never();
+        $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        Cache::swap($cache);
+
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getIsCaching')->andReturn(false);
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen)->atLeast(1);
+
+        $rels = $foo->calculateRoundTripRelations();
+        $expected = $foo->calculateRoundTripRelations();
+        $expected[4]['principalType'] = 'polyMorphicPlaceholder';
+        $expected[6]['principalType'] = 'polyMorphicPlaceholder';
+        $expected[5]['dependentType'] = 'polyMorphicPlaceholder';
+        $expected[7]['dependentType'] = 'polyMorphicPlaceholder';
+
+        // if groups is empty, bail right back out - nothing to do
+        // else - need to loop through rels
+        //  -- if neither principal type nor dependent type in groups, continue
+        //  -- if one type is known and other is not
+        //     -- check that unknown type is in list of types connected to known type - if not, KABOOM, else check that unknownProp is in connected property list for unknown type.  If not, KABOOM, else switch unknown type for placeholder
+        //  -- if both types are known, need to figure out who is who - check properties available.  Whichever matches with connected property list is unknown.
+        $actual = $foo->getRepairedRoundTripRelations();
+
+        $this->assertEquals(count($rels), count($actual));
+        $this->assertNotEquals($rels, $actual);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetRepairedRelationsWhenNoPolymorphics()
+    {
+        // yes, this is not actual structure - we're testing that in absence of polymorphic-relation gubbins,
+        // raw relations are passed through unmodified
+        $expected = ['foo', 'bar'];
+
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('calculateRoundTripRelations')->andReturn($expected);
+        $foo->shouldReceive('getPolymorphicRelationGroups')->andReturn([]);
+
+        $actual = $foo->getRepairedRoundTripRelations();
         $this->assertEquals($expected, $actual);
     }
 

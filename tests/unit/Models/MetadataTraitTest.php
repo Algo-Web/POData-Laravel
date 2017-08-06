@@ -12,6 +12,7 @@ use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
+use POData\Providers\Metadata\Type\StringType;
 
 /**
  * Generated Test Class.
@@ -611,6 +612,41 @@ class MetadataTraitTest extends TestCase
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetXmlSchemaOnUnknownSideOfPolymorphic()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $entity = m::mock(ResourceEntityType::class);
+        $entity->shouldReceive('isAbstract')->withAnyArgs()->andReturn(true)->once();
+
+        $iType = new StringType();
+        $base = m::mock(ResourceEntityType::class)->makePartial();
+        $base->shouldReceive('getInstanceType')->andReturn($iType);
+        $base->shouldReceive('getName')->andReturn(TestMorphOneSource::class);
+        $base->shouldReceive('getFullName')->andReturn(TestMorphOneSource::class);
+        $base->shouldReceive('addProperty')->andReturn(null)->times(2);
+        $base->shouldReceive('setMediaLinkEntry')->andReturn(null)->times(1);
+        $base->shouldReceive('isMediaLinkEntry')->andReturn(true)->once();
+        $base->shouldReceive('addNamedStream')->andReturn(null)->times(1);
+
+        $metaProv = m::mock(SimpleMetadataProvider::class)->makePartial();
+        $metaProv->shouldReceive('resolveEntityType')->andReturn($entity)->once();
+        $metaProv->shouldReceive('addEntityType')->andReturn($base);
+
+        App::instance('metadata', $metaProv);
+
+        //$foo = new TestMorphOneSource($meta);
+        $foo = m::mock(TestMorphOneSource::class)->makePartial();
+        $foo->shouldReceive('metadata')->andReturn($meta);
+        $foo->shouldReceive('isUnknownPolymorphSide')->andReturn(true)->once();
+
+        $result = $foo->getXmlSchema();
+        $this->assertEquals(TestMorphOneSource::class, $result->getName());
     }
 
     /**

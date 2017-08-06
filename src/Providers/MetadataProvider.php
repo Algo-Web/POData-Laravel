@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use AlgoWeb\PODataLaravel\Models\TestMorphOneParent;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
@@ -45,11 +46,12 @@ class MetadataProvider extends MetadataBaseProvider
         $meta = App::make('metadata');
 
         $stdRef = new \ReflectionClass(new \stdClass());
-        $meta->addEntityType($stdRef, 'polyMorphicPlaceholder', true, null);
+        $abstract = $meta->addEntityType($stdRef, 'polyMorphicPlaceholder', true, null);
 
         $modelNames = $this->getCandidateModels();
 
         list($entityTypes) = $this->getEntityTypesAndResourceSets($meta, $modelNames);
+        $entityTypes['polyMorphicPlaceholder'] = $abstract;
 
         // need to lift EntityTypes
         $biDirect = $this->calculateRoundTripRelations();
@@ -222,6 +224,56 @@ class MetadataProvider extends MetadataBaseProvider
         }
 
         return $knownSide;
+    }
+
+    /**
+     * Get round-trip relations after inserting polymorphic-powered placeholders
+     *
+     * @return array
+     */
+    public function getRepairedRoundTripRelations()
+    {
+        $rels = $this->calculateRoundTripRelations();
+        $groups = $this->getPolymorphicRelationGroups();
+
+        if (0 === count($groups)) {
+            return $rels;
+        }
+
+        $placeholder = 'polyMorphicPlaceholder';
+
+        $groupKeys = array_keys($groups);
+
+        // we have at least one polymorphic relation, need to dig it out
+        $numRels = count($rels);
+        for ($i = 0; $i < $numRels; $i++) {
+            $relation = $rels[$i];
+            $principalType = $relation['principalType'];
+            $dependentType = $relation['dependentType'];
+            $principalPoly = in_array($principalType, $groupKeys);
+            $dependentPoly = in_array($dependentType, $groupKeys);
+            // if relation is not polymorphic, then move on
+            if (!($principalPoly || $dependentPoly)) {
+                continue;
+            } else {
+                // if only one end is a known end of a polymorphic relation
+                // for moment we're punting on both
+                $oneEnd = $principalPoly !== $dependentPoly;
+                assert($oneEnd, 'Multi-generational polymorphic relation chains not implemented');
+                $targRels = $principalPoly ? $groups[$principalType] : $groups[$dependentType];
+                $targUnknown = $targRels[$principalPoly ? $dependentType : $principalType];
+                $targProperty = $principalPoly ? $relation['dependentProp'] : $relation['principalProp'];
+                $msg = 'Specified unknown-side property ' . $targProperty . ' not found in polymorphic relation map';
+                assert(in_array($targProperty, $targUnknown), $msg);
+
+                $targType = $principalPoly ? 'dependentType' : 'principalType';
+                $otherType = $principalPoly ? 'principalType' : 'dependentType';
+                $rels[$i][$targType] = $placeholder;
+                continue;
+            }
+        }
+
+        return $rels;
     }
 
     /**
