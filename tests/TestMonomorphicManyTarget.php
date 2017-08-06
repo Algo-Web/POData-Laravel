@@ -51,4 +51,12 @@ class TestMonomorphicManyTarget extends Model
     {
         return $this->belongsToMany(TestMonomorphicManySource::class, "target_source", "many_id", "many_source");
     }
+
+    public function metadata()
+    {
+        if (isset($this->metaArray)) {
+            return $this->metaArray;
+        }
+        return $this->traitmetadata();
+    }
 }

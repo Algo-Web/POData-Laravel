@@ -280,7 +280,7 @@ class MetadataProviderTest extends TestCase
             ->never();
         $meta->shouldReceive('addResourceReferencePropertyBidirectional')
             ->with(m::type(ResourceEntityType::class), m::type(ResourceEntityType::class), 'morph', 'morphTarget')
-            ->times(2);
+            ->never();
 
         App::instance('metadata', $meta);
 

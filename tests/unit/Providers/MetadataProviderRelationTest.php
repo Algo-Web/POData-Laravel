@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
+use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 
 class MetadataProviderRelationTest extends TestCase
@@ -390,6 +391,55 @@ class MetadataProviderRelationTest extends TestCase
 
         $actual = $foo->getRepairedRoundTripRelations();
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testMonomorphicManyToManyRelation()
+    {
+        $metaRaw = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $this->setUpSchemaFacade();
+
+        $cacheStore = Cache::getFacadeRoot();
+        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+
+        $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
+
+        $types = [];
+
+        foreach ($classen as $className) {
+            $testModel = new $className($metaRaw);
+            $testType = ($testModel->getXmlSchema());
+            App::instance($className, $testModel);
+            $types[$className] = $testType;
+        }
+
+        $abstract = m::mock(ResourceEntityType::class);
+        $abstract->shouldReceive('isAbstract')->andReturn(true)->atLeast(1);
+
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen);
+        $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
+        $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
+
+        $meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
+        $meta->shouldReceive('addEntityType')
+            ->with(m::any(), 'polyMorphicPlaceholder', true, null)
+            ->andReturn($abstract);
+        $meta->shouldReceive('addKeyProperty')->andReturnNull()->atLeast(1);
+        $meta->shouldReceive('addPrimitiveProperty')->andReturnNull()->atLeast(1);
+        $meta->shouldReceive('addResourceSetReferencePropertyBidirectional')
+            ->withAnyArgs()->andReturn(null)->atLeast(1);
+        $meta->shouldReceive('addResourceReferenceSinglePropertyBidirectional')
+            ->withAnyArgs()->andReturn(null)->never();
+        $meta->shouldReceive('addResourceReferencePropertyBidirectional')
+            ->withAnyArgs()->andReturn(null)->never();
+
+        App::instance('metadata', $meta);
+
+        $foo->boot();
     }
 
     private function setUpSchemaFacade()

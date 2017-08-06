@@ -53,10 +53,8 @@ class MetadataProvider extends MetadataBaseProvider
         list($entityTypes) = $this->getEntityTypesAndResourceSets($meta, $modelNames);
         $entityTypes['polyMorphicPlaceholder'] = $abstract;
 
-        // need to lift EntityTypes
-        $biDirect = $this->calculateRoundTripRelations();
-
-        $groups = $this->getPolymorphicRelationGroups();
+        // need to lift EntityTypes, adjust for polymorphic-affected relations, etc
+        $biDirect = $this->getRepairedRoundTripRelations();
 
         // now that endpoints are hooked up, tackle the relationships
         // if we'd tried earlier, we'd be guaranteed to try to hook a relation up to null, which would be bad
