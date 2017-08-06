@@ -34,6 +34,7 @@ use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\ResourceTypeKind;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use Mockery as m;
+use POData\Providers\Metadata\Type\StringType;
 
 /**
  * Generated Test Class.
@@ -248,6 +249,7 @@ class MetadataProviderTest extends TestCase
         $abstract = $this->createAbstractMockType();
 
         $meta = \Mockery::mock(SimpleMetadataProvider::class);
+        $meta->shouldReceive('addKeyProperty')->andReturnNull()->once();
         $meta->shouldReceive('addResourceSet')->andReturnNull()->once();
         $meta->shouldReceive('resolveResourceSet')
             ->withArgs(['polyMorphicPlaceholders'])->andReturn($placeholder);
@@ -297,6 +299,7 @@ class MetadataProviderTest extends TestCase
         $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
 
         $meta = \Mockery::mock(SimpleMetadataProvider::class);
+        $meta->shouldReceive('addKeyProperty')->andReturnNull()->once();
         $meta->shouldReceive('resolveResourceSet')
             ->withArgs(['polyMorphicPlaceholders'])->andReturn($placeholder);
         $meta->shouldReceive('addResourceSet')->andReturnNull()->once();
@@ -462,11 +465,17 @@ class MetadataProviderTest extends TestCase
     {
         $abstractSet = m::mock(ResourceSet::class);
 
+        $iType = new StringType();
+
         $abstract = m::mock(ResourceEntityType::class);
         $abstract->shouldReceive('isAbstract')->andReturn(true);
         $abstract->shouldReceive('getFullName')->andReturn('polyMorphicPlaceholder');
+        $abstract->shouldReceive('getName')->andReturn('polyMorphicPlaceholder');
         $abstract->shouldReceive('setCustomState')->andReturnNull();
         $abstract->shouldReceive('getCustomState')->andReturn($abstractSet);
+        $abstract->shouldReceive('getInstanceType')->andReturn($iType);
+        $abstract->shouldReceive('addProperty')->andReturn(null);
+        $abstract->shouldReceive('keyProperty')->andReturn(null);
         return $abstract;
     }
 }
