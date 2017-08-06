@@ -54,7 +54,7 @@ class MetadataProvider extends MetadataBaseProvider
         $abstract = $meta->addEntityType($stdRef, static::POLYMORPHIC, true, null);
         $meta->addKeyProperty($abstract, 'PrimaryKey', TypeCode::STRING);
 
-        $abstractSet = $meta->addResourceSet(static::POLYMORPHIC, $abstract);
+        $meta->addResourceSet(static::POLYMORPHIC, $abstract);
 
         $modelNames = $this->getCandidateModels();
 
@@ -279,7 +279,6 @@ class MetadataProvider extends MetadataBaseProvider
                 assert(in_array($targProperty, $targUnknown), $msg);
 
                 $targType = $principalPoly ? 'dependentRSet' : 'principalRSet';
-                $otherType = $principalPoly ? 'principalType' : 'dependentType';
                 $rels[$i][$targType] = $placeholder;
                 continue;
             }

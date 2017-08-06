@@ -136,7 +136,7 @@ trait MetadataTrait
      *
      * @return ResourceEntityType
      */
-    public function getXmlSchema($metaNamespace = 'Data')
+    public function getXmlSchema()
     {
         $raw = $this->metadata();
         if ([] == $raw) {
