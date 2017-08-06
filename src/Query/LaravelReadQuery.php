@@ -22,6 +22,8 @@ use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 
 class LaravelReadQuery
 {
+    const PK = 'PrimaryKey';
+
     protected $auth;
 
     public function __construct(AuthInterface $auth = null)
@@ -89,8 +91,10 @@ class LaravelReadQuery
         if (null != $orderBy) {
             foreach ($orderBy->getOrderByInfo()->getOrderByPathSegments() as $order) {
                 foreach ($order->getSubPathSegments() as $subOrder) {
+                    $subName = $subOrder->getName();
+                    $subName = (self::PK == $subName) ? $sourceEntityInstance->getKeyName() : $subName;
                     $sourceEntityInstance = $sourceEntityInstance->orderBy(
-                        $subOrder->getName(),
+                        $subName,
                         $order->isAscending() ? 'asc' : 'desc'
                     );
                 }

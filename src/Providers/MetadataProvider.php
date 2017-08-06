@@ -14,6 +14,7 @@ use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema as Schema;
+use POData\Providers\Metadata\Type\TypeCode;
 
 class MetadataProvider extends MetadataBaseProvider
 {
@@ -51,6 +52,8 @@ class MetadataProvider extends MetadataBaseProvider
 
         $stdRef = new \ReflectionClass(new \stdClass());
         $abstract = $meta->addEntityType($stdRef, static::POLYMORPHIC, true, null);
+        $meta->addKeyProperty($abstract, 'PrimaryKey', TypeCode::STRING);
+
         $abstractSet = $meta->addResourceSet(static::POLYMORPHIC, $abstract);
 
         $modelNames = $this->getCandidateModels();

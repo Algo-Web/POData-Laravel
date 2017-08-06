@@ -41,6 +41,8 @@ use POData\UriProcessor\SegmentStack;
 
 class IronicSerialiser implements IObjectSerialiser
 {
+    const PK = 'PrimaryKey';
+
     /**
      * The service implementation.
      *
@@ -461,6 +463,7 @@ class IronicSerialiser implements IObjectSerialiser
             $keyType = $resourceProperty->getInstanceType();
             assert($keyType instanceof IType, '$keyType not instanceof IType');
             $keyName = $resourceProperty->getName();
+            $keyName = (self::PK == $keyName) ? $entityInstance->getKeyName() : $keyName;
             $keyValue = $entityInstance->$keyName;
             if (!isset($keyValue)) {
                 throw ODataException::createInternalServerError(
