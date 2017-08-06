@@ -635,7 +635,7 @@ class MetadataTraitTest extends TestCase
         $base->shouldReceive('addNamedStream')->andReturn(null)->times(1);
 
         $metaProv = m::mock(SimpleMetadataProvider::class)->makePartial();
-        $metaProv->shouldReceive('resolveEntityType')->andReturn($entity)->once();
+        $metaProv->shouldReceive('resolveResourceType')->andReturn($entity)->once();
         $metaProv->shouldReceive('addEntityType')->andReturn($base);
 
         App::instance('metadata', $metaProv);
