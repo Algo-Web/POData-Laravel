@@ -143,7 +143,7 @@ trait MetadataTrait
         $metadata = App::make('metadata');
 
         $reflec = new \ReflectionClass(get_class($this));
-        $complex = $metadata->addEntityType($reflec, $reflec->getShortName(), $metaNamespace);
+        $complex = $metadata->addEntityType($reflec, $reflec->getShortName());
         $keyName = $this->getKeyName();
         if (null != $keyName) {
             $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);
