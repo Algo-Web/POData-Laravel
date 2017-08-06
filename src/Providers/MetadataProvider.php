@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
 use POData\Providers\Metadata\IMetadataProvider;
+use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,9 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
         $meta = App::make('metadata');
+
+        $stdRef = new \ReflectionClass(new \stdClass());
+        $abstract = $meta->addEntityType($stdRef, 'polyMorphicPlaceholder', true, null);
 
         $modelNames = $this->getCandidateModels();
 

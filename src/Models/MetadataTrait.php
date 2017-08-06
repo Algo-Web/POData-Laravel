@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\App as App;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceStreamInfo;
 use POData\Providers\Metadata\Type\EdmPrimitiveType;
 use Illuminate\Database\Eloquent\Model;
@@ -144,8 +145,17 @@ trait MetadataTrait
 
         $metadata = App::make('metadata');
 
+        $isUnknown = $this->isUnknownPolymorphSide();
+        if ($isUnknown) {
+            $baseType = $metadata->resolveResourceType('polyMorphicPlaceholder');
+            assert($baseType instanceof ResourceEntityType);
+            assert($baseType->isAbstract());
+        } else {
+            $baseType = null;
+        }
+
         $reflec = new \ReflectionClass(get_class($this));
-        $complex = $metadata->addEntityType($reflec, $reflec->getShortName());
+        $complex = $metadata->addEntityType($reflec, $reflec->getShortName(), false, $baseType);
         $keyName = $this->getKeyName();
         if (null != $keyName) {
             $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);
