@@ -1,5 +1,9 @@
 Unreleased
 ----------
+   * Simulate polymorphic relations a la OData v3
+   * Turned Scrutinizer analysis up to 11
+   * Implement Laravel-specialised object model serialiser
+   * Get skipToken handling working
    * Add capability to use Laravel's passport authentication (if available)
         Thank you to Renan William Alves de Paula
         (renan@4success.com.br) for the patch
