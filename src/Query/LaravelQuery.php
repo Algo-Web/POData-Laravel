@@ -411,7 +411,7 @@ class LaravelQuery implements IQueryProvider
             $varType = isset($spec['type']) ? $spec['type'] : null;
             $varName = $spec['name'];
             if (null == $varType) {
-                $parms[] = $sourceEntityInstance->$varName;
+                $parms[] = ('id' == $varName) ? $sourceEntityInstance->getKey() : $sourceEntityInstance->$varName;
                 continue;
             }
             // TODO: Give this smarts and actively pick up instantiation details

@@ -36,6 +36,7 @@ will trip an exception complaining that resource set has already been
 added.
 * This can be worked around by setting a custom endpoint name on one
 of the colliding models.
+* Controller input parameters map 'id' to underlying model's primary key
 
 -- Configuration options --
 * APP_METADATA_CACHING - Whether or not to turn model metadata caching on
@@ -105,7 +106,7 @@ See CONTRIBUTING.md for the details.
 * [x] $select
 * [x] $top
 * [x] $skip
-* [ ] $skiptoken
+* [x] $skiptoken
 * [x] $orderby
 * [x] $expand
 
