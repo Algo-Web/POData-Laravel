@@ -5,15 +5,16 @@ namespace AlgoWeb\PODataLaravel\Models;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Connection as Connection;
-use Mockery\Mockery;
+use Mockery as m;
 
-class TestMorphOneSource extends Model
+class TestMorphManySourceAlternate extends Model
 {
     use MetadataTrait {
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
         // not bury ourselves under a stack overflow and segfault
         getRelationshipsFromMethods as getRel;
     }
+
     protected $metaArray;
     protected $connect;
 
@@ -24,6 +25,8 @@ class TestMorphOneSource extends Model
      */
     protected $fillable = ['*'];
 
+    public $primaryKey = 'alternate_id';
+
     public function __construct(array $meta = null, Connection $connect = null)
     {
         if (isset($meta)) {
@@ -32,7 +35,7 @@ class TestMorphOneSource extends Model
         if (isset($connect)) {
             $this->connect = $connect;
         } else {
-            $connect = \Mockery::mock(Connection::class)->makePartial();
+            $connect = m::mock(Connection::class)->makePartial();
             $this->connect = $connect;
         }
         parent::__construct();
@@ -40,7 +43,7 @@ class TestMorphOneSource extends Model
 
     public function getTable()
     {
-        return 'testmorphonesource';
+        return 'testmorphmanytargetalternate';
     }
 
     public function getConnectionName()
@@ -68,6 +71,6 @@ class TestMorphOneSource extends Model
 
     public function morphTarget()
     {
-        return $this->morphOne('AlgoWeb\PODataLaravel\Models\TestMorphTarget', 'morph');
+        return $this->morphMany('AlgoWeb\PODataLaravel\Models\TestMorphTarget', 'morph');
     }
 }

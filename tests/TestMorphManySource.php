@@ -5,7 +5,7 @@ namespace AlgoWeb\PODataLaravel\Models;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Connection as Connection;
-use Mockery\Mockery;
+use Mockery as m;
 
 class TestMorphManySource extends Model
 {
@@ -17,6 +17,13 @@ class TestMorphManySource extends Model
     protected $metaArray;
     protected $connect;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = ['*'];
+
     public function __construct(array $meta = null, Connection $connect = null)
     {
         if (isset($meta)) {
@@ -25,7 +32,7 @@ class TestMorphManySource extends Model
         if (isset($connect)) {
             $this->connect = $connect;
         } else {
-            $connect = \Mockery::mock(Connection::class)->makePartial();
+            $connect = m::mock(Connection::class)->makePartial();
             $this->connect = $connect;
         }
         parent::__construct();

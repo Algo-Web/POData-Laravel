@@ -133,6 +133,20 @@ class LaravelReadQueryTest extends TestCase
         $this->assertFalse($result->hasMore);
     }
 
+    public function testGetNullResource()
+    {
+        $rSet = m::mock(ResourceSet::class);
+        $source = m::mock(TestModel::class)->makePartial();
+        $source->shouldReceive('get')->andReturn(collect([]));
+
+        $foo = m::mock(LaravelReadQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
+
+        $expected = null;
+        $actual = $foo->getResource($rSet, null, [], $source);
+        $this->assertEquals($expected, $actual);
+    }
+
     /**
      * @return TestModel
      */

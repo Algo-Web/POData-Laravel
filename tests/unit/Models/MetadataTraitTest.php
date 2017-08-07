@@ -12,6 +12,7 @@ use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
+use POData\Providers\Metadata\Type\StringType;
 
 /**
  * Generated Test Class.
@@ -516,9 +517,9 @@ class MetadataTraitTest extends TestCase
         $result = $foo->getRelationshipsFromMethods();
         $this->assertEquals(0, count($result['HasOne']));
         $this->assertEquals(1, count($result['HasMany']));
-        $this->assertEquals(0, count($result['KnownPolyMorphSide']));
-        $this->assertEquals(1, count($result['UnknownPolyMorphSide']));
-        $this->assertTrue(array_key_exists('manySource', $result['UnknownPolyMorphSide']));
+        $this->assertEquals(1, count($result['KnownPolyMorphSide']));
+        $this->assertEquals(0, count($result['UnknownPolyMorphSide']));
+        $this->assertTrue(array_key_exists('manySource', $result['KnownPolyMorphSide']));
         $this->assertTrue(array_key_exists('manySource', $result['HasMany']));
     }
 
@@ -531,9 +532,9 @@ class MetadataTraitTest extends TestCase
         $result = $foo->getRelationshipsFromMethods();
         $this->assertEquals(0, count($result['HasOne']));
         $this->assertEquals(1, count($result['HasMany']));
-        $this->assertEquals(1, count($result['KnownPolyMorphSide']));
-        $this->assertEquals(0, count($result['UnknownPolyMorphSide']));
-        $this->assertTrue(array_key_exists('manyTarget', $result['KnownPolyMorphSide']));
+        $this->assertEquals(0, count($result['KnownPolyMorphSide']));
+        $this->assertEquals(1, count($result['UnknownPolyMorphSide']));
+        $this->assertTrue(array_key_exists('manyTarget', $result['UnknownPolyMorphSide']));
         $this->assertTrue(array_key_exists('manyTarget', $result['HasMany']));
     }
 
@@ -611,5 +612,104 @@ class MetadataTraitTest extends TestCase
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetXmlSchemaOnUnknownSideOfPolymorphic()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $entity = m::mock(ResourceEntityType::class);
+        $entity->shouldReceive('isAbstract')->withAnyArgs()->andReturn(true)->once();
+
+        $iType = new StringType();
+        $base = m::mock(ResourceEntityType::class)->makePartial();
+        $base->shouldReceive('getInstanceType')->andReturn($iType);
+        $base->shouldReceive('getName')->andReturn(TestMorphOneSource::class);
+        $base->shouldReceive('getFullName')->andReturn(TestMorphOneSource::class);
+        $base->shouldReceive('addProperty')->andReturn(null)->times(2);
+        $base->shouldReceive('setMediaLinkEntry')->andReturn(null)->times(1);
+        $base->shouldReceive('isMediaLinkEntry')->andReturn(true)->once();
+        $base->shouldReceive('addNamedStream')->andReturn(null)->times(1);
+
+        $metaProv = m::mock(SimpleMetadataProvider::class)->makePartial();
+        $metaProv->shouldReceive('resolveResourceType')->andReturn($entity)->once();
+        $metaProv->shouldReceive('addEntityType')->andReturn($base);
+
+        App::instance('metadata', $metaProv);
+
+        //$foo = new TestMorphOneSource($meta);
+        $foo = m::mock(TestMorphOneSource::class)->makePartial();
+        $foo->shouldReceive('metadata')->andReturn($meta);
+        $foo->shouldReceive('isUnknownPolymorphSide')->andReturn(true)->once();
+
+        $result = $foo->getXmlSchema();
+        $this->assertEquals(TestMorphOneSource::class, $result->getName());
+    }
+
+    /**
+     * @dataProvider knownSideProvider
+     */
+    public function testCheckKnownSide($modelName, $expected)
+    {
+        $foo = new $modelName();
+        $actual = $foo->isKnownPolymorphSide();
+        $this->assertTrue($expected === $actual);
+    }
+
+    public function knownSideProvider()
+    {
+        return [
+            [TestCastModel::class, false],
+            [TestGetterModel::class, false],
+            [TestModel::class, false],
+            [TestMonomorphicManySource::class, false],
+            [TestMonomorphicManyTarget::class, false],
+            [TestMonomorphicOneAndManySource::class, false],
+            [TestMonomorphicOneAndManyTarget::class, false],
+            [TestMonomorphicSource::class, false],
+            [TestMonomorphicTarget::class, false],
+            [TestMorphManySource::class, false],
+            [TestMorphManySourceAlternate::class, false],
+            [TestMorphManyToManySource::class, false],
+            [TestMorphManyToManyTarget::class, true],
+            [TestMorphOneSource::class, false],
+            [TestMorphOneSourceAlternate::class, false],
+            [TestMorphTarget::class, true],
+        ];
+    }
+
+    /**
+     * @dataProvider unknownSideProvider
+     */
+    public function testCheckUnknownSide($modelName, $expected)
+    {
+        $foo = new $modelName();
+        $actual = $foo->isUnknownPolymorphSide();
+        $this->assertTrue($expected === $actual);
+    }
+
+    public function unknownSideProvider()
+    {
+        return [
+            [TestCastModel::class, false],
+            [TestGetterModel::class, false],
+            [TestModel::class, false],
+            [TestMonomorphicManySource::class, false],
+            [TestMonomorphicManyTarget::class, false],
+            [TestMonomorphicOneAndManySource::class, false],
+            [TestMonomorphicOneAndManyTarget::class, false],
+            [TestMonomorphicSource::class, false],
+            [TestMonomorphicTarget::class, false],
+            [TestMorphManySource::class, true],
+            [TestMorphManySourceAlternate::class, true],
+            [TestMorphManyToManySource::class, true],
+            [TestMorphManyToManyTarget::class, false],
+            [TestMorphOneSource::class, true],
+            [TestMorphOneSourceAlternate::class, true],
+            [TestMorphTarget::class, false],
+        ];
     }
 }

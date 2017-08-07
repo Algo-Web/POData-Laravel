@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Common\Messages;
 use POData\Common\ODataConstants;
@@ -18,6 +19,7 @@ use POData\ObjectModel\ODataProperty;
 use POData\ObjectModel\ODataPropertyContent;
 use POData\ObjectModel\ODataURL;
 use POData\ObjectModel\ODataURLCollection;
+use POData\Providers\Metadata\IMetadataProvider;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourcePropertyKind;
@@ -41,6 +43,8 @@ use POData\UriProcessor\SegmentStack;
 
 class IronicSerialiser implements IObjectSerialiser
 {
+    const PK = 'PrimaryKey';
+
     /**
      * The service implementation.
      *
@@ -89,7 +93,15 @@ class IronicSerialiser implements IObjectSerialiser
      */
     private $lightStack = [];
 
+    /**
+     * @var ModelSerialiser
+     */
     private $modelSerialiser;
+
+    /**
+     * @var IMetadataProvider
+     */
+    private $metaProvider;
 
     /**
      * @param IService                  $service    Reference to the data service instance
@@ -125,6 +137,25 @@ class IronicSerialiser implements IObjectSerialiser
         $stackCount = count($this->lightStack);
         $topOfStack = $this->lightStack[$stackCount-1];
         $resourceType = $this->getService()->getProvidersWrapper()->resolveResourceType($topOfStack[0]);
+        // need gubbinz to unpack an abstract resource type
+        if ($resourceType->isAbstract()) {
+            $payloadClass = get_class($entryObject->results);
+            $derived = $this->getMetadata()->getDerivedTypes($resourceType);
+            assert(0 < count($derived));
+            foreach ($derived as $rawType) {
+                if (!$rawType->isAbstract()) {
+                    $name = $rawType->getInstanceType()->getName();
+                    if ($payloadClass == $name) {
+                        $resourceType = $rawType;
+                        break;
+                    }
+                }
+            }
+            // despite all set up, checking, etc, if we haven't picked a concrete resource type,
+            // wheels have fallen off, so blow up
+            assert(!$resourceType->isAbstract(), 'Concrete resource type not selected for payload '.$payloadClass);
+        }
+
         $rawProp = $resourceType->getAllProperties();
         $relProp = [];
         $nonRelProp = [];
@@ -461,7 +492,7 @@ class IronicSerialiser implements IObjectSerialiser
             $keyType = $resourceProperty->getInstanceType();
             assert($keyType instanceof IType, '$keyType not instanceof IType');
             $keyName = $resourceProperty->getName();
-            $keyValue = $entityInstance->$keyName;
+            $keyValue = (self::PK == $keyName) ? $entityInstance->getKey() : $entityInstance->$keyName;
             if (!isset($keyValue)) {
                 throw ODataException::createInternalServerError(
                     Messages::badQueryNullKeysAreNotSupported($typeName, $keyName)
@@ -910,5 +941,16 @@ class IronicSerialiser implements IObjectSerialiser
             return false;
         }
         return 0 == ($resourceKind % 4);
+    }
+
+    /*
+     * @return IMetadataProvider
+     */
+    protected function getMetadata()
+    {
+        if (null == $this->metaProvider) {
+            $this->metaProvider = App::make('metadata');
+        }
+        return $this->metaProvider;
     }
 }

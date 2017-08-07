@@ -22,6 +22,8 @@ use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 
 class LaravelReadQuery
 {
+    const PK = 'PrimaryKey';
+
     protected $auth;
 
     public function __construct(AuthInterface $auth = null)
@@ -89,8 +91,10 @@ class LaravelReadQuery
         if (null != $orderBy) {
             foreach ($orderBy->getOrderByInfo()->getOrderByPathSegments() as $order) {
                 foreach ($order->getSubPathSegments() as $subOrder) {
+                    $subName = $subOrder->getName();
+                    $subName = (self::PK == $subName) ? $sourceEntityInstance->getKeyName() : $subName;
                     $sourceEntityInstance = $sourceEntityInstance->orderBy(
-                        $subOrder->getName(),
+                        $subName,
                         $order->isAscending() ? 'asc' : 'desc'
                     );
                 }
@@ -313,7 +317,14 @@ class LaravelReadQuery
             $sourceEntityInstance = $sourceEntityInstance->where($fieldName, $fieldValue);
         }
         $sourceEntityInstance = $sourceEntityInstance->get();
-        return (0 == $sourceEntityInstance->count()) ? null : $sourceEntityInstance->first();
+        $sourceCount = $sourceEntityInstance->count();
+        if (0 == $sourceCount) {
+            return null;
+        }
+        $sourceEntityInstance = $sourceEntityInstance->first();
+        $sourceEntityInstance->PrimaryKey = $sourceEntityInstance->getKey();
+
+        return $sourceEntityInstance;
     }
 
     /**
@@ -342,7 +353,9 @@ class LaravelReadQuery
         $this->checkAuth($sourceEntityInstance);
 
         $propertyName = $targetProperty->getName();
-        return $sourceEntityInstance->$propertyName;
+        $result = $sourceEntityInstance->$propertyName;
+        $result->PrimaryKey = $result->getKey();
+        return $result;
     }
 
     /**
@@ -434,6 +447,7 @@ class LaravelReadQuery
     {
         if ($keyDescriptor) {
             foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
+                $key = (self::PK == $key) ? $sourceEntityInstance->getKeyName() : $key;
                 $trimValue = trim($value[0], '\'');
                 $sourceEntityInstance = $sourceEntityInstance->where($key, $trimValue);
             }
