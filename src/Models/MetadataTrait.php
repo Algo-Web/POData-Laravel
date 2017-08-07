@@ -157,6 +157,7 @@ trait MetadataTrait
         $reflec = new \ReflectionClass(get_class($this));
         $complex = $metadata->addEntityType($reflec, $reflec->getShortName(), false, $baseType);
         $keyName = $this->getKeyName();
+
         if (null != $keyName) {
             $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);
         }

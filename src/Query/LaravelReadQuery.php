@@ -317,7 +317,14 @@ class LaravelReadQuery
             $sourceEntityInstance = $sourceEntityInstance->where($fieldName, $fieldValue);
         }
         $sourceEntityInstance = $sourceEntityInstance->get();
-        return (0 == $sourceEntityInstance->count()) ? null : $sourceEntityInstance->first();
+        $sourceCount = $sourceEntityInstance->count();
+        if (0 == $sourceCount) {
+            return null;
+        }
+        $sourceEntityInstance = $sourceEntityInstance->first();
+        $sourceEntityInstance->PrimaryKey = $sourceEntityInstance->getKey();
+
+        return $sourceEntityInstance;
     }
 
     /**
@@ -346,7 +353,9 @@ class LaravelReadQuery
         $this->checkAuth($sourceEntityInstance);
 
         $propertyName = $targetProperty->getName();
-        return $sourceEntityInstance->$propertyName;
+        $result = $sourceEntityInstance->$propertyName;
+        $result->PrimaryKey = $result->getKey();
+        return $result;
     }
 
     /**
@@ -438,6 +447,7 @@ class LaravelReadQuery
     {
         if ($keyDescriptor) {
             foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
+                $key = (self::PK == $key) ? $sourceEntityInstance->getKeyName() : $key;
                 $trimValue = trim($value[0], '\'');
                 $sourceEntityInstance = $sourceEntityInstance->where($key, $trimValue);
             }

@@ -2,11 +2,28 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
+use AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
+use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use Illuminate\Support\Facades\App;
 use Mockery as m;
 use POData\Common\ODataConstants;
+use POData\Common\Url;
 use POData\IService;
+use POData\ObjectModel\ODataEntry;
+use POData\ObjectModel\ODataLink;
+use POData\ObjectModel\ODataMediaLink;
+use POData\ObjectModel\ODataProperty;
+use POData\ObjectModel\ODataPropertyContent;
+use POData\OperationContext\IOperationContext;
 use POData\OperationContext\ServiceHost;
 use POData\Providers\Metadata\ResourceSetWrapper;
+use POData\Providers\Metadata\SimpleMetadataProvider;
+use POData\Providers\ProvidersWrapper;
+use POData\Providers\Query\IQueryProvider;
+use POData\Providers\Query\QueryResult;
+use POData\Providers\Stream\StreamProviderWrapper;
 use POData\SimpleDataService;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjectionNode;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\RootProjectionNode;
@@ -372,6 +389,119 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $expected = '?$orderby=CustomerTitle&$inlinecount=all&$skiptoken=\'University+of+Loamshire\'';
         $actual = $foo->getNextLinkUri($object, ' ');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testSerialisePolymorphicUnknownType()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $this->setUpSchemaFacade();
+
+        $simple = new SimpleMetadataProvider('Data', 'Data');
+        App::instance('metadata', $simple);
+
+        $classen = [ TestMorphOneSource::class, TestMorphOneSourceAlternate::class, TestMorphTarget::class];
+
+        foreach ($classen as $className) {
+            $testModel = new $className($meta);
+            App::instance($className, $testModel);
+        }
+
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->boot();
+
+        $propContent = new ODataPropertyContent();
+        $propContent->properties = [new ODataProperty(), new ODataProperty(), new ODataProperty()];
+        $propContent->properties[0]->name = 'alternate_id';
+        $propContent->properties[1]->name = 'name';
+        $propContent->properties[2]->name = 'id';
+        $propContent->properties[0]->typeName = 'Edm.Int32';
+        $propContent->properties[1]->typeName = 'Edm.String';
+        $propContent->properties[2]->typeName = 'Edm.Int32';
+        $propContent->properties[0]->value= '42';
+        $propContent->properties[1]->value = 'Hammer, M.C.';
+
+        $odataLink = new ODataLink();
+        $odataLink->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morphTarget';
+        $odataLink->title = 'morphTarget';
+        $odataLink->type = 'application/atom+xml;type=entry';
+        $odataLink->url = 'TestMorphOneSourceAlternates(PrimaryKey=\'42\')/morphTarget';
+
+        $mediaLink1 = new ODataMediaLink(
+            'photo',
+            'stream',
+            'stream',
+            '*/*',
+            'eTag'
+        );
+        $mediaLink = new ODataMediaLink(
+            'TestMorphOneSourceAlternate',
+            '/$value',
+            'TestMorphOneSourceAlternates(PrimaryKey=\'42\')/$value',
+            '*/*',
+            'eTag'
+        );
+
+        $expected = new ODataEntry();
+        $expected->id = 'http://localhost/odata.svc/TestMorphOneSourceAlternates(PrimaryKey=\'42\')';
+        $expected->title = 'TestMorphOneSourceAlternate';
+        $expected->editLink = 'TestMorphOneSourceAlternates(PrimaryKey=\'42\')';
+        $expected->type = 'TestMorphOneSourceAlternate';
+        $expected->propertyContent = $propContent;
+        $expected->links[] = $odataLink;
+        $expected->mediaLink = $mediaLink;
+        $expected->mediaLinks[] = $mediaLink1;
+        $expected->isMediaLinkEntry = true;
+        $expected->resourceSetName = 'TestMorphOneSourceAlternates';
+
+        $model = new TestMorphOneSourceAlternate($meta);
+        $model->alternate_id = 42;
+        $model->name = 'Hammer, M.C.';
+        $model->PrimaryKey = 42;
+
+        $payload = new QueryResult();
+        $payload->results = $model;
+
+        $service = new Url('http://localhost/odata.svc');
+        $request = new Url('http://localhost/odata.svc/TestMorphOneSourceAlternates(42)');
+
+        $targType = $simple->resolveResourceType('polyMorphicPlaceholder');
+
+        $request = m::mock(RequestDescription::class)->makePartial();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMorphOneSourceAlternates(42)');
+        $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestMorphOneSourceAlternates(42)');
+        $request->shouldReceive('getTargetResourceType')->andReturn($targType);
+
+        $provWrap = m::mock(ProvidersWrapper::class);
+        $provWrap->shouldReceive('resolveResourceType')->andReturn($targType);
+
+        $host = m::mock(ServiceHost::class);
+        $host->shouldReceive('getAbsoluteServiceUri')->andReturn($service);
+        $host->shouldReceive('getProvidersWrapper')->andReturn($provWrap);
+
+        $stream = m::mock(StreamProviderWrapper::class)->makePartial();
+        $stream->shouldReceive('getStreamETag2')->andReturn('eTag');
+        $stream->shouldReceive('getReadStreamUri2')->andReturn('stream');
+        $stream->shouldReceive('getStreamContentType2')->andReturn('*/*');
+
+        $opContext = m::mock(IOperationContext::class);
+
+        $dataService = m::mock(SimpleDataService::class)->makePartial();
+        $dataService->setHost($host);
+        $dataService->shouldReceive('getProvidersWrapper')->andReturn($provWrap);
+        $dataService->shouldReceive('getOperationContext')->andReturn($opContext);
+        $dataService->shouldReceive('getStreamProviderWrapper')->andReturn($stream);
+        //$dataService = new SimpleDataService($db, App::make('metadata'), $host);
+
+        $ironic = new IronicSerialiser($dataService, $request);
+
+        $actual = $ironic->writeTopLevelElement($payload);
         $this->assertEquals($expected, $actual);
     }
 }

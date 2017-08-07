@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\TestMorphOneParent;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
@@ -50,7 +51,7 @@ class MetadataProvider extends MetadataBaseProvider
         }
         $meta = App::make('metadata');
 
-        $stdRef = new \ReflectionClass(new \stdClass());
+        $stdRef = new \ReflectionClass(Model::class);
         $abstract = $meta->addEntityType($stdRef, static::POLYMORPHIC, true, null);
         $meta->addKeyProperty($abstract, 'PrimaryKey', TypeCode::STRING);
 

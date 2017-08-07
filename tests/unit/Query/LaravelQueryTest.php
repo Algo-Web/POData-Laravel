@@ -194,7 +194,7 @@ class LaravelQueryTest extends TestCase
      */
     public function testGetResourceSetWithEntitiesAndCount()
     {
-        $instanceType = new \StdClass();
+        $instanceType = new \stdClass();
         $instanceType->name = 'AlgoWeb\\PODataLaravel\\Models\\TestMorphManySource';
 
         $mockResource = \Mockery::mock(ResourceSet::class);
@@ -249,7 +249,7 @@ class LaravelQueryTest extends TestCase
         $testModel->shouldReceive('skip')->andReturn($rawResult)->once();
         App::instance(TestModel::class, $testModel);
 
-        $instance = new \StdClass();
+        $instance = new \stdClass();
         $instance->name = TestModel::class;
 
         $queryType = QueryType::ENTITIES();
@@ -276,14 +276,19 @@ class LaravelQueryTest extends TestCase
     {
         $where = ['foo' => 2];
 
+        $mod1 = m::mock(TestModel::class)->makePartial();
+        $mod1->shouldReceive('getKey')->andReturn('foo');
+        $mod2 = m::mock(TestModel::class)->makePartial();
+        $mod2->shouldReceive('getKey')->andReturn('bar');
+
         $testModel = m::mock(TestModel::class)->makePartial();
-        $testModel->shouldReceive('get')->andReturn(collect(['a', 'b']))->once();
+        $testModel->shouldReceive('get')->andReturn(collect([$mod1, $mod2]))->once();
         $testModel->shouldReceive('where')->andReturn($testModel);
         App::instance(TestModel::class, $testModel);
 
         $key = null;
 
-        $instance = new \StdClass();
+        $instance = new \stdClass();
         $instance->name = TestModel::class;
 
         $type = m::mock(ResourceType::class);
@@ -298,12 +303,12 @@ class LaravelQueryTest extends TestCase
         $foo->shouldReceive('getReader')->andReturn($reader);
 
         $result = $reader->getResource($resource, $key, $where);
-        $this->assertEquals('a', $result);
+        $this->assertEquals($mod1, $result);
     }
 
     public function testGetResourceSetWithSuppliedOrderAndFilterInfo()
     {
-        $instanceType = new \StdClass();
+        $instanceType = new \stdClass();
         $instanceType->name = 'AlgoWeb\\PODataLaravel\\Models\\TestMorphManySource';
 
         $resourceType = m::mock(ResourceType::class);
@@ -695,7 +700,9 @@ class LaravelQueryTest extends TestCase
         $rawResult->shouldReceive('get')->withAnyArgs()->andReturn($finalResult);
         $rawResult->shouldReceive('getRelated')->andReturn(TestMorphTarget::class);
 
-        $targSource = m::mock(TestMorphTarget::class);
+        $targSource = m::mock(TestMorphTarget::class)->makePartial();
+        $targSource->shouldReceive('getKey')->andReturn('theSecret')->atLeast(1);
+
 
         $sourceEntity = \Mockery::mock(TestMorphManySource::class)->makePartial();
         $sourceEntity->shouldReceive('where')->andReturnSelf();
@@ -791,8 +798,11 @@ class LaravelQueryTest extends TestCase
 
     public function testGetRelatedResourceReferenceWithValidGubbins()
     {
+        $mod1 = new TestModel();
+        $mod1->name = 'Hammer, MC';
+
         $model = new TestModel();
-        $model->name = 'Hammer, MC';
+        $model->name = $mod1;
 
         $source = m::mock(ResourceSet::class);
         $targ = m::mock(ResourceSet::class);
