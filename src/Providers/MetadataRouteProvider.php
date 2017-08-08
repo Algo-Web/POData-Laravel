@@ -41,7 +41,7 @@ class MetadataRouteProvider extends ServiceProvider
 
     private function getAuthMiddleware()
     {
-        $disable = $this->getAuthDisable();
+        $disable = $this->isAuthDisable();
         if ($disable) {
             return null;
         }
@@ -59,7 +59,7 @@ class MetadataRouteProvider extends ServiceProvider
     /**
      * @return bool
      */
-    protected function getAuthDisable()
+    protected function isAuthDisable()
     {
         return true === config('APP_DISABLE_AUTH', null);
     }

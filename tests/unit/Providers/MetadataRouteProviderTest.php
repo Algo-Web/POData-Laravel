@@ -33,7 +33,7 @@ class MetadataRouteProviderTest extends TestCase
         $actual = [];
 
         $foo = m::mock(MetadataRouteProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getAuthDisable')->andReturn(true)->once();
+        $foo->shouldReceive('isAuthDisable')->andReturn(true)->once();
         $foo->boot();
 
         $allRoutes = Route::getRoutes();
