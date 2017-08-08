@@ -42,6 +42,7 @@ of the colliding models.
 * APP_METADATA_CACHING - Whether or not to turn model metadata caching on
 * APP_METADATA_CACHE_DURATION - If caching, how long (in minutes) to
 retain cached metadata
+* APP_DISABLE_AUTH - Disable authentication
 
 ## Contributing
 

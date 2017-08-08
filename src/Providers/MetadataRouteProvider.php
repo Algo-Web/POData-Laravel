@@ -15,17 +15,19 @@ class MetadataRouteProvider extends ServiceProvider
      */
     public function boot()
     {
-        self::setupRoute();
+        $this->setupRoute();
     }
 
-    private static function setupRoute()
+    private function setupRoute()
     {
-        $authMiddleware = self::getAuthMiddleware();
+        $authMiddleware = $this->getAuthMiddleware();
         $controllerMethod = 'AlgoWeb\PODataLaravel\Controllers\ODataController@index';
+
+        Route::get('odata.svc/$metadata', ['uses' => $controllerMethod, 'middleware' => null]);
 
         Route::any('odata.svc/{section}', ['uses' => $controllerMethod, 'middleware' => $authMiddleware])
             ->where(['section' => '.*']);
-        Route::any('odata.svc', ['uses' => $controllerMethod, 'middleware' => $authMiddleware]);
+        Route::any('odata.svc', ['uses' => $controllerMethod, 'middleware' => null]);
     }
 
     /**
@@ -37,8 +39,13 @@ class MetadataRouteProvider extends ServiceProvider
     {
     }
 
-    private static function getAuthMiddleware()
+    private function getAuthMiddleware()
     {
+        $disable = $this->isAuthDisable();
+        if ($disable) {
+            return null;
+        }
+
         $authMiddleware = 'auth.basic';
 
         if (interface_exists(\Illuminate\Contracts\Auth\Factory::class)) {
@@ -47,5 +54,13 @@ class MetadataRouteProvider extends ServiceProvider
         }
 
         return $authMiddleware;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isAuthDisable()
+    {
+        return true === config('APP_DISABLE_AUTH', null);
     }
 }
