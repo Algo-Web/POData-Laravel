@@ -124,7 +124,7 @@ class MetadataProviderTest extends TestCase
             TestMonomorphicSource::class, TestMonomorphicTarget::class, TestMorphManyToManySource::class,
             TestMorphManyToManyTarget::class, TestMonomorphicOneAndManySource::class,
             TestMonomorphicOneAndManyTarget::class, TestCastModel::class, TestMorphOneSourceAlternate::class,
-            TestMorphManySourceAlternate::class];
+            TestMorphManySourceAlternate::class, TestMorphManySourceWithUnexposedTarget::class];
 
         foreach ($classen as $className) {
             $testModel = m::mock($className)->makePartial();
