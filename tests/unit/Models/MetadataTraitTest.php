@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
+use AlgoWeb\PODataLaravel\Providers\TestMorphManySourceWithUnexposedTarget;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
@@ -679,6 +680,8 @@ class MetadataTraitTest extends TestCase
             [TestMorphOneSource::class, false],
             [TestMorphOneSourceAlternate::class, false],
             [TestMorphTarget::class, true],
+            [TestMorphTarget::class, true],
+            [TestMorphManySourceWithUnexposedTarget::class, false]
         ];
     }
 
@@ -711,6 +714,7 @@ class MetadataTraitTest extends TestCase
             [TestMorphOneSource::class, true],
             [TestMorphOneSourceAlternate::class, true],
             [TestMorphTarget::class, false],
+            [TestMorphManySourceWithUnexposedTarget::class, false]
         ];
     }
 }
