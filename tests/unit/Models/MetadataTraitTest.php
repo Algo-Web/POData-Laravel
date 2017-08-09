@@ -629,10 +629,11 @@ class MetadataTraitTest extends TestCase
         $base->shouldReceive('getInstanceType')->andReturn($iType);
         $base->shouldReceive('getName')->andReturn(TestMorphOneSource::class);
         $base->shouldReceive('getFullName')->andReturn(TestMorphOneSource::class);
-        $base->shouldReceive('addProperty')->andReturn(null)->times(2);
+        $base->shouldReceive('addProperty')->andReturn(null)->times(1);
         $base->shouldReceive('setMediaLinkEntry')->andReturn(null)->times(1);
         $base->shouldReceive('isMediaLinkEntry')->andReturn(true)->once();
         $base->shouldReceive('addNamedStream')->andReturn(null)->times(1);
+        $base->shouldReceive('getKeyProperties')->andReturn(['a'])->times(1);
 
         $metaProv = m::mock(SimpleMetadataProvider::class)->makePartial();
         $metaProv->shouldReceive('resolveResourceType')->andReturn($entity)->once();
