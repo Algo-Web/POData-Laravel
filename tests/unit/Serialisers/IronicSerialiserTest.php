@@ -417,15 +417,12 @@ class IronicSerialiserTest extends SerialiserTestBase
         $metaProv->boot();
 
         $propContent = new ODataPropertyContent();
-        $propContent->properties = [new ODataProperty(), new ODataProperty(), new ODataProperty()];
-        $propContent->properties[0]->name = 'alternate_id';
-        $propContent->properties[1]->name = 'name';
-        $propContent->properties[2]->name = 'id';
-        $propContent->properties[0]->typeName = 'Edm.Int32';
-        $propContent->properties[1]->typeName = 'Edm.String';
-        $propContent->properties[2]->typeName = 'Edm.Int32';
-        $propContent->properties[0]->value= '42';
-        $propContent->properties[1]->value = 'Hammer, M.C.';
+        $propContent->properties = [new ODataProperty(), new ODataProperty()];
+        $propContent->properties[0]->name = 'name';
+        $propContent->properties[1]->name = 'id';
+        $propContent->properties[0]->typeName = 'Edm.String';
+        $propContent->properties[1]->typeName = 'Edm.Int32';
+        $propContent->properties[0]->value = 'Hammer, M.C.';
 
         $odataLink = new ODataLink();
         $odataLink->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morphTarget';

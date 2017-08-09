@@ -146,10 +146,12 @@ trait MetadataTrait
         $metadata = App::make('metadata');
 
         $isUnknown = $this->isUnknownPolymorphSide();
+        $isAbstract = false;
         if ($isUnknown) {
             $baseType = $metadata->resolveResourceType('polyMorphicPlaceholder');
             assert($baseType instanceof ResourceEntityType);
             assert($baseType->isAbstract());
+            $isAbstract = true;
         } else {
             $baseType = null;
         }
@@ -158,9 +160,10 @@ trait MetadataTrait
         $complex = $metadata->addEntityType($reflec, $reflec->getShortName(), false, $baseType);
         $keyName = $this->getKeyName();
 
-        if (null != $keyName) {
+        if (null !== $keyName && !$isAbstract) {
             $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);
         }
+        assert(0 < count($complex->getKeyProperties()), get_class($this) . ' has no effective keys');
 
         foreach ($raw as $key => $secret) {
             if ($key == $keyName) {
