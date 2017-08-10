@@ -1510,6 +1510,52 @@ class LaravelQueryTest extends TestCase
         $this->assertTrue($foo->putResource($resource, $key, []));
     }
 
+    public function testUnpackSourceEntityInstanceFromSingleton()
+    {
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+        $rProp = m::mock(ResourceProperty::class);
+        $key = m::mock(KeyDescriptor::class);
+
+        $entity = new QueryResult();
+        $entity->results = m::mock(TestModel::class);
+
+        $reader = m::mock(LaravelReadQuery::class);
+        // Set things up to respond if an only if the ReadQuery call receives an Eloquent model, not a QueryResult
+        $reader->shouldReceive('getResourceFromRelatedResourceSet')
+            ->with($source, m::type(Model::class), $target, $rProp, $key)
+            ->andReturn(null)->once();
+
+        $foo = m::mock(LaravelQuery::class)->makePartial();
+        $foo->shouldReceive('getReader')->andReturn($reader);
+
+        $result = $foo->getResourceFromRelatedResourceSet($source, $entity, $target, $rProp, $key);
+        $this->assertNull($result);
+    }
+
+    public function testUnpackSourceEntityInstanceFromArray()
+    {
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+        $rProp = m::mock(ResourceProperty::class);
+        $key = m::mock(KeyDescriptor::class);
+
+        $entity = new QueryResult();
+        $entity->results = [m::mock(TestModel::class)];
+
+        $reader = m::mock(LaravelReadQuery::class);
+        // Set things up to respond if an only if the ReadQuery call receives an Eloquent model, not a QueryResult
+        $reader->shouldReceive('getResourceFromRelatedResourceSet')
+            ->with($source, m::type(Model::class), $target, $rProp, $key)
+            ->andReturn(null)->once();
+
+        $foo = m::mock(LaravelQuery::class)->makePartial();
+        $foo->shouldReceive('getReader')->andReturn($reader);
+
+        $result = $foo->getResourceFromRelatedResourceSet($source, $entity, $target, $rProp, $key);
+        $this->assertNull($result);
+    }
+
     private function seedControllerMetadata(TestController $controller = null)
     {
         $translator = \Mockery::mock(\Illuminate\Translation\Translator::class)->makePartial();

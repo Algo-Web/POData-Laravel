@@ -102,6 +102,7 @@ class LaravelQuery implements IQueryProvider
         $skipToken = null,
         $sourceEntityInstance = null
     ) {
+        $sourceEntityInstance = $this->unpackSourceEntity($sourceEntityInstance);
         return $this->getReader()->getResourceSet(
             $queryType,
             $resourceSet,
@@ -161,6 +162,7 @@ class LaravelQuery implements IQueryProvider
         $skip = null,
         $skipToken = null
     ) {
+        $sourceEntityInstance = $this->unpackSourceEntity($sourceEntityInstance);
         return $this->getReader()->getRelatedResourceSet(
             $queryType,
             $sourceResourceSet,
@@ -194,6 +196,7 @@ class LaravelQuery implements IQueryProvider
         ResourceProperty $targetProperty,
         KeyDescriptor $keyDescriptor
     ) {
+        $sourceEntityInstance = $this->unpackSourceEntity($sourceEntityInstance);
         return $this->getReader()->getResourceFromRelatedResourceSet(
             $sourceResourceSet,
             $sourceEntityInstance,
@@ -221,6 +224,8 @@ class LaravelQuery implements IQueryProvider
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty
     ) {
+        $sourceEntityInstance = $this->unpackSourceEntity($sourceEntityInstance);
+
         $result = $this->getReader()->getRelatedResourceReference(
             $sourceResourceSet,
             $sourceEntityInstance,
@@ -248,6 +253,8 @@ class LaravelQuery implements IQueryProvider
         $data,
         $shouldUpdate = false
     ) {
+        $sourceEntityInstance = $this->unpackSourceEntity($sourceEntityInstance);
+
         $verb = 'update';
         return $this->createUpdateCoreWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb);
     }
@@ -262,6 +269,8 @@ class LaravelQuery implements IQueryProvider
         ResourceSet $sourceResourceSet,
         $sourceEntityInstance
     ) {
+        $sourceEntityInstance = $this->unpackSourceEntity($sourceEntityInstance);
+
         $verb = 'delete';
         if (!($sourceEntityInstance instanceof Model)) {
             throw new InvalidArgumentException('Source entity must be an Eloquent model.');
@@ -292,6 +301,8 @@ class LaravelQuery implements IQueryProvider
         $sourceEntityInstance,
         $data
     ) {
+        $sourceEntityInstance = $this->unpackSourceEntity($sourceEntityInstance);
+
         $verb = 'create';
         return $this->createUpdateCoreWrapper($resourceSet, $sourceEntityInstance, $data, $verb);
     }
@@ -449,5 +460,19 @@ class LaravelQuery implements IQueryProvider
             );
         }
         return $outData;
+    }
+
+    /**
+     * @param $sourceEntityInstance
+     * @return mixed|null|\object[]
+     */
+    private function unpackSourceEntity($sourceEntityInstance)
+    {
+        if ($sourceEntityInstance instanceof QueryResult) {
+            $sourceEntityInstance = $sourceEntityInstance->results;
+            $sourceEntityInstance = (is_array($sourceEntityInstance))
+                ? $sourceEntityInstance[0] : $sourceEntityInstance;
+        }
+        return $sourceEntityInstance;
     }
 }
