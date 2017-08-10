@@ -347,7 +347,7 @@ class LaravelQuery implements IQueryProvider
         $method = $goal['method'];
         $paramList = $goal['parameters'];
         $controller = App::make($controlClass);
-        $parms = $this->createUpdateDeleteProcessInput($sourceEntityInstance, $arrayData, $paramList);
+        $parms = $this->createUpdateDeleteProcessInput($arrayData, $paramList, $sourceEntityInstance);
         unset($data);
 
         $result = call_user_func_array(array($controller, $method), $parms);
@@ -405,12 +405,12 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * @param $sourceEntityInstance
      * @param $data
      * @param $paramList
+     * @param Model|null $sourceEntityInstance
      * @return array
      */
-    private function createUpdateDeleteProcessInput(Model $sourceEntityInstance, $data, $paramList)
+    private function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance = null)
     {
         $parms = [];
 
