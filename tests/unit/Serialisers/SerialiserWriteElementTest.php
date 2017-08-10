@@ -3,6 +3,8 @@
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\TestModel;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
@@ -16,6 +18,9 @@ use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use POData\ObjectModel\ObjectModelSerializer;
+use POData\ObjectModel\ODataEntry;
+use POData\ObjectModel\ODataLink;
+use POData\ObjectModel\ODataProperty;
 use POData\ObjectModel\ODataPropertyContent;
 use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
@@ -412,5 +417,82 @@ class SerialiserWriteElementTest extends SerialiserTestBase
             $this->assertEquals(isset($objectVal), isset($ironicVal), "Values for $propName differently null");
             $this->assertEquals(is_string($objectVal), is_string($ironicVal), "Values for $propName not identical");
         }
+    }
+
+    public function testSerialiseSingleModelWithNullExpansion()
+    {
+        $serialiser = new ModelSerialiser();
+        $serialiser->reset();
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicManySources');
+        $request->shouldReceive('fullUrl')
+            ->andReturn('http://localhost/odata.svc/TestMonomorphicManySources(1)?$expand=manySource');
+
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = new TestMonomorphicManySource($metadata);
+        $target = new TestMonomorphicManyTarget($metadata);
+
+        App::instance(TestMonomorphicManySource::class, $source);
+        App::instance(TestMonomorphicManyTarget::class, $target);
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri("/odata.svc/");
+
+        $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->boot();
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        $stack = [ ['type' => 'TestMonomorphicManySource', 'prop' => 'manySource'],
+        ];
+
+        // default data service
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $ironic = new IronicSerialiserDummy($service, $processor->getRequest());
+        $ironic->setLightStack($stack);
+
+        $model = new TestMonomorphicManySource($metadata, null);
+        $model->id = 1;
+        $model->name = 'Name';
+
+        $result = new QueryResult();
+        $result->results = $model;
+
+        $propContent = new ODataPropertyContent();
+        $propContent->properties = [new ODataProperty(), new ODataProperty()];
+        $propContent->properties[0]->name = 'id';
+        $propContent->properties[1]->name = 'name';
+        $propContent->properties[0]->typeName = 'Edm.Int32';
+        $propContent->properties[1]->typeName = 'Edm.String';
+        $propContent->properties[0]->value = '1';
+        $propContent->properties[1]->value = 'Name';
+
+        $link = new ODataLink();
+        $link->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/manySource';
+        $link->title = 'manySource';
+        $link->type = 'application/atom+xml;type=feed';
+        $link->url = 'TestMonomorphicManySources(id=1)/manySource';
+
+        $expected = new ODataEntry();
+        $expected->id = 'http://localhost/odata.svc/TestMonomorphicManySources(id=1)';
+        $expected->title = 'TestMonomorphicManySource';
+        $expected->editLink = 'TestMonomorphicManySources(id=1)';
+        $expected->type = 'TestMonomorphicManySource';
+        $expected->isMediaLinkEntry = false;
+        $expected->resourceSetName = 'TestMonomorphicManySources';
+        $expected->links = [$link];
+        $expected->propertyContent = $propContent;
+
+        $actual = $ironic->writeTopLevelElement($result);
+        $this->assertEquals($expected, $actual);
     }
 }
