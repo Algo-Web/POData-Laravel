@@ -499,31 +499,6 @@ class LaravelQueryTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testGetRelatedResourceSetNullSourceInstance()
-    {
-        $srcResource = m::mock(ResourceSet::class);
-        $dstResource = m::mock(ResourceSet::class);
-        $property = m::mock(ResourceProperty::class);
-        $property->shouldReceive('getName')->andReturn('name');
-        $key = m::mock(KeyDescriptor::class);
-        $sourceEntity = null;
-
-        $query = m::mock(QueryType::class);
-
-        $foo = new LaravelQuery();
-
-        $expected = 'Source entity must be an Eloquent model.';
-        $actual = null;
-
-        try {
-            $foo->getRelatedResourceSet($query, $srcResource, $sourceEntity, $dstResource, $property);
-        } catch (InvalidArgumentException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
-
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getRelatedResourceSet
      */
@@ -634,28 +609,6 @@ class LaravelQueryTest extends TestCase
         $this->assertTrue($result instanceof QueryResult);
         $this->assertEquals(3, $result->count);
         $this->assertEquals(null, $result->results);
-    }
-
-    public function testGetResourceFromRelatedResourceSetNullSourceInstance()
-    {
-        $srcResource = m::mock(ResourceSet::class);
-        $dstResource = m::mock(ResourceSet::class);
-        $property = m::mock(ResourceProperty::class);
-        $property->shouldReceive('getName')->andReturn('name');
-        $key = m::mock(KeyDescriptor::class);
-        $sourceEntity = null;
-
-        $foo = new LaravelQuery();
-
-        $expected = 'Source entity must be an Eloquent model.';
-        $actual = null;
-
-        try {
-            $foo->getResourceFromRelatedResourceSet($srcResource, $sourceEntity, $dstResource, $property, $key);
-        } catch (InvalidArgumentException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
     }
 
     public function testGetResourceFromRelatedResourceSetNonNullSourceInstanceMissingPropertyThrowException()
@@ -775,27 +728,6 @@ class LaravelQueryTest extends TestCase
         $this->assertEquals('a', $result->get()->first());
     }
 
-    public function testGetRelatedResourceReferenceNullSourceInstance()
-    {
-        $srcResource = m::mock(ResourceSet::class);
-        $dstResource = m::mock(ResourceSet::class);
-        $property = m::mock(ResourceProperty::class);
-        $property->shouldReceive('getName')->andReturn('name');
-        $sourceEntity = null;
-
-        $foo = new LaravelQuery();
-
-        $expected = 'Source entity must be an Eloquent model.';
-        $actual = null;
-
-        try {
-            $foo->getRelatedResourceReference($srcResource, $sourceEntity, $dstResource, $property);
-        } catch (InvalidArgumentException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
     public function testGetRelatedResourceReferenceWithValidGubbins()
     {
         $mod1 = new TestModel();
@@ -812,24 +744,6 @@ class LaravelQueryTest extends TestCase
         $foo = new LaravelQuery();
         $result = $foo->getRelatedResourceReference($source, $model, $targ, $property);
         $this->assertEquals($model->name, $result);
-    }
-
-    public function testAttemptUpdateBadSourceInstanceThrowException()
-    {
-        $mockResource = m::mock(ResourceSet::class);
-        $model = new \DateTime();
-        $keyDesc = m::mock(KeyDescriptor::class);
-        $data = null;
-
-        $foo = new LaravelQuery();
-        $expected = 'Source entity must either be null or an Eloquent model.';
-        $actual = null;
-        try {
-            $result = $foo->updateResource($mockResource, $model, $keyDesc, $data);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
     }
 
     public function testAttemptUpdate()
@@ -876,23 +790,6 @@ class LaravelQueryTest extends TestCase
         }
         $this->assertEquals($expected, $actual);
         $this->assertEquals($expectedCode, $actualCode);
-    }
-
-    public function testAttemptCreateBadSourceInstanceThrowException()
-    {
-        $mockResource = m::mock(ResourceSet::class);
-        $model = new \DateTime();
-        $data = null;
-
-        $foo = new LaravelQuery();
-        $expected = 'Source entity must either be null or an Eloquent model.';
-        $actual = null;
-        try {
-            $result = $foo->createResourceforResourceSet($mockResource, $model, $data);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
     }
 
     public function testAttemptCreatePermissionDenied()
@@ -1508,6 +1405,52 @@ class LaravelQueryTest extends TestCase
 
         $foo = new LaravelQuery();
         $this->assertTrue($foo->putResource($resource, $key, []));
+    }
+
+    public function testUnpackSourceEntityInstanceFromSingleton()
+    {
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+        $rProp = m::mock(ResourceProperty::class);
+        $key = m::mock(KeyDescriptor::class);
+
+        $entity = new QueryResult();
+        $entity->results = m::mock(TestModel::class);
+
+        $reader = m::mock(LaravelReadQuery::class);
+        // Set things up to respond if an only if the ReadQuery call receives an Eloquent model, not a QueryResult
+        $reader->shouldReceive('getResourceFromRelatedResourceSet')
+            ->with($source, m::type(Model::class), $target, $rProp, $key)
+            ->andReturn(null)->once();
+
+        $foo = m::mock(LaravelQuery::class)->makePartial();
+        $foo->shouldReceive('getReader')->andReturn($reader);
+
+        $result = $foo->getResourceFromRelatedResourceSet($source, $entity, $target, $rProp, $key);
+        $this->assertNull($result);
+    }
+
+    public function testUnpackSourceEntityInstanceFromArray()
+    {
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+        $rProp = m::mock(ResourceProperty::class);
+        $key = m::mock(KeyDescriptor::class);
+
+        $entity = new QueryResult();
+        $entity->results = [m::mock(TestModel::class)];
+
+        $reader = m::mock(LaravelReadQuery::class);
+        // Set things up to respond if an only if the ReadQuery call receives an Eloquent model, not a QueryResult
+        $reader->shouldReceive('getResourceFromRelatedResourceSet')
+            ->with($source, m::type(Model::class), $target, $rProp, $key)
+            ->andReturn(null)->once();
+
+        $foo = m::mock(LaravelQuery::class)->makePartial();
+        $foo->shouldReceive('getReader')->andReturn($reader);
+
+        $result = $foo->getResourceFromRelatedResourceSet($source, $entity, $target, $rProp, $key);
+        $this->assertNull($result);
     }
 
     private function seedControllerMetadata(TestController $controller = null)
