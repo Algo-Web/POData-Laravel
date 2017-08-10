@@ -314,10 +314,10 @@ class LaravelReadQuery
         if (0 == $sourceCount) {
             return null;
         }
-        $sourceEntityInstance = $sourceEntityInstance->first();
-        $sourceEntityInstance->PrimaryKey = $sourceEntityInstance->getKey();
+        $result = $sourceEntityInstance->first();
+        $result->PrimaryKey = $result->getKey();
 
-        return $sourceEntityInstance;
+        return $result;
     }
 
     /**
@@ -351,7 +351,7 @@ class LaravelReadQuery
      * IE: http://host/EntitySet(1L)/NavigationPropertyToCollection(33)
      *
      * @param ResourceSet $sourceResourceSet The entity set containing the source entity
-     * @param object $sourceEntityInstance The source entity instance.
+     * @param Model $sourceEntityInstance The source entity instance.
      * @param ResourceSet $targetResourceSet The entity set containing the entity to fetch
      * @param ResourceProperty $targetProperty The metadata of the target property.
      * @param KeyDescriptor $keyDescriptor The key identifying the entity to fetch

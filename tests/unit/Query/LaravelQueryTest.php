@@ -746,24 +746,6 @@ class LaravelQueryTest extends TestCase
         $this->assertEquals($model->name, $result);
     }
 
-    public function testAttemptUpdateBadSourceInstanceThrowException()
-    {
-        $mockResource = m::mock(ResourceSet::class);
-        $model = new \DateTime();
-        $keyDesc = m::mock(KeyDescriptor::class);
-        $data = null;
-
-        $foo = new LaravelQuery();
-        $expected = 'Source entity must either be null or an Eloquent model.';
-        $actual = null;
-        try {
-            $result = $foo->updateResource($mockResource, $model, $keyDesc, $data);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
     public function testAttemptUpdate()
     {
         $controller = new TestController();
@@ -808,23 +790,6 @@ class LaravelQueryTest extends TestCase
         }
         $this->assertEquals($expected, $actual);
         $this->assertEquals($expectedCode, $actualCode);
-    }
-
-    public function testAttemptCreateBadSourceInstanceThrowException()
-    {
-        $mockResource = m::mock(ResourceSet::class);
-        $model = new \DateTime();
-        $data = null;
-
-        $foo = new LaravelQuery();
-        $expected = 'Source entity must either be null or an Eloquent model.';
-        $actual = null;
-        try {
-            $result = $foo->createResourceforResourceSet($mockResource, $model, $data);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
     }
 
     public function testAttemptCreatePermissionDenied()

@@ -102,7 +102,7 @@ class LaravelQuery implements IQueryProvider
         $skipToken = null,
         $sourceEntityInstance = null
     ) {
-        $sourceEntityInstance = $this->unpackSourceEntity($sourceEntityInstance);
+        $source = $this->unpackSourceEntity($sourceEntityInstance);
         return $this->getReader()->getResourceSet(
             $queryType,
             $resourceSet,
@@ -111,7 +111,7 @@ class LaravelQuery implements IQueryProvider
             $top,
             $skip,
             $skipToken,
-            $sourceEntityInstance
+            $source
         );
     }
     /**
@@ -162,11 +162,11 @@ class LaravelQuery implements IQueryProvider
         $skip = null,
         $skipToken = null
     ) {
-        $sourceEntityInstance = $this->unpackSourceEntity($sourceEntityInstance);
+        $source = $this->unpackSourceEntity($sourceEntityInstance);
         return $this->getReader()->getRelatedResourceSet(
             $queryType,
             $sourceResourceSet,
-            $sourceEntityInstance,
+            $source,
             $targetResourceSet,
             $targetProperty,
             $filter,
@@ -196,10 +196,10 @@ class LaravelQuery implements IQueryProvider
         ResourceProperty $targetProperty,
         KeyDescriptor $keyDescriptor
     ) {
-        $sourceEntityInstance = $this->unpackSourceEntity($sourceEntityInstance);
+        $source = $this->unpackSourceEntity($sourceEntityInstance);
         return $this->getReader()->getResourceFromRelatedResourceSet(
             $sourceResourceSet,
-            $sourceEntityInstance,
+            $source,
             $targetResourceSet,
             $targetProperty,
             $keyDescriptor
@@ -224,11 +224,11 @@ class LaravelQuery implements IQueryProvider
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty
     ) {
-        $sourceEntityInstance = $this->unpackSourceEntity($sourceEntityInstance);
+        $source = $this->unpackSourceEntity($sourceEntityInstance);
 
         $result = $this->getReader()->getRelatedResourceReference(
             $sourceResourceSet,
-            $sourceEntityInstance,
+            $source,
             $targetResourceSet,
             $targetProperty
         );
@@ -253,10 +253,10 @@ class LaravelQuery implements IQueryProvider
         $data,
         $shouldUpdate = false
     ) {
-        $sourceEntityInstance = $this->unpackSourceEntity($sourceEntityInstance);
+        $source = $this->unpackSourceEntity($sourceEntityInstance);
 
         $verb = 'update';
-        return $this->createUpdateCoreWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb);
+        return $this->createUpdateCoreWrapper($sourceResourceSet, $data, $verb, $source);
     }
     /**
      * Delete resource from a resource set.
@@ -269,19 +269,19 @@ class LaravelQuery implements IQueryProvider
         ResourceSet $sourceResourceSet,
         $sourceEntityInstance
     ) {
-        $sourceEntityInstance = $this->unpackSourceEntity($sourceEntityInstance);
+        $source = $this->unpackSourceEntity($sourceEntityInstance);
 
         $verb = 'delete';
-        if (!($sourceEntityInstance instanceof Model)) {
+        if (!($source instanceof Model)) {
             throw new InvalidArgumentException('Source entity must be an Eloquent model.');
         }
 
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
-        $id = $sourceEntityInstance->getKey();
-        $name = $sourceEntityInstance->getKeyName();
+        $id = $source->getKey();
+        $name = $source->getKeyName();
         $data = [$name => $id];
 
-        $data = $this->createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb);
+        $data = $this->createUpdateDeleteCore($source, $data, $class, $verb);
 
         $success = isset($data['id']);
         if ($success) {
@@ -301,10 +301,10 @@ class LaravelQuery implements IQueryProvider
         $sourceEntityInstance,
         $data
     ) {
-        $sourceEntityInstance = $this->unpackSourceEntity($sourceEntityInstance);
+        $source = $this->unpackSourceEntity($sourceEntityInstance);
 
         $verb = 'create';
-        return $this->createUpdateCoreWrapper($resourceSet, $sourceEntityInstance, $data, $verb);
+        return $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source);
     }
 
     /**
@@ -375,32 +375,28 @@ class LaravelQuery implements IQueryProvider
 
     /**
      * @param ResourceSet $sourceResourceSet
-     * @param $sourceEntityInstance
      * @param $data
      * @param $verb
+     * @param Model|null $source
      * @return mixed
+     * @throws InvalidOperationException
      * @throws ODataException
-     * @throws \POData\Common\InvalidOperationException
      */
-    private function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $sourceEntityInstance, $data, $verb)
+    private function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $data, $verb, Model $source = null)
     {
         $lastWord = 'update' == $verb ? 'updated' : 'created';
-        if (!(null == $sourceEntityInstance || $sourceEntityInstance instanceof Model)) {
-            throw new InvalidArgumentException('Source entity must either be null or an Eloquent model.');
-        }
-
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
-        if (!$this->auth->canAuth($this->verbMap[$verb], $class, $sourceEntityInstance)) {
+        if (!$this->auth->canAuth($this->verbMap[$verb], $class, $source)) {
             throw new ODataException('Access denied', 403);
         }
 
-        $data = $this->createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb);
+        $payload = $this->createUpdateDeleteCore($source, $data, $class, $verb);
 
-        $success = isset($data['id']);
+        $success = isset($payload['id']);
 
         if ($success) {
             try {
-                return $class::findOrFail($data['id']);
+                return $class::findOrFail($payload['id']);
             } catch (\Exception $e) {
                 throw new ODataException($e->getMessage(), 500);
             }
@@ -414,7 +410,7 @@ class LaravelQuery implements IQueryProvider
      * @param $paramList
      * @return array
      */
-    private function createUpdateDeleteProcessInput($sourceEntityInstance, $data, $paramList)
+    private function createUpdateDeleteProcessInput(Model $sourceEntityInstance, $data, $paramList)
     {
         $parms = [];
 
@@ -469,9 +465,9 @@ class LaravelQuery implements IQueryProvider
     private function unpackSourceEntity($sourceEntityInstance)
     {
         if ($sourceEntityInstance instanceof QueryResult) {
-            $sourceEntityInstance = $sourceEntityInstance->results;
-            $sourceEntityInstance = (is_array($sourceEntityInstance))
-                ? $sourceEntityInstance[0] : $sourceEntityInstance;
+            $source = $sourceEntityInstance->results;
+            $source = (is_array($source)) ? $source[0] : $source;
+            return $source;
         }
         return $sourceEntityInstance;
     }
