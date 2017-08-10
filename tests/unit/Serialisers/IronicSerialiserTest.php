@@ -2,10 +2,13 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
 use POData\Common\ODataConstants;
@@ -18,6 +21,7 @@ use POData\ObjectModel\ODataProperty;
 use POData\ObjectModel\ODataPropertyContent;
 use POData\OperationContext\IOperationContext;
 use POData\OperationContext\ServiceHost;
+use POData\OperationContext\Web\Illuminate\IlluminateOperationContext;
 use POData\Providers\Metadata\ResourceSetWrapper;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\ProvidersWrapper;
@@ -146,20 +150,16 @@ class IronicSerialiserTest extends SerialiserTestBase
             ->andReturn('http://localhost/odata.svc/Models');
         $kidNode = m::mock(ExpandedProjectionNode::class);
         $node = m::mock(RootProjectionNode::class);
-        $node->shouldReceive('findNode')->withArgs(['Models'])->andReturn($kidNode)->once();
-        $node->shouldReceive('isExpansionSpecified')->andReturn(true)->times(2);
+        $node->shouldReceive('isExpansionSpecified')->andReturn(true);
+        $node->shouldReceive('getPropertyName')->andReturn('Scatman John');
         $request = m::mock(RequestDescription::class)->makePartial();
-        $request->shouldReceive('getRootProjectionNode')->andReturn($node)->times(3);
-
-        $segName = 'Models';
-        $segWrapper = m::mock(ResourceSetWrapper::class);
+        $request->shouldReceive('getRootProjectionNode')->andReturn($node)->times(1);
 
         $foo = new IronicSerialiserDummy($mockService, $request);
-        $foo->getStack()->pushSegment($segName, $segWrapper);
-        $foo->getStack()->pushSegment($segName, $segWrapper);
 
         $result = $foo->getCurrentExpandedProjectionNode();
         $this->assertTrue($result instanceof ExpandedProjectionNode);
+        $this->assertEquals('Scatman John', $result->getPropertyName());
     }
 
     public function testGetCurrentExpandedProjectionNodeNeedsExpansionThreeLevelsEndUpNull()
@@ -170,18 +170,17 @@ class IronicSerialiserTest extends SerialiserTestBase
         $kidNode = m::mock(ExpandedProjectionNode::class);
         $kidNode->shouldReceive('findNode')->andReturn(null)->once();
         $node = m::mock(RootProjectionNode::class);
-        $node->shouldReceive('findNode')->withArgs(['Models'])->andReturn($kidNode)->once();
-        $node->shouldReceive('isExpansionSpecified')->andReturn(true)->times(3);
+        $node->shouldReceive('findNode')->withArgs(['edge'])->andReturn($kidNode)->once();
         $request = m::mock(RequestDescription::class)->makePartial();
-        $request->shouldReceive('getRootProjectionNode')->andReturn($node)->times(4);
+        $request->shouldReceive('getRootProjectionNode')->andReturn($node)->times(1);
 
-        $segName = 'Models';
-        $segWrapper = m::mock(ResourceSetWrapper::class);
+        $stack = [ ['type' => 'Models', 'prop' => 'Models'],
+            ['type' => 'Models', 'prop' => 'edge'],
+            ['type' => 'Models', 'prop' => 'edge']
+        ];
 
         $foo = new IronicSerialiserDummy($mockService, $request);
-        $foo->getStack()->pushSegment($segName, $segWrapper);
-        $foo->getStack()->pushSegment($segName, $segWrapper);
-        $foo->getStack()->pushSegment($segName, $segWrapper);
+        $foo->setLightStack($stack);
 
         $expected = 'assert(): is_null($expandedProjectionNode) failed';
         $actual = null;
@@ -202,18 +201,17 @@ class IronicSerialiserTest extends SerialiserTestBase
         $kidNode = m::mock(ExpandedProjectionNode::class);
         $kidNode->shouldReceive('findNode')->andReturn('eins')->once();
         $node = m::mock(RootProjectionNode::class);
-        $node->shouldReceive('findNode')->withArgs(['Models'])->andReturn($kidNode)->once();
-        $node->shouldReceive('isExpansionSpecified')->andReturn(true)->times(3);
+        $node->shouldReceive('findNode')->withArgs(['edge'])->andReturn($kidNode)->once();
         $request = m::mock(RequestDescription::class)->makePartial();
-        $request->shouldReceive('getRootProjectionNode')->andReturn($node)->times(4);
+        $request->shouldReceive('getRootProjectionNode')->andReturn($node)->times(1);
 
-        $segName = 'Models';
-        $segWrapper = m::mock(ResourceSetWrapper::class);
+        $stack = [ ['type' => 'Models', 'prop' => 'Models'],
+            ['type' => 'Models', 'prop' => 'edge'],
+            ['type' => 'Models', 'prop' => 'edge']
+        ];
 
         $foo = new IronicSerialiserDummy($mockService, $request);
-        $foo->getStack()->pushSegment($segName, $segWrapper);
-        $foo->getStack()->pushSegment($segName, $segWrapper);
-        $foo->getStack()->pushSegment($segName, $segWrapper);
+        $foo->setLightStack($stack);
 
         $expected = 'assert(): $expandedProjectionNode not instanceof ExpandedProjectionNode failed';
         $actual = null;
@@ -499,6 +497,77 @@ class IronicSerialiserTest extends SerialiserTestBase
         $ironic = new IronicSerialiser($dataService, $request);
 
         $actual = $ironic->writeTopLevelElement($payload);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testWriteNullTopLevelElement()
+    {
+        $query = new QueryResult();
+
+        $foo = m::mock(IronicSerialiser::class)->makePartial();
+        $this->assertNull($foo->writeTopLevelElement($query));
+    }
+
+    public function testSerialiseSingleModelWithNullExpansion()
+    {
+        $serialiser = new ModelSerialiser();
+        $serialiser->reset();
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicManySources');
+        $request->shouldReceive('fullUrl')
+            ->andReturn('http://localhost/odata.svc/TestMonomorphicManySources(1)?$expand=manySource');
+
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = new TestMonomorphicManySource($metadata);
+        $target = new TestMonomorphicManyTarget($metadata);
+
+        App::instance(TestMonomorphicManySource::class, $source);
+        App::instance(TestMonomorphicManyTarget::class, $target);
+
+        $op = new IlluminateOperationContext($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri("/odata.svc/");
+
+        $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->boot();
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        $model = m::mock(TestMonomorphicManySource::class)->makePartial();
+        $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->id = 1;
+        $model->name = 'Name';
+        $model->shouldReceive('getAttribute')->withArgs(['manySource'])->andReturn([]);
+
+        $result = new QueryResult();
+        $result->results = $model;
+
+        // default data service
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+
+        $ironic = m::mock(IronicSerialiser::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $ironic->shouldReceive('shouldExpandSegment')->withArgs(['manySource'])->andReturn(true)->atLeast(1);
+        $ironic->shouldReceive('getService')->andReturn($service);
+        $ironic->shouldReceive('getRequest')->andReturn($processor->getRequest());
+        $ironic->shouldReceive('getModelSerialiser')->andReturn($serialiser);
+        $ironic->shouldReceive('writeTopLevelElements')->andReturn(null)->once();
+
+        $expected = 'assert(): Should have 1 elements in stack, have 2 elements failed';
+        $actual = null;
+
+        try {
+            $ironic->writeTopLevelElement($result);
+        } catch (\ErrorException $e) {
+            $actual = $e->getMessage();
+        }
         $this->assertEquals($expected, $actual);
     }
 }

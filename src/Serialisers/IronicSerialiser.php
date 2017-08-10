@@ -91,12 +91,14 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Lightweight stack tracking for recursive descent fill
      */
-    private $lightStack = [];
+    protected $lightStack = [];
 
     /**
      * @var ModelSerialiser
      */
     private $modelSerialiser;
+
+
 
     /**
      * @var IMetadataProvider
@@ -136,7 +138,7 @@ class IronicSerialiser implements IObjectSerialiser
 
         $stackCount = count($this->lightStack);
         $topOfStack = $this->lightStack[$stackCount-1];
-        $resourceType = $this->getService()->getProvidersWrapper()->resolveResourceType($topOfStack[0]);
+        $resourceType = $this->getService()->getProvidersWrapper()->resolveResourceType($topOfStack['type']);
         // need gubbinz to unpack an abstract resource type
         if ($resourceType->isAbstract()) {
             $payloadClass = get_class($entryObject->results);
@@ -230,7 +232,7 @@ class IronicSerialiser implements IObjectSerialiser
         $newCount = count($this->lightStack);
         assert(
             $newCount == $stackCount,
-            'Should have ' . $stackCount . 'elements in stack, have ' . $newCount . 'elements'
+            'Should have ' . $stackCount . ' elements in stack, have ' . $newCount . ' elements'
         );
         array_pop($this->lightStack);
         return $odata;
@@ -587,7 +589,7 @@ class IronicSerialiser implements IObjectSerialiser
         if (is_null($expandedProjectionNode)) {
             return null;
         } else {
-            $segmentNames = $this->getStack()->getSegmentNames();
+            $segmentNames = $this->getLightStack();
             $depth = count($segmentNames);
             // $depth == 1 means serialization of root entry
             //(the resource identified by resource path) is going on,
@@ -597,7 +599,7 @@ class IronicSerialiser implements IObjectSerialiser
             // for resource identified by resource path.
             if (0 != $depth) {
                 for ($i = 1; $i < $depth; ++$i) {
-                    $expandedProjectionNode = $expandedProjectionNode->findNode($segmentNames[$i]);
+                    $expandedProjectionNode = $expandedProjectionNode->findNode($segmentNames[$i]['prop']);
                     assert(!is_null($expandedProjectionNode), 'is_null($expandedProjectionNode)');
                     assert(
                         $expandedProjectionNode instanceof ExpandedProjectionNode,
@@ -623,7 +625,6 @@ class IronicSerialiser implements IObjectSerialiser
         if (is_null($expandedProjectionNode)) {
             return false;
         }
-
         $expandedProjectionNode = $expandedProjectionNode->findNode($navigationPropertyName);
 
         // null is a valid input to an instanceof call as of PHP 5.6 - will always return false
@@ -745,7 +746,7 @@ class IronicSerialiser implements IObjectSerialiser
     {
         if (0 == count($this->lightStack)) {
             $typeName = $this->getRequest()->getTargetResourceType()->getName();
-            array_push($this->lightStack, [$typeName, $typeName]);
+            array_push($this->lightStack, ['type' => $typeName, 'property' => $typeName]);
         }
     }
 
@@ -784,7 +785,7 @@ class IronicSerialiser implements IObjectSerialiser
     private function writePrimitiveProperties($entryObject, $nonRelProp)
     {
         $propertyContent = new ODataPropertyContent();
-        $cereal = $this->modelSerialiser->bulkSerialise($entryObject);
+        $cereal = $this->getModelSerialiser()->bulkSerialise($entryObject);
         foreach ($cereal as $corn => $flake) {
             if (!array_key_exists($corn, $nonRelProp)) {
                 continue;
@@ -816,7 +817,7 @@ class IronicSerialiser implements IObjectSerialiser
         $value = $entryObject->results->$propName;
         $result = new QueryResult();
         $result->results = $value;
-        array_push($this->lightStack, [$nextName, $propName]);
+        array_push($this->lightStack, ['type' => $nextName, 'prop' => $propName]);
         if (!$isCollection) {
             $expandedResult = $this->writeTopLevelElement($result);
         } else {
@@ -952,5 +953,21 @@ class IronicSerialiser implements IObjectSerialiser
             $this->metaProvider = App::make('metadata');
         }
         return $this->metaProvider;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getLightStack()
+    {
+        return $this->lightStack;
+    }
+
+    /**
+     * @return ModelSerialiser
+     */
+    public function getModelSerialiser()
+    {
+        return $this->modelSerialiser;
     }
 }

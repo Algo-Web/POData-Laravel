@@ -28,4 +28,9 @@ class IronicSerialiserDummy extends IronicSerialiser
     {
         return parent::getNextLinkUri($lastObject, $absoluteUri);
     }
+
+    public function setLightStack(array $stack)
+    {
+        $this->lightStack = $stack;
+    }
 }
