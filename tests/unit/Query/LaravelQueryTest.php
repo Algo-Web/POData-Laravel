@@ -499,31 +499,6 @@ class LaravelQueryTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testGetRelatedResourceSetNullSourceInstance()
-    {
-        $srcResource = m::mock(ResourceSet::class);
-        $dstResource = m::mock(ResourceSet::class);
-        $property = m::mock(ResourceProperty::class);
-        $property->shouldReceive('getName')->andReturn('name');
-        $key = m::mock(KeyDescriptor::class);
-        $sourceEntity = null;
-
-        $query = m::mock(QueryType::class);
-
-        $foo = new LaravelQuery();
-
-        $expected = 'Source entity must be an Eloquent model.';
-        $actual = null;
-
-        try {
-            $foo->getRelatedResourceSet($query, $srcResource, $sourceEntity, $dstResource, $property);
-        } catch (InvalidArgumentException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
-
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getRelatedResourceSet
      */
@@ -634,28 +609,6 @@ class LaravelQueryTest extends TestCase
         $this->assertTrue($result instanceof QueryResult);
         $this->assertEquals(3, $result->count);
         $this->assertEquals(null, $result->results);
-    }
-
-    public function testGetResourceFromRelatedResourceSetNullSourceInstance()
-    {
-        $srcResource = m::mock(ResourceSet::class);
-        $dstResource = m::mock(ResourceSet::class);
-        $property = m::mock(ResourceProperty::class);
-        $property->shouldReceive('getName')->andReturn('name');
-        $key = m::mock(KeyDescriptor::class);
-        $sourceEntity = null;
-
-        $foo = new LaravelQuery();
-
-        $expected = 'Source entity must be an Eloquent model.';
-        $actual = null;
-
-        try {
-            $foo->getResourceFromRelatedResourceSet($srcResource, $sourceEntity, $dstResource, $property, $key);
-        } catch (InvalidArgumentException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
     }
 
     public function testGetResourceFromRelatedResourceSetNonNullSourceInstanceMissingPropertyThrowException()
@@ -773,27 +726,6 @@ class LaravelQueryTest extends TestCase
 
         $result = $foo->getRelatedResourceReference($srcResource, $sourceEntity, $dstResource, $property);
         $this->assertEquals('a', $result->get()->first());
-    }
-
-    public function testGetRelatedResourceReferenceNullSourceInstance()
-    {
-        $srcResource = m::mock(ResourceSet::class);
-        $dstResource = m::mock(ResourceSet::class);
-        $property = m::mock(ResourceProperty::class);
-        $property->shouldReceive('getName')->andReturn('name');
-        $sourceEntity = null;
-
-        $foo = new LaravelQuery();
-
-        $expected = 'Source entity must be an Eloquent model.';
-        $actual = null;
-
-        try {
-            $foo->getRelatedResourceReference($srcResource, $sourceEntity, $dstResource, $property);
-        } catch (InvalidArgumentException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
     }
 
     public function testGetRelatedResourceReferenceWithValidGubbins()

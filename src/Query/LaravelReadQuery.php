@@ -219,7 +219,7 @@ class LaravelReadQuery
      *
      * @param QueryType          $queryType            Is this is a query for a count, entities, or entities-with-count
      * @param ResourceSet        $sourceResourceSet    The entity set containing the source entity
-     * @param object             $sourceEntityInstance The source entity instance
+     * @param Model              $sourceEntityInstance The source entity instance
      * @param ResourceSet        $targetResourceSet    The resource set pointed to by the navigation property
      * @param ResourceProperty   $targetProperty       The navigation property to retrieve
      * @param FilterInfo|null    $filter               The $filter parameter of the OData query.  NULL if none specified
@@ -234,7 +234,7 @@ class LaravelReadQuery
     public function getRelatedResourceSet(
         QueryType $queryType,
         ResourceSet $sourceResourceSet,
-        $sourceEntityInstance,
+        Model $sourceEntityInstance,
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty,
         FilterInfo $filter = null,
@@ -243,13 +243,6 @@ class LaravelReadQuery
         $skip = null,
         SkipTokenInfo $skipToken = null
     ) {
-        if (!($sourceEntityInstance instanceof Model)) {
-            throw new InvalidArgumentException('Source entity must be an Eloquent model.');
-        }
-
-        assert(null != $sourceEntityInstance, 'Source instance must not be null');
-        $this->checkSourceInstance($sourceEntityInstance);
-
         $this->checkAuth($sourceEntityInstance);
 
         $propertyName = $targetProperty->getName();
@@ -333,7 +326,7 @@ class LaravelReadQuery
      * http://host/EntitySet?$expand=NavigationPropertyToSingleEntity
      *
      * @param ResourceSet $sourceResourceSet The entity set containing the source entity
-     * @param object $sourceEntityInstance The source entity instance.
+     * @param Model  $sourceEntityInstance The source entity instance.
      * @param ResourceSet $targetResourceSet The entity set containing the entity pointed to by the navigation property
      * @param ResourceProperty $targetProperty The navigation property to fetch
      *
@@ -341,15 +334,10 @@ class LaravelReadQuery
      */
     public function getRelatedResourceReference(
         ResourceSet $sourceResourceSet,
-        $sourceEntityInstance,
+        Model $sourceEntityInstance,
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty
     ) {
-        if (!($sourceEntityInstance instanceof Model)) {
-            throw new InvalidArgumentException('Source entity must be an Eloquent model.');
-        }
-        $this->checkSourceInstance($sourceEntityInstance);
-
         $this->checkAuth($sourceEntityInstance);
 
         $propertyName = $targetProperty->getName();
@@ -372,14 +360,11 @@ class LaravelReadQuery
      */
     public function getResourceFromRelatedResourceSet(
         ResourceSet $sourceResourceSet,
-        $sourceEntityInstance,
+        Model $sourceEntityInstance,
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty,
         KeyDescriptor $keyDescriptor
     ) {
-        if (!($sourceEntityInstance instanceof Model)) {
-            throw new InvalidArgumentException('Source entity must be an Eloquent model.');
-        }
         $propertyName = $targetProperty->getName();
         if (!method_exists($sourceEntityInstance, $propertyName)) {
             $msg = 'Relation method, '.$propertyName.', does not exist on supplied entity.';
