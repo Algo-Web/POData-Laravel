@@ -305,7 +305,7 @@ class MetadataProviderTest extends TestCase
         $meta->shouldReceive('addResourceSet')->andReturnNull()->once();
         $meta->shouldReceive('addEntityType')->andReturn($abstract)->atLeast(1);
         $meta->shouldReceive('addResourceReferenceProperty')
-            ->with(m::type(ResourceEntityType::class), 'morphTarget', m::any())
+            ->with(m::type(ResourceEntityType::class), 'morphTarget', m::any(), true, true)
             ->atLeast(1);
         $meta->shouldReceive('addResourceSetReferenceProperty')
             ->with(m::type(ResourceEntityType::class), 'morph', m::any())

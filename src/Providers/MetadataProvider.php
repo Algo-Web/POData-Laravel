@@ -3,6 +3,8 @@
 namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\TestMorphOneParent;
+use App\Models\Extraction\Address;
+use App\Models\Extraction\Customer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
@@ -284,7 +286,6 @@ class MetadataProvider extends MetadataBaseProvider
                 continue;
             }
         }
-
         return $rels;
     }
 
@@ -447,12 +448,14 @@ class MetadataProvider extends MetadataBaseProvider
         $dependentMult = $line['dependentMult'];
         $dependentProp = $line['dependentProp'];
         $dependentRSet = $line['dependentRSet'];
+
         if (!isset($entityTypes[$principalType]) || !isset($entityTypes[$dependentType])) {
             return;
         }
         $principal = $entityTypes[$principalType];
         $dependent = $entityTypes[$dependentType];
         $isPoly = static::POLYMORPHIC == $principalRSet || static::POLYMORPHIC == $dependentRSet;
+
         if ($isPoly) {
             $this->attachReferencePolymorphic(
                 $meta,
@@ -567,21 +570,24 @@ class MetadataProvider extends MetadataBaseProvider
             : $meta->resolveResourceSet(static::POLYMORPHIC_PLURAL);
         assert($principalSet instanceof ResourceSet, $principalRSet);
         assert($dependentSet instanceof ResourceSet, $dependentRSet);
+
         $isPrincipalAdded = null !== $principal->resolveProperty($principalProp);
         $isDependentAdded = null !== $dependent->resolveProperty($dependentProp);
+        $prinMany = '*' == $principalMult;
+        $depMany = '*' == $dependentMult;
 
         if (!$isPrincipalAdded) {
             if ('*' == $principalMult) {
                 $meta->addResourceSetReferenceProperty($principal, $principalProp, $dependentSet);
             } else {
-                $meta->addResourceReferenceProperty($principal, $principalProp, $dependentSet);
+                $meta->addResourceReferenceProperty($principal, $principalProp, $dependentSet, $prinPoly, $depMany);
             }
         }
         if (!$isDependentAdded) {
             if ('*' == $dependentMult) {
                 $meta->addResourceSetReferenceProperty($dependent, $dependentProp, $principalSet);
             } else {
-                $meta->addResourceReferenceProperty($dependent, $dependentProp, $principalSet);
+                $meta->addResourceReferenceProperty($dependent, $dependentProp, $principalSet, $depPoly, $prinMany);
             }
         }
         return;
