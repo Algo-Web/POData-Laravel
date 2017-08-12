@@ -138,10 +138,10 @@ class IronicSerialiser implements IObjectSerialiser
 
         $stackCount = count($this->lightStack);
         $topOfStack = $this->lightStack[$stackCount-1];
+        $payloadClass = get_class($entryObject->results);
         $resourceType = $this->getService()->getProvidersWrapper()->resolveResourceType($topOfStack['type']);
         // need gubbinz to unpack an abstract resource type
         if ($resourceType->isAbstract()) {
-            $payloadClass = get_class($entryObject->results);
             $derived = $this->getMetadata()->getDerivedTypes($resourceType);
             assert(0 < count($derived));
             foreach ($derived as $rawType) {
@@ -157,6 +157,14 @@ class IronicSerialiser implements IObjectSerialiser
             // wheels have fallen off, so blow up
             assert(!$resourceType->isAbstract(), 'Concrete resource type not selected for payload '.$payloadClass);
         }
+
+        // make sure we're barking up right tree
+        assert($resourceType instanceof ResourceEntityType, get_class($resourceType));
+        $targClass = $resourceType->getInstanceType()->getName();
+        assert(
+            $entryObject->results instanceof $targClass,
+            'Object being serialised not instance of expected class, '.$targClass. ', is actually '.$payloadClass
+        );
 
         $rawProp = $resourceType->getAllProperties();
         $relProp = [];
@@ -234,7 +242,10 @@ class IronicSerialiser implements IObjectSerialiser
             $newCount == $stackCount,
             'Should have ' . $stackCount . ' elements in stack, have ' . $newCount . ' elements'
         );
-        array_pop($this->lightStack);
+        $this->lightStack[$newCount-1]['count']--;
+        if (0 == $this->lightStack[$newCount-1]['count']) {
+            array_pop($this->lightStack);
+        }
         return $odata;
     }
 
@@ -746,7 +757,7 @@ class IronicSerialiser implements IObjectSerialiser
     {
         if (0 == count($this->lightStack)) {
             $typeName = $this->getRequest()->getTargetResourceType()->getName();
-            array_push($this->lightStack, ['type' => $typeName, 'property' => $typeName]);
+            array_push($this->lightStack, ['type' => $typeName, 'property' => $typeName, 'count' => 1]);
         }
     }
 
@@ -815,9 +826,13 @@ class IronicSerialiser implements IObjectSerialiser
         $isCollection = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
         $nuLink->isCollection = $isCollection;
         $value = $entryObject->results->$propName;
+
         $result = new QueryResult();
         $result->results = $value;
-        array_push($this->lightStack, ['type' => $nextName, 'prop' => $propName]);
+        $resultCount = $isCollection ? count($value) : 1;
+        $newStackLine = ['type' => $nextName, 'prop' => $propName, 'count' => $resultCount];
+        array_push($this->lightStack, $newStackLine);
+
         if (!$isCollection) {
             $expandedResult = $this->writeTopLevelElement($result);
         } else {
