@@ -577,14 +577,14 @@ class MetadataProvider extends MetadataBaseProvider
         $depMany = '*' == $dependentMult;
 
         if (!$isPrincipalAdded) {
-            if ('*' == $principalMult) {
+            if ('*' == $principalMult || $depMany) {
                 $meta->addResourceSetReferenceProperty($principal, $principalProp, $dependentSet);
             } else {
                 $meta->addResourceReferenceProperty($principal, $principalProp, $dependentSet, $prinPoly, $depMany);
             }
         }
         if (!$isDependentAdded) {
-            if ('*' == $dependentMult) {
+            if ('*' == $dependentMult || $prinMany) {
                 $meta->addResourceSetReferenceProperty($dependent, $dependentProp, $principalSet);
             } else {
                 $meta->addResourceReferenceProperty($dependent, $dependentProp, $principalSet, $depPoly, $prinMany);
