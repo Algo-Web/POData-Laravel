@@ -4,6 +4,8 @@ namespace AlgoWeb\PODataLaravel\Serialisers;
 
 class IronicSerialiserDummy extends IronicSerialiser
 {
+    protected $expand = [];
+
     public function getCurrentExpandedProjectionNode()
     {
         return parent::getCurrentExpandedProjectionNode();
@@ -11,6 +13,10 @@ class IronicSerialiserDummy extends IronicSerialiser
 
     public function shouldExpandSegment($navigationPropertyName)
     {
+        if (array_key_exists($navigationPropertyName, $this->expand)) {
+            return $this->expand[$navigationPropertyName];
+        }
+
         return parent::shouldExpandSegment($navigationPropertyName);
     }
 
@@ -32,5 +38,10 @@ class IronicSerialiserDummy extends IronicSerialiser
     public function setLightStack(array $stack)
     {
         $this->lightStack = $stack;
+    }
+
+    public function setPropertyExpansion($propName, $toExpand = true)
+    {
+        $this->expand[$propName] = boolval($toExpand);
     }
 }

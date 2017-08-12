@@ -19,6 +19,7 @@ use Mockery as m;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use POData\ObjectModel\ObjectModelSerializer;
 use POData\ObjectModel\ODataEntry;
+use POData\ObjectModel\ODataFeed;
 use POData\ObjectModel\ODataLink;
 use POData\ObjectModel\ODataProperty;
 use POData\ObjectModel\ODataPropertyContent;
@@ -269,7 +270,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
             ->andReturn('/odata.svc/TestMonomorphicSources(id=42)?$expand=oneSource,manySource');
         $request->shouldReceive('fullUrl')
             ->andReturn('http://localhost/odata.svc/TestMonomorphicSources(id=42)?$expand=oneSource,manySource');
-        $request->request = new ParameterBag([ '$expand' => "oneSource,manySource"]);
+        $request->request = new ParameterBag(['$expand' => "oneSource,manySource"]);
 
         $metadata = [];
         $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -451,7 +452,8 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $query = m::mock(LaravelQuery::class);
 
-        $stack = [ ['type' => 'TestMonomorphicManySource', 'prop' => 'manySource'],
+        $stack = [
+            ['type' => 'TestMonomorphicManySource', 'prop' => 'manySource', 'count' => 1],
         ];
 
         // default data service
@@ -493,6 +495,166 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $expected->propertyContent = $propContent;
 
         $actual = $ironic->writeTopLevelElement($result);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testSerialiseSingleModelWithTwoSubordinatesExpansion()
+    {
+        $serialiser = new ModelSerialiser();
+        $serialiser->reset();
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicSources');
+        $request->shouldReceive('fullUrl')
+            ->andReturn('http://localhost/odata.svc/TestMonomorphicSources(1)?$expand=manySource');
+
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = new TestMonomorphicSource($metadata);
+        $target = new TestMonomorphicTarget($metadata);
+
+        App::instance(TestMonomorphicSource::class, $source);
+        App::instance(TestMonomorphicTarget::class, $target);
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri("/odata.svc/");
+
+        $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->boot();
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        $stack = [
+            ['type' => 'TestMonomorphicSource', 'prop' => 'TestMonomorphicSource', 'count' => 1],
+        ];
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri("/odata.svc/");
+
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $ironic = new IronicSerialiserDummy($service, $processor->getRequest());
+        $ironic->setLightStack($stack);
+        $ironic->setPropertyExpansion('manySource');
+        $ironic->setPropertyExpansion('oneSource', false);
+        $ironic->setPropertyExpansion('oneTarget', false);
+        $ironic->setPropertyExpansion('manyTarget', false);
+
+        $targ1 = new TestMonomorphicTarget($metadata);
+        $targ1->id = 1;
+        $targ1->name = 'Inspector';
+
+        $targ2 = new TestMonomorphicTarget($metadata);
+        $targ2->id = 2;
+        $targ2->name = 'Gadget';
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        $relation = m::mock(HasMany::class)->makePartial();
+        $relation->shouldReceive('get')->andReturn(collect([$targ1, $targ2]));
+
+        $model = m::mock(TestMonomorphicSource::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->id = 1;
+        $model->name = 'Name';
+        $model->shouldReceive('getAttribute')->withArgs(['manySource'])->andReturn(([$targ1, $targ2]));
+
+        $result = new QueryResult();
+        $result->results = $model;
+
+        $propContent = new ODataPropertyContent();
+        $propContent->properties = [new ODataProperty(), new ODataProperty()];
+        $propContent->properties[0]->name = 'id';
+        $propContent->properties[1]->name = 'name';
+        $propContent->properties[0]->typeName = 'Edm.Int32';
+        $propContent->properties[1]->typeName = 'Edm.String';
+        $propContent->properties[0]->value = '1';
+        $propContent->properties[1]->value = 'Name';
+
+        $feed1Content = new ODataPropertyContent();
+        $feed1Content->properties = [new ODataProperty(), new ODataProperty()];
+        $feed1Content->properties[0]->name = 'id';
+        $feed1Content->properties[1]->name = 'name';
+        $feed1Content->properties[0]->typeName = 'Edm.Int32';
+        $feed1Content->properties[1]->typeName = 'Edm.String';
+        $feed1Content->properties[0]->value = '1';
+        $feed1Content->properties[1]->value = 'Inspector';
+
+        $feed2Content = new ODataPropertyContent();
+        $feed2Content->properties = [new ODataProperty(), new ODataProperty()];
+        $feed2Content->properties[0]->name = 'id';
+        $feed2Content->properties[1]->name = 'name';
+        $feed2Content->properties[0]->typeName = 'Edm.Int32';
+        $feed2Content->properties[1]->typeName = 'Edm.String';
+        $feed2Content->properties[0]->value = '2';
+        $feed2Content->properties[1]->value = 'Gadget';
+
+        $feed1 = new ODataEntry();
+        $feed1->id = 'http://localhost/odata.svc/TestMonomorphicTargets(id=1)';
+        $feed1->title = 'TestMonomorphicTarget';
+        $feed1->editLink = 'TestMonomorphicTargets(id=1)';
+        $feed1->type = 'TestMonomorphicTarget';
+        $feed1->propertyContent = $feed1Content;
+        $feed1->isMediaLinkEntry = false;
+        $feed1->resourceSetName = 'TestMonomorphicTargets';
+        $feed2 = new ODataEntry();
+        $feed2->id = 'http://localhost/odata.svc/TestMonomorphicTargets(id=2)';
+        $feed2->title = 'TestMonomorphicTarget';
+        $feed2->editLink = 'TestMonomorphicTargets(id=2)';
+        $feed2->type = 'TestMonomorphicTarget';
+        $feed2->propertyContent = $feed2Content;
+        $feed2->isMediaLinkEntry = false;
+        $feed2->resourceSetName = 'TestMonomorphicTargets';
+
+        $feedLink = new ODataLink();
+        $feedLink->name = 'self';
+        $feedLink->title = 'manySource';
+        $feedLink->url = 'TestMonomorphicSources(id=1)/manySource';
+
+        $feed = new ODataFeed();
+        $feed->id = 'http://localhost/odata.svc/TestMonomorphicSources(id=1)/manySource';
+        $feed->title = 'manySource';
+        $feed->selfLink = $feedLink;
+        $feed->entries = [$feed1, $feed2];
+
+        $link1 = new ODataLink();
+        $link1->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/oneSource';
+        $link1->title = 'oneSource';
+        $link1->type = 'application/atom+xml;type=entry';
+        $link1->url = 'TestMonomorphicSources(id=1)/oneSource';
+
+        $link2 = new ODataLink();
+        $link2->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/manySource';
+        $link2->title = 'manySource';
+        $link2->type = 'application/atom+xml;type=feed';
+        $link2->url = 'TestMonomorphicSources(id=1)/manySource';
+        $link2->isCollection = true;
+        $link2->isExpanded = true;
+        $link2->expandedResult = $feed;
+
+        $expected = new ODataEntry();
+        $expected->id = 'http://localhost/odata.svc/TestMonomorphicSources(id=1)';
+        $expected->title = 'TestMonomorphicSource';
+        $expected->editLink = 'TestMonomorphicSources(id=1)';
+        $expected->type = 'TestMonomorphicSource';
+        $expected->propertyContent = $propContent;
+        $expected->links = [$link1, $link2];
+        $expected->isMediaLinkEntry = false;
+        $expected->resourceSetName = 'TestMonomorphicSources';
+
+        $actual = $ironic->writeTopLevelElement($result);
+        // not too worried about the TestMonomorphicTarget links, so zeroing them out here
+        $actual->links[1]->expandedResult->entries[0]->links = [];
+        $actual->links[1]->expandedResult->entries[1]->links = [];
         $this->assertEquals($expected, $actual);
     }
 }
