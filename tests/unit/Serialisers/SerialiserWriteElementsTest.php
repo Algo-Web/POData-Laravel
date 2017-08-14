@@ -7,6 +7,7 @@ use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
@@ -191,6 +192,9 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
 
     public function testWriteTopLevelElementsAllExpanded()
     {
+        $known = Carbon::create(2017, 1, 1, 0, 0, 0, 'UTC');
+        Carbon::setTestNow($known);
+
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicSources?$expand=manySource');
         $request->shouldReceive('fullUrl')

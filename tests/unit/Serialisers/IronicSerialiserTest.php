@@ -9,6 +9,7 @@ use AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
 use POData\Common\ODataConstants;
@@ -19,6 +20,7 @@ use POData\ObjectModel\ODataLink;
 use POData\ObjectModel\ODataMediaLink;
 use POData\ObjectModel\ODataProperty;
 use POData\ObjectModel\ODataPropertyContent;
+use POData\ObjectModel\ODataTitle;
 use POData\OperationContext\IOperationContext;
 use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext;
@@ -392,6 +394,9 @@ class IronicSerialiserTest extends SerialiserTestBase
 
     public function testSerialisePolymorphicUnknownType()
     {
+        $known = Carbon::create(2017, 1, 1, 0, 0, 0, 'UTC');
+        Carbon::setTestNow($known);
+
         $meta = [];
         $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -445,7 +450,7 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $expected = new ODataEntry();
         $expected->id = 'http://localhost/odata.svc/TestMorphOneSourceAlternates(PrimaryKey=\'42\')';
-        $expected->title = 'TestMorphOneSourceAlternate';
+        $expected->title = new ODataTitle('TestMorphOneSourceAlternate');
         $expected->editLink = 'TestMorphOneSourceAlternates(PrimaryKey=\'42\')';
         $expected->type = 'TestMorphOneSourceAlternate';
         $expected->propertyContent = $propContent;
@@ -454,6 +459,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $expected->mediaLinks[] = $mediaLink1;
         $expected->isMediaLinkEntry = true;
         $expected->resourceSetName = 'TestMorphOneSourceAlternates';
+        $expected->updated = '2017-01-01T00:00:00+00:00';
 
         $model = new TestMorphOneSourceAlternate($meta);
         $model->alternate_id = 42;
@@ -510,6 +516,9 @@ class IronicSerialiserTest extends SerialiserTestBase
 
     public function testSerialiseSingleModelWithNullExpansion()
     {
+        $known = Carbon::create(2017, 1, 1, 0, 0, 0, 'UTC');
+        Carbon::setTestNow($known);
+
         $serialiser = new ModelSerialiser();
         $serialiser->reset();
         $request = $this->setUpRequest();
@@ -559,6 +568,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $ironic->shouldReceive('getRequest')->andReturn($processor->getRequest());
         $ironic->shouldReceive('getModelSerialiser')->andReturn($serialiser);
         $ironic->shouldReceive('writeTopLevelElements')->andReturn(null)->once();
+        $ironic->shouldReceive('getUpdated')->andReturn($known);
 
         $expected = 'assert(): Should have 1 elements in stack, have 2 elements failed';
         $actual = null;
