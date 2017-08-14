@@ -304,12 +304,12 @@ class IronicSerialiser implements IObjectSerialiser
         $resourceSet = $this->getRequest()->getTargetResourceSetWrapper()->getResourceSet();
         $requestTop = $this->getRequest()->getTopOptionCount();
         $pageSize = $this->getService()->getConfiguration()->getEntitySetPageSize($resourceSet);
-        $requestTop = (null == $requestTop) ? $pageSize + 1 : $requestTop;
+        $requestTop = (null === $requestTop) ? $pageSize + 1 : $requestTop;
 
         if (true === $entryObjects->hasMore && $requestTop > $pageSize) {
             $stackSegment = $setName;
             $lastObject = end($entryObjects->results);
-            $segment = $this->getNextLinkUri($lastObject, $absoluteUri);
+            $segment = $this->getNextLinkUri($lastObject);
             $nextLink = new ODataLink();
             $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
             $nextLink->url = rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment;
@@ -363,7 +363,7 @@ class IronicSerialiser implements IObjectSerialiser
             if ($i > 0 && true === $entryObjects->hasMore) {
                 $stackSegment = $this->getRequest()->getTargetResourceSetWrapper()->getName();
                 $lastObject = end($entryObjects->results);
-                $segment = $this->getNextLinkUri($lastObject, $this->getRequest()->getRequestUrl()->getUrlAsString());
+                $segment = $this->getNextLinkUri($lastObject);
                 $nextLink = new ODataLink();
                 $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
                 $nextLink->url = rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment;
@@ -704,13 +704,13 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Get next page link from the given entity instance.
      *
-     * @param mixed  &$lastObject Last object serialized to be
+     * @param mixed &$lastObject Last object serialized to be
      *                            used for generating $skiptoken
-     * @param string $absoluteUri Absolute response URI
-     *
      * @return string for the link for next page
+     * @throws ODataException
+     *
      */
-    protected function getNextLinkUri(&$lastObject, $absoluteUri)
+    protected function getNextLinkUri(&$lastObject)
     {
         $currentExpandedProjectionNode = $this->getCurrentExpandedProjectionNode();
         $internalOrderByInfo = $currentExpandedProjectionNode->getInternalOrderByInfo();
