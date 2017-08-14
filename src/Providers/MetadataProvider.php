@@ -2,9 +2,6 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
-use AlgoWeb\PODataLaravel\Models\TestMorphOneParent;
-use App\Models\Extraction\Address;
-use App\Models\Extraction\Customer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;

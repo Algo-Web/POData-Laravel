@@ -30,9 +30,9 @@ class IronicSerialiserDummy extends IronicSerialiser
         return parent::needNextPageLink($resultSetCount);
     }
 
-    public function getNextLinkUri(&$lastObject, $absoluteUri)
+    public function getNextLinkUri(&$lastObject)
     {
-        return parent::getNextLinkUri($lastObject, $absoluteUri);
+        return parent::getNextLinkUri($lastObject);
     }
 
     public function setLightStack(array $stack)

@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Common\Messages;
@@ -17,6 +18,7 @@ use POData\ObjectModel\ODataMediaLink;
 use POData\ObjectModel\ODataNavigationPropertyInfo;
 use POData\ObjectModel\ODataProperty;
 use POData\ObjectModel\ODataPropertyContent;
+use POData\ObjectModel\ODataTitle;
 use POData\ObjectModel\ODataURL;
 use POData\ObjectModel\ODataURLCollection;
 use POData\Providers\Metadata\IMetadataProvider;
@@ -105,6 +107,12 @@ class IronicSerialiser implements IObjectSerialiser
      */
     private $metaProvider;
 
+    /*
+     * Update time to insert into ODataEntry/ODataFeed fields
+     * @var Carbon;
+     */
+    private $updated;
+
     /**
      * @param IService                  $service    Reference to the data service instance
      * @param RequestDescription|null   $request    Type instance describing the client submitted request
@@ -118,6 +126,7 @@ class IronicSerialiser implements IObjectSerialiser
         $this->stack = new SegmentStack($request);
         $this->complexTypeInstanceCollection = [];
         $this->modelSerialiser = new ModelSerialiser();
+        $this->updated = Carbon::now();
     }
 
     /**
@@ -228,7 +237,7 @@ class IronicSerialiser implements IObjectSerialiser
         $odata = new ODataEntry();
         $odata->resourceSetName = $resourceSet->getName();
         $odata->id = $absoluteUri;
-        $odata->title = $title;
+        $odata->title = new ODataTitle($title);
         $odata->type = $type;
         $odata->propertyContent = $propertyContent;
         $odata->isMediaLinkEntry = $resourceType->isMediaLinkEntry();
@@ -236,6 +245,7 @@ class IronicSerialiser implements IObjectSerialiser
         $odata->mediaLink = $mediaLink;
         $odata->mediaLinks = $mediaLinks;
         $odata->links = $links;
+        $odata->updated = $this->getUpdated()->format(DATE_ATOM);
 
         $newCount = count($this->lightStack);
         assert(
@@ -273,9 +283,10 @@ class IronicSerialiser implements IObjectSerialiser
         $selfLink->url = $relativeUri;
 
         $odata = new ODataFeed();
-        $odata->title = $title;
+        $odata->title = new ODataTitle($title);
         $odata->id = $absoluteUri;
         $odata->selfLink = $selfLink;
+        $odata->updated = $this->getUpdated()->format(DATE_ATOM);
 
         if ($this->getRequest()->queryType == QueryType::ENTITIES_WITH_COUNT()) {
             $odata->rowCount = $this->getRequest()->getCountValue();
@@ -293,12 +304,12 @@ class IronicSerialiser implements IObjectSerialiser
         $resourceSet = $this->getRequest()->getTargetResourceSetWrapper()->getResourceSet();
         $requestTop = $this->getRequest()->getTopOptionCount();
         $pageSize = $this->getService()->getConfiguration()->getEntitySetPageSize($resourceSet);
-        $requestTop = (null == $requestTop) ? $pageSize + 1 : $requestTop;
+        $requestTop = (null === $requestTop) ? $pageSize + 1 : $requestTop;
 
         if (true === $entryObjects->hasMore && $requestTop > $pageSize) {
             $stackSegment = $setName;
             $lastObject = end($entryObjects->results);
-            $segment = $this->getNextLinkUri($lastObject, $absoluteUri);
+            $segment = $this->getNextLinkUri($lastObject);
             $nextLink = new ODataLink();
             $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
             $nextLink->url = rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment;
@@ -352,7 +363,7 @@ class IronicSerialiser implements IObjectSerialiser
             if ($i > 0 && true === $entryObjects->hasMore) {
                 $stackSegment = $this->getRequest()->getTargetResourceSetWrapper()->getName();
                 $lastObject = end($entryObjects->results);
-                $segment = $this->getNextLinkUri($lastObject, $this->getRequest()->getRequestUrl()->getUrlAsString());
+                $segment = $this->getNextLinkUri($lastObject);
                 $nextLink = new ODataLink();
                 $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
                 $nextLink->url = rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment;
@@ -492,6 +503,16 @@ class IronicSerialiser implements IObjectSerialiser
     public function getStack()
     {
         return $this->stack;
+    }
+
+    /**
+     * Get update timestamp
+     *
+     * @return Carbon
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
     }
 
     protected function getEntryInstanceKey($entityInstance, ResourceType $resourceType, $containerName)
@@ -683,13 +704,13 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Get next page link from the given entity instance.
      *
-     * @param mixed  &$lastObject Last object serialized to be
+     * @param mixed &$lastObject Last object serialized to be
      *                            used for generating $skiptoken
-     * @param string $absoluteUri Absolute response URI
-     *
      * @return string for the link for next page
+     * @throws ODataException
+     *
      */
-    protected function getNextLinkUri(&$lastObject, $absoluteUri)
+    protected function getNextLinkUri(&$lastObject)
     {
         $currentExpandedProjectionNode = $this->getCurrentExpandedProjectionNode();
         $internalOrderByInfo = $currentExpandedProjectionNode->getInternalOrderByInfo();
@@ -846,7 +867,7 @@ class IronicSerialiser implements IObjectSerialiser
             if (isset($nuLink->expandedResult->selfLink)) {
                 $nuLink->expandedResult->selfLink->title = $propName;
                 $nuLink->expandedResult->selfLink->url = $nuLink->url;
-                $nuLink->expandedResult->title = $propName;
+                $nuLink->expandedResult->title = new ODataTitle($propName);
                 $nuLink->expandedResult->id = rtrim($this->absoluteServiceUri, '/') . '/' . $nuLink->url;
             }
         }

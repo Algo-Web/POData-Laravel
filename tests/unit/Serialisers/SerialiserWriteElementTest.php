@@ -9,6 +9,7 @@ use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
@@ -23,6 +24,7 @@ use POData\ObjectModel\ODataFeed;
 use POData\ObjectModel\ODataLink;
 use POData\ObjectModel\ODataProperty;
 use POData\ObjectModel\ODataPropertyContent;
+use POData\ObjectModel\ODataTitle;
 use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
 use POData\Providers\Metadata\SimpleMetadataProvider;
@@ -422,6 +424,9 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
     public function testSerialiseSingleModelWithNullExpansion()
     {
+        $known = Carbon::create(2017, 1, 1, 0, 0, 0, 'UTC');
+        Carbon::setTestNow($known);
+
         $serialiser = new ModelSerialiser();
         $serialiser->reset();
         $request = $this->setUpRequest();
@@ -486,13 +491,14 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $expected = new ODataEntry();
         $expected->id = 'http://localhost/odata.svc/TestMonomorphicManySources(id=1)';
-        $expected->title = 'TestMonomorphicManySource';
+        $expected->title = new ODataTitle('TestMonomorphicManySource');
         $expected->editLink = 'TestMonomorphicManySources(id=1)';
         $expected->type = 'TestMonomorphicManySource';
         $expected->isMediaLinkEntry = false;
         $expected->resourceSetName = 'TestMonomorphicManySources';
         $expected->links = [$link];
         $expected->propertyContent = $propContent;
+        $expected->updated = '2017-01-01T00:00:00+00:00';
 
         $actual = $ironic->writeTopLevelElement($result);
         $this->assertEquals($expected, $actual);
@@ -500,6 +506,9 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
     public function testSerialiseSingleModelWithTwoSubordinatesExpansion()
     {
+        $known = Carbon::create(2017, 1, 1, 0, 0, 0, 'UTC');
+        Carbon::setTestNow($known);
+
         $serialiser = new ModelSerialiser();
         $serialiser->reset();
         $request = $this->setUpRequest();
@@ -600,20 +609,23 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $feed1 = new ODataEntry();
         $feed1->id = 'http://localhost/odata.svc/TestMonomorphicTargets(id=1)';
-        $feed1->title = 'TestMonomorphicTarget';
+        $feed1->title = new ODataTitle('TestMonomorphicTarget');
         $feed1->editLink = 'TestMonomorphicTargets(id=1)';
         $feed1->type = 'TestMonomorphicTarget';
         $feed1->propertyContent = $feed1Content;
         $feed1->isMediaLinkEntry = false;
         $feed1->resourceSetName = 'TestMonomorphicTargets';
+        $feed1->updated = '2017-01-01T00:00:00+00:00';
+
         $feed2 = new ODataEntry();
         $feed2->id = 'http://localhost/odata.svc/TestMonomorphicTargets(id=2)';
-        $feed2->title = 'TestMonomorphicTarget';
+        $feed2->title = new ODataTitle('TestMonomorphicTarget');
         $feed2->editLink = 'TestMonomorphicTargets(id=2)';
         $feed2->type = 'TestMonomorphicTarget';
         $feed2->propertyContent = $feed2Content;
         $feed2->isMediaLinkEntry = false;
         $feed2->resourceSetName = 'TestMonomorphicTargets';
+        $feed2->updated = '2017-01-01T00:00:00+00:00';
 
         $feedLink = new ODataLink();
         $feedLink->name = 'self';
@@ -622,9 +634,10 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $feed = new ODataFeed();
         $feed->id = 'http://localhost/odata.svc/TestMonomorphicSources(id=1)/manySource';
-        $feed->title = 'manySource';
+        $feed->title = new ODataTitle('manySource');
         $feed->selfLink = $feedLink;
         $feed->entries = [$feed1, $feed2];
+        $feed->updated = '2017-01-01T00:00:00+00:00';
 
         $link1 = new ODataLink();
         $link1->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/oneSource';
@@ -643,13 +656,14 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $expected = new ODataEntry();
         $expected->id = 'http://localhost/odata.svc/TestMonomorphicSources(id=1)';
-        $expected->title = 'TestMonomorphicSource';
+        $expected->title = new ODataTitle('TestMonomorphicSource');
         $expected->editLink = 'TestMonomorphicSources(id=1)';
         $expected->type = 'TestMonomorphicSource';
         $expected->propertyContent = $propContent;
         $expected->links = [$link1, $link2];
         $expected->isMediaLinkEntry = false;
         $expected->resourceSetName = 'TestMonomorphicSources';
+        $expected->updated = '2017-01-01T00:00:00+00:00';
 
         $actual = $ironic->writeTopLevelElement($result);
         // not too worried about the TestMonomorphicTarget links, so zeroing them out here
