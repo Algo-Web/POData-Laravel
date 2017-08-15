@@ -11,6 +11,7 @@ use POData\Common\ODataException;
 use POData\IService;
 use POData\ObjectModel\IObjectSerialiser;
 use POData\ObjectModel\ODataBagContent;
+use POData\ObjectModel\ODataCategory;
 use POData\ObjectModel\ODataEntry;
 use POData\ObjectModel\ODataFeed;
 use POData\ObjectModel\ODataLink;
@@ -238,10 +239,13 @@ class IronicSerialiser implements IObjectSerialiser
         $odata->resourceSetName = $resourceSet->getName();
         $odata->id = $absoluteUri;
         $odata->title = new ODataTitle($title);
-        $odata->type = $type;
+        $odata->type = new ODataCategory($type);
         $odata->propertyContent = $propertyContent;
         $odata->isMediaLinkEntry = $resourceType->isMediaLinkEntry();
-        $odata->editLink = $relativeUri;
+        $odata->editLink = new ODataLink();
+        $odata->editLink->url = $relativeUri;
+        $odata->editLink->name = 'edit';
+        $odata->editLink->title = $title;
         $odata->mediaLink = $mediaLink;
         $odata->mediaLinks = $mediaLinks;
         $odata->links = $links;
@@ -400,7 +404,7 @@ class IronicSerialiser implements IObjectSerialiser
             $odataProperty->value = $internalContent;
         }
 
-        $propertyContent->properties[] = $odataProperty;
+        $propertyContent->properties[$propertyName] = $odataProperty;
 
         return $propertyContent;
     }
@@ -426,7 +430,7 @@ class IronicSerialiser implements IObjectSerialiser
         $odataProperty->typeName = 'Collection('.$resourceType->getFullName().')';
         $odataProperty->value = $this->writeBagValue($resourceType, $result);
 
-        $propertyContent->properties[] = $odataProperty;
+        $propertyContent->properties[$propertyName] = $odataProperty;
         return $propertyContent;
     }
 
@@ -457,7 +461,7 @@ class IronicSerialiser implements IObjectSerialiser
             $odataProperty->value = $this->primitiveToString($rType, $primitiveValue->results);
         }
 
-        $propertyContent->properties[] = $odataProperty;
+        $propertyContent->properties[$odataProperty->name] = $odataProperty;
 
         return $propertyContent;
     }
@@ -559,7 +563,7 @@ class IronicSerialiser implements IObjectSerialiser
         $mediaLink = null;
         if ($resourceType->isMediaLinkEntry()) {
             $eTag = $streamProviderWrapper->getStreamETag2($entryObject, null, $context);
-            $mediaLink = new ODataMediaLink($type, '/$value', $relativeUri . '/$value', '*/*', $eTag);
+            $mediaLink = new ODataMediaLink($type, '/$value', $relativeUri . '/$value', '*/*', $eTag, 'edit-media');
         }
         $mediaLinks = [];
         if ($resourceType->hasNamedStream()) {
@@ -828,7 +832,7 @@ class IronicSerialiser implements IObjectSerialiser
             $subProp->name = $corn;
             $subProp->value = isset($flake) ? $this->primitiveToString($rType, $flake) : null;
             $subProp->typeName = $nonRelProp[$corn]->getResourceType()->getFullName();
-            $propertyContent->properties[] = $subProp;
+            $propertyContent->properties[$corn] = $subProp;
         }
         return $propertyContent;
     }
@@ -955,13 +959,13 @@ class IronicSerialiser implements IObjectSerialiser
                 assert($rType instanceof IType, get_class($rType));
                 $internalProperty->value = $this->primitiveToString($rType, $result->$propName);
 
-                $internalContent->properties[] = $internalProperty;
+                $internalContent->properties[$propName] = $internalProperty;
             } elseif (ResourcePropertyKind::COMPLEX_TYPE == $resourceKind) {
                 $rType = $prop->getResourceType();
                 $internalProperty->typeName = $rType->getFullName();
                 $internalProperty->value = $this->writeComplexValue($rType, $result->$propName, $propName);
 
-                $internalContent->properties[] = $internalProperty;
+                $internalContent->properties[$propName] = $internalProperty;
             }
         }
 
