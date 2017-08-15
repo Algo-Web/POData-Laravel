@@ -15,6 +15,7 @@ use Mockery as m;
 use POData\Common\ODataConstants;
 use POData\Common\Url;
 use POData\IService;
+use POData\ObjectModel\ODataCategory;
 use POData\ObjectModel\ODataEntry;
 use POData\ObjectModel\ODataLink;
 use POData\ObjectModel\ODataMediaLink;
@@ -420,12 +421,12 @@ class IronicSerialiserTest extends SerialiserTestBase
         $metaProv->boot();
 
         $propContent = new ODataPropertyContent();
-        $propContent->properties = [new ODataProperty(), new ODataProperty()];
-        $propContent->properties[0]->name = 'name';
-        $propContent->properties[1]->name = 'id';
-        $propContent->properties[0]->typeName = 'Edm.String';
-        $propContent->properties[1]->typeName = 'Edm.Int32';
-        $propContent->properties[0]->value = 'Hammer, M.C.';
+        $propContent->properties = ['name' => new ODataProperty(), 'id' => new ODataProperty()];
+        $propContent->properties['name']->name = 'name';
+        $propContent->properties['id']->name = 'id';
+        $propContent->properties['name']->typeName = 'Edm.String';
+        $propContent->properties['id']->typeName = 'Edm.Int32';
+        $propContent->properties['name']->value = 'Hammer, M.C.';
 
         $odataLink = new ODataLink();
         $odataLink->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morphTarget';
@@ -445,14 +446,18 @@ class IronicSerialiserTest extends SerialiserTestBase
             '/$value',
             'TestMorphOneSourceAlternates(PrimaryKey=\'42\')/$value',
             '*/*',
-            'eTag'
+            'eTag',
+            'edit-media'
         );
 
         $expected = new ODataEntry();
         $expected->id = 'http://localhost/odata.svc/TestMorphOneSourceAlternates(PrimaryKey=\'42\')';
         $expected->title = new ODataTitle('TestMorphOneSourceAlternate');
-        $expected->editLink = 'TestMorphOneSourceAlternates(PrimaryKey=\'42\')';
-        $expected->type = 'TestMorphOneSourceAlternate';
+        $expected->editLink = new ODataLink();
+        $expected->editLink->url = 'TestMorphOneSourceAlternates(PrimaryKey=\'42\')';
+        $expected->editLink->name = 'edit';
+        $expected->editLink->title = 'TestMorphOneSourceAlternate';
+        $expected->type = new ODataCategory('TestMorphOneSourceAlternate');
         $expected->propertyContent = $propContent;
         $expected->links[] = $odataLink;
         $expected->mediaLink = $mediaLink;

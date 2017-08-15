@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use POData\ObjectModel\ObjectModelSerializer;
+use POData\ObjectModel\ODataCategory;
 use POData\ObjectModel\ODataEntry;
 use POData\ObjectModel\ODataFeed;
 use POData\ObjectModel\ODataLink;
@@ -84,10 +85,11 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
         $numProperties = count($objectResult->propertyContent->properties);
+        $keys = array_keys($objectResult->propertyContent->properties);
         for ($i = 0; $i < $numProperties; $i++) {
-            $propName = $objectResult->propertyContent->properties[$i]->name;
-            $objectVal = $objectResult->propertyContent->properties[$i]->value;
-            $ironicVal = $ironicResult->propertyContent->properties[$i]->value;
+            $propName = $objectResult->propertyContent->properties[$keys[$i]]->name;
+            $objectVal = $objectResult->propertyContent->properties[$keys[$i]]->value;
+            $ironicVal = $ironicResult->propertyContent->properties[$keys[$i]]->value;
             $this->assertEquals(isset($objectVal), isset($ironicVal), "Values for $propName differently null");
             $this->assertEquals(is_string($objectVal), is_string($ironicVal), "Values for $propName not identical");
         }
@@ -201,10 +203,11 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
         $numProperties = count($objectResult->propertyContent->properties);
+        $keys = array_keys($objectResult->propertyContent->properties);
         for ($i = 0; $i < $numProperties; $i++) {
-            $propName = $objectResult->propertyContent->properties[$i]->name;
-            $objectVal = $objectResult->propertyContent->properties[$i]->value;
-            $ironicVal = $ironicResult->propertyContent->properties[$i]->value;
+            $propName = $objectResult->propertyContent->properties[$keys[$i]]->name;
+            $objectVal = $objectResult->propertyContent->properties[$keys[$i]]->value;
+            $ironicVal = $ironicResult->propertyContent->properties[$keys[$i]]->value;
             $this->assertEquals(isset($objectVal), isset($ironicVal), "Values for $propName differently null");
             $this->assertEquals(is_string($objectVal), is_string($ironicVal), "Values for $propName not identical");
         }
@@ -256,10 +259,11 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
         $numProperties = count($objectResult->propertyContent->properties);
+        $keys = array_keys($objectResult->propertyContent->properties);
         for ($i = 0; $i < $numProperties; $i++) {
-            $propName = $objectResult->propertyContent->properties[$i]->name;
-            $objectVal = $objectResult->propertyContent->properties[$i]->value;
-            $ironicVal = $ironicResult->propertyContent->properties[$i]->value;
+            $propName = $objectResult->propertyContent->properties[$keys[$i]]->name;
+            $objectVal = $objectResult->propertyContent->properties[$keys[$i]]->value;
+            $ironicVal = $ironicResult->propertyContent->properties[$keys[$i]]->value;
             $this->assertEquals(isset($objectVal), isset($ironicVal), "Values for $propName differently null");
             $this->assertEquals(is_string($objectVal), is_string($ironicVal), "Values for $propName not identical");
         }
@@ -352,10 +356,11 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $this->assertEquals($objectResult, $ironicResult, '', 0, 20);
 
         $numProperties = count($objectResult->propertyContent->properties);
+        $keys = array_keys($objectResult->propertyContent->properties);
         for ($i = 0; $i < $numProperties; $i++) {
-            $propName = $objectResult->propertyContent->properties[$i]->name;
-            $objectVal = $objectResult->propertyContent->properties[$i]->value;
-            $ironicVal = $ironicResult->propertyContent->properties[$i]->value;
+            $propName = $objectResult->propertyContent->properties[$keys[$i]]->name;
+            $objectVal = $objectResult->propertyContent->properties[$keys[$i]]->value;
+            $ironicVal = $ironicResult->propertyContent->properties[$keys[$i]]->value;
             $this->assertEquals(isset($objectVal), isset($ironicVal), "Values for $propName differently null");
             $this->assertEquals(is_string($objectVal), is_string($ironicVal), "Values for $propName not identical");
         }
@@ -413,10 +418,11 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
         $numProperties = count($objectResult->propertyContent->properties);
+        $keys = array_keys($objectResult->propertyContent->properties);
         for ($i = 0; $i < $numProperties; $i++) {
-            $propName = $objectResult->propertyContent->properties[$i]->name;
-            $objectVal = $objectResult->propertyContent->properties[$i]->value;
-            $ironicVal = $ironicResult->propertyContent->properties[$i]->value;
+            $propName = $objectResult->propertyContent->properties[$keys[$i]]->name;
+            $objectVal = $objectResult->propertyContent->properties[$keys[$i]]->value;
+            $ironicVal = $ironicResult->propertyContent->properties[$keys[$i]]->value;
             $this->assertEquals(isset($objectVal), isset($ironicVal), "Values for $propName differently null");
             $this->assertEquals(is_string($objectVal), is_string($ironicVal), "Values for $propName not identical");
         }
@@ -475,13 +481,13 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $result->results = $model;
 
         $propContent = new ODataPropertyContent();
-        $propContent->properties = [new ODataProperty(), new ODataProperty()];
-        $propContent->properties[0]->name = 'id';
-        $propContent->properties[1]->name = 'name';
-        $propContent->properties[0]->typeName = 'Edm.Int32';
-        $propContent->properties[1]->typeName = 'Edm.String';
-        $propContent->properties[0]->value = '1';
-        $propContent->properties[1]->value = 'Name';
+        $propContent->properties = ['id' => new ODataProperty(), 'name' => new ODataProperty()];
+        $propContent->properties['id']->name = 'id';
+        $propContent->properties['name']->name = 'name';
+        $propContent->properties['id']->typeName = 'Edm.Int32';
+        $propContent->properties['name']->typeName = 'Edm.String';
+        $propContent->properties['id']->value = '1';
+        $propContent->properties['name']->value = 'Name';
 
         $link = new ODataLink();
         $link->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/manySource';
@@ -493,7 +499,11 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $expected->id = 'http://localhost/odata.svc/TestMonomorphicManySources(id=1)';
         $expected->title = new ODataTitle('TestMonomorphicManySource');
         $expected->editLink = 'TestMonomorphicManySources(id=1)';
-        $expected->type = 'TestMonomorphicManySource';
+        $expected->editLink = new ODataLink();
+        $expected->editLink->url = 'TestMonomorphicManySources(id=1)';
+        $expected->editLink->name = 'edit';
+        $expected->editLink->title = 'TestMonomorphicManySource';
+        $expected->type = new ODataCategory('TestMonomorphicManySource');
         $expected->isMediaLinkEntry = false;
         $expected->resourceSetName = 'TestMonomorphicManySources';
         $expected->links = [$link];
@@ -581,37 +591,40 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $result->results = $model;
 
         $propContent = new ODataPropertyContent();
-        $propContent->properties = [new ODataProperty(), new ODataProperty()];
-        $propContent->properties[0]->name = 'id';
-        $propContent->properties[1]->name = 'name';
-        $propContent->properties[0]->typeName = 'Edm.Int32';
-        $propContent->properties[1]->typeName = 'Edm.String';
-        $propContent->properties[0]->value = '1';
-        $propContent->properties[1]->value = 'Name';
+        $propContent->properties = ['id' => new ODataProperty(), 'name' => new ODataProperty()];
+        $propContent->properties['id']->name = 'id';
+        $propContent->properties['name']->name = 'name';
+        $propContent->properties['id']->typeName = 'Edm.Int32';
+        $propContent->properties['name']->typeName = 'Edm.String';
+        $propContent->properties['id']->value = '1';
+        $propContent->properties['name']->value = 'Name';
 
         $feed1Content = new ODataPropertyContent();
-        $feed1Content->properties = [new ODataProperty(), new ODataProperty()];
-        $feed1Content->properties[0]->name = 'id';
-        $feed1Content->properties[1]->name = 'name';
-        $feed1Content->properties[0]->typeName = 'Edm.Int32';
-        $feed1Content->properties[1]->typeName = 'Edm.String';
-        $feed1Content->properties[0]->value = '1';
-        $feed1Content->properties[1]->value = 'Inspector';
+        $feed1Content->properties = ['id' => new ODataProperty(), 'name' => new ODataProperty()];
+        $feed1Content->properties['id']->name = 'id';
+        $feed1Content->properties['name']->name = 'name';
+        $feed1Content->properties['id']->typeName = 'Edm.Int32';
+        $feed1Content->properties['name']->typeName = 'Edm.String';
+        $feed1Content->properties['id']->value = '1';
+        $feed1Content->properties['name']->value = 'Inspector';
 
         $feed2Content = new ODataPropertyContent();
-        $feed2Content->properties = [new ODataProperty(), new ODataProperty()];
-        $feed2Content->properties[0]->name = 'id';
-        $feed2Content->properties[1]->name = 'name';
-        $feed2Content->properties[0]->typeName = 'Edm.Int32';
-        $feed2Content->properties[1]->typeName = 'Edm.String';
-        $feed2Content->properties[0]->value = '2';
-        $feed2Content->properties[1]->value = 'Gadget';
+        $feed2Content->properties = ['id' => new ODataProperty(), 'name' => new ODataProperty()];
+        $feed2Content->properties['id']->name = 'id';
+        $feed2Content->properties['name']->name = 'name';
+        $feed2Content->properties['id']->typeName = 'Edm.Int32';
+        $feed2Content->properties['name']->typeName = 'Edm.String';
+        $feed2Content->properties['id']->value = '2';
+        $feed2Content->properties['name']->value = 'Gadget';
 
         $feed1 = new ODataEntry();
         $feed1->id = 'http://localhost/odata.svc/TestMonomorphicTargets(id=1)';
         $feed1->title = new ODataTitle('TestMonomorphicTarget');
-        $feed1->editLink = 'TestMonomorphicTargets(id=1)';
-        $feed1->type = 'TestMonomorphicTarget';
+        $feed1->editLink = new ODataLink();
+        $feed1->editLink->url = 'TestMonomorphicTargets(id=1)';
+        $feed1->editLink->name = 'edit';
+        $feed1->editLink->title = 'TestMonomorphicTarget';
+        $feed1->type = new ODataCategory('TestMonomorphicTarget');
         $feed1->propertyContent = $feed1Content;
         $feed1->isMediaLinkEntry = false;
         $feed1->resourceSetName = 'TestMonomorphicTargets';
@@ -620,8 +633,11 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $feed2 = new ODataEntry();
         $feed2->id = 'http://localhost/odata.svc/TestMonomorphicTargets(id=2)';
         $feed2->title = new ODataTitle('TestMonomorphicTarget');
-        $feed2->editLink = 'TestMonomorphicTargets(id=2)';
-        $feed2->type = 'TestMonomorphicTarget';
+        $feed2->editLink = new ODataLink();
+        $feed2->editLink->url = 'TestMonomorphicTargets(id=2)';
+        $feed2->editLink->name = 'edit';
+        $feed2->editLink->title = 'TestMonomorphicTarget';
+        $feed2->type = new ODataCategory('TestMonomorphicTarget');
         $feed2->propertyContent = $feed2Content;
         $feed2->isMediaLinkEntry = false;
         $feed2->resourceSetName = 'TestMonomorphicTargets';
@@ -657,8 +673,11 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $expected = new ODataEntry();
         $expected->id = 'http://localhost/odata.svc/TestMonomorphicSources(id=1)';
         $expected->title = new ODataTitle('TestMonomorphicSource');
-        $expected->editLink = 'TestMonomorphicSources(id=1)';
-        $expected->type = 'TestMonomorphicSource';
+        $expected->editLink = new ODataLink();
+        $expected->editLink->url = 'TestMonomorphicSources(id=1)';
+        $expected->editLink->name = 'edit';
+        $expected->editLink->title = 'TestMonomorphicSource';
+        $expected->type = new ODataCategory('TestMonomorphicSource');
         $expected->propertyContent = $propContent;
         $expected->links = [$link1, $link2];
         $expected->isMediaLinkEntry = false;
