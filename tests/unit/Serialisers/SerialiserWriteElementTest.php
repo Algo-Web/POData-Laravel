@@ -509,6 +509,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $expected->links = [$link];
         $expected->propertyContent = $propContent;
         $expected->updated = '2017-01-01T00:00:00+00:00';
+        $expected->baseURI = 'http://localhost/odata.svc/';
 
         $actual = $ironic->writeTopLevelElement($result);
         $this->assertEquals($expected, $actual);
@@ -683,6 +684,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $expected->isMediaLinkEntry = false;
         $expected->resourceSetName = 'TestMonomorphicSources';
         $expected->updated = '2017-01-01T00:00:00+00:00';
+        $expected->baseURI = 'http://localhost/odata.svc/';
 
         $actual = $ironic->writeTopLevelElement($result);
         // not too worried about the TestMonomorphicTarget links, so zeroing them out here
