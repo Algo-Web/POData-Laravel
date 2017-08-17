@@ -465,6 +465,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $expected->isMediaLinkEntry = true;
         $expected->resourceSetName = 'TestMorphOneSourceAlternates';
         $expected->updated = '2017-01-01T00:00:00+00:00';
+        $expected->baseURI = 'http://localhost/odata.svc/';
 
         $model = new TestMorphOneSourceAlternate($meta);
         $model->alternate_id = 42;
