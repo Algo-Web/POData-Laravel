@@ -4,12 +4,15 @@ namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
 use POData\Common\ODataConstants;
@@ -17,6 +20,7 @@ use POData\Common\Url;
 use POData\IService;
 use POData\ObjectModel\ODataCategory;
 use POData\ObjectModel\ODataEntry;
+use POData\ObjectModel\ODataFeed;
 use POData\ObjectModel\ODataLink;
 use POData\ObjectModel\ODataMediaLink;
 use POData\ObjectModel\ODataProperty;
@@ -573,17 +577,97 @@ class IronicSerialiserTest extends SerialiserTestBase
         $ironic->shouldReceive('getService')->andReturn($service);
         $ironic->shouldReceive('getRequest')->andReturn($processor->getRequest());
         $ironic->shouldReceive('getModelSerialiser')->andReturn($serialiser);
-        $ironic->shouldReceive('writeTopLevelElements')->andReturn(null)->once();
+        $ironic->shouldReceive('writeTopLevelElements')->andReturn(null)->never();
         $ironic->shouldReceive('getUpdated')->andReturn($known);
 
-        $expected = 'assert(): Should have 1 elements in stack, have 2 elements failed';
-        $actual = null;
+        $ironicResult = $ironic->writeTopLevelElement($result);
+        $this->assertNull($ironicResult->links[0]->expandedResult);
+    }
 
-        try {
-            $ironic->writeTopLevelElement($result);
-        } catch (\ErrorException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
+    public function testCrankshaftFeedExpansion()
+    {
+        $known = Carbon::create(2017, 1, 1, 0, 0, 0, 'UTC');
+        Carbon::setTestNow($known);
+
+        $serialiser = new ModelSerialiser();
+        $serialiser->reset();
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicSources');
+        $request->shouldReceive('fullUrl')
+            ->andReturn('http://localhost/odata.svc/TestMonomorphicSources(1)?$expand=manySource');
+
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = new TestMonomorphicSource($metadata);
+        $target = new TestMonomorphicTarget($metadata);
+
+        App::instance(TestMonomorphicSource::class, $source);
+        App::instance(TestMonomorphicTarget::class, $target);
+
+        $op = new IlluminateOperationContext($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri("/odata.svc/");
+
+        $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->boot();
+
+        $targ = new TestMonomorphicTarget($metadata);
+        $targ->id = 1;
+        $targ->name = 'Name';
+
+        $hasMany = m::mock(HasMany::class)->makePartial();
+        $hasMany->shouldReceive('getResults')->andReturn([$targ]);
+
+        $emptyMany = m::mock(HasMany::class)->makePartial();
+        $emptyMany->shouldReceive('getResults')->andReturn([]);
+
+        $src1 = m::mock(TestMonomorphicSource::class)->makePartial();
+        $src1->shouldReceive('metadata')->andReturn($metadata);
+        $src1->shouldReceive('manySource')->andReturn($hasMany);
+        $src1->id = 1;
+
+        $src2 = m::mock(TestMonomorphicSource::class)->makePartial();
+        $src2->shouldReceive('metadata')->andReturn($metadata);
+        $src2->shouldReceive('manySource')->andReturn($emptyMany);
+        $src2->id = 2;
+
+        $src3 = m::mock(TestMonomorphicSource::class)->makePartial();
+        $src3->shouldReceive('metadata')->andReturn($metadata);
+        $src3->shouldReceive('manySource')->andReturn($hasMany);
+        $src3->id = 3;
+
+        $results = [new QueryResult(), new QueryResult(), new QueryResult()];
+        $results[0]->results = $src1;
+        $results[1]->results = $src2;
+        $results[2]->results = $src3;
+
+        $collection = new QueryResult();
+        $collection->results = $results;
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+
+        $ironic = new IronicSerialiserDummy($service, $processor->getRequest());
+        $ironic->setPropertyExpansion('manySource', true);
+        $ironic->setPropertyExpansion('oneSource', false);
+        $ironic->setPropertyExpansion('manyTarget', false);
+        $ironic->setPropertyExpansion('oneTarget', false);
+
+        $ironicResult = $ironic->writeTopLevelElements($collection);
+        $this->assertEquals(3, count($ironicResult->entries));
+        $this->assertNull($ironicResult->entries[0]->links[0]->expandedResult);
+        $this->assertNull($ironicResult->entries[1]->links[0]->expandedResult);
+        $this->assertNull($ironicResult->entries[2]->links[0]->expandedResult);
+        $this->assertTrue($ironicResult->entries[0]->links[1]->expandedResult instanceof ODataFeed);
+        $this->assertNull($ironicResult->entries[1]->links[1]->expandedResult);
+        $this->assertTrue($ironicResult->entries[2]->links[1]->expandedResult instanceof ODataFeed);
     }
 }

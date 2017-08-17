@@ -867,15 +867,17 @@ class IronicSerialiser implements IObjectSerialiser
         $result = new QueryResult();
         $result->results = $value;
         $resultCount = $isCollection ? count($value) : 1;
-        $newStackLine = ['type' => $nextName, 'prop' => $propName, 'count' => $resultCount];
-        array_push($this->lightStack, $newStackLine);
 
-        if (!$isCollection) {
-            $expandedResult = $this->writeTopLevelElement($result);
-        } else {
-            $expandedResult = $this->writeTopLevelElements($result);
+        if (0 < $resultCount) {
+            $newStackLine = ['type' => $nextName, 'prop' => $propName, 'count' => $resultCount];
+            array_push($this->lightStack, $newStackLine);
+            if (!$isCollection) {
+                $expandedResult = $this->writeTopLevelElement($result);
+            } else {
+                $expandedResult = $this->writeTopLevelElements($result);
+            }
+            $nuLink->expandedResult = $expandedResult;
         }
-        $nuLink->expandedResult = $expandedResult;
         if (!isset($nuLink->expandedResult)) {
             $nuLink->isCollection = null;
             $nuLink->isExpanded = null;
