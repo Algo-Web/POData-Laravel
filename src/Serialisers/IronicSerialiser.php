@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Common\Messages;
@@ -282,7 +283,8 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeTopLevelElements(QueryResult &$entryObjects)
     {
-        assert(is_array($entryObjects->results), '!is_array($entryObjects->results)');
+        $res = $entryObjects->results;
+        assert(is_array($res) || $res instanceof Collection, '!is_array($entryObjects->results)');
 
         $this->loadStackIfEmpty();
         $setName = $this->getRequest()->getTargetResourceSetWrapper()->getName();
@@ -307,7 +309,7 @@ class IronicSerialiser implements IObjectSerialiser
         if ($this->getRequest()->queryType == QueryType::ENTITIES_WITH_COUNT()) {
             $odata->rowCount = $this->getRequest()->getCountValue();
         }
-        foreach ($entryObjects->results as $entry) {
+        foreach ($res as $entry) {
             if (!$entry instanceof QueryResult) {
                 $query = new QueryResult();
                 $query->results = $entry;
