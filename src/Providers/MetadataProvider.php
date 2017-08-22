@@ -50,7 +50,7 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
         $meta = App::make('metadata');
-        self::$relationCache = null;
+        $this->reset();
 
         $stdRef = new \ReflectionClass(Model::class);
         $abstract = $meta->addEntityType($stdRef, static::POLYMORPHIC, true, null);
@@ -247,14 +247,15 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function getRepairedRoundTripRelations()
     {
-        $rels = $this->calculateRoundTripRelations();
-        $groups = $this->getPolymorphicRelationGroups();
-
-        if (0 === count($groups)) {
-            return $rels;
-        }
-
         if (!isset(self::$relationCache)) {
+            $rels = $this->calculateRoundTripRelations();
+            $groups = $this->getPolymorphicRelationGroups();
+
+            if (0 === count($groups)) {
+                self::$relationCache = $rels;
+                return $rels;
+            }
+
             $placeholder = static::POLYMORPHIC;
 
             $groupKeys = array_keys($groups);
@@ -594,5 +595,10 @@ class MetadataProvider extends MetadataBaseProvider
             }
         }
         return;
+    }
+
+    public function reset()
+    {
+        self::$relationCache = null;
     }
 }
