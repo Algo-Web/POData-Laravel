@@ -20,6 +20,7 @@ class MetadataProvider extends MetadataBaseProvider
 {
     protected $multConstraints = [ '0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
     protected static $metaNAMESPACE = 'Data';
+    protected static $relationCache;
     const POLYMORPHIC = 'polyMorphicPlaceholder';
     const POLYMORPHIC_PLURAL = 'polyMorphicPlaceholders';
 
@@ -49,6 +50,7 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
         $meta = App::make('metadata');
+        self::$relationCache = null;
 
         $stdRef = new \ReflectionClass(Model::class);
         $abstract = $meta->addEntityType($stdRef, static::POLYMORPHIC, true, null);
@@ -252,38 +254,42 @@ class MetadataProvider extends MetadataBaseProvider
             return $rels;
         }
 
-        $placeholder = static::POLYMORPHIC;
+        if (!isset(self::$relationCache)) {
+            $placeholder = static::POLYMORPHIC;
 
-        $groupKeys = array_keys($groups);
+            $groupKeys = array_keys($groups);
 
-        // we have at least one polymorphic relation, need to dig it out
-        $numRels = count($rels);
-        for ($i = 0; $i < $numRels; $i++) {
-            $relation = $rels[$i];
-            $principalType = $relation['principalType'];
-            $dependentType = $relation['dependentType'];
-            $principalPoly = in_array($principalType, $groupKeys);
-            $dependentPoly = in_array($dependentType, $groupKeys);
-            // if relation is not polymorphic, then move on
-            if (!($principalPoly || $dependentPoly)) {
-                continue;
-            } else {
-                // if only one end is a known end of a polymorphic relation
-                // for moment we're punting on both
-                $oneEnd = $principalPoly !== $dependentPoly;
-                assert($oneEnd, 'Multi-generational polymorphic relation chains not implemented');
-                $targRels = $principalPoly ? $groups[$principalType] : $groups[$dependentType];
-                $targUnknown = $targRels[$principalPoly ? $dependentType : $principalType];
-                $targProperty = $principalPoly ? $relation['dependentProp'] : $relation['principalProp'];
-                $msg = 'Specified unknown-side property ' . $targProperty . ' not found in polymorphic relation map';
-                assert(in_array($targProperty, $targUnknown), $msg);
+            // we have at least one polymorphic relation, need to dig it out
+            $numRels = count($rels);
+            for ($i = 0; $i < $numRels; $i++) {
+                $relation = $rels[$i];
+                $principalType = $relation['principalType'];
+                $dependentType = $relation['dependentType'];
+                $principalPoly = in_array($principalType, $groupKeys);
+                $dependentPoly = in_array($dependentType, $groupKeys);
+                // if relation is not polymorphic, then move on
+                if (!($principalPoly || $dependentPoly)) {
+                    continue;
+                } else {
+                    // if only one end is a known end of a polymorphic relation
+                    // for moment we're punting on both
+                    $oneEnd = $principalPoly !== $dependentPoly;
+                    assert($oneEnd, 'Multi-generational polymorphic relation chains not implemented');
+                    $targRels = $principalPoly ? $groups[$principalType] : $groups[$dependentType];
+                    $targUnknown = $targRels[$principalPoly ? $dependentType : $principalType];
+                    $targProperty = $principalPoly ? $relation['dependentProp'] : $relation['principalProp'];
+                    $msg = 'Specified unknown-side property ' . $targProperty
+                           . ' not found in polymorphic relation map';
+                    assert(in_array($targProperty, $targUnknown), $msg);
 
-                $targType = $principalPoly ? 'dependentRSet' : 'principalRSet';
-                $rels[$i][$targType] = $placeholder;
-                continue;
+                    $targType = $principalPoly ? 'dependentRSet' : 'principalRSet';
+                    $rels[$i][$targType] = $placeholder;
+                    continue;
+                }
             }
+            self::$relationCache = $rels;
         }
-        return $rels;
+        return self::$relationCache;
     }
 
     /**
