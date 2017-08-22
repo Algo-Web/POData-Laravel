@@ -601,4 +601,35 @@ class MetadataProvider extends MetadataBaseProvider
     {
         self::$relationCache = null;
     }
+
+    /**
+     * Resolve possible reverse relation property names
+     *
+     * @param Model $source
+     * @param Model $target
+     * @param $propName
+     * @return string|null
+     */
+    public function resolveReverseProperty(Model $source, Model $target, $propName)
+    {
+        assert(is_string($propName), 'Property name must be string');
+        $relations = $this->getRepairedRoundTripRelations();
+
+        $sourceName = get_class($source);
+        $targName = get_class($target);
+
+        $filter = function ($segment) use ($sourceName, $targName, $propName) {
+            $match = $sourceName == $segment['principalType'];
+            $match &= $targName == $segment['dependentType'];
+            $match &= $propName == $segment['principalProp'];
+
+            return $match;
+        };
+
+        // array_filter does not reset keys - we have to do it ourselves
+        $trim = array_values(array_filter($relations, $filter));
+        $result = 0 === count($trim) ? null : $trim[0]['dependentProp'];
+
+        return $result;
+    }
 }
