@@ -553,6 +553,7 @@ class LaravelQuery implements IQueryProvider
         } elseif ($relation instanceof HasOneOrMany) {
             $relation->save($targetEntityInstance);
         }
+        return true;
     }
 
     /**
@@ -597,13 +598,15 @@ class LaravelQuery implements IQueryProvider
                 $otherPropName
             );
         }
+        return true;
     }
 
     /**
      * @param $sourceEntityInstance
      * @param $targetEntityInstance
      * @param $navPropName
-     * @return mixed
+     * @return Relation
+     * @throws \InvalidArgumentException
      */
     protected function isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName)
     {
