@@ -74,7 +74,7 @@ class LaravelQueryTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-//        $this->object = new \AlgoWeb\PODataLaravel\Query\LaravelQuery();
+        //$this->object = new \AlgoWeb\PODataLaravel\Query\LaravelQuery();
         $this->mapping = [
             TestModel::class =>
                 [

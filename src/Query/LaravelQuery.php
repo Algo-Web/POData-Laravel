@@ -496,7 +496,8 @@ class LaravelQuery implements IQueryProvider
      * @param ResourceSet $sourceResourceSet The entity set containing the entity to fetch
      * @param object[] $data The new data for the entity instance
      *
-     * @return object[]|null returns the newly created model if successful, or null if model creation failed
+     * @return object[] returns the newly created model if successful, or throws an exception if model creation failed
+     * @throw \Exception
      */
     public function createBulkResourceforResourceSet(
         ResourceSet $sourceResourceSet,
@@ -529,7 +530,8 @@ class LaravelQuery implements IQueryProvider
      * @param object[] $data The new data for the entity instances
      * @param bool $shouldUpdate Should undefined values be updated or reset to default
      *
-     * @return object[]|null the new resource value if it is assignable, or throw exception for null
+     * @return object[] the new resource value if it is assignable, or throw exception for null
+     * @throw \Exception
      */
     public function updateBulkResource(
         ResourceSet $sourceResourceSet,
