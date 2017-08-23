@@ -3,11 +3,18 @@
 namespace AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
+use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\DB;
 use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
-use POData\UriProcessor\QueryProcessor\Expression\Parser\IExpressionProvider;
 use POData\UriProcessor\QueryProcessor\ExpressionParser\FilterInfo;
 use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
 use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
@@ -31,6 +38,7 @@ class LaravelQuery implements IQueryProvider
     protected $reader;
     public $queryProviderClassName;
     private $verbMap = [];
+    protected $metadataProvider;
 
     public function __construct(AuthInterface $auth = null)
     {
@@ -42,6 +50,7 @@ class LaravelQuery implements IQueryProvider
         $this->verbMap['create'] = ActionVerb::CREATE();
         $this->verbMap['update'] = ActionVerb::UPDATE();
         $this->verbMap['delete'] = ActionVerb::DELETE();
+        $this->metadataProvider = new MetadataProvider(App::make('app'));
     }
 
     /**
@@ -74,6 +83,16 @@ class LaravelQuery implements IQueryProvider
     public function getReader()
     {
         return $this->reader;
+    }
+
+    /**
+     * Dig out local copy of POData-Laravel metadata provider
+     *
+     * @return MetadataProvider
+     */
+    public function getMetadataProvider()
+    {
+        return $this->metadataProvider;
     }
 
     /**
@@ -470,5 +489,182 @@ class LaravelQuery implements IQueryProvider
             return $source;
         }
         return $sourceEntityInstance;
+    }
+
+    /**
+     * Create multiple new resources in a resource set.
+     * @param ResourceSet $sourceResourceSet The entity set containing the entity to fetch
+     * @param object[] $data The new data for the entity instance
+     *
+     * @return object[] returns the newly created model if successful, or throws an exception if model creation failed
+     * @throw \Exception
+     */
+    public function createBulkResourceforResourceSet(
+        ResourceSet $sourceResourceSet,
+        array $data
+    ) {
+        $result = [];
+        try {
+            DB::beginTransaction();
+            foreach ($data as $newItem) {
+                $raw = $this->createResourceforResourceSet($sourceResourceSet, null, $newItem);
+                if (null === $raw) {
+                    throw new \Exception('Bulk model creation failed');
+                }
+                $result[] = $raw;
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        return $result;
+    }
+
+    /**
+     * Updates a group of resources in a resource set.
+     *
+     * @param ResourceSet $sourceResourceSet The entity set containing the source entity
+     * @param object $sourceEntityInstance The source entity instance
+     * @param KeyDescriptor[] $keyDescriptor The key identifying the entity to fetch
+     * @param object[] $data The new data for the entity instances
+     * @param bool $shouldUpdate Should undefined values be updated or reset to default
+     *
+     * @return object[] the new resource value if it is assignable, or throw exception for null
+     * @throw \Exception
+     */
+    public function updateBulkResource(
+        ResourceSet $sourceResourceSet,
+        $sourceEntityInstance,
+        array $keyDescriptor,
+        array $data,
+        $shouldUpdate = false
+    ) {
+        $numKeys = count($keyDescriptor);
+        if ($numKeys !== count($data)) {
+            $msg = 'Key descriptor array and data array must be same length';
+            throw new \InvalidArgumentException($msg);
+        }
+        $result = [];
+
+        try {
+            DB::beginTransaction();
+            for ($i = 0; $i < $numKeys; $i++) {
+                $newItem = $data[$i];
+                $newKey = $keyDescriptor[$i];
+                $raw = $this->updateResource($sourceResourceSet, $sourceEntityInstance, $newKey, $newItem);
+                if (null === $raw) {
+                    throw new \Exception('Bulk model update failed');
+                }
+                $result[] = $raw;
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        return $result;
+    }
+
+    /**
+     * Attaches child model to parent model
+     *
+     * @param ResourceSet $sourceResourceSet
+     * @param object $sourceEntityInstance
+     * @param ResourceSet $targetResourceSet
+     * @param object $targetEntityInstance
+     * @param $navPropName
+     *
+     * @return bool
+     */
+    public function hookSingleModel(
+        ResourceSet $sourceResourceSet,
+        $sourceEntityInstance,
+        ResourceSet $targetResourceSet,
+        $targetEntityInstance,
+        $navPropName
+    ) {
+        $relation = $this->isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName);
+        assert($sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model);
+
+        if ($relation instanceof BelongsTo) {
+            $relation->associate($targetEntityInstance);
+        } elseif ($relation instanceof BelongsToMany) {
+            $relation->attach($targetEntityInstance);
+        } elseif ($relation instanceof HasOneOrMany) {
+            $relation->save($targetEntityInstance);
+        }
+        return true;
+    }
+
+    /**
+     * Removes child model from parent model
+     *
+     * @param ResourceSet $sourceResourceSet
+     * @param object $sourceEntityInstance
+     * @param ResourceSet $targetResourceSet
+     * @param object $targetEntityInstance
+     * @param $navPropName
+     *
+     * @return bool
+     */
+    public function unhookSingleModel(
+        ResourceSet $sourceResourceSet,
+        $sourceEntityInstance,
+        ResourceSet $targetResourceSet,
+        $targetEntityInstance,
+        $navPropName
+    ) {
+        $relation = $this->isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName);
+        assert($sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model);
+
+        if ($relation instanceof BelongsTo) {
+            $relation->dissociate();
+        } elseif ($relation instanceof BelongsToMany) {
+            $relation->detach($targetEntityInstance);
+        } elseif ($relation instanceof HasOneOrMany) {
+            // dig up inverse property name, so we can pass it to unhookSingleModel with source and target elements
+            // swapped
+            $otherPropName = $this->getMetadataProvider()
+                ->resolveReverseProperty($sourceEntityInstance, $targetEntityInstance, $navPropName);
+            if (null === $otherPropName) {
+                $msg = 'Bad navigation property, '.$navPropName.', on source model '.get_class($sourceEntityInstance);
+                throw new \InvalidArgumentException($msg);
+            }
+            $this->unhookSingleModel(
+                $targetResourceSet,
+                $targetEntityInstance,
+                $sourceResourceSet,
+                $sourceEntityInstance,
+                $otherPropName
+            );
+        }
+        return true;
+    }
+
+    /**
+     * @param $sourceEntityInstance
+     * @param $targetEntityInstance
+     * @param $navPropName
+     * @return Relation
+     * @throws \InvalidArgumentException
+     */
+    protected function isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName)
+    {
+        if (!$sourceEntityInstance instanceof Model || !$targetEntityInstance instanceof Model) {
+            $msg = 'Both source and target must be Eloquent models';
+            throw new \InvalidArgumentException($msg);
+        }
+        $relation = $sourceEntityInstance->$navPropName();
+        if (!$relation instanceof Relation) {
+            $msg = 'Navigation property must be an Eloquent relation';
+            throw new \InvalidArgumentException($msg);
+        }
+        $targType = $relation->getRelated();
+        if (!$targetEntityInstance instanceof $targType) {
+            $msg = 'Target instance must be of type compatible with relation declared in method '.$navPropName;
+            throw new \InvalidArgumentException($msg);
+        }
+        return $relation;
     }
 }

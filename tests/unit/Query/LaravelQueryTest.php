@@ -4,9 +4,20 @@ namespace AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
+use AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
+use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
+use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
+use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 
@@ -63,7 +74,7 @@ class LaravelQueryTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-//        $this->object = new \AlgoWeb\PODataLaravel\Query\LaravelQuery();
+        //$this->object = new \AlgoWeb\PODataLaravel\Query\LaravelQuery();
         $this->mapping = [
             TestModel::class =>
                 [
@@ -1451,6 +1462,299 @@ class LaravelQueryTest extends TestCase
 
         $result = $foo->getResourceFromRelatedResourceSet($source, $entity, $target, $rProp, $key);
         $this->assertNull($result);
+    }
+
+    public function testHookSingleModelWithBothModelsNull()
+    {
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+        $srcInstance = null;
+        $targInstance = null;
+        $navPropName = 'metadata';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial();
+
+        $expected = 'Both source and target must be Eloquent models';
+        $actual = null;
+
+        try {
+            $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
+        } catch (\InvalidArgumentException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testUnhookSingleModelWithBothModelsNull()
+    {
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+        $srcInstance = null;
+        $targInstance = null;
+        $navPropName = 'metadata';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial();
+
+        $expected = 'Both source and target must be Eloquent models';
+        $actual = null;
+
+        try {
+            $foo->unhookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
+        } catch (\InvalidArgumentException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testHookSingleModelWithBadRelation()
+    {
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+        $srcInstance = $this->generateTestModelWithMetadata();
+        $targInstance = $this->generateTestModelWithMetadata();
+        $navPropName = 'metadata';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial();
+
+        $expected = 'Navigation property must be an Eloquent relation';
+        $actual = null;
+
+        try {
+            $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
+        } catch (\InvalidArgumentException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testHookSingleModelWithMispointedRelation()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+        $srcInstance = new TestMonomorphicSource($meta);
+        $targInstance = new TestMonomorphicSource($meta);
+        $navPropName = 'manySource';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial();
+
+        $expected = 'Target instance must be of type compatible with relation declared in method '.$navPropName;
+        $actual = null;
+
+        try {
+            $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
+        } catch (\InvalidArgumentException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testHookSingleModelOneToOneOrMany()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMonomorphicTarget($meta);
+        $hasMany = m::mock(HasMany::class)->makePartial();
+        $hasMany->shouldReceive('getRelated')->andReturn($relInstance);
+        $hasMany->shouldReceive('save')->andReturn(null)->once();
+        $srcInstance = m::mock(TestMonomorphicSource::class)->makePartial();
+        $targInstance = new TestMonomorphicTarget($meta);
+        $navPropName = 'manySource';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('isModelHookInputsOk')->andReturn($hasMany);
+
+        $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
+    }
+
+    public function testHookSingleModelMorphOneToOneOrMany()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMorphTarget($meta);
+        $morphOne = m::mock(MorphOne::class)->makePartial();
+        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
+        $morphOne->shouldReceive('save')->andReturn(null)->once();
+        $srcInstance = m::mock(TestMorphOneSource::class)->makePartial();
+        $targInstance = new TestMorphTarget($meta);
+        $navPropName = 'morphTarget';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+
+        $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
+    }
+
+    public function testHookSingleModelMorphManyToMany()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMorphManyToManyTarget($meta);
+        $morphToMany = m::mock(MorphToMany::class)->makePartial();
+        $morphToMany->shouldReceive('getRelated')->andReturn($relInstance);
+        $morphToMany->shouldReceive('attach')->andReturn(null)->once();
+        $srcInstance = m::mock(TestMorphManyToManySource::class)->makePartial();
+        $targInstance = new TestMorphManyToManyTarget($meta);
+        $navPropName = 'morphTarget';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphToMany);
+
+        $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
+    }
+
+    public function testHookSingleModelFromKnownPolymorphicSide()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMorphOneSource($meta);
+        $morphOne = m::mock(MorphTo::class)->makePartial();
+        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
+        $morphOne->shouldReceive('associate')->andReturn(null)->once();
+        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
+        $targInstance = new TestMorphOneSource($meta);
+        $navPropName = 'morphTarget';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+
+        $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
+    }
+
+    public function testUnhookSingleModelFromParentSide()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relParent = new TestMonomorphicTarget($meta);
+        $relChild = new TestMonomorphicSource($meta);
+
+        $hasMany = m::mock(HasMany::class)->makePartial();
+        $hasMany->shouldReceive('getRelated')->andReturn($relParent)->once();
+
+        $belongsTo = m::mock(BelongsTo::class)->makePartial();
+        $belongsTo->shouldReceive('getRelated')->andReturn($relChild)->once();
+        $belongsTo->shouldReceive('dissociate')->andReturn(null)->once();
+
+        $parent = m::mock(TestMonomorphicSource::class)->makePartial();
+        $parent->shouldReceive('manySource')->andReturn($hasMany)->atLeast(1);
+        $child = m::mock(TestMonomorphicTarget::class)->makePartial();
+        $child->shouldReceive('manyTarget')->andReturn($belongsTo)->atLeast(1);
+
+        $parentNavName = 'manySource';
+        $childNavName = 'manyTarget';
+
+        $metaProv = m::mock(MetadataProvider::class);
+        $metaProv->shouldReceive('resolveReverseProperty')->andReturn($childNavName);
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getMetadataProvider')->andReturn($metaProv);
+        $foo->unhookSingleModel($source, $parent, $target, $child, $parentNavName);
+    }
+
+    public function testUnhookModelWithUnresolvableOppositeRelation()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $hasMany = m::mock(HasMany::class)->makePartial();
+
+        $parent = new TestMonomorphicSource($meta);
+        $child = new TestMonomorphicTarget($meta);
+
+        $metaProv = m::mock(MetadataProvider::class);
+        $metaProv->shouldReceive('resolveReverseProperty')->andReturn(null);
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getMetadataProvider')->andReturn($metaProv);
+        $foo->shouldReceive('isModelHookInputsOk')->andReturn($hasMany);
+
+        $expected = 'Bad navigation property, manySource, on source model '
+                    .'AlgoWeb\PODataLaravel\Models\TestMonomorphicSource';
+        $actual = null;
+
+        try {
+            $foo->unhookSingleModel($source, $parent, $target, $child, 'manySource');
+        } catch (\InvalidArgumentException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testUnhookModelManyToMany()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $srcInstance = new TestMorphManyToManySource($meta);
+        $targInstance = new TestMorphManyToManyTarget($meta);
+
+        $manyToMany = m::mock(BelongsToMany::class)->makePartial();
+        $manyToMany->shouldReceive('detach')->andReturn(null)->once();
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('isModelHookInputsOk')->andReturn($manyToMany)->once();
+
+        $foo->unhookSingleModel($source, $srcInstance, $target, $targInstance, 'manySource');
     }
 
     private function seedControllerMetadata(TestController $controller = null)

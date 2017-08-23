@@ -20,6 +20,7 @@ class MetadataProvider extends MetadataBaseProvider
 {
     protected $multConstraints = [ '0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
     protected static $metaNAMESPACE = 'Data';
+    protected static $relationCache;
     const POLYMORPHIC = 'polyMorphicPlaceholder';
     const POLYMORPHIC_PLURAL = 'polyMorphicPlaceholders';
 
@@ -49,6 +50,7 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
         $meta = App::make('metadata');
+        $this->reset();
 
         $stdRef = new \ReflectionClass(Model::class);
         $abstract = $meta->addEntityType($stdRef, static::POLYMORPHIC, true, null);
@@ -245,45 +247,50 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function getRepairedRoundTripRelations()
     {
-        $rels = $this->calculateRoundTripRelations();
-        $groups = $this->getPolymorphicRelationGroups();
+        if (!isset(self::$relationCache)) {
+            $rels = $this->calculateRoundTripRelations();
+            $groups = $this->getPolymorphicRelationGroups();
 
-        if (0 === count($groups)) {
-            return $rels;
-        }
-
-        $placeholder = static::POLYMORPHIC;
-
-        $groupKeys = array_keys($groups);
-
-        // we have at least one polymorphic relation, need to dig it out
-        $numRels = count($rels);
-        for ($i = 0; $i < $numRels; $i++) {
-            $relation = $rels[$i];
-            $principalType = $relation['principalType'];
-            $dependentType = $relation['dependentType'];
-            $principalPoly = in_array($principalType, $groupKeys);
-            $dependentPoly = in_array($dependentType, $groupKeys);
-            // if relation is not polymorphic, then move on
-            if (!($principalPoly || $dependentPoly)) {
-                continue;
-            } else {
-                // if only one end is a known end of a polymorphic relation
-                // for moment we're punting on both
-                $oneEnd = $principalPoly !== $dependentPoly;
-                assert($oneEnd, 'Multi-generational polymorphic relation chains not implemented');
-                $targRels = $principalPoly ? $groups[$principalType] : $groups[$dependentType];
-                $targUnknown = $targRels[$principalPoly ? $dependentType : $principalType];
-                $targProperty = $principalPoly ? $relation['dependentProp'] : $relation['principalProp'];
-                $msg = 'Specified unknown-side property ' . $targProperty . ' not found in polymorphic relation map';
-                assert(in_array($targProperty, $targUnknown), $msg);
-
-                $targType = $principalPoly ? 'dependentRSet' : 'principalRSet';
-                $rels[$i][$targType] = $placeholder;
-                continue;
+            if (0 === count($groups)) {
+                self::$relationCache = $rels;
+                return $rels;
             }
+
+            $placeholder = static::POLYMORPHIC;
+
+            $groupKeys = array_keys($groups);
+
+            // we have at least one polymorphic relation, need to dig it out
+            $numRels = count($rels);
+            for ($i = 0; $i < $numRels; $i++) {
+                $relation = $rels[$i];
+                $principalType = $relation['principalType'];
+                $dependentType = $relation['dependentType'];
+                $principalPoly = in_array($principalType, $groupKeys);
+                $dependentPoly = in_array($dependentType, $groupKeys);
+                // if relation is not polymorphic, then move on
+                if (!($principalPoly || $dependentPoly)) {
+                    continue;
+                } else {
+                    // if only one end is a known end of a polymorphic relation
+                    // for moment we're punting on both
+                    $oneEnd = $principalPoly !== $dependentPoly;
+                    assert($oneEnd, 'Multi-generational polymorphic relation chains not implemented');
+                    $targRels = $principalPoly ? $groups[$principalType] : $groups[$dependentType];
+                    $targUnknown = $targRels[$principalPoly ? $dependentType : $principalType];
+                    $targProperty = $principalPoly ? $relation['dependentProp'] : $relation['principalProp'];
+                    $msg = 'Specified unknown-side property ' . $targProperty
+                           . ' not found in polymorphic relation map';
+                    assert(in_array($targProperty, $targUnknown), $msg);
+
+                    $targType = $principalPoly ? 'dependentRSet' : 'principalRSet';
+                    $rels[$i][$targType] = $placeholder;
+                    continue;
+                }
+            }
+            self::$relationCache = $rels;
         }
-        return $rels;
+        return self::$relationCache;
     }
 
     /**
@@ -588,5 +595,41 @@ class MetadataProvider extends MetadataBaseProvider
             }
         }
         return;
+    }
+
+    public function reset()
+    {
+        self::$relationCache = null;
+    }
+
+    /**
+     * Resolve possible reverse relation property names
+     *
+     * @param Model $source
+     * @param Model $target
+     * @param $propName
+     * @return string|null
+     */
+    public function resolveReverseProperty(Model $source, Model $target, $propName)
+    {
+        assert(is_string($propName), 'Property name must be string');
+        $relations = $this->getRepairedRoundTripRelations();
+
+        $sourceName = get_class($source);
+        $targName = get_class($target);
+
+        $filter = function ($segment) use ($sourceName, $targName, $propName) {
+            $match = $sourceName == $segment['principalType'];
+            $match &= $targName == $segment['dependentType'];
+            $match &= $propName == $segment['principalProp'];
+
+            return $match;
+        };
+
+        // array_filter does not reset keys - we have to do it ourselves
+        $trim = array_values(array_filter($relations, $filter));
+        $result = 0 === count($trim) ? null : $trim[0]['dependentProp'];
+
+        return $result;
     }
 }

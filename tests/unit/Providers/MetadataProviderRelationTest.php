@@ -410,6 +410,7 @@ class MetadataProviderRelationTest extends TestCase
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('calculateRoundTripRelations')->andReturn($expected);
         $foo->shouldReceive('getPolymorphicRelationGroups')->andReturn([]);
+        $foo->reset();
 
         $actual = $foo->getRepairedRoundTripRelations();
         $this->assertEquals($expected, $actual);
