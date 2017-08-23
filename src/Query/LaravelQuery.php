@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\DB;
 use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
@@ -501,7 +502,22 @@ class LaravelQuery implements IQueryProvider
         ResourceSet $sourceResourceSet,
         array $data
     ) {
-        // TODO: Implement createBulkResourceforResourceSet() method.
+        $result = [];
+        try {
+            DB::beginTransaction();
+            foreach ($data as $newItem) {
+                $raw = $this->createResourceforResourceSet($sourceResourceSet, null, $newItem);
+                if (null === $raw) {
+                    throw new \Exception('Bulk model creation failed');
+                }
+                $result[] = $raw;
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        return $result;
     }
 
     /**
@@ -522,7 +538,30 @@ class LaravelQuery implements IQueryProvider
         array $data,
         $shouldUpdate = false
     ) {
-        // TODO: Implement updateBulkResource() method.
+        $numKeys = count($keyDescriptor);
+        if ($numKeys !== count($data)) {
+            $msg = 'Key descriptor array and data array must be same length';
+            throw new \InvalidArgumentException($msg);
+        }
+        $result = [];
+
+        try {
+            DB::beginTransaction();
+            for ($i = 0; $i < $numKeys; $i++) {
+                $newItem = $data[$i];
+                $newKey = $keyDescriptor[$i];
+                $raw = $this->updateResource($sourceResourceSet, $sourceEntityInstance, $newKey, $newItem);
+                if (null === $raw) {
+                    throw new \Exception('Bulk model update failed');
+                }
+                $result[] = $raw;
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        return $result;
     }
 
     /**
