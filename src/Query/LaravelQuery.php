@@ -532,6 +532,10 @@ class LaravelQuery implements IQueryProvider
                     }
                     $result[] = $raw;
                 }
+            } else {
+                $keyDescriptor = null;
+                $pastVerb = 'created';
+                $result = $this->processBulkCustom($sourceResourceSet, $data, $mapping, $pastVerb, $keyDescriptor);
             }
             DB::commit();
         } catch (\Exception $e) {
@@ -582,6 +586,9 @@ class LaravelQuery implements IQueryProvider
                     }
                     $result[] = $raw;
                 }
+            } else {
+                $pastVerb = 'updated';
+                $result = $this->processBulkCustom($sourceResourceSet, $data, $mapping, $pastVerb, $keyDescriptor);
             }
             DB::commit();
         } catch (\Exception $e) {
@@ -711,5 +718,82 @@ class LaravelQuery implements IQueryProvider
         assert($type instanceof \ReflectionClass, get_class($type));
         $modelName = $type->getName();
         return $this->getControllerContainer()->getMapping($modelName, $verbName);
+    }
+
+    /**
+     * Prepare bulk request from supplied data.  If $keyDescriptors is not null, its elements are assumed to
+     * correspond 1-1 to those in $data.
+     *
+     * @param $paramList
+     * @param array $data
+     * @param KeyDescriptor[]|null $keyDescriptors
+     */
+    protected function prepareBulkRequestInput($paramList, array $data, array $keyDescriptors = null)
+    {
+        $parms = [];
+        $isCreate = null === $keyDescriptors;
+
+        // for moment, we're only processing parameters of type Request
+        foreach ($paramList as $spec) {
+            $varType = isset($spec['type']) ? $spec['type'] : null;
+            $varName = $spec['name'];
+            if (null !== $varType) {
+                $var = new $varType();
+                if ($spec['isRequest']) {
+                    $var->setMethod($isCreate ? 'POST' : 'PUT');
+                    $bulkData = [ 'data' => $data];
+                    if (null !== $keyDescriptors) {
+                        $keys = [];
+                        foreach ($keyDescriptors as $desc) {
+                            assert($desc instanceof KeyDescriptor, get_class($desc));
+                            $keys[] = $desc->getNamedValues();
+                        }
+                        $bulkData['keys'] = $keys;
+                    }
+                    $var->request = new \Symfony\Component\HttpFoundation\ParameterBag($bulkData);
+                }
+                $parms[] = $var;
+            }
+        }
+        return $parms;
+    }
+
+    /**
+     * @param ResourceSet $sourceResourceSet
+     * @param array $data
+     * @param $mapping
+     * @param $pastVerb
+     * @param array $keyDescriptor
+     * @return array
+     * @throws ODataException
+     */
+    protected function processBulkCustom(
+        ResourceSet $sourceResourceSet,
+        array $data,
+        $mapping,
+        $pastVerb,
+        array $keyDescriptor = null
+    ) {
+        $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
+        $controlClass = $mapping['controller'];
+        $method = $mapping['method'];
+        $paramList = $mapping['parameters'];
+        $controller = App::make($controlClass);
+        $parms = $this->prepareBulkRequestInput($paramList, $data, $keyDescriptor);
+
+        $callResult = call_user_func_array(array($controller, $method), $parms);
+        $payload = $this->createUpdateDeleteProcessOutput($callResult);
+        $success = isset($payload['id']) && is_array($payload['id']);
+
+        if ($success) {
+            try {
+                $result = $class::findMany($payload['id'])->toArray()[0];
+                return $result;
+            } catch (\Exception $e) {
+                throw new ODataException($e->getMessage(), 500);
+            }
+        } else {
+            throw new ODataException('Target models not successfully ' . $pastVerb, 422);
+        }
     }
 }
