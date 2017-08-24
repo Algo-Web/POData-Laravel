@@ -51,7 +51,7 @@ class MetadataControllerProviderTest extends TestCase
         $this->assertTrue(is_array($result));
         $inner = $result[TestModel::class];
         $this->assertTrue(is_array($inner));
-        $this->assertEquals(4, count($inner));
+        $this->assertEquals(6, count($inner));
         foreach ($expectedMap as $verb => $gubbins) {
             $this->assertTrue(isset($inner[$verb]) && is_array($inner[$verb]));
             $this->assertEquals($gubbins['method'], $inner[$verb]['method']);
@@ -94,7 +94,7 @@ class MetadataControllerProviderTest extends TestCase
         $this->assertTrue(is_array($result));
         $inner = $result[TestModel::class];
         $this->assertTrue(is_array($inner));
-        $this->assertEquals(4, count($inner));
+        $this->assertEquals(6, count($inner));
         foreach ($expectedMap as $verb => $gubbins) {
             $this->assertTrue(isset($inner[$verb]) && is_array($inner[$verb]));
             $this->assertEquals($gubbins['method'], $inner[$verb]['method']);
@@ -122,6 +122,57 @@ class MetadataControllerProviderTest extends TestCase
 
         $expected = 'assert(): Mapping already defined for model AlgoWeb\PODataLaravel\Models\TestModel'
                     .' and CRUD verb create failed';
+        $actual = null;
+
+        try {
+            $foo->boot();
+        } catch (\ErrorException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testMapAssemblyWithSoftCollisionOnOptionalVerb()
+    {
+        $controller1 = new TestController();
+        $controller2 = new ElectricBoogalooController();
+        $mapping = $controller2->getMapping();
+        $mapping[TestModel::class]['bulkCreate'] = 'storeTestModel';
+        $controller2->setMapping($mapping);
+
+        $container = m::mock(MetadataControllerContainer::class)->makePartial();
+        App::instance('metadataControllers', $container);
+
+        $foo = m::mock(MetadataControllerProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getCandidateControllers')->andReturn([$controller1, $controller2])->once();
+
+        $foo->boot();
+
+        $actual = $container->getMapping(TestModel::class, 'bulkCreate');
+        $this->assertEquals('storeTestModel', $actual['method']);
+        $this->assertEquals(ElectricBoogalooController::class, $actual['controller']);
+    }
+
+    public function testMapAssemblyWithHardCollisionOnOptionalVerb()
+    {
+        $controller1 = new TestController();
+        $mapping = $controller1->getMapping();
+        $mapping[TestModel::class]['bulkCreate'] = 'storeTestModel';
+        $controller1->setMapping($mapping);
+        unset($mapping);
+        $controller2 = new ElectricBoogalooController();
+        $mapping = $controller2->getMapping();
+        $mapping[TestModel::class]['bulkCreate'] = 'storeTestModel';
+        $controller2->setMapping($mapping);
+
+        $container = m::mock(MetadataControllerContainer::class)->makePartial();
+        App::instance('metadataControllers', $container);
+
+        $foo = m::mock(MetadataControllerProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getCandidateControllers')->andReturn([$controller1, $controller2])->once();
+
+        $expected = 'assert(): Mapping already defined for model AlgoWeb\PODataLaravel\Models\TestModel'
+                    .' and CRUD verb bulkCreate failed';
         $actual = null;
 
         try {

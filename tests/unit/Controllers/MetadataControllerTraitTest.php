@@ -85,6 +85,53 @@ class MetadataControllerTraitTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testGetMethodUndefinedOptionalCrudVerbBulkCreate()
+    {
+        $foo = new TestController();
+
+        $actual = $foo->getMethodName(TestModel::class, 'bulkCreate');
+        $this->assertNull($actual);
+    }
+
+    public function testGetMethodUndefinedOptionalCrudVerbBulkUpdate()
+    {
+        $foo = new TestController();
+
+        $actual = $foo->getMethodName(TestModel::class, 'bulkUpdate');
+        $this->assertNull($actual);
+    }
+
+    public function testGetMethodBulkCreateDefined()
+    {
+        $foo = new TestController();
+        $foo->setMapping([TestModel::class => ['bulkCreate' => 'storeTestModel']]);
+
+        $expected = [
+            'method' => 'storeTestModel',
+            'controller' => TestController::class,
+            'parameters' => ['request' => ['name' => 'request', 'type' => TestRequest::class, 'isRequest' => true]]
+        ];
+        $actual = $foo->getMethodName(TestModel::class, 'bulkCreate');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetMethodBulkUpdateDefined()
+    {
+        $foo = new TestController();
+        $foo->setMapping([TestModel::class => ['bulkUpdate' => 'updateTestModel']]);
+
+        $expected = [
+            'method' => 'updateTestModel',
+            'controller' => TestController::class,
+            'parameters' => [
+                'request' => ['name' => 'request', 'type' => TestRequest::class, 'isRequest' => true],
+                'id' => ['name' => 'id', 'isRequest' => false]
+            ]
+        ];
+        $actual = $foo->getMethodName(TestModel::class, 'bulkUpdate');
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testModelMappingNotArray()
     {
         $foo = new TestController();
@@ -235,5 +282,15 @@ class MetadataControllerTraitTest extends TestCase
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetMappingsWithOptionalsUndefined()
+    {
+        $foo = new TestController();
+        $map = $foo->getMappings();
+        $this->assertTrue(array_key_exists('bulkCreate', $map[TestModel::class]));
+        $this->assertTrue(array_key_exists('bulkUpdate', $map[TestModel::class]));
+        $this->assertNull($map[TestModel::class]['bulkCreate']);
+        $this->assertNull($map[TestModel::class]['bulkUpdate']);
     }
 }

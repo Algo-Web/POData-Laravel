@@ -12,6 +12,11 @@ trait MetadataControllerTrait
     protected $crudVerbs = ['create', 'read', 'update', 'delete'];
 
     /*
+     * Optional crud verbs - if these are unset in mapping array, LaravelQuery drops through to default handler
+     */
+    protected $optionalVerbs = ['bulkCreate', 'bulkUpdate'];
+
+    /*
      * Array to record mapping betweeen model-verb combos and names
      * First-level key is fully-qualified model name
      * (eg Alt\Swedish\Chef\Bork\Bork\Bork)
@@ -24,7 +29,7 @@ trait MetadataControllerTrait
      *
      * @param $modelName
      * @param $crudVerb
-     * @return array
+     * @return array\null
      * @throws \Exception
      */
     public function getMethodName($modelName, $crudVerb)
@@ -39,6 +44,7 @@ trait MetadataControllerTrait
         }
 
         $this->checkCrudVerbDefined($crudVerb);
+        $isOptional = in_array($crudVerb, $this->optionalVerbs);
 
         $lookup = $this->mapping[$modelName];
         if (!is_array($lookup)) {
@@ -46,6 +52,10 @@ trait MetadataControllerTrait
         }
 
         if (!array_key_exists($crudVerb, $lookup)) {
+            if ($isOptional) {
+                // optional crud verbs don't have to be defined - so we can return null
+                return null;
+            }
             throw new \Exception('Metadata mapping for CRUD verb '.$crudVerb.' on model '.$modelName.' not defined');
         }
         $result = $lookup[$crudVerb];
@@ -99,6 +109,16 @@ trait MetadataControllerTrait
                 $allMappings[$key][$verb] = ['method' => $method, 'controller' => $class, 'parameters' => $parmArray];
             }
         }
+        // bolt on optional, undefined mappings - empty mappings will need to be deduplicated in metadata controller
+        // provider
+        $mapKeys = array_keys($this->mapping);
+        foreach ($mapKeys as $map) {
+            $undefined = array_diff($this->optionalVerbs, array_keys($this->mapping[$map]));
+            foreach ($undefined as $undef) {
+                $allMappings[$map][$undef] = null;
+            }
+        }
+
         return $allMappings;
     }
 
@@ -137,7 +157,8 @@ trait MetadataControllerTrait
     private function checkCrudVerbDefined($crudVerb)
     {
         assert(is_string($crudVerb));
-        if (!in_array(strtolower($crudVerb), $this->crudVerbs)) {
+        $lowVerb = strtolower($crudVerb);
+        if (!in_array($lowVerb, $this->crudVerbs) && !in_array($crudVerb, $this->optionalVerbs)) {
             throw new \Exception('CRUD verb ' . $crudVerb . ' not defined');
         }
     }
