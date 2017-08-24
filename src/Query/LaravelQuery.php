@@ -585,7 +585,10 @@ class LaravelQuery implements IQueryProvider
         $navPropName
     ) {
         $relation = $this->isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName);
-        assert($sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model);
+        assert(
+            $sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model,
+            'Both input entities must be Eloquent models'
+        );
 
         if ($relation instanceof BelongsTo) {
             $relation->associate($targetEntityInstance);
@@ -616,7 +619,10 @@ class LaravelQuery implements IQueryProvider
         $navPropName
     ) {
         $relation = $this->isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName);
-        assert($sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model);
+        assert(
+            $sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model,
+            'Both input entities must be Eloquent models'
+        );
 
         if ($relation instanceof BelongsTo) {
             $relation->dissociate();

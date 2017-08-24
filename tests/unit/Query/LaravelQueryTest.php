@@ -1630,7 +1630,7 @@ class LaravelQueryTest extends TestCase
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphToMany);
 
-        $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
+        $this->assertTrue($foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName));
     }
 
     public function testHookSingleModelFromKnownPolymorphicSide()
@@ -1656,7 +1656,109 @@ class LaravelQueryTest extends TestCase
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
 
-        $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
+        $this->assertTrue($foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName));
+    }
+
+    public function testHookSingleModelBothInputsNotModel()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMorphOneSource($meta);
+        $morphOne = m::mock(MorphTo::class)->makePartial();
+        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
+        $morphOne->shouldReceive('associate')->andReturn(null)->never();
+        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
+        $targInstance = new TestMorphOneSource($meta);
+        $navPropName = 'morphTarget';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+
+        $expected = 'assert(): Both input entities must be Eloquent models failed';
+        $actual = null;
+
+        try {
+            $foo->hookSingleModel($source, null, $target, null, $navPropName);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testHookSingleModelFirstInputNotModel()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMorphOneSource($meta);
+        $morphOne = m::mock(MorphTo::class)->makePartial();
+        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
+        $morphOne->shouldReceive('associate')->andReturn(null)->never();
+        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
+        $targInstance = new TestMorphOneSource($meta);
+        $navPropName = 'morphTarget';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+
+        $expected = 'assert(): Both input entities must be Eloquent models failed';
+        $actual = null;
+
+        try {
+            $foo->hookSingleModel($source, null, $target, $targInstance, $navPropName);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testHookSingleModelSecondInputNotModel()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMorphOneSource($meta);
+        $morphOne = m::mock(MorphTo::class)->makePartial();
+        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
+        $morphOne->shouldReceive('associate')->andReturn(null)->never();
+        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
+        $targInstance = new TestMorphOneSource($meta);
+        $navPropName = 'morphTarget';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+
+        $expected = 'assert(): Both input entities must be Eloquent models failed';
+        $actual = null;
+
+        try {
+            $foo->hookSingleModel($source, $srcInstance, $target, null, $navPropName);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 
     public function testUnhookSingleModelFromParentSide()
@@ -1694,7 +1796,7 @@ class LaravelQueryTest extends TestCase
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getMetadataProvider')->andReturn($metaProv);
-        $foo->unhookSingleModel($source, $parent, $target, $child, $parentNavName);
+        $this->assertTrue($foo->unhookSingleModel($source, $parent, $target, $child, $parentNavName));
     }
 
     public function testUnhookModelWithUnresolvableOppositeRelation()
@@ -1754,7 +1856,109 @@ class LaravelQueryTest extends TestCase
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('isModelHookInputsOk')->andReturn($manyToMany)->once();
 
-        $foo->unhookSingleModel($source, $srcInstance, $target, $targInstance, 'manySource');
+        $this->assertTrue($foo->unhookSingleModel($source, $srcInstance, $target, $targInstance, 'manySource'));
+    }
+
+    public function testUnhookSingleModelBothInputsNotModel()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMorphOneSource($meta);
+        $morphOne = m::mock(MorphTo::class)->makePartial();
+        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
+        $morphOne->shouldReceive('associate')->andReturn(null)->never();
+        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
+        $targInstance = new TestMorphOneSource($meta);
+        $navPropName = 'morphTarget';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+
+        $expected = 'assert(): Both input entities must be Eloquent models failed';
+        $actual = null;
+
+        try {
+            $foo->unhookSingleModel($source, null, $target, null, $navPropName);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testUnhookSingleModelFirstInputNotModel()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMorphOneSource($meta);
+        $morphOne = m::mock(MorphTo::class)->makePartial();
+        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
+        $morphOne->shouldReceive('associate')->andReturn(null)->never();
+        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
+        $targInstance = new TestMorphOneSource($meta);
+        $navPropName = 'morphTarget';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+
+        $expected = 'assert(): Both input entities must be Eloquent models failed';
+        $actual = null;
+
+        try {
+            $foo->unhookSingleModel($source, null, $target, $targInstance, $navPropName);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testUnhookSingleModelSecondInputNotModel()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMorphOneSource($meta);
+        $morphOne = m::mock(MorphTo::class)->makePartial();
+        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
+        $morphOne->shouldReceive('associate')->andReturn(null)->never();
+        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
+        $targInstance = new TestMorphOneSource($meta);
+        $navPropName = 'morphTarget';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+
+        $expected = 'assert(): Both input entities must be Eloquent models failed';
+        $actual = null;
+
+        try {
+            $foo->unhookSingleModel($source, $srcInstance, $target, null, $navPropName);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 
     private function seedControllerMetadata(TestController $controller = null)

@@ -29,7 +29,7 @@ trait MetadataControllerTrait
      *
      * @param $modelName
      * @param $crudVerb
-     * @return array\null
+     * @return null|array
      * @throws \Exception
      */
     public function getMethodName($modelName, $crudVerb)
