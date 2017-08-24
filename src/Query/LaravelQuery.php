@@ -736,7 +736,6 @@ class LaravelQuery implements IQueryProvider
         // for moment, we're only processing parameters of type Request
         foreach ($paramList as $spec) {
             $varType = isset($spec['type']) ? $spec['type'] : null;
-            $varName = $spec['name'];
             if (null !== $varType) {
                 $var = new $varType();
                 if ($spec['isRequest']) {
@@ -763,7 +762,7 @@ class LaravelQuery implements IQueryProvider
      * @param array $data
      * @param $mapping
      * @param $pastVerb
-     * @param array $keyDescriptor
+     * @param KeyDescriptor[]|null $keyDescriptor
      * @return array
      * @throws ODataException
      */
