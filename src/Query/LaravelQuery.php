@@ -2,7 +2,9 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
+use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
+use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -39,6 +41,7 @@ class LaravelQuery implements IQueryProvider
     public $queryProviderClassName;
     private $verbMap = [];
     protected $metadataProvider;
+    protected $controllerContainer;
 
     public function __construct(AuthInterface $auth = null)
     {
@@ -51,6 +54,7 @@ class LaravelQuery implements IQueryProvider
         $this->verbMap['update'] = ActionVerb::UPDATE();
         $this->verbMap['delete'] = ActionVerb::DELETE();
         $this->metadataProvider = new MetadataProvider(App::make('app'));
+        $this->controllerContainer = App::make('metadataControllers');
     }
 
     /**
@@ -93,6 +97,17 @@ class LaravelQuery implements IQueryProvider
     public function getMetadataProvider()
     {
         return $this->metadataProvider;
+    }
+
+    /**
+     * Dig out local copy of controller metadata mapping
+     *
+     * @return MetadataControllerContainer
+     */
+    public function getControllerContainer()
+    {
+        assert(null !== $this->controllerContainer, get_class($this->controllerContainer));
+        return $this->controllerContainer;
     }
 
     /**
@@ -503,15 +518,20 @@ class LaravelQuery implements IQueryProvider
         ResourceSet $sourceResourceSet,
         array $data
     ) {
+        $verbName = 'bulkCreate';
+        $mapping = $this->getOptionalVerbMapping($sourceResourceSet, $verbName);
+
         $result = [];
         try {
             DB::beginTransaction();
-            foreach ($data as $newItem) {
-                $raw = $this->createResourceforResourceSet($sourceResourceSet, null, $newItem);
-                if (null === $raw) {
-                    throw new \Exception('Bulk model creation failed');
+            if (null === $mapping) {
+                foreach ($data as $newItem) {
+                    $raw = $this->createResourceforResourceSet($sourceResourceSet, null, $newItem);
+                    if (null === $raw) {
+                        throw new \Exception('Bulk model creation failed');
+                    }
+                    $result[] = $raw;
                 }
-                $result[] = $raw;
             }
             DB::commit();
         } catch (\Exception $e) {
@@ -547,16 +567,21 @@ class LaravelQuery implements IQueryProvider
         }
         $result = [];
 
+        $verbName = 'bulkUpdate';
+        $mapping = $this->getOptionalVerbMapping($sourceResourceSet, $verbName);
+
         try {
             DB::beginTransaction();
-            for ($i = 0; $i < $numKeys; $i++) {
-                $newItem = $data[$i];
-                $newKey = $keyDescriptor[$i];
-                $raw = $this->updateResource($sourceResourceSet, $sourceEntityInstance, $newKey, $newItem);
-                if (null === $raw) {
-                    throw new \Exception('Bulk model update failed');
+            if (null === $mapping) {
+                for ($i = 0; $i < $numKeys; $i++) {
+                    $newItem = $data[$i];
+                    $newKey = $keyDescriptor[$i];
+                    $raw = $this->updateResource($sourceResourceSet, $sourceEntityInstance, $newKey, $newItem);
+                    if (null === $raw) {
+                        throw new \Exception('Bulk model update failed');
+                    }
+                    $result[] = $raw;
                 }
-                $result[] = $raw;
             }
             DB::commit();
         } catch (\Exception $e) {
@@ -672,5 +697,19 @@ class LaravelQuery implements IQueryProvider
             throw new \InvalidArgumentException($msg);
         }
         return $relation;
+    }
+
+    /**
+     * @param ResourceSet $sourceResourceSet
+     * @return array|null
+     * @param $verbName
+     */
+    protected function getOptionalVerbMapping(ResourceSet $sourceResourceSet, $verbName)
+    {
+        // dig up target class name
+        $type = $sourceResourceSet->getResourceType()->getInstanceType();
+        assert($type instanceof \ReflectionClass, get_class($type));
+        $modelName = $type->getName();
+        return $this->getControllerContainer()->getMapping($modelName, $verbName);
     }
 }
