@@ -76,6 +76,21 @@ class TestModel extends Model
         }
     }
 
+    public static function findMany(array $id, $columns = ['*'])
+    {
+        if (0 == count($id)) {
+            throw (new ModelNotFoundException)->setModel(TestModel::class);
+        } else {
+            $result = [];
+            for ($i = 0; $i < count($id); $i++) {
+                $model = new self;
+                $model->id = $id[$i];
+                $result[] = $model;
+            }
+            return collect([$result]);
+        }
+    }
+
     public function metadata()
     {
         if (isset($this->metaArray)) {

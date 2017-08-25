@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\App;
 
 class MetadataControllerProvider extends MetadataBaseProvider
 {
+    /*
+     * Optional crud verbs - these need to be deduplicated for empty mappings
+     */
+    protected $optionalVerbs = ['bulkCreate', 'bulkUpdate'];
+
     /**
      * Bootstrap the application services.  Post-boot.
      *
@@ -50,8 +55,14 @@ class MetadataControllerProvider extends MetadataBaseProvider
                 }
                 // if we do, make sure we aren't re-adding mappings for any of the CRUD verbs
                 foreach ($lock as $barrel => $roll) {
+                    $isOptional = in_array($barrel, $this->optionalVerbs);
+                    $alreadyKey = array_key_exists($barrel, $metamix[$key]);
+                    if ($isOptional) {
+                        // if we've picked up a default mapping for an optional verb, then we can overwrite it
+                        $alreadyKey = null === $metamix[$key][$barrel] ? false : $alreadyKey;
+                    }
                     assert(
-                        !array_key_exists($barrel, $metamix[$key]),
+                        !$alreadyKey,
                         'Mapping already defined for model '.$key.' and CRUD verb '.$barrel
                     );
                     $metamix[$key][$barrel] = $roll;
