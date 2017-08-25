@@ -507,8 +507,8 @@ trait MetadataTrait
 
     private function polyglotKeyMethodBackupNames($foo, $condition = false)
     {
-        $fkList = ['getForeignKey'];
-        $rkList = ['getOtherKey'];
+        $fkList = ['getForeignKey', 'getForeignKeyName'];
+        $rkList = ['getOtherKey', 'getQualifiedParentKeyName'];
 
         $fkMethodName = null;
         $rkMethodName = null;
@@ -519,21 +519,13 @@ trait MetadataTrait
                 $rkMethodName = $line['rk'];
             } else {
                 $methodList = get_class_methods(get_class($foo));
-                $fkMethodName = 'getForeignKeyName';
-                foreach ($fkList as $option) {
-                    if (in_array($option, $methodList)) {
-                        $fkMethodName = $option;
-                        break;
-                    }
-                }
+                $fkCombo = array_values(array_intersect($fkList, $methodList));
+                assert(1 <= count($fkCombo), 'Expected at least 1 element in foreign-key list, got '.count($fkCombo));
+                $fkMethodName = $fkCombo[0];
                 assert(in_array($fkMethodName, $methodList), 'Selected method, '.$fkMethodName.', not in method list');
-                $rkMethodName = 'getQualifiedParentKeyName';
-                foreach ($rkList as $option) {
-                    if (in_array($option, $methodList)) {
-                        $rkMethodName = $option;
-                        break;
-                    }
-                }
+                $rkCombo = array_values(array_intersect($rkList, $methodList));
+                assert(1 <= count($rkCombo), 'Expected at least 1 element in related-key list, got '.count($rkCombo));
+                $rkMethodName = $rkCombo[0];
                 assert(in_array($rkMethodName, $methodList), 'Selected method, '.$rkMethodName.', not in method list');
                 $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
                 static::$methodAlternate[get_class($foo)] = $line;
