@@ -2,6 +2,8 @@
 
 namespace AlgoWeb\PODataLaravel\Controllers;
 
+use AlgoWeb\PODataLaravel\Models\TestBulkCreateRequest;
+use AlgoWeb\PODataLaravel\Models\TestBulkUpdateRequest;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Requests\TestRequest;
 use Illuminate\Support\Facades\Validator;
@@ -62,6 +64,35 @@ class TestController extends \Illuminate\Routing\Controller
         return response()->json(['status' => 'error', 'id' => null, 'errors' => $validator->errors()]);
     }
 
+    public function storeBulkTestModel(TestBulkCreateRequest $request)
+    {
+        $data = $request->all();
+        $rules = $request->rules();
+        $msg = null;
+
+        // Validate the inputs
+        $validator = Validator::make($data, $rules);
+
+        if ($validator->passes()) {
+            $bulkData = $data['data'];
+            $isSuccess = true;
+            $idList = [];
+            foreach ($bulkData as $row) {
+                $isSuccess &= isset($row['success']) && true == $row['success'];
+                $idList[] = count($idList) + 1;
+            }
+            if ($isSuccess) {
+                return response()->json(['status' => 'success', 'id' => $idList, 'errors' => null]);
+            }
+
+            $error = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] 0';
+            $errors = new \Illuminate\Support\MessageBag([$error]);
+            return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
+        }
+
+        return response()->json(['status' => 'error', 'id' => null, 'errors' => $validator->errors()]);
+    }
+
     /**
      * Display the specified resource.
      *
@@ -105,6 +136,41 @@ class TestController extends \Illuminate\Routing\Controller
             $errors = new \Illuminate\Support\MessageBag([$err]);
             return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
         }
+        return response()->json(['status' => 'error', 'id' => null, 'errors' => $validator->errors()]);
+    }
+
+    public function updateBulkTestModel(TestBulkUpdateRequest $request)
+    {
+        $data = $request->all();
+        $rules = $request->rules();
+        $msg = null;
+
+        // Validate the inputs
+        $validator = Validator::make($data, $rules);
+
+        if ($validator->passes()) {
+            $bulkData = $data['data'];
+            $bulkKeys = $data['keys'];
+            $numKeys = count($bulkKeys);
+            $isSuccess = true;
+            $idList = [];
+
+            for ($i = 0; $i < $numKeys; $i ++) {
+                $row = $bulkData[$i];
+                $rawKey = $bulkKeys[$i];
+
+                $isSuccess &= isset($row['success']) && true == $row['success'];
+                $idList[] = $rawKey['id'];
+            }
+            if ($isSuccess) {
+                return response()->json(['status' => 'success', 'id' => $idList, 'errors' => null]);
+            }
+
+            $error = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] 0';
+            $errors = new \Illuminate\Support\MessageBag([$error]);
+            return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
+        }
+
         return response()->json(['status' => 'error', 'id' => null, 'errors' => $validator->errors()]);
     }
 
