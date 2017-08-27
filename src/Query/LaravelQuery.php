@@ -745,7 +745,12 @@ class LaravelQuery implements IQueryProvider
                         $keys = [];
                         foreach ($keyDescriptors as $desc) {
                             assert($desc instanceof KeyDescriptor, get_class($desc));
-                            $keys[] = $desc->getNamedValues();
+                            $rawPayload = $desc->getNamedValues();
+                            $keyPayload = [];
+                            foreach ($rawPayload as $keyName => $keyVal) {
+                                $keyPayload[$keyName] = $keyVal[0];
+                            }
+                            $keys[] = $keyPayload;
                         }
                         $bulkData['keys'] = $keys;
                     }

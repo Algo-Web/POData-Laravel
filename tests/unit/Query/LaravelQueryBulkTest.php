@@ -4,15 +4,20 @@ namespace AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Controllers\TestController;
+use AlgoWeb\PODataLaravel\Models\LaravelQueryDummy;
+use AlgoWeb\PODataLaravel\Models\TestBulkCreateRequest;
+use AlgoWeb\PODataLaravel\Models\TestBulkUpdateRequest;
 use AlgoWeb\PODataLaravel\Models\TestCase;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Requests\TestRequest;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Mockery as m;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
+use POData\Providers\Metadata\Type\Int32;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 
 class LaravelQueryBulkTest extends TestCase
@@ -179,42 +184,81 @@ class LaravelQueryBulkTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testBulkCustomCreateGoodLookup()
+    public function testBulkCustomCreateMethod()
     {
-        $callResult = response()->json(['status' => 'success', 'id' => [2, 4, 6], 'errors' => null]);
-
-        $testController = m::mock(TestController::class);
-        $testController->shouldReceive('storeTestModel')->andReturn($callResult)->once();
-        App::instance(TestController::class, $testController);
-
-        $map = [
-            'method' => 'storeTestModel',
+        $paramList = [
+            'method' => 'storeBulkTestModel',
             'controller' => TestController::class,
-            'parameters' => ['request' => ['name' => 'request', 'type' => TestRequest::class, 'isRequest' => true]]
+            'parameters' => ['request' =>
+                ['name' => 'request', 'type' => TestBulkCreateRequest::class, 'isRequest' => true]]
         ];
 
-        $data = [['data']];
+        $actualValid = m::mock(\Illuminate\Validation\Validator::class);
+        $actualValid->shouldReceive('passes')->andReturn(true)->once();
 
-        $container = m::mock(MetadataControllerContainer::class);
-        $container->shouldReceive('getMapping')->andReturn($map)->once();
+        $valFactory = m::mock(\Illuminate\Validation\Factory::class);
+        $valFactory->shouldReceive('make')->andReturn($actualValid);
 
-        $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->never();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->once();
+        Validator::swap($valFactory);
 
-        $iType = new \ReflectionClass(TestModel::class);
-        $type = m::mock(ResourceEntityType::class);
-        $type->shouldReceive('getInstanceType')->andReturn($iType);
-        $source = m::mock(ResourceSet::class);
-        $source->shouldReceive('getResourceType')->andReturn($type);
+        $controller = new TestController();
 
-        $foo = m::mock(LaravelQuery::class)->makePartial();
-        $foo->shouldReceive('getControllerContainer')->andReturn($container);
+        $query = new LaravelQueryDummy();
 
-        $result = $foo->createBulkResourceforResourceSet($source, $data);
-        $this->assertTrue(is_array($result));
-        $this->assertEquals(3, count($result));
+        $date = new \DateTime('2017-01-01');
+
+        $rawData = [];
+        $rawData[] = ['name' => 'name', 'date' => $date, 'weight' => 0, 'code' => '42', 'success' => true];
+        $rawData[] = ['name' => 'name', 'date' => $date, 'weight' => 0, 'code' => '42', 'success' => true];
+
+        $request = $query->prepareBulkRequestInput($paramList['parameters'], $rawData);
+        $request = $request[0];
+        $this->assertTrue($request instanceof TestBulkCreateRequest, get_class($request));
+
+        $result = $controller->storeBulkTestModel($request);
+        $data = $result->getData();
+        $this->assertEquals([1, 2], $data->id);
+    }
+
+    public function testBulkCustomUpdateMethod()
+    {
+        $paramList = [
+            'method' => 'updateBulkTestModel',
+            'controller' => TestController::class,
+            'parameters' => ['request' =>
+                ['name' => 'request', 'type' => TestBulkUpdateRequest::class, 'isRequest' => true]]
+        ];
+
+        $actualValid = m::mock(\Illuminate\Validation\Validator::class);
+        $actualValid->shouldReceive('passes')->andReturn(true)->once();
+
+        $valFactory = m::mock(\Illuminate\Validation\Factory::class);
+        $valFactory->shouldReceive('make')->andReturn($actualValid);
+
+        Validator::swap($valFactory);
+
+        $controller = new TestController();
+
+        $query = new LaravelQueryDummy();
+
+        $date = new \DateTime('2017-01-01');
+
+        $descOne = m::mock(KeyDescriptor::class);
+        $descOne->shouldReceive('getNamedValues')->andReturn(['id' => [1, new Int32()]]);
+        $descTwo = m::mock(KeyDescriptor::class);
+        $descTwo->shouldReceive('getNamedValues')->andReturn(['id' => [4, new Int32()]]);
+
+        $rawData = [];
+        $rawData[] = ['name' => 'name', 'date' => $date, 'weight' => 0, 'code' => '42', 'success' => true];
+        $rawData[] = ['name' => 'name', 'date' => $date, 'weight' => 0, 'code' => '42', 'success' => true];
+
+        $request = $query->prepareBulkRequestInput($paramList['parameters'], $rawData, [$descOne, $descTwo]);
+        $request = $request[0];
+        $this->assertTrue($request instanceof TestBulkUpdateRequest, get_class($request));
+
+        $result = $controller->updateBulkTestModel($request);
+        $data = $result->getData();
+        $this->assertEquals([1, 4], $data->id);
     }
 
     public function testBulkUpdate()
