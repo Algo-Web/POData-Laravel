@@ -621,6 +621,8 @@ class LaravelQuery implements IQueryProvider
             $sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model,
             'Both input entities must be Eloquent models'
         );
+        // in case the fake 'PrimaryKey' attribute got set inbound for a polymorphic-affected model, flatten it now
+        unset($targetEntityInstance->PrimaryKey);
 
         if ($relation instanceof BelongsTo) {
             $relation->associate($targetEntityInstance);
@@ -655,6 +657,8 @@ class LaravelQuery implements IQueryProvider
             $sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model,
             'Both input entities must be Eloquent models'
         );
+        // in case the fake 'PrimaryKey' attribute got set inbound for a polymorphic-affected model, flatten it now
+        unset($targetEntityInstance->PrimaryKey);
 
         if ($relation instanceof BelongsTo) {
             $relation->dissociate();
