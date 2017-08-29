@@ -21,9 +21,9 @@ class ODataController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, $dump = false)
+    public function index(Request $request)
     {
-        $dump = (true === $dump) || $this->getIsDumping();
+        $dump = $this->getIsDumping();
 
         $context = new OperationContextAdapter($request);
         $host = new ServiceHost($context, $request);

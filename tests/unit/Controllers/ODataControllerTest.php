@@ -110,6 +110,7 @@ class ODataControllerTest extends TestCase
         Carbon::setTestNow($knownDate);
 
         $root = "GET;-;15:17:00;";
+        $this->object->shouldReceive('getIsDumping')->andReturn(true);
 
         $storage = Storage::getFacadeRoot();
         $storage->shouldReceive('put')->with($root.'request', m::any())->andReturnNull()->once();
@@ -121,7 +122,6 @@ class ODataControllerTest extends TestCase
         $request->shouldReceive('getQueryString')->andReturn('');
         $request->shouldReceive('getBaseUrl')->andReturn('http://192.168.2.1/abm-master/public/odata.svc');
         $request->initialize();
-        $dump = true;
 
         $expected = '&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
 <service xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" >
@@ -131,7 +131,7 @@ class ODataControllerTest extends TestCase
 </service>
 ';
 
-        $result =  $this->object->index($request, $dump);
+        $result =  $this->object->index($request);
         $this->assertEquals(200, $result->getStatusCode());
         $actual = $result->getContent();
         //$this->assertEquals($expected, $actual);
@@ -153,7 +153,7 @@ class ODataControllerTest extends TestCase
         $request->shouldReceive('getBaseUrl')->andReturn('http://192.168.2.1/abm-master/public/odata.svc');
         $request->shouldReceive('header')->withArgs(['XTest'])->andReturn('catch')->once();
         $request->initialize();
-        $dump = true;
+        $this->object->shouldReceive('getIsDumping')->andReturn(true);
 
         $expected = '&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
 <service xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" >
@@ -163,7 +163,7 @@ class ODataControllerTest extends TestCase
 </service>
 ';
 
-        $result =  $this->object->index($request, $dump);
+        $result =  $this->object->index($request);
         $this->assertEquals(200, $result->getStatusCode());
         $actual = $result->getContent();
         //$this->assertEquals($expected, $actual);
