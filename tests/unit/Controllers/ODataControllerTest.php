@@ -56,7 +56,7 @@ class ODataControllerTest extends TestCase
 
     public function testIndexMalformedBaseService()
     {
-        $this->object->shouldReceive('getIsDumping')->passthru()->once();
+        $this->object->shouldReceive('isDumping')->passthru()->once();
         $request = m::mock(Request::class)->makePartial();
         $request->shouldReceive('getMethod')->andReturn('GET');
         $request->shouldReceive('getQueryString')->andReturn('http://192.168.2.1/abm-master/public/odata.svc');
@@ -121,7 +121,7 @@ class ODataControllerTest extends TestCase
         Carbon::setTestNow($knownDate);
 
         $root = "GET;-;15:17:00;";
-        $this->object->shouldReceive('getIsDumping')->andReturn(true);
+        $this->object->shouldReceive('isDumping')->andReturn(true);
 
         $db = DB::getFacadeRoot();
         $db->shouldReceive('beginTransaction')->andReturn(null)->once();
@@ -174,7 +174,7 @@ class ODataControllerTest extends TestCase
         $request->shouldReceive('getBaseUrl')->andReturn('http://192.168.2.1/abm-master/public/odata.svc');
         $request->shouldReceive('header')->withArgs(['XTest'])->andReturn('catch')->once();
         $request->initialize();
-        $this->object->shouldReceive('getIsDumping')->andReturn(true);
+        $this->object->shouldReceive('isDumping')->andReturn(true);
 
         $expected = '&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
 <service xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" >

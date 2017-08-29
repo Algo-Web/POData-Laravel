@@ -24,8 +24,8 @@ class ODataController extends BaseController
      */
     public function index(Request $request)
     {
-        $dump = $this->getIsDumping();
-        $dryRun = $this->getIsDryRun();
+        $dump = $this->isDumping();
+        $dryRun = $this->isDryRun();
         $commitCall = $dryRun ? 'rollBack' : 'commit';
 
         try {
@@ -93,7 +93,7 @@ class ODataController extends BaseController
     /**
      * @return bool
      */
-    protected function getIsDumping()
+    protected function isDumping()
     {
         $configDump = env('APP_DUMP_REQUESTS', false);
         return true === $configDump;
@@ -104,7 +104,7 @@ class ODataController extends BaseController
      *
      * @return bool
      */
-    protected function getIsDryRun()
+    protected function isDryRun()
     {
         $configDump = env('APP_DRY_RUN', false);
         return true === $configDump;
