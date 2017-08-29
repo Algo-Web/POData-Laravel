@@ -1,5 +1,6 @@
 Unreleased
 ----------
+   * Add dry-run config option
    * Add config switch to bypass authentication
    * Simulate polymorphic relations a la OData v3
    * Turned Scrutinizer analysis up to 11
