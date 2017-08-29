@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use AlgoWeb\PODataLaravel\Controllers\Controller as BaseController;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use POData\OperationContext\ServiceHost as ServiceHost;
 use POData\SimpleDataService as DataService;
@@ -21,61 +22,70 @@ class ODataController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, $dump = false)
+    public function index(Request $request)
     {
-        $dump = (true === $dump) || $this->getIsDumping();
+        $dump = $this->isDumping();
+        $dryRun = $this->isDryRun();
+        $commitCall = $dryRun ? 'rollBack' : 'commit';
 
-        $context = new OperationContextAdapter($request);
-        $host = new ServiceHost($context, $request);
-        $host->setServiceUri('/odata.svc/');
+        try {
+            DB::beginTransaction();
+            $context = new OperationContextAdapter($request);
+            $host = new ServiceHost($context, $request);
+            $host->setServiceUri('/odata.svc/');
 
-        $query = App::make('odataquery');
-        $meta = App::make('metadata');
+            $query = App::make('odataquery');
+            $meta = App::make('metadata');
 
-        $service = new DataService($query, $meta, $host);
-        $cereal = new IronicSerialiser($service, null);
-        $service = new DataService($query, $meta, $host, $cereal);
-        $service->handleRequest();
+            $service = new DataService($query, $meta, $host);
+            $cereal = new IronicSerialiser($service, null);
+            $service = new DataService($query, $meta, $host, $cereal);
+            $service->handleRequest();
 
-        $odataResponse = $context->outgoingResponse();
+            $odataResponse = $context->outgoingResponse();
 
-        if (true === $dump) {
-            // iff XTest header is set, containing class and method name
-            // dump outgoing odataResponse, metadata, and incoming request
-            $xTest = $request->header('XTest');
-            $date = Carbon::now(0);
-            $timeString = $date->toTimeString();
-            $xTest = (null !== $xTest) ? $xTest
-                : $request->method() . ';' . str_replace('/', '-', $request->path()) . ';' . $timeString . ';';
-            if (null != $xTest) {
-                $reflectionClass = new \ReflectionClass('Illuminate\Http\Request');
-                $reflectionProperty = $reflectionClass->getProperty('userResolver');
-                $reflectionProperty->setAccessible(true);
-                $reflectionProperty->setValue($request, null);
-                $reflectionProperty = $reflectionClass->getProperty('routeResolver');
-                $reflectionProperty->setAccessible(true);
-                $reflectionProperty->setValue($request, null);
-                $cerealRequest = serialize($request);
-                $cerealMeta = serialize($meta);
-                $cerealResponse = serialize($odataResponse);
-                Storage::put($xTest.'request', $cerealRequest);
-                Storage::put($xTest.'metadata', $cerealMeta);
-                Storage::put($xTest.'response', $cerealResponse);
+            if (true === $dump) {
+                // iff XTest header is set, containing class and method name
+                // dump outgoing odataResponse, metadata, and incoming request
+                $xTest = $request->header('XTest');
+                $date = Carbon::now(0);
+                $timeString = $date->toTimeString();
+                $xTest = (null !== $xTest) ? $xTest
+                    : $request->method() . ';' . str_replace('/', '-', $request->path()) . ';' . $timeString . ';';
+                if (null != $xTest) {
+                    $reflectionClass = new \ReflectionClass('Illuminate\Http\Request');
+                    $reflectionProperty = $reflectionClass->getProperty('userResolver');
+                    $reflectionProperty->setAccessible(true);
+                    $reflectionProperty->setValue($request, null);
+                    $reflectionProperty = $reflectionClass->getProperty('routeResolver');
+                    $reflectionProperty->setAccessible(true);
+                    $reflectionProperty->setValue($request, null);
+                    $cerealRequest = serialize($request);
+                    $cerealMeta = serialize($meta);
+                    $cerealResponse = serialize($odataResponse);
+                    Storage::put($xTest . 'request', $cerealRequest);
+                    Storage::put($xTest . 'metadata', $cerealMeta);
+                    Storage::put($xTest . 'response', $cerealResponse);
+                }
             }
-        }
 
-        $content = $odataResponse->getStream();
+            $content = $odataResponse->getStream();
 
-        $headers = $odataResponse->getHeaders();
-        $responseCode = $headers[\POData\Common\ODataConstants::HTTPRESPONSE_HEADER_STATUS_CODE];
-        $responseCode = isset($responseCode) ? intval($responseCode) : 200;
-        $response = new Response($content, $responseCode);
-        $response->setStatusCode($headers['Status']);
+            $headers = $odataResponse->getHeaders();
+            $responseCode = $headers[\POData\Common\ODataConstants::HTTPRESPONSE_HEADER_STATUS_CODE];
+            $responseCode = isset($responseCode) ? intval($responseCode) : 200;
+            $response = new Response($content, $responseCode);
+            $response->setStatusCode($headers['Status']);
 
-        foreach ($headers as $headerName => $headerValue) {
-            if (!is_null($headerValue)) {
-                $response->headers->set($headerName, $headerValue);
+            foreach ($headers as $headerName => $headerValue) {
+                if (!is_null($headerValue)) {
+                    $response->headers->set($headerName, $headerValue);
+                }
             }
+            DB::$commitCall();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
         }
         return $response;
     }
@@ -83,9 +93,20 @@ class ODataController extends BaseController
     /**
      * @return bool
      */
-    protected function getIsDumping()
+    protected function isDumping()
     {
         $configDump = env('APP_DUMP_REQUESTS', false);
+        return true === $configDump;
+    }
+
+    /**
+     * Is application dry-running (ie, not committing) non-READ requests?
+     *
+     * @return bool
+     */
+    protected function isDryRun()
+    {
+        $configDump = env('APP_DRY_RUN', false);
         return true === $configDump;
     }
 }

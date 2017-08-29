@@ -7,6 +7,7 @@ use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Mockery as m;
 use POData\Common\ODataException;
@@ -55,13 +56,18 @@ class ODataControllerTest extends TestCase
 
     public function testIndexMalformedBaseService()
     {
-        $this->object->shouldReceive('getIsDumping')->passthru()->once();
+        $this->object->shouldReceive('isDumping')->passthru()->once();
         $request = m::mock(Request::class)->makePartial();
         $request->shouldReceive('getMethod')->andReturn('GET');
         $request->shouldReceive('getQueryString')->andReturn('http://192.168.2.1/abm-master/public/odata.svc');
         $request->shouldReceive('getBaseUrl')->andReturn('http://192.168.2.1/abm-master/public');
         $request->initialize();
         $dump = false;
+
+        $db = DB::getFacadeRoot();
+        $db->shouldReceive('beginTransaction')->andReturn(null)->once();
+        $db->shouldReceive('commit')->andReturn(null)->never();
+        $db->shouldReceive('rollBack')->andReturn(null)->once();
 
         $expected = 'Malformed base service uri in the configuration file '
                     .'(should end with .svc, there should not be query or fragment in the base service uri)';
@@ -87,6 +93,11 @@ class ODataControllerTest extends TestCase
         $request->initialize();
         $dump = false;
 
+        $db = DB::getFacadeRoot();
+        $db->shouldReceive('beginTransaction')->andReturn(null)->once();
+        $db->shouldReceive('commit')->andReturn(null)->once();
+        $db->shouldReceive('rollBack')->andReturn(null)->never();
+
         $expected = '&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
 <service xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" >
  <workspace>
@@ -110,6 +121,12 @@ class ODataControllerTest extends TestCase
         Carbon::setTestNow($knownDate);
 
         $root = "GET;-;15:17:00;";
+        $this->object->shouldReceive('isDumping')->andReturn(true);
+
+        $db = DB::getFacadeRoot();
+        $db->shouldReceive('beginTransaction')->andReturn(null)->once();
+        $db->shouldReceive('commit')->andReturn(null)->once();
+        $db->shouldReceive('rollBack')->andReturn(null)->never();
 
         $storage = Storage::getFacadeRoot();
         $storage->shouldReceive('put')->with($root.'request', m::any())->andReturnNull()->once();
@@ -121,7 +138,6 @@ class ODataControllerTest extends TestCase
         $request->shouldReceive('getQueryString')->andReturn('');
         $request->shouldReceive('getBaseUrl')->andReturn('http://192.168.2.1/abm-master/public/odata.svc');
         $request->initialize();
-        $dump = true;
 
         $expected = '&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
 <service xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" >
@@ -131,7 +147,7 @@ class ODataControllerTest extends TestCase
 </service>
 ';
 
-        $result =  $this->object->index($request, $dump);
+        $result =  $this->object->index($request);
         $this->assertEquals(200, $result->getStatusCode());
         $actual = $result->getContent();
         //$this->assertEquals($expected, $actual);
@@ -147,13 +163,18 @@ class ODataControllerTest extends TestCase
         $storage->shouldReceive('put')->with('catchmetadata', m::any())->andReturnNull()->once();
         $storage->shouldReceive('put')->with('catchresponse', m::any())->andReturnNull()->once();
 
+        $db = DB::getFacadeRoot();
+        $db->shouldReceive('beginTransaction')->andReturn(null)->once();
+        $db->shouldReceive('rollBack')->andReturn(null)->never();
+        $db->shouldReceive('commit')->andReturn(null)->once();
+
         $request = m::mock(Request::class)->makePartial();
         $request->shouldReceive('getMethod')->andReturn('GET');
         $request->shouldReceive('getQueryString')->andReturn('');
         $request->shouldReceive('getBaseUrl')->andReturn('http://192.168.2.1/abm-master/public/odata.svc');
         $request->shouldReceive('header')->withArgs(['XTest'])->andReturn('catch')->once();
         $request->initialize();
-        $dump = true;
+        $this->object->shouldReceive('isDumping')->andReturn(true);
 
         $expected = '&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
 <service xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" >
@@ -163,7 +184,7 @@ class ODataControllerTest extends TestCase
 </service>
 ';
 
-        $result =  $this->object->index($request, $dump);
+        $result =  $this->object->index($request);
         $this->assertEquals(200, $result->getStatusCode());
         $actual = $result->getContent();
         //$this->assertEquals($expected, $actual);
