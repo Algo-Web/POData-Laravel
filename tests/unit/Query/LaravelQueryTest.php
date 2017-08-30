@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\App;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use Illuminate\Support\Facades\DB;
 use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
 use POData\Providers\Metadata\ResourceSet;
@@ -1959,6 +1960,39 @@ class LaravelQueryTest extends TestCase
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testStartTransaction()
+    {
+        $db = DB::getFacadeRoot();
+        $db->shouldReceive('rollBack')->andReturnNull()->never();
+        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
+        $db->shouldReceive('commit')->andReturnNull()->never();
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->startTransaction();
+    }
+
+    public function testCommitTransaction()
+    {
+        $db = DB::getFacadeRoot();
+        $db->shouldReceive('rollBack')->andReturnNull()->never();
+        $db->shouldReceive('beginTransaction')->andReturnNull()->never();
+        $db->shouldReceive('commit')->andReturnNull()->once();
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->commitTransaction();
+    }
+
+    public function testRollBackTransaction()
+    {
+        $db = DB::getFacadeRoot();
+        $db->shouldReceive('rollBack')->andReturnNull()->once();
+        $db->shouldReceive('beginTransaction')->andReturnNull()->never();
+        $db->shouldReceive('commit')->andReturnNull()->never();
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->rollBackTransaction();
     }
 
     private function seedControllerMetadata(TestController $controller = null)
