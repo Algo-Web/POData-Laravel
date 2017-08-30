@@ -804,4 +804,28 @@ class LaravelQuery implements IQueryProvider
             throw new ODataException('Target models not successfully ' . $pastVerb, 422);
         }
     }
+
+    /**
+     * Start database transaction
+     */
+    public function startTransaction()
+    {
+        DB::beginTransaction();
+    }
+
+    /**
+     * Commit database transaction
+     */
+    public function commitTransaction()
+    {
+        DB::commit();
+    }
+
+    /**
+     * Abort database transaction
+     */
+    public function rollBackTransaction()
+    {
+        DB::rollBack();
+    }
 }
