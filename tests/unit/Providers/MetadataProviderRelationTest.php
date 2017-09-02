@@ -16,6 +16,8 @@ use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use AlgoWeb\PODataLaravel\Models\TestMorphTargetAlternate;
+use AlgoWeb\PODataLaravel\Models\TestPolymorphicDualSource;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
@@ -127,6 +129,26 @@ class MetadataProviderRelationTest extends TestCase
         $expected[] = [
             "principalType" => TestMorphOneSourceAlternate::class,
             "principalRSet" => TestMorphOneSourceAlternate::class,
+            "principalMult" => "1",
+            "principalProp" => "morphTarget",
+            "dependentType" => TestMorphTarget::class,
+            "dependentRSet" => TestMorphTarget::class,
+            "dependentMult" => "0..1",
+            "dependentProp" => "morph"
+        ];
+        $expected[] = [
+            "principalType" => TestPolymorphicDualSource::class,
+            "principalRSet" => TestPolymorphicDualSource::class,
+            "principalMult" => "1",
+            "principalProp" => "morphAlternate",
+            "dependentType" => TestMorphTargetAlternate::class,
+            "dependentRSet" => TestMorphTargetAlternate::class,
+            "dependentMult" => "0..1",
+            "dependentProp" => "morph"
+        ];
+        $expected[] = [
+            "principalType" => TestPolymorphicDualSource::class,
+            "principalRSet" => TestPolymorphicDualSource::class,
             "principalMult" => "1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,

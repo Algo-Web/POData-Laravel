@@ -34,10 +34,7 @@ class MetadataRelationHolder
 
     public function getRelationsByKey($className, $keyName)
     {
-        if (!array_key_exists($className, $this->relations)) {
-            $msg = $className . ' does not exist in holder';
-            throw new \InvalidArgumentException($msg);
-        }
+        $this->checkClassExists($className);
 
         $rels = $this->relations[$className];
         if (!array_key_exists($keyName, $rels)) {
@@ -108,10 +105,7 @@ class MetadataRelationHolder
 
     public function getRelationsByClass($className)
     {
-        if (!array_key_exists($className, $this->relations)) {
-            $msg = $className . ' does not exist in holder';
-            throw new \InvalidArgumentException($msg);
-        }
+        $this->checkClassExists($className);
 
         $rels = $this->relations[$className];
         $keys = array_keys($rels);
@@ -212,5 +206,16 @@ class MetadataRelationHolder
             'dependentProp' => $principalProperty
         ];
         return [$forward, $reverse];
+    }
+
+    /**
+     * @param $className
+     */
+    protected function checkClassExists($className)
+    {
+        if (!array_key_exists($className, $this->relations)) {
+            $msg = $className . ' does not exist in holder';
+            throw new \InvalidArgumentException($msg);
+        }
     }
 }
