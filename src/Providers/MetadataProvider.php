@@ -226,12 +226,13 @@ class MetadataProvider extends MetadataBaseProvider
             $hook = $hooks[$key];
             foreach ($hook as $barb) {
                 foreach ($barb as $knownType => $propData) {
+                    $propName = array_keys($propData)[0];
                     if (in_array($knownType, $knownKeys)) {
                         if (!isset($knownSide[$knownType][$key])) {
                             $knownSide[$knownType][$key] = [];
                         }
                         assert(isset($knownSide[$knownType][$key]));
-                        $knownSide[$knownType][$key][] = $propData['property'];
+                        $knownSide[$knownType][$key][] = $propData[$propName]['property'];
                     }
                 }
             }
@@ -303,9 +304,10 @@ class MetadataProvider extends MetadataBaseProvider
         foreach ($remix as $principalType => $value) {
             foreach ($value as $fk => $localRels) {
                 foreach ($localRels as $dependentType => $deets) {
-                    $principalMult = $deets['multiplicity'];
-                    $principalProperty = $deets['property'];
-                    $principalKey = $deets['local'];
+                    $propName = array_keys($deets)[0];
+                    $principalMult = $deets[$propName]['multiplicity'];
+                    $principalProperty = $deets[$propName]['property'];
+                    $principalKey = $deets[$propName]['local'];
 
                     if (!isset($remix[$dependentType])) {
                         continue;
@@ -315,8 +317,9 @@ class MetadataProvider extends MetadataBaseProvider
                         continue;
                     }
                     $foreign = $foreign[$principalKey];
-                    $dependentMult = $foreign[$dependentType]['multiplicity'];
-                    $dependentProperty = $foreign[$dependentType]['property'];
+                    $propName = array_keys($foreign[$dependentType])[0];
+                    $dependentMult = $foreign[$dependentType][$propName]['multiplicity'];
+                    $dependentProperty = $foreign[$dependentType][$propName]['property'];
                     assert(
                         in_array($dependentMult, $this->multConstraints[$principalMult]),
                         'Cannot pair multiplicities ' . $dependentMult . ' and ' . $principalMult
@@ -357,17 +360,19 @@ class MetadataProvider extends MetadataBaseProvider
                     if (!isset($hooks[$dependentType])) {
                         continue;
                     }
-                    $principalMult = $deets['multiplicity'];
-                    $principalProperty = $deets['property'];
-                    $principalKey = $deets['local'];
+                    $propName = array_keys($deets)[0];
+                    $principalMult = $deets[$propName]['multiplicity'];
+                    $principalProperty = $deets[$propName]['property'];
+                    $principalKey = $deets[$propName]['local'];
 
                     $foreign = $hooks[$dependentType];
                     $foreign = null != $foreign && isset($foreign[$principalKey]) ? $foreign[$principalKey] : null;
 
                     if (null != $foreign && isset($foreign[$principalType])) {
                         $foreign = $foreign[$principalType];
-                        $dependentMult = $foreign['multiplicity'];
-                        $dependentProperty = $foreign['property'];
+                        $propName = array_keys($foreign)[0];
+                        $dependentMult = $foreign[$propName]['multiplicity'];
+                        $dependentProperty = $foreign[$propName]['property'];
                         assert(
                             in_array($dependentMult, $this->multConstraints[$principalMult]),
                             'Cannot pair multiplicities ' . $dependentMult . ' and ' . $principalMult

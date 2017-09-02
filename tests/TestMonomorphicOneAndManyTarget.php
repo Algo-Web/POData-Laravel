@@ -58,16 +58,16 @@ class TestMonomorphicOneAndManyTarget extends Model
 
     public function oneSource()
     {
-        return $this->belongsTo(TestMonomorphicOneAndManyTarget::class, 'one_id');
+        return $this->belongsTo(TestMonomorphicOneAndManySource::class, 'one_id');
     }
 
     public function twoSource()
     {
-        return $this->belongsTo(TestMonomorphicOneAndManyTarget::class, 'two_id');
+        return $this->belongsTo(TestMonomorphicOneAndManySource::class, 'two_id');
     }
 
     public function manySource()
     {
-        return $this->belongsTo(TestMonomorphicOneAndManyTarget::class, 'many_id');
+        return $this->belongsTo(TestMonomorphicOneAndManySource::class, 'many_id');
     }
 }

@@ -14,11 +14,15 @@ class MetadataBidirectionalTest extends TestCase
         $expected = [
             'many_source' =>
                 [
-                    $targ => [ 'property' => 'manySource', 'local' => 'many_id', 'multiplicity' => '*', 'type' => null]
+                    $targ => [
+                        'manySource' =>
+                            [ 'property' => 'manySource', 'local' => 'many_id', 'multiplicity' => '*', 'type' => null]]
                 ],
             'one_source' =>
                 [
-                    $targ => [ 'property' => 'oneSource', 'local' => 'one_id', 'multiplicity' => '0..1', 'type' => null]
+                    $targ => [
+                        'oneSource' =>
+                            ['property' => 'oneSource', 'local' => 'one_id', 'multiplicity' => '0..1', 'type' => null]]
                 ]
         ];
 
@@ -48,19 +52,23 @@ class MetadataBidirectionalTest extends TestCase
             'many_id' =>
                 [
                     $targ => [
+                        'manyTarget' => [
                         'property' => 'manyTarget',
                         'local' => 'many_source',
                         'multiplicity' => '1',
                         'type' => null
+                            ]
                     ]
                 ],
             'one_id' =>
                 [
                     $targ => [
+                        'oneTarget' => [
                         'property' => 'oneTarget',
                         'local' => 'one_source',
                         'multiplicity' => '1',
                         'type' => null
+                            ]
                     ]
                 ]
         ];
@@ -93,10 +101,12 @@ class MetadataBidirectionalTest extends TestCase
             'many_source' =>
                 [
                     $fooTarg => [
-                        'property' => 'manySource',
-                        'local' => 'many_id',
-                        'multiplicity' => '*',
-                        'type' => null
+                        'manySource' => [
+                            'property' => 'manySource',
+                            'local' => 'many_id',
+                            'multiplicity' => '*',
+                            'type' => null
+                        ]
                     ]
                 ]
         ];
@@ -104,10 +114,12 @@ class MetadataBidirectionalTest extends TestCase
             'many_id' =>
                 [
                     $barTarg => [
-                        'property' => 'manyTarget',
-                        'local' => 'many_source',
-                        'multiplicity' => '*',
-                        'type' => null
+                        'manyTarget' => [
+                            'property' => 'manyTarget',
+                            'local' => 'many_source',
+                            'multiplicity' => '*',
+                            'type' => null
+                        ]
                     ]
                 ]
         ];
@@ -150,7 +162,8 @@ class MetadataBidirectionalTest extends TestCase
         $expected = [
             'morph_id' =>
                 [
-                    $targ => [ 'property' => 'morph', 'local' => 'id', 'multiplicity' => '1', 'type' => 'known']
+                    $targ => [ 'morph' => [
+                        'property' => 'morph', 'local' => 'id', 'multiplicity' => '1', 'type' => 'known']]
                 ]
         ];
 
@@ -180,10 +193,12 @@ class MetadataBidirectionalTest extends TestCase
             'id' =>
                 [
                     $targ => [
+                        'morphTarget' => [
                         'property' => 'morphTarget',
                         'local' => 'morph_id',
                         'multiplicity' => '*',
                         'type' => 'unknown'
+                            ]
                     ]
                 ]
         ];
@@ -214,10 +229,12 @@ class MetadataBidirectionalTest extends TestCase
             'id' =>
                 [
                     $targ => [
+                        'morphTarget' => [
                         'property' => 'morphTarget',
                         'local' => 'morph_id',
                         'multiplicity' => '0..1',
                         'type' => 'unknown'
+                            ]
                     ]
                 ]
         ];
@@ -248,10 +265,12 @@ class MetadataBidirectionalTest extends TestCase
             'source_id' =>
                 [
                     $targ => [
+                        'manySource' => [
                         'property' => 'manySource',
                         'local' => 'target_id',
                         'multiplicity' => '*',
                         'type' => 'unknown'
+                            ]
                     ]
                 ]
         ];
@@ -282,10 +301,12 @@ class MetadataBidirectionalTest extends TestCase
             'target_id' =>
                 [
                     $targ => [
+                        'manyTarget' => [
                         'property' => 'manyTarget',
                         'local' => 'source_id',
                         'multiplicity' => '*',
                         'type' => 'known'
+                            ]
                     ]
                 ]
         ];
@@ -316,12 +337,15 @@ class MetadataBidirectionalTest extends TestCase
         $expected = [
             'one_id' =>
                 [
-                    $targ => ['property' => 'oneTarget', 'local' => 'id', 'multiplicity' => '0..1', 'type' => null],
-                    $twoTarg => ['property' => 'twoTarget', 'local' => 'id', 'multiplicity' => '0..1', 'type' => null]
+                    $targ => ['oneTarget' => [
+                        'property' => 'oneTarget', 'local' => 'id', 'multiplicity' => '0..1', 'type' => null]],
+                    $twoTarg => ['twoTarget' => [
+                        'property' => 'twoTarget', 'local' => 'id', 'multiplicity' => '0..1', 'type' => null]]
                 ],
             'many_id' =>
                 [
-                    $targ => ['property' => 'manyTarget', 'local' => 'id', 'multiplicity' => '*', 'type' => null]
+                    $targ => ['manyTarget' =>
+                        ['property' => 'manyTarget', 'local' => 'id', 'multiplicity' => '*', 'type' => null]]
                 ]
         ];
 
@@ -340,5 +364,29 @@ class MetadataBidirectionalTest extends TestCase
                 $this->assertEquals($expected[$key][$innerKey], $actual[$key][$innerKey]);
             }
         }
+    }
+
+    public function testMonomorphicRelationsKeyedOnSameFieldFromChild()
+    {
+        $foo = new TestMonomorphicOneAndManyTarget();
+        $targ = new TestMonomorphicOneAndManySource();
+        $targName = get_class($targ);
+
+        $expected = [
+            'id' =>
+                [
+                    $targName => ['oneSource' => [
+                            'property' => 'oneSource', 'local' => 'one_id', 'multiplicity' => '1', 'type' => null],
+                        'twoSource' => [
+                            'property' => 'twoSource', 'local' => 'two_id', 'multiplicity' => '1', 'type' => null],
+                        'manySource' => [
+                            'property' => 'manySource', 'local' => 'many_id', 'multiplicity' => '1', 'type' => null]]
+                ]
+        ];
+
+        $actual = $foo->getRelationships();
+        $this->assertTrue(isset($actual));
+        $this->assertTrue(is_array($actual));
+        $this->assertEquals($expected, $actual);
     }
 }

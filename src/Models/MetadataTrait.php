@@ -548,7 +548,10 @@ trait MetadataTrait
         if (!isset($hooks[$first])) {
             $hooks[$first] = [];
         }
-        $hooks[$first][$targ] = [
+        if (!isset($hooks[$first][$targ])) {
+            $hooks[$first][$targ] = [];
+        }
+        $hooks[$first][$targ][$property] = [
             'property' => $property,
             'local' => $last,
             'multiplicity' => $mult,

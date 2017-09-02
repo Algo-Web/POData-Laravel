@@ -82,7 +82,7 @@ class MetadataProviderRelationTest extends TestCase
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
             "dependentMult" => "0..1",
-            "dependentProp" => "manySource"
+            "dependentProp" => "oneSource"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
@@ -92,7 +92,7 @@ class MetadataProviderRelationTest extends TestCase
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
             "dependentMult" => "*",
-            "dependentProp" => "manySource"
+            "dependentProp" => "oneSource"
         ];
         $expected[] = [
             "principalType" => TestMorphManySource::class,
@@ -137,9 +137,10 @@ class MetadataProviderRelationTest extends TestCase
 
         $actual = $foo->calculateRoundTripRelations();
         $this->assertTrue(is_array($actual), "Bidirectional relations result not an array");
+        $counter = 0;
         $this->assertEquals(2 * count($expected), count($actual));
         foreach ($expected as $forward) {
-            $this->assertTrue(in_array($forward, $actual));
+            $this->assertTrue(in_array($forward, $actual), $counter);
             $reverse = $forward;
             $reverse['principalType'] = $forward['dependentType'];
             $reverse['principalMult'] = $forward['dependentMult'];
@@ -149,7 +150,8 @@ class MetadataProviderRelationTest extends TestCase
             $reverse['dependentMult'] = $forward['principalMult'];
             $reverse['dependentProp'] = $forward['principalProp'];
             $reverse['dependentRSet'] = $forward['principalRSet'];
-            $this->assertTrue(in_array($reverse, $actual));
+            $this->assertTrue(in_array($reverse, $actual), $counter);
+            $counter++;
         }
     }
 
