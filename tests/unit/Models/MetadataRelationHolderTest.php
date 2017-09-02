@@ -165,6 +165,14 @@ class MetadataRelationHolderTest extends TestCase
             "dependentMult" => "*",
             "dependentProp" => "manySource"
         ];
+        $expected[] = [
+            "principalType" => TestMonomorphicOneAndManySource::class,
+            "principalMult" => "1",
+            "principalProp" => "twoTarget",
+            "dependentType" => TestMonomorphicOneAndManyTarget::class,
+            "dependentMult" => "0..1",
+            "dependentProp" => "twoSource"
+        ];
 
         $foo = new MetadataRelationHolder();
         $src = new TestMonomorphicOneAndManyTarget();
@@ -389,6 +397,14 @@ class MetadataRelationHolderTest extends TestCase
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentMult" => "0..1",
             "dependentProp" => "oneSource"
+        ];
+        $expected[] = [
+            "principalType" => TestMonomorphicOneAndManySource::class,
+            "principalMult" => "1",
+            "principalProp" => "twoTarget",
+            "dependentType" => TestMonomorphicOneAndManyTarget::class,
+            "dependentMult" => "0..1",
+            "dependentProp" => "twoSource"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,

@@ -218,4 +218,12 @@ class MetadataRelationHolder
             throw new \InvalidArgumentException($msg);
         }
     }
+
+    /**
+     * Reset stored relations
+     */
+    public function reset()
+    {
+        $this->relations = [];
+    }
 }

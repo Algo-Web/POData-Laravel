@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
@@ -21,8 +22,22 @@ class MetadataProvider extends MetadataBaseProvider
     protected $multConstraints = [ '0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
     protected static $metaNAMESPACE = 'Data';
     protected static $relationCache;
+    protected static $rawRelationCache;
     const POLYMORPHIC = 'polyMorphicPlaceholder';
     const POLYMORPHIC_PLURAL = 'polyMorphicPlaceholders';
+    protected $relationHolder;
+
+    /**
+     * Create a new service provider instance.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return void
+     */
+    public function __construct($app)
+    {
+        parent::__construct($app);
+        $this->relationHolder = new MetadataRelationHolder();
+    }
 
     /**
      * Bootstrap the application services.  Post-boot.
@@ -142,42 +157,31 @@ class MetadataProvider extends MetadataBaseProvider
 
     public function calculateRoundTripRelations()
     {
-        $modelNames = $this->getCandidateModels();
+        if (!isset(static::$rawRelationCache)) {
+            $modelNames = $this->getCandidateModels();
 
-        $hooks = [];
-        foreach ($modelNames as $name) {
-            $model = new $name();
-            $rels = $model->getRelationships();
-            // it doesn't matter if a model has no relationships here, that lack will simply be skipped over
-            // during hookup processing
-            $hooks[$name] = $rels;
-        }
-
-        // model relation gubbins are assembled, now the hard bit starts
-        // storing assembled bidirectional relationship schema
-        $rawLines = [];
-        // storing unprocessed relation gubbins for second-pass processing
-        $remix = [];
-        $this->calculateRoundTripRelationsFirstPass($hooks, $rawLines, $remix);
-
-        // now for second processing pass, to pick up stuff that first didn't handle
-        $rawLines = $this->calculateRoundTripRelationsSecondPass($remix, $rawLines);
-
-        $numLines = count($rawLines);
-        for ($i = 0; $i < $numLines; $i++) {
-            $rawLines[$i]['principalRSet'] = $rawLines[$i]['principalType'];
-            $rawLines[$i]['dependentRSet'] = $rawLines[$i]['dependentType'];
-        }
-
-        // deduplicate rawLines - can't use array_unique as array value elements are themselves arrays
-        $lines = [];
-        foreach ($rawLines as $line) {
-            if (!in_array($line, $lines)) {
-                $lines[] = $line;
+            foreach ($modelNames as $name) {
+                $model = new $name();
+                $this->getRelationHolder()->addModel($model);
             }
+
+            // model relation gubbins are assembled, now fish out relation results from holder
+            $lines = [];
+            foreach ($modelNames as $name) {
+                $workLines = $this->getRelationHolder()->getRelationsByClass($name);
+                foreach ($workLines as $work) {
+                    // if this relation line is already in $rawLines, don't add it again
+                    $work['principalRSet'] = $work['principalType'];
+                    $work['dependentRSet'] = $work['dependentType'];
+                    if (!in_array($work, $lines)) {
+                        $lines[] = $work;
+                    }
+                }
+            }
+            static::$rawRelationCache = $lines;
         }
 
-        return $lines;
+        return static::$rawRelationCache;
     }
 
     public function getPolymorphicRelationGroups()
@@ -292,159 +296,6 @@ class MetadataProvider extends MetadataBaseProvider
             self::$relationCache = $rels;
         }
         return self::$relationCache;
-    }
-
-    /**
-     * @param $remix
-     * @param $lines
-     * @return array
-     */
-    private function calculateRoundTripRelationsSecondPass($remix, $lines)
-    {
-        foreach ($remix as $principalType => $value) {
-            foreach ($value as $fk => $localRels) {
-                foreach ($localRels as $dependentType => $deets) {
-                    $propName = array_keys($deets)[0];
-                    $principalMult = $deets[$propName]['multiplicity'];
-                    $principalProperty = $deets[$propName]['property'];
-                    $principalKey = $deets[$propName]['local'];
-
-                    if (!isset($remix[$dependentType])) {
-                        continue;
-                    }
-                    $foreign = $remix[$dependentType];
-                    if (!isset($foreign[$principalKey])) {
-                        continue;
-                    }
-                    $foreign = $foreign[$principalKey];
-                    $propName = array_keys($foreign[$dependentType])[0];
-                    $dependentMult = $foreign[$dependentType][$propName]['multiplicity'];
-                    $dependentProperty = $foreign[$dependentType][$propName]['property'];
-                    assert(
-                        in_array($dependentMult, $this->multConstraints[$principalMult]),
-                        'Cannot pair multiplicities ' . $dependentMult . ' and ' . $principalMult
-                    );
-                    assert(
-                        in_array($principalMult, $this->multConstraints[$dependentMult]),
-                        'Cannot pair multiplicities ' . $principalMult . ' and ' . $dependentMult
-                    );
-                    // generate forward and reverse relations
-                    list($forward, $reverse) = $this->calculateRoundTripRelationsGenForwardReverse(
-                        $principalType,
-                        $principalMult,
-                        $principalProperty,
-                        $dependentType,
-                        $dependentMult,
-                        $dependentProperty
-                    );
-                    // add forward relation
-                    $lines[] = $forward;
-                    // add reverse relation
-                    $lines[] = $reverse;
-                }
-            }
-        }
-        return $lines;
-    }
-
-    /**
-     * @param $hooks
-     * @param $lines
-     * @param $remix
-     */
-    private function calculateRoundTripRelationsFirstPass($hooks, &$lines, &$remix)
-    {
-        foreach ($hooks as $principalType => $value) {
-            foreach ($value as $fk => $localRels) {
-                foreach ($localRels as $dependentType => $deets) {
-                    if (!isset($hooks[$dependentType])) {
-                        continue;
-                    }
-                    $propName = array_keys($deets)[0];
-                    $principalMult = $deets[$propName]['multiplicity'];
-                    $principalProperty = $deets[$propName]['property'];
-                    $principalKey = $deets[$propName]['local'];
-
-                    $foreign = $hooks[$dependentType];
-                    $foreign = null != $foreign && isset($foreign[$principalKey]) ? $foreign[$principalKey] : null;
-
-                    if (null != $foreign && isset($foreign[$principalType])) {
-                        $foreign = $foreign[$principalType];
-                        $propName = array_keys($foreign)[0];
-                        $dependentMult = $foreign[$propName]['multiplicity'];
-                        $dependentProperty = $foreign[$propName]['property'];
-                        assert(
-                            in_array($dependentMult, $this->multConstraints[$principalMult]),
-                            'Cannot pair multiplicities ' . $dependentMult . ' and ' . $principalMult
-                        );
-                        assert(
-                            in_array($principalMult, $this->multConstraints[$dependentMult]),
-                            'Cannot pair multiplicities ' . $principalMult . ' and ' . $dependentMult
-                        );
-                        // generate forward and reverse relations
-                        list($forward, $reverse) = $this->calculateRoundTripRelationsGenForwardReverse(
-                            $principalType,
-                            $principalMult,
-                            $principalProperty,
-                            $dependentType,
-                            $dependentMult,
-                            $dependentProperty
-                        );
-                        // add forward relation
-                        $lines[] = $forward;
-                        // add reverse relation
-                        $lines[] = $reverse;
-                    } else {
-                        if (!isset($remix[$principalType])) {
-                            $remix[$principalType] = [];
-                        }
-                        if (!isset($remix[$principalType][$fk])) {
-                            $remix[$principalType][$fk] = [];
-                        }
-                        if (!isset($remix[$principalType][$fk][$dependentType])) {
-                            $remix[$principalType][$fk][$dependentType] = $deets;
-                        }
-                        assert(isset($remix[$principalType][$fk][$dependentType]));
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * @param $principalType
-     * @param $principalMult
-     * @param $principalProperty
-     * @param $dependentType
-     * @param $dependentMult
-     * @param $dependentProperty
-     * @return array[]
-     */
-    private function calculateRoundTripRelationsGenForwardReverse(
-        $principalType,
-        $principalMult,
-        $principalProperty,
-        $dependentType,
-        $dependentMult,
-        $dependentProperty
-    ) {
-        $forward = [
-            'principalType' => $principalType,
-            'principalMult' => $dependentMult,
-            'principalProp' => $principalProperty,
-            'dependentType' => $dependentType,
-            'dependentMult' => $principalMult,
-            'dependentProp' => $dependentProperty
-        ];
-        $reverse = [
-            'principalType' => $dependentType,
-            'principalMult' => $principalMult,
-            'principalProp' => $dependentProperty,
-            'dependentType' => $principalType,
-            'dependentMult' => $dependentMult,
-            'dependentProp' => $principalProperty
-        ];
-        return [$forward, $reverse];
     }
 
     private function processRelationLine($line, $entityTypes, &$meta)
@@ -605,6 +456,8 @@ class MetadataProvider extends MetadataBaseProvider
     public function reset()
     {
         self::$relationCache = null;
+        self::$rawRelationCache = null;
+        $this->getRelationHolder()->reset();
     }
 
     /**
@@ -636,5 +489,14 @@ class MetadataProvider extends MetadataBaseProvider
         $result = 0 === count($trim) ? null : $trim[0]['dependentProp'];
 
         return $result;
+    }
+
+    /**
+     * @return MetadataRelationHolder
+     */
+    public function getRelationHolder()
+    {
+        assert(null !== $this->relationHolder, 'Relation holder must not be null');
+        return $this->relationHolder;
     }
 }

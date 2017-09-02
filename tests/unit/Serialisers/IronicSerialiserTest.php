@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
@@ -414,6 +415,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         App::instance('metadata', $simple);
 
         $classen = [ TestMorphOneSource::class, TestMorphOneSourceAlternate::class, TestMorphTarget::class];
+        $holder = new MetadataRelationHolder();
 
         foreach ($classen as $className) {
             $testModel = new $className($meta);
@@ -422,6 +424,7 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->boot();
 
         $propContent = new ODataPropertyContent();
@@ -551,8 +554,11 @@ class IronicSerialiserTest extends SerialiserTestBase
         $host->setServiceUri("/odata.svc/");
 
         $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
+        $holder = new MetadataRelationHolder();
+
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -611,8 +617,11 @@ class IronicSerialiserTest extends SerialiserTestBase
         $host->setServiceUri("/odata.svc/");
 
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
+        $holder = new MetadataRelationHolder();
+
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->boot();
 
         $targ = new TestMonomorphicTarget($metadata);

@@ -339,7 +339,10 @@ class MetadataBidirectionalTest extends TestCase
                 [
                     $targ => ['oneTarget' => [
                         'property' => 'oneTarget', 'local' => 'id', 'multiplicity' => '0..1', 'type' => null]],
-                    $twoTarg => ['twoTarget' => [
+                ],
+            'two_id' =>
+                [
+                    $targ => ['twoTarget' => [
                         'property' => 'twoTarget', 'local' => 'id', 'multiplicity' => '0..1', 'type' => null]]
                 ],
             'many_id' =>

@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestCase;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
@@ -28,7 +29,7 @@ use POData\Providers\Metadata\SimpleMetadataProvider;
 
 class MetadataProviderRelationTest extends TestCase
 {
-    public function testMonomorphicSourceAndTarget()
+    public function testGetAllRelations()
     {
         $app = App::make('app');
         $foo = new MetadataProvider($app);
@@ -90,11 +91,21 @@ class MetadataProviderRelationTest extends TestCase
             "principalType" => TestMonomorphicOneAndManySource::class,
             "principalRSet" => TestMonomorphicOneAndManySource::class,
             "principalMult" => "1",
+            "principalProp" => "twoTarget",
+            "dependentType" => TestMonomorphicOneAndManyTarget::class,
+            "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
+            "dependentMult" => "0..1",
+            "dependentProp" => "twoSource"
+        ];
+        $expected[] = [
+            "principalType" => TestMonomorphicOneAndManySource::class,
+            "principalRSet" => TestMonomorphicOneAndManySource::class,
+            "principalMult" => "1",
             "principalProp" => "manyTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
             "dependentMult" => "*",
-            "dependentProp" => "oneSource"
+            "dependentProp" => "manySource"
         ];
         $expected[] = [
             "principalType" => TestMorphManySource::class,
@@ -190,6 +201,7 @@ class MetadataProviderRelationTest extends TestCase
         App::instance('metadata', $simple);
 
         $classen = [ TestMorphOneSource::class, TestMorphOneSourceAlternate::class, TestMorphTarget::class];
+        $holder = new MetadataRelationHolder();
 
         foreach ($classen as $className) {
             $testModel = new $className($meta);
@@ -204,6 +216,8 @@ class MetadataProviderRelationTest extends TestCase
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getIsCaching')->andReturn(false);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen)->once();
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
+        $foo->reset();
 
         $result = $foo->calculateRoundTripRelations();
         $this->assertEquals(4, count($result));
@@ -222,6 +236,7 @@ class MetadataProviderRelationTest extends TestCase
         App::instance('metadata', $simple);
 
         $classen = [ TestMorphManySource::class, TestMorphManySourceAlternate::class, TestMorphTarget::class];
+        $holder = new MetadataRelationHolder();
 
         foreach ($classen as $className) {
             $testModel = new $className($meta);
@@ -236,6 +251,8 @@ class MetadataProviderRelationTest extends TestCase
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getIsCaching')->andReturn(false);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen)->once();
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
+        $foo->reset();
 
         $result = $foo->calculateRoundTripRelations();
         $this->assertEquals(4, count($result));
@@ -254,6 +271,7 @@ class MetadataProviderRelationTest extends TestCase
         App::instance('metadata', $simple);
 
         $classen = [ TestMorphManySource::class, TestMorphManySourceAlternate::class, TestMorphTarget::class];
+        $holder = new MetadataRelationHolder();
 
         foreach ($classen as $className) {
             $testModel = new $className($meta);
@@ -268,6 +286,7 @@ class MetadataProviderRelationTest extends TestCase
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getIsCaching')->andReturn(false);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen)->once();
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
 
         $expected = [];
         $expected[TestMorphTarget::class] = [];
@@ -290,6 +309,7 @@ class MetadataProviderRelationTest extends TestCase
         App::instance('metadata', $simple);
 
         $classen = [ TestMonomorphicSource::class, TestMonomorphicTarget::class];
+        $holder = new MetadataRelationHolder();
 
         foreach ($classen as $className) {
             $testModel = new $className($meta);
@@ -304,6 +324,7 @@ class MetadataProviderRelationTest extends TestCase
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getIsCaching')->andReturn(false);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen)->once();
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
 
         $expected = [];
         $actual = $foo->getPolymorphicRelationGroups();
@@ -323,6 +344,7 @@ class MetadataProviderRelationTest extends TestCase
         App::instance('metadata', $simple);
 
         $classen = [ TestMonomorphicSource::class, TestMonomorphicTarget::class, TestMorphManyToManyTarget::class];
+        $holder = new MetadataRelationHolder();
 
         foreach ($classen as $className) {
             $testModel = new $className($meta);
@@ -337,6 +359,7 @@ class MetadataProviderRelationTest extends TestCase
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getIsCaching')->andReturn(false);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen)->once();
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
 
         $expected = [];
         $actual = $foo->getPolymorphicRelationGroups();
@@ -356,6 +379,7 @@ class MetadataProviderRelationTest extends TestCase
         App::instance('metadata', $simple);
 
         $classen = [ TestMonomorphicSource::class, TestMonomorphicTarget::class, TestMorphManyToManySource::class];
+        $holder = new MetadataRelationHolder();
 
         foreach ($classen as $className) {
             $testModel = new $className($meta);
@@ -370,6 +394,7 @@ class MetadataProviderRelationTest extends TestCase
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getIsCaching')->andReturn(false);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen)->once();
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
 
         $expected = [];
         $actual = $foo->getPolymorphicRelationGroups();
@@ -390,6 +415,7 @@ class MetadataProviderRelationTest extends TestCase
 
         $classen = [ TestMorphManySource::class, TestMorphManySourceAlternate::class, TestMorphTarget::class,
             TestMonomorphicSource::class, TestMonomorphicTarget::class];
+        $holder = new MetadataRelationHolder();
 
         foreach ($classen as $className) {
             $testModel = new $className($meta);
@@ -404,13 +430,14 @@ class MetadataProviderRelationTest extends TestCase
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getIsCaching')->andReturn(false);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen)->atLeast(1);
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
 
         $rels = $foo->calculateRoundTripRelations();
         $expected = $foo->calculateRoundTripRelations();
-        $expected[4]['principalRSet'] = 'polyMorphicPlaceholder';
-        $expected[6]['principalRSet'] = 'polyMorphicPlaceholder';
-        $expected[5]['dependentRSet'] = 'polyMorphicPlaceholder';
-        $expected[7]['dependentRSet'] = 'polyMorphicPlaceholder';
+        $expected[0]['principalRSet'] = 'polyMorphicPlaceholder';
+        $expected[3]['principalRSet'] = 'polyMorphicPlaceholder';
+        $expected[1]['dependentRSet'] = 'polyMorphicPlaceholder';
+        $expected[2]['dependentRSet'] = 'polyMorphicPlaceholder';
 
         // if groups is empty, bail right back out - nothing to do
         // else - need to loop through rels
@@ -430,8 +457,10 @@ class MetadataProviderRelationTest extends TestCase
         // yes, this is not actual structure - we're testing that in absence of polymorphic-relation gubbins,
         // raw relations are passed through unmodified
         $expected = ['foo', 'bar'];
+        $holder = new MetadataRelationHolder();
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('calculateRoundTripRelations')->andReturn($expected);
         $foo->shouldReceive('getPolymorphicRelationGroups')->andReturn([]);
         $foo->reset();
@@ -453,6 +482,7 @@ class MetadataProviderRelationTest extends TestCase
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
 
         $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
+        $holder = new MetadataRelationHolder();
 
         $types = [];
 
@@ -475,6 +505,7 @@ class MetadataProviderRelationTest extends TestCase
         $foo->shouldReceive('getCandidateModels')->andReturn($classen);
         $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
         $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
 
         $meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
         $meta->shouldReceive('addEntityType')

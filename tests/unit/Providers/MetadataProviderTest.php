@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\ODataMetadata\MetadataManager;
 use AlgoWeb\ODataMetadata\MetadataV3\edm\TEntityTypeType;
+use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestCastModel;
 use AlgoWeb\PODataLaravel\Models\TestGetterModel;
@@ -128,6 +129,7 @@ class MetadataProviderTest extends TestCase
             TestMonomorphicOneAndManyTarget::class, TestCastModel::class, TestMorphOneSourceAlternate::class,
             TestMorphManySourceAlternate::class, TestMorphManySourceWithUnexposedTarget::class,
             TestPolymorphicDualSource::class];
+        $holder = new MetadataRelationHolder();
 
         foreach ($classen as $className) {
             $testModel = m::mock($className)->makePartial();
@@ -144,6 +146,7 @@ class MetadataProviderTest extends TestCase
         Cache::swap($cache);
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getIsCaching')->andReturn(true)->once();
 
         $foo->boot();
@@ -160,6 +163,7 @@ class MetadataProviderTest extends TestCase
         App::instance(TestModel::class, $testModel);
 
         $this->setUpSchemaFacade();
+        $holder = new MetadataRelationHolder();
 
         //$meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
         $meta = new SimpleMetadataProvider('Data', 'Data');
@@ -172,6 +176,7 @@ class MetadataProviderTest extends TestCase
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCandidateModels')->andReturn([TestModel::class]);
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
 
         $foo->boot();
@@ -197,6 +202,7 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $abstract = $this->createAbstractMockType();
+        $holder = new MetadataRelationHolder();
 
         $meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
         $meta->shouldReceive('addEntityType')->andReturn($abstract)->once();
@@ -207,6 +213,7 @@ class MetadataProviderTest extends TestCase
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCandidateModels')->andReturn([TestModel::class]);
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
 
         $foo->boot();
@@ -226,6 +233,7 @@ class MetadataProviderTest extends TestCase
         $classen = [TestMonomorphicOneAndManySource::class, TestMonomorphicOneAndManyTarget::class,
             TestMorphManyToManyTarget::class, TestMorphManyToManySource::class, TestMonomorphicSource::class,
             TestMonomorphicTarget::class];
+        $holder = new MetadataRelationHolder();
 
         $types = [];
 
@@ -246,6 +254,7 @@ class MetadataProviderTest extends TestCase
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCandidateModels')->andReturn($classen);
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
         $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
 
@@ -279,6 +288,7 @@ class MetadataProviderTest extends TestCase
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
 
         $classen = [TestMorphManySource::class, TestMorphTarget::class];
+        $holder = new MetadataRelationHolder();
 
         $types = [];
         $i = 0;
@@ -298,6 +308,7 @@ class MetadataProviderTest extends TestCase
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCandidateModels')->andReturn($classen);
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
         $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
 
@@ -344,6 +355,7 @@ class MetadataProviderTest extends TestCase
             TestMonomorphicSource::class, TestMonomorphicTarget::class, TestMorphManyToManySource::class,
             TestMorphManyToManyTarget::class, TestMonomorphicOneAndManySource::class,
             TestMonomorphicOneAndManyTarget::class];
+        $holder = new MetadataRelationHolder();
 
         $types = [];
         $i = 0;
@@ -360,6 +372,7 @@ class MetadataProviderTest extends TestCase
         $app = App::make('app');
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCandidateModels')->andReturn($classen);
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->boot();
 
         $meta = App::make('metadata');
@@ -396,10 +409,12 @@ class MetadataProviderTest extends TestCase
         $auth->shouldReceive('user')->andReturn($testModel)->once();
 
         $classen = [TestModel::class];
+        $holder = new MetadataRelationHolder();
 
         $app = App::make('app');
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCandidateModels')->andReturn($classen);
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->boot();
 
         $meta = App::make('metadata');

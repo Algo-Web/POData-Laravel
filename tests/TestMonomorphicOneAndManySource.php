@@ -63,7 +63,7 @@ class TestMonomorphicOneAndManySource extends Model
 
     public function twoTarget()
     {
-        return $this->hasOne(TestMonomorphicTarget::class, 'one_id');
+        return $this->hasOne(TestMonomorphicOneAndManyTarget::class, 'two_id');
     }
 
     public function manyTarget()
