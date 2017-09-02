@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Connection as Connection;
 use Mockery\Mockery;
 
-class TestMonomorphicManyTarget extends Model
+class TestMorphTargetAlternate extends Model
 {
     use MetadataTrait {
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
@@ -37,6 +37,11 @@ class TestMonomorphicManyTarget extends Model
         parent::__construct();
     }
 
+    public function getTable()
+    {
+        return 'testmorphtargetalternate';
+    }
+
     public function getConnectionName()
     {
         return 'testconnection';
@@ -45,11 +50,6 @@ class TestMonomorphicManyTarget extends Model
     public function getConnection()
     {
         return $this->connect;
-    }
-
-    public function manyTarget()
-    {
-        return $this->belongsToMany(TestMonomorphicManySource::class, "target_source", "many_id", "many_source");
     }
 
     public function metadata()
@@ -63,5 +63,10 @@ class TestMonomorphicManyTarget extends Model
     public function getRelationshipsFromMethods($biDir = false)
     {
         return $this->getRel($biDir);
+    }
+
+    public function morph()
+    {
+        return $this->morphTo();
     }
 }

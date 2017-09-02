@@ -21,6 +21,8 @@ use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use AlgoWeb\PODataLaravel\Models\TestMorphTargetAlternate;
+use AlgoWeb\PODataLaravel\Models\TestPolymorphicDualSource;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\App;
@@ -122,9 +124,10 @@ class MetadataProviderTest extends TestCase
         $classen = [TestModel::class, TestGetterModel::class, TestMorphManySource::class, TestMorphOneSource::class,
             TestMorphTarget::class, TestMonomorphicManySource::class, TestMonomorphicManyTarget::class,
             TestMonomorphicSource::class, TestMonomorphicTarget::class, TestMorphManyToManySource::class,
-            TestMorphManyToManyTarget::class, TestMonomorphicOneAndManySource::class,
+            TestMorphManyToManyTarget::class, TestMonomorphicOneAndManySource::class, TestMorphTargetAlternate::class,
             TestMonomorphicOneAndManyTarget::class, TestCastModel::class, TestMorphOneSourceAlternate::class,
-            TestMorphManySourceAlternate::class, TestMorphManySourceWithUnexposedTarget::class];
+            TestMorphManySourceAlternate::class, TestMorphManySourceWithUnexposedTarget::class,
+            TestPolymorphicDualSource::class];
 
         foreach ($classen as $className) {
             $testModel = m::mock($className)->makePartial();

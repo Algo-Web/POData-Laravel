@@ -62,4 +62,9 @@ class TestMonomorphicManySource extends Model
         }
         return $this->traitmetadata();
     }
+
+    public function getRelationshipsFromMethods($biDir = false)
+    {
+        return $this->getRel($biDir);
+    }
 }
