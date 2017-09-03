@@ -138,6 +138,11 @@ class MetadataRelationHolder
         return $results;
     }
 
+    public function hasClass($className)
+    {
+        return array_key_exists($className, $this->relations);
+    }
+
     private function getMorphToRelations($principalType, $targDeets, $keyName)
     {
         $result = [];
