@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
@@ -267,6 +268,7 @@ class SerialiserWritePrimitiveTest extends SerialiserTestBase
      */
     private function setUpDataServiceDeps($request)
     {
+        $holder = new MetadataRelationHolder();
         $metadata = [];
         $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
@@ -281,6 +283,7 @@ class SerialiserWritePrimitiveTest extends SerialiserTestBase
         $classen = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->boot();
 
         $meta = App::make('metadata');

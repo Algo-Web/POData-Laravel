@@ -196,7 +196,7 @@ class ODataControllerTest extends TestCase
         $this->assertFalse($headers->has('Last-Modified'));
         $this->assertFalse($headers->has('Location'));
         $this->assertTrue($headers->has('Status'));
-        $this->assertFalse($headers->has('StatusCode'));
+        $this->assertTrue($headers->has('StatusCode'));
         $this->assertFalse($headers->has('StatusDesc'));
         $this->assertTrue($headers->has('DataServiceVersion'));
     }

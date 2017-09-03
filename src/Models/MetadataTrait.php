@@ -541,16 +541,21 @@ trait MetadataTrait
      * @param $last
      * @param $mult
      * @param $targ
+     * @param string|null $targ
      */
-    private function addRelationsHook(&$hooks, $first, $property, $last, $mult, $targ)
+    private function addRelationsHook(&$hooks, $first, $property, $last, $mult, $targ, $type = null)
     {
         if (!isset($hooks[$first])) {
             $hooks[$first] = [];
         }
-        $hooks[$first][$targ] = [
+        if (!isset($hooks[$first][$targ])) {
+            $hooks[$first][$targ] = [];
+        }
+        $hooks[$first][$targ][$property] = [
             'property' => $property,
             'local' => $last,
-            'multiplicity' => $mult
+            'multiplicity' => $mult,
+            'type' => $type
         ];
     }
 
@@ -635,7 +640,7 @@ trait MetadataTrait
             $localName = $localSegments[count($localSegments) - 1];
             $first = $isMany ? $keyName : $localName;
             $last = $isMany ? $localName : $keyName;
-            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
+            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, 'unknown');
         }
     }
 
@@ -662,7 +667,7 @@ trait MetadataTrait
 
             $first = $keyName;
             $last = (isset($localName) && '' != $localName) ? $localName : $foo->getRelated()->getKeyName();
-            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
+            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, 'known');
         }
     }
 

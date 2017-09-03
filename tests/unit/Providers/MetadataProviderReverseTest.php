@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestCase;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
@@ -39,6 +40,7 @@ class MetadataProviderReverseTest extends TestCase
         App::instance('metadata', $simple);
 
         $classen = [ TestMonomorphicSource::class, TestMonomorphicTarget::class];
+        $holder = new MetadataRelationHolder();
 
         foreach ($classen as $className) {
             $testModel = new $className($meta);
@@ -53,6 +55,7 @@ class MetadataProviderReverseTest extends TestCase
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getIsCaching')->andReturn(false);
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen)->atLeast(1);
 
         $foo->boot();
@@ -83,6 +86,7 @@ class MetadataProviderReverseTest extends TestCase
         App::instance('metadata', $simple);
 
         $classen = [ TestMorphManySource::class, TestMorphManySourceAlternate::class, TestMorphTarget::class];
+        $holder = new MetadataRelationHolder();
 
         foreach ($classen as $className) {
             $testModel = new $className($meta);
@@ -97,6 +101,7 @@ class MetadataProviderReverseTest extends TestCase
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getIsCaching')->andReturn(false);
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen)->atLeast(1);
 
         $foo->boot();
@@ -128,6 +133,7 @@ class MetadataProviderReverseTest extends TestCase
         App::instance('metadata', $simple);
 
         $classen = [ TestMorphManySource::class];
+        $holder = new MetadataRelationHolder();
 
         foreach ($classen as $className) {
             $testModel = new $className($meta);
@@ -142,6 +148,7 @@ class MetadataProviderReverseTest extends TestCase
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getIsCaching')->andReturn(false);
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen)->atLeast(1);
 
         $foo->boot();
@@ -165,6 +172,7 @@ class MetadataProviderReverseTest extends TestCase
         App::instance('metadata', $simple);
 
         $classen = [ TestMorphManySource::class, TestMorphManySourceAlternate::class, TestMorphTarget::class];
+        $holder = new MetadataRelationHolder();
 
         foreach ($classen as $className) {
             $testModel = new $className($meta);
@@ -179,6 +187,7 @@ class MetadataProviderReverseTest extends TestCase
 
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getIsCaching')->andReturn(false);
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen)->atLeast(1);
 
         $foo->boot();

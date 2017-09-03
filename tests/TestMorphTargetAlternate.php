@@ -2,11 +2,12 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
+use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Connection as Connection;
 use Mockery\Mockery;
 
-class TestMonomorphicOneAndManyTarget extends Model
+class TestMorphTargetAlternate extends Model
 {
     use MetadataTrait {
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
@@ -38,7 +39,7 @@ class TestMonomorphicOneAndManyTarget extends Model
 
     public function getTable()
     {
-        return 'testoneandmanytarget';
+        return 'testmorphtargetalternate';
     }
 
     public function getConnectionName()
@@ -51,23 +52,21 @@ class TestMonomorphicOneAndManyTarget extends Model
         return $this->connect;
     }
 
+    public function metadata()
+    {
+        if (isset($this->metaArray)) {
+            return $this->metaArray;
+        }
+        return $this->traitmetadata();
+    }
+
     public function getRelationshipsFromMethods($biDir = false)
     {
         return $this->getRel($biDir);
     }
 
-    public function oneSource()
+    public function morph()
     {
-        return $this->belongsTo(TestMonomorphicOneAndManySource::class, 'one_id');
-    }
-
-    public function twoSource()
-    {
-        return $this->belongsTo(TestMonomorphicOneAndManySource::class, 'two_id');
-    }
-
-    public function manySource()
-    {
-        return $this->belongsTo(TestMonomorphicOneAndManySource::class, 'many_id');
+        return $this->morphTo();
     }
 }
