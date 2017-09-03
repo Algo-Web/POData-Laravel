@@ -81,9 +81,11 @@ class MetadataRelationHolderTest extends TestCase
     {
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
+            "principalRSet" => TestMonomorphicOneAndManySource::class,
             "principalMult" => "1",
             "principalProp" => "manyTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
+            "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
             "dependentMult" => "*",
             "dependentProp" => "manySource"
         ];
@@ -104,9 +106,11 @@ class MetadataRelationHolderTest extends TestCase
             $reverse['principalType'] = $forward['dependentType'];
             $reverse['principalMult'] = $forward['dependentMult'];
             $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
             $reverse['dependentType'] = $forward['principalType'];
             $reverse['dependentMult'] = $forward['principalMult'];
             $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
             $this->assertTrue(in_array($reverse, $actual));
         }
     }
@@ -116,9 +120,11 @@ class MetadataRelationHolderTest extends TestCase
         $expected = [];
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
+            "principalRSet" => TestMonomorphicOneAndManySource::class,
             "principalMult" => "1",
             "principalProp" => "oneTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
+            "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
             "dependentMult" => "0..1",
             "dependentProp" => "oneSource"
         ];
@@ -139,9 +145,11 @@ class MetadataRelationHolderTest extends TestCase
             $reverse['principalType'] = $forward['dependentType'];
             $reverse['principalMult'] = $forward['dependentMult'];
             $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
             $reverse['dependentType'] = $forward['principalType'];
             $reverse['dependentMult'] = $forward['principalMult'];
             $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
             $this->assertTrue(in_array($reverse, $actual));
         }
     }
@@ -151,17 +159,21 @@ class MetadataRelationHolderTest extends TestCase
         $expected = [];
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
+            "principalRSet" => TestMonomorphicOneAndManySource::class,
             "principalMult" => "1",
             "principalProp" => "oneTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
+            "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
             "dependentMult" => "0..1",
             "dependentProp" => "oneSource"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
+            "principalRSet" => TestMonomorphicOneAndManySource::class,
             "principalMult" => "1",
             "principalProp" => "manyTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
+            "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
             "dependentMult" => "*",
             "dependentProp" => "manySource"
         ];
@@ -182,9 +194,11 @@ class MetadataRelationHolderTest extends TestCase
             $reverse['principalType'] = $forward['dependentType'];
             $reverse['principalMult'] = $forward['dependentMult'];
             $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
             $reverse['dependentType'] = $forward['principalType'];
             $reverse['dependentMult'] = $forward['principalMult'];
             $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
             $this->assertTrue(in_array($reverse, $actual));
         }
     }
@@ -194,9 +208,11 @@ class MetadataRelationHolderTest extends TestCase
         $expected = [];
         $expected[] = [
             "principalType" => TestMonomorphicManySource::class,
+            "principalRSet" => TestMonomorphicManySource::class,
             "principalMult" => "*",
             "principalProp" => "manySource",
             "dependentType" => TestMonomorphicManyTarget::class,
+            "dependentRSet" => TestMonomorphicManyTarget::class,
             "dependentMult" => "*",
             "dependentProp" => "manyTarget"
         ];
@@ -217,9 +233,11 @@ class MetadataRelationHolderTest extends TestCase
             $reverse['principalType'] = $forward['dependentType'];
             $reverse['principalMult'] = $forward['dependentMult'];
             $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
             $reverse['dependentType'] = $forward['principalType'];
             $reverse['dependentMult'] = $forward['principalMult'];
             $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
             $this->assertTrue(in_array($reverse, $actual));
         }
 
@@ -232,9 +250,11 @@ class MetadataRelationHolderTest extends TestCase
             $reverse['principalType'] = $forward['dependentType'];
             $reverse['principalMult'] = $forward['dependentMult'];
             $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
             $reverse['dependentType'] = $forward['principalType'];
             $reverse['dependentMult'] = $forward['principalMult'];
             $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
             $this->assertTrue(in_array($reverse, $actual));
         }
     }
@@ -244,9 +264,11 @@ class MetadataRelationHolderTest extends TestCase
         $expected = [];
         $expected[] = [
             "principalType" => TestMorphOneSource::class,
+            "principalRSet" => TestMorphOneSource::class,
             "principalMult" => "1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
+            "dependentRSet" => TestMorphTarget::class,
             "dependentMult" => "0..1",
             "dependentProp" => "morph"
         ];
@@ -267,9 +289,11 @@ class MetadataRelationHolderTest extends TestCase
             $reverse['principalType'] = $forward['dependentType'];
             $reverse['principalMult'] = $forward['dependentMult'];
             $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
             $reverse['dependentType'] = $forward['principalType'];
             $reverse['dependentMult'] = $forward['principalMult'];
             $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
             $this->assertTrue(in_array($reverse, $actual));
         }
     }
@@ -279,9 +303,11 @@ class MetadataRelationHolderTest extends TestCase
         $expected = [];
         $expected[] = [
             "principalType" => TestMorphOneSource::class,
+            "principalRSet" => TestMorphOneSource::class,
             "principalMult" => "1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
+            "dependentRSet" => TestMorphTarget::class,
             "dependentMult" => "0..1",
             "dependentProp" => "morph"
         ];
@@ -302,9 +328,11 @@ class MetadataRelationHolderTest extends TestCase
             $reverse['principalType'] = $forward['dependentType'];
             $reverse['principalMult'] = $forward['dependentMult'];
             $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
             $reverse['dependentType'] = $forward['principalType'];
             $reverse['dependentMult'] = $forward['principalMult'];
             $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
             $this->assertTrue(in_array($reverse, $actual));
         }
     }
@@ -314,9 +342,11 @@ class MetadataRelationHolderTest extends TestCase
         $expected = [];
         $expected[] = [
             "principalType" => TestMorphManyToManySource::class,
+            "principalRSet" => TestMorphManyToManySource::class,
             "principalMult" => "*",
             "principalProp" => "manySource",
             "dependentType" => TestMorphManyToManyTarget::class,
+            "dependentRSet" => TestMorphManyToManyTarget::class,
             "dependentMult" => "*",
             "dependentProp" => "manyTarget"
         ];
@@ -337,9 +367,11 @@ class MetadataRelationHolderTest extends TestCase
             $reverse['principalType'] = $forward['dependentType'];
             $reverse['principalMult'] = $forward['dependentMult'];
             $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
             $reverse['dependentType'] = $forward['principalType'];
             $reverse['dependentMult'] = $forward['principalMult'];
             $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
             $this->assertTrue(in_array($reverse, $actual));
         }
     }
@@ -349,9 +381,11 @@ class MetadataRelationHolderTest extends TestCase
         $expected = [];
         $expected[] = [
             "principalType" => TestMorphManyToManySource::class,
+            "principalRSet" => TestMorphManyToManySource::class,
             "principalMult" => "*",
             "principalProp" => "manySource",
             "dependentType" => TestMorphManyToManyTarget::class,
+            "dependentRSet" => TestMorphManyToManyTarget::class,
             "dependentMult" => "*",
             "dependentProp" => "manyTarget"
         ];
@@ -372,9 +406,11 @@ class MetadataRelationHolderTest extends TestCase
             $reverse['principalType'] = $forward['dependentType'];
             $reverse['principalMult'] = $forward['dependentMult'];
             $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
             $reverse['dependentType'] = $forward['principalType'];
             $reverse['dependentMult'] = $forward['principalMult'];
             $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
             $this->assertTrue(in_array($reverse, $actual));
         }
     }
@@ -384,17 +420,21 @@ class MetadataRelationHolderTest extends TestCase
         $expected = [];
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
+            "principalRSet" => TestMonomorphicOneAndManySource::class,
             "principalMult" => "1",
             "principalProp" => "oneTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
+            "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
             "dependentMult" => "0..1",
             "dependentProp" => "oneSource"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
+            "principalRSet" => TestMonomorphicOneAndManySource::class,
             "principalMult" => "1",
             "principalProp" => "manyTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
+            "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
             "dependentMult" => "*",
             "dependentProp" => "manySource"
         ];
@@ -415,9 +455,11 @@ class MetadataRelationHolderTest extends TestCase
             $reverse['principalType'] = $forward['dependentType'];
             $reverse['principalMult'] = $forward['dependentMult'];
             $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
             $reverse['dependentType'] = $forward['principalType'];
             $reverse['dependentMult'] = $forward['principalMult'];
             $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
             $this->assertTrue(in_array($reverse, $actual));
         }
     }
@@ -427,33 +469,41 @@ class MetadataRelationHolderTest extends TestCase
         $expected = [];
         $expected[] = [
             "principalType" => TestMorphOneSource::class,
+            "principalRSet" => TestMorphOneSource::class,
             "principalMult" => "1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
+            "dependentRSet" => TestMorphTarget::class,
             "dependentMult" => "0..1",
             "dependentProp" => "morph"
         ];
         $expected[] = [
             "principalType" => TestMorphOneSourceAlternate::class,
+            "principalRSet" => TestMorphOneSourceAlternate::class,
             "principalMult" => "1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
+            "dependentRSet" => TestMorphTarget::class,
             "dependentMult" => "0..1",
             "dependentProp" => "morph"
         ];
         $expected[] = [
             "principalType" => TestMorphManySource::class,
+            "principalRSet" => TestMorphManySource::class,
             "principalMult" => "1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
+            "dependentRSet" => TestMorphTarget::class,
             "dependentMult" => "*",
             "dependentProp" => "morph"
         ];
         $expected[] = [
             "principalType" => TestMorphManySourceAlternate::class,
+            "principalRSet" => TestMorphManySourceAlternate::class,
             "principalMult" => "1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
+            "dependentRSet" => TestMorphTarget::class,
             "dependentMult" => "*",
             "dependentProp" => "morph"
         ];
@@ -474,9 +524,11 @@ class MetadataRelationHolderTest extends TestCase
             $reverse['principalType'] = $forward['dependentType'];
             $reverse['principalMult'] = $forward['dependentMult'];
             $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
             $reverse['dependentType'] = $forward['principalType'];
             $reverse['dependentMult'] = $forward['principalMult'];
             $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
             $this->assertTrue(in_array($reverse, $actual));
         }
     }
@@ -486,9 +538,11 @@ class MetadataRelationHolderTest extends TestCase
         $expected = [];
         $expected[] = [
             "principalType" => TestPolymorphicDualSource::class,
+            "principalRSet" => TestPolymorphicDualSource::class,
             "principalMult" => "1",
             "principalProp" => "morphAlternate",
             "dependentType" => TestMorphTargetAlternate::class,
+            "dependentRSet" => TestMorphTargetAlternate::class,
             "dependentMult" => "0..1",
             "dependentProp" => "morph"
         ];
@@ -507,9 +561,11 @@ class MetadataRelationHolderTest extends TestCase
             $reverse['principalType'] = $forward['dependentType'];
             $reverse['principalMult'] = $forward['dependentMult'];
             $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
             $reverse['dependentType'] = $forward['principalType'];
             $reverse['dependentMult'] = $forward['principalMult'];
             $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
             $this->assertTrue(in_array($reverse, $actual));
         }
     }

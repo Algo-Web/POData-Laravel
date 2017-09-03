@@ -122,6 +122,22 @@ class MetadataRelationHolder
         return $results;
     }
 
+    public function getRelations()
+    {
+        $results = [];
+        $registered = array_keys($this->relations);
+
+        foreach ($registered as $className) {
+            $lines = $this->getRelationsByClass($className);
+            foreach ($lines as $line) {
+                if (!in_array($line, $results)) {
+                    $results[] = $line;
+                }
+            }
+        }
+        return $results;
+    }
+
     private function getMorphToRelations($principalType, $targDeets, $keyName)
     {
         $result = [];
@@ -195,7 +211,9 @@ class MetadataRelationHolder
             'principalProp' => $principalProperty,
             'dependentType' => $dependentType,
             'dependentMult' => $principalMult,
-            'dependentProp' => $dependentProperty
+            'dependentProp' => $dependentProperty,
+            'principalRSet' => $principalType,
+            'dependentRSet' => $dependentType
         ];
         $reverse = [
             'principalType' => $dependentType,
@@ -203,7 +221,9 @@ class MetadataRelationHolder
             'principalProp' => $dependentProperty,
             'dependentType' => $principalType,
             'dependentMult' => $dependentMult,
-            'dependentProp' => $principalProperty
+            'dependentProp' => $principalProperty,
+            'principalRSet' => $dependentType,
+            'dependentRSet' => $principalType
         ];
         return [$forward, $reverse];
     }
