@@ -31,7 +31,6 @@ class MetadataProvider extends MetadataBaseProvider
      * Create a new service provider instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct($app)
     {
@@ -155,6 +154,11 @@ class MetadataProvider extends MetadataBaseProvider
         return [$entityTypes, $resourceSets, $begins];
     }
 
+    /**
+     * Get round-trip relations before inserting polymorphic-powered placeholders
+     *
+     * @return array[]
+     */
     public function calculateRoundTripRelations()
     {
         if (!isset(static::$rawRelationCache)) {

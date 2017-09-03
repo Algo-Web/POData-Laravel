@@ -547,4 +547,42 @@ class MetadataRelationHolderTest extends TestCase
         }
         $this->assertEquals($expected, $actual);
     }
+
+    public function testGetRelationsOnSingleClassWithoutRelations()
+    {
+        $expected = [];
+        $foo = new MetadataRelationHolder();
+        $model = new TestModel();
+
+        $foo->addModel($model);
+
+        $actual = $foo->getRelationsByClass(TestModel::class);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetRelationsOnSingleClassWithRelations()
+    {
+        $expected = [];
+        $foo = new MetadataRelationHolder();
+        $model = new TestMonomorphicManySource();
+
+        $foo->addModel($model);
+
+        $actual = $foo->getRelationsByClass(TestMonomorphicManySource::class);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetRelationsFromUnrelatedModels()
+    {
+        $expected = [];
+        $foo = new MetadataRelationHolder();
+        $model = new TestMonomorphicManySource();
+        $bar = new TestMorphOneSourceAlternate();
+
+        $foo->addModel($model);
+        $foo->addModel($bar);
+
+        $actual = $foo->getRelationsByClass(TestMonomorphicManySource::class);
+        $this->assertEquals($expected, $actual);
+    }
 }

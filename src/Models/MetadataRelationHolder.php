@@ -75,28 +75,15 @@ class MetadataRelationHolder
                     if (!array_key_exists($foreignType, $this->relations)) {
                         continue;
                     }
-                    foreach ($raw as $dependentProperty => $dependentPayload) {
-                        if ($keyName == $dependentPayload['local']) {
-                            $dependentMult = $dependentPayload['multiplicity'];
-                            // generate forward and reverse relations
-                            list($forward, $reverse) = $this->calculateRoundTripRelationsGenForwardReverse(
-                                $principalType,
-                                $principalMult,
-                                $principalProperty,
-                                $dependentType,
-                                $dependentMult,
-                                $dependentProperty
-                            );
-                            if (!in_array($forward, $result)) {
-                                // add forward relation
-                                $result[] = $forward;
-                            }
-                            if (!in_array($reverse, $result)) {
-                                // add reverse relation
-                                $result[] = $reverse;
-                            }
-                        }
-                    }
+                    $result = $this->generateRoundTripRelations(
+                        $principalType,
+                        $keyName,
+                        $raw,
+                        $principalMult,
+                        $principalProperty,
+                        $dependentType,
+                        $result
+                    );
                 }
             }
         }
@@ -136,28 +123,16 @@ class MetadataRelationHolder
                     if ($targType != $principalType) {
                         continue;
                     }
-                    foreach ($interDeets as $dependentProperty => $finalDeets) {
-                        if ($keyName !== $finalDeets['local']) {
-                            continue;
-                        }
-                        $dependentMult = $finalDeets['multiplicity'];
-                        list($forward, $reverse) = $this->calculateRoundTripRelationsGenForwardReverse(
-                            $principalType,
-                            $principalMult,
-                            $principalProperty,
-                            $dependentType,
-                            $dependentMult,
-                            $dependentProperty
-                        );
-                        if (!in_array($forward, $result)) {
-                            // add forward relation
-                            $result[] = $forward;
-                        }
-                        if (!in_array($reverse, $result)) {
-                            // add reverse relation
-                            $result[] = $reverse;
-                        }
-                    }
+                    $raw = $interDeets;
+                    $result = $this->generateRoundTripRelations(
+                        $principalType,
+                        $keyName,
+                        $raw,
+                        $principalMult,
+                        $principalProperty,
+                        $dependentType,
+                        $result
+                    );
                 }
             }
         }
@@ -225,5 +200,49 @@ class MetadataRelationHolder
     public function reset()
     {
         $this->relations = [];
+    }
+
+    /**
+     * @param $principalType
+     * @param $keyName
+     * @param $raw
+     * @param $principalMult
+     * @param $principalProperty
+     * @param $dependentType
+     * @param $result
+     * @return array
+     */
+    private function generateRoundTripRelations(
+        $principalType,
+        $keyName,
+        $raw,
+        $principalMult,
+        $principalProperty,
+        $dependentType,
+        $result
+    ) {
+        foreach ($raw as $dependentProperty => $dependentPayload) {
+            if ($keyName !== $dependentPayload['local']) {
+                continue;
+            }
+            $dependentMult = $dependentPayload['multiplicity'];
+            list($forward, $reverse) = $this->calculateRoundTripRelationsGenForwardReverse(
+                $principalType,
+                $principalMult,
+                $principalProperty,
+                $dependentType,
+                $dependentMult,
+                $dependentProperty
+            );
+            if (!in_array($forward, $result)) {
+                // add forward relation
+                $result[] = $forward;
+            }
+            if (!in_array($reverse, $result)) {
+                // add reverse relation
+                $result[] = $reverse;
+            }
+        }
+        return $result;
     }
 }
