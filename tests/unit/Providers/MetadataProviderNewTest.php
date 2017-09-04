@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\ODataMetadata\MetadataManager;
 use AlgoWeb\ODataMetadata\MetadataV3\edm\TEntityTypeType;
+use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestCastModel;
 use AlgoWeb\PODataLaravel\Models\TestGetterModel;
@@ -41,10 +42,10 @@ use POData\Providers\Metadata\Type\StringType;
 /**
  * Generated Test Class.
  */
-class MetadataProviderTest extends TestCase
+class MetadataProviderNewTest extends TestCase
 {
     /**
-     * @var \AlgoWeb\PODataLaravel\Providers\MetadataProviderOld
+     * @var \AlgoWeb\PODataLaravel\Providers\MetadataProvider
      */
     protected $object;
 
@@ -55,7 +56,10 @@ class MetadataProviderTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->object = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
+//        $this->object = new \AlgoWeb\PODataLaravel\Providers\MetadataProvider();
+        $holder = new MetadataRelationHolder();
+        $this->object = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $this->object->shouldReceive('getRelationHolder')->andReturn($holder);
         $this->object->reset();
     }
 
@@ -90,6 +94,13 @@ class MetadataProviderTest extends TestCase
 
         $foo = $this->object;
         $foo->boot();
+    }
+
+    public function testConstruct()
+    {
+        $app = m::mock(\Illuminate\Contracts\Foundation\Application::class);
+        $foo = new MetadataProvider($app);
+        $this->assertTrue($foo->getRelationHolder() instanceof MetadataRelationHolder);
     }
 
     public function testBootHasMigrationsIsCached()
@@ -425,7 +436,7 @@ class MetadataProviderTest extends TestCase
      */
     public function testRegister()
     {
-        $foo = new MetadataProviderOld($this->app);
+        $foo = new MetadataProvider($this->app);
         $foo->register();
 
         $result = App::make('metadata');

@@ -6,6 +6,7 @@ use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use AlgoWeb\PODataLaravel\Providers\MetadataProviderOld;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -48,8 +49,9 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $host->setServiceUri("/odata.svc/");
 
         $classen = [TestModel::class];
-        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -101,8 +103,9 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $host->setServiceUri("/odata.svc/");
 
         $classen = [TestModel::class];
-        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -156,8 +159,9 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $host->setServiceUri("/odata.svc/");
 
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
-        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -215,8 +219,9 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $host->setServiceUri("/odata.svc/");
 
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
-        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $belongsTo = m::mock(BelongsTo::class)->makePartial();
@@ -283,8 +288,9 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $host->setServiceUri("/odata.svc/");
 
         $classen = [TestModel::class];
-        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');
