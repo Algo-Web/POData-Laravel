@@ -5,6 +5,7 @@ namespace AlgoWeb\PODataLaravel\Serialisers;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use AlgoWeb\PODataLaravel\Providers\MetadataProviderOld;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Illuminate\Support\Facades\App;
 use POData\ObjectModel\ObjectModelSerializer;
@@ -323,7 +324,7 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
 
         $classen = [TestModel::class];
-        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->reset();
         $metaProv->boot();

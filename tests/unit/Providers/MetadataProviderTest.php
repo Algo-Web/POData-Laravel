@@ -44,7 +44,7 @@ use POData\Providers\Metadata\Type\StringType;
 class MetadataProviderTest extends TestCase
 {
     /**
-     * @var \AlgoWeb\PODataLaravel\Providers\MetadataProvider
+     * @var \AlgoWeb\PODataLaravel\Providers\MetadataProviderOld
      */
     protected $object;
 
@@ -55,7 +55,7 @@ class MetadataProviderTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->object = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $this->object = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $this->object->reset();
     }
 
@@ -425,7 +425,7 @@ class MetadataProviderTest extends TestCase
      */
     public function testRegister()
     {
-        $foo = new MetadataProvider($this->app);
+        $foo = new MetadataProviderOld($this->app);
         $foo->register();
 
         $result = App::make('metadata');

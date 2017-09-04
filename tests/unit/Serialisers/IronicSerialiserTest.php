@@ -10,6 +10,7 @@ use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use AlgoWeb\PODataLaravel\Providers\MetadataProviderOld;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -420,7 +421,7 @@ class IronicSerialiserTest extends SerialiserTestBase
             App::instance($className, $testModel);
         }
 
-        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->boot();
 
@@ -551,7 +552,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $host->setServiceUri("/odata.svc/");
 
         $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
-        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->reset();
         $metaProv->boot();
@@ -612,7 +613,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $host->setServiceUri("/odata.svc/");
 
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
-        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->reset();
         $metaProv->boot();

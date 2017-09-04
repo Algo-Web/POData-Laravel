@@ -2,7 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
-use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use AlgoWeb\PODataLaravel\Providers\MetadataProviderOld;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
@@ -12,7 +12,7 @@ class MetadataRelationHolderCharacterisationTest extends TestCase
     public function testGetMonomorphicOneToOneAndOneToMany()
     {
         $holder = new MetadataRelationHolder();
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
 
         foreach ($classen as $className) {
@@ -40,7 +40,7 @@ class MetadataRelationHolderCharacterisationTest extends TestCase
     public function testGetMonomorphicManyToMany()
     {
         $holder = new MetadataRelationHolder();
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
 
         foreach ($classen as $className) {
@@ -68,7 +68,7 @@ class MetadataRelationHolderCharacterisationTest extends TestCase
     public function testGetPolymorphicOneToOne()
     {
         $holder = new MetadataRelationHolder();
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $classen = [TestMorphOneSource::class, TestMorphOneSourceAlternate::class, TestMorphTarget::class];
 
         foreach ($classen as $className) {
@@ -96,7 +96,7 @@ class MetadataRelationHolderCharacterisationTest extends TestCase
     public function testGetPolymorphicOneToMany()
     {
         $holder = new MetadataRelationHolder();
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $classen = [TestMorphManySource::class, TestMorphManySourceAlternate::class, TestMorphTarget::class];
 
         foreach ($classen as $className) {
@@ -124,7 +124,7 @@ class MetadataRelationHolderCharacterisationTest extends TestCase
     public function testGetPolymorphicManyToMany()
     {
         $holder = new MetadataRelationHolder();
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $classen = [TestMorphManyToManySource::class, TestMorphManyToManyTarget::class];
 
         foreach ($classen as $className) {
@@ -152,7 +152,7 @@ class MetadataRelationHolderCharacterisationTest extends TestCase
     public function testGetPolymorphicDualSource()
     {
         $holder = new MetadataRelationHolder();
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $classen = [TestPolymorphicDualSource::class, TestMorphTarget::class, TestMorphTargetAlternate::class];
 
         foreach ($classen as $className) {

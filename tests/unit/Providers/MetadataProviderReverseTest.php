@@ -31,7 +31,8 @@ class MetadataProviderReverseTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->metadataProvider = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $this->metadataProvider = m::mock(MetadataProviderOld::class)
+            ->makePartial()->shouldAllowMockingProtectedMethods();
         $this->metadataProvider->reset();
     }
 

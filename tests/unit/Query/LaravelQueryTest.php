@@ -10,6 +10,7 @@ use AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use AlgoWeb\PODataLaravel\Providers\MetadataProviderOld;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -1792,7 +1793,7 @@ class LaravelQueryTest extends TestCase
         $parentNavName = 'manySource';
         $childNavName = 'manyTarget';
 
-        $metaProv = m::mock(MetadataProvider::class);
+        $metaProv = m::mock(MetadataProviderOld::class);
         $metaProv->shouldReceive('resolveReverseProperty')->andReturn($childNavName);
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
@@ -1817,7 +1818,7 @@ class LaravelQueryTest extends TestCase
         $parent = new TestMonomorphicSource($meta);
         $child = new TestMonomorphicTarget($meta);
 
-        $metaProv = m::mock(MetadataProvider::class);
+        $metaProv = m::mock(MetadataProviderOld::class);
         $metaProv->shouldReceive('resolveReverseProperty')->andReturn(null);
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();

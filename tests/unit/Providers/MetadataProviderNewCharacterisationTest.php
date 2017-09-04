@@ -21,9 +21,9 @@ class MetadataProviderNewCharacterisationTest extends TestCase
     public function testGetPolymorphicOneToOne()
     {
         $holder = new MetadataRelationHolder();
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->reset();
-        $bar = m::mock(MetadataProviderNew::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $bar = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $bar->reset();
         $classen = [TestMorphOneSource::class, TestMorphOneSourceAlternate::class, TestMorphTarget::class];
         shuffle($classen);
@@ -57,9 +57,9 @@ class MetadataProviderNewCharacterisationTest extends TestCase
     public function testGetPolymorphicOneToMany()
     {
         $holder = new MetadataRelationHolder();
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->reset();
-        $bar = m::mock(MetadataProviderNew::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $bar = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $bar->reset();
         $classen = [TestMorphManySource::class, TestMorphManySourceAlternate::class, TestMorphTarget::class];
         shuffle($classen);
@@ -93,9 +93,9 @@ class MetadataProviderNewCharacterisationTest extends TestCase
     public function testGetPolymorphicManyToMany()
     {
         $holder = new MetadataRelationHolder();
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->reset();
-        $bar = m::mock(MetadataProviderNew::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $bar = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $bar->reset();
         $classen = [TestMorphManyToManyTarget::class, TestMorphManyToManySource::class];
         shuffle($classen);
@@ -129,9 +129,9 @@ class MetadataProviderNewCharacterisationTest extends TestCase
     public function testGetPolymorphicDualSource()
     {
         $holder = new MetadataRelationHolder();
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->reset();
-        $bar = m::mock(MetadataProviderNew::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $bar = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $bar->reset();
         $classen = [TestMorphTargetAlternate::class, TestPolymorphicDualSource::class, TestMorphTarget::class];
         shuffle($classen);
@@ -165,9 +165,9 @@ class MetadataProviderNewCharacterisationTest extends TestCase
     public function testGetPolymorphicMegamix()
     {
         $holder = new MetadataRelationHolder();
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->reset();
-        $bar = m::mock(MetadataProviderNew::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $bar = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $bar->reset();
         $classen = [TestMorphTargetAlternate::class, TestPolymorphicDualSource::class, TestMorphTarget::class,
             TestMorphOneSource::class, TestMorphOneSourceAlternate::class,
