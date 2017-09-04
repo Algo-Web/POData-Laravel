@@ -12,6 +12,7 @@ class MetadataProviderNew extends MetadataProvider
     {
         parent::__construct($app);
         $this->relationHolder = new MetadataRelationHolder();
+        self::$isBooted = false;
     }
 
     /**

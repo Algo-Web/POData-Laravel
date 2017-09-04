@@ -96,6 +96,13 @@ class MetadataProviderNewTest extends TestCase
         $foo->boot();
     }
 
+    public function testConstruct()
+    {
+        $app = m::mock(\Illuminate\Contracts\Foundation\Application::class);
+        $foo = new MetadataProviderNew($app);
+        $this->assertTrue($foo->getRelationHolder() instanceof MetadataRelationHolder);
+    }
+
     public function testBootHasMigrationsIsCached()
     {
         $this->setUpSchemaFacade();
