@@ -45,6 +45,9 @@ class MetadataRelationHolder
         $result = [];
         $payload = $rels[$keyName];
         $principalType = $className;
+        $numRel = 0;
+        $isKnown = false;
+
         foreach ($payload as $dependentType => $targDeets) {
             if (!array_key_exists($dependentType, $this->relations)) {
                 continue;
@@ -58,6 +61,7 @@ class MetadataRelationHolder
                         $result[] = $morph;
                     }
                 }
+                $isKnown = true;
                 continue;
             }
 
@@ -70,12 +74,19 @@ class MetadataRelationHolder
                 if (!array_key_exists($targKey, $foreign)) {
                     continue;
                 }
+                $numRel++;
+
                 $foreignDeets = $foreign[$targKey];
                 foreach ($foreignDeets as $foreignType => $raw) {
                     if (!array_key_exists($foreignType, $this->relations)) {
                         continue;
                     }
                     foreach ($raw as $dependentProperty => $dependentPayload) {
+                        if ($principalType !== $foreignType) {
+                            if (null === $dependentPayload['type']) {
+                                continue;
+                            }
+                        }
                         if ($keyName == $dependentPayload['local']) {
                             $dependentMult = $dependentPayload['multiplicity'];
                             // generate forward and reverse relations
@@ -100,6 +111,11 @@ class MetadataRelationHolder
                 }
             }
         }
+
+        $maxRel = $isKnown ? PHP_INT_MAX : 2 * $numRel;
+        $msg = 'Key '.$keyName. ' on class '.$className . ' should have no more than '
+               .$maxRel.' lines, has '.count($result);
+        assert($maxRel >= count($result), $msg);
         return $result;
     }
 
