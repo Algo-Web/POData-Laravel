@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\ODataMetadata\MetadataManager;
 use AlgoWeb\ODataMetadata\MetadataV3\edm\TEntityTypeType;
+use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestCastModel;
 use AlgoWeb\PODataLaravel\Models\TestGetterModel;
@@ -41,10 +42,10 @@ use POData\Providers\Metadata\Type\StringType;
 /**
  * Generated Test Class.
  */
-class MetadataProviderTest extends TestCase
+class MetadataProviderNewTest extends TestCase
 {
     /**
-     * @var \AlgoWeb\PODataLaravel\Providers\MetadataProvider
+     * @var \AlgoWeb\PODataLaravel\Providers\MetadataProviderNew
      */
     protected $object;
 
@@ -55,7 +56,10 @@ class MetadataProviderTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->object = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+//        $this->object = new \AlgoWeb\PODataLaravel\Providers\MetadataProviderNew();
+        $holder = new MetadataRelationHolder();
+        $this->object = m::mock(MetadataProviderNew::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $this->object->shouldReceive('getRelationHolder')->andReturn($holder);
         $this->object->reset();
     }
 
@@ -69,7 +73,7 @@ class MetadataProviderTest extends TestCase
     }
 
     /**
-     * @covers \AlgoWeb\PODataLaravel\Providers\MetadataProvider::boot
+     * @covers \AlgoWeb\PODataLaravel\Providers\MetadataProviderNew::boot
      */
     public function testBootNoMigrations()
     {
@@ -81,7 +85,7 @@ class MetadataProviderTest extends TestCase
     }
 
     /**
-     * @covers \AlgoWeb\PODataLaravel\Providers\MetadataProvider::boot
+     * @covers \AlgoWeb\PODataLaravel\Providers\MetadataProviderNew::boot
      */
     public function testBootNoMigrationsExceptionThrown()
     {
@@ -421,11 +425,11 @@ class MetadataProviderTest extends TestCase
 
 
     /**
-     * @covers \AlgoWeb\PODataLaravel\Providers\MetadataProvider::register
+     * @covers \AlgoWeb\PODataLaravel\Providers\MetadataProviderNew::register
      */
     public function testRegister()
     {
-        $foo = new MetadataProvider($this->app);
+        $foo = new MetadataProviderNew($this->app);
         $foo->register();
 
         $result = App::make('metadata');

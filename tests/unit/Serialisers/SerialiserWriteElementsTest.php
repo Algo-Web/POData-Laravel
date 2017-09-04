@@ -50,6 +50,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $classen = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -103,6 +104,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $classen = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -158,6 +160,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -217,6 +220,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $belongsTo = m::mock(BelongsTo::class)->makePartial();
@@ -285,6 +289,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $classen = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');

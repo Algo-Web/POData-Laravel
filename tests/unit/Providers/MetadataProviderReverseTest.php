@@ -26,6 +26,15 @@ use POData\Providers\Metadata\SimpleMetadataProvider;
 
 class MetadataProviderReverseTest extends TestCase
 {
+    private $metadataProvider;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->metadataProvider = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $this->metadataProvider->reset();
+    }
+
     public function testReverseAcrossSingleRelation()
     {
         $meta = [];
@@ -51,7 +60,7 @@ class MetadataProviderReverseTest extends TestCase
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
         Cache::swap($cache);
 
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo = $this->metadataProvider;
         $foo->shouldReceive('getIsCaching')->andReturn(false);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen)->atLeast(1);
 
@@ -95,7 +104,7 @@ class MetadataProviderReverseTest extends TestCase
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
         Cache::swap($cache);
 
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo = $this->metadataProvider;
         $foo->shouldReceive('getIsCaching')->andReturn(false);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen)->atLeast(1);
 
@@ -140,7 +149,7 @@ class MetadataProviderReverseTest extends TestCase
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
         Cache::swap($cache);
 
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo = $this->metadataProvider;
         $foo->shouldReceive('getIsCaching')->andReturn(false);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen)->atLeast(1);
 
@@ -177,7 +186,7 @@ class MetadataProviderReverseTest extends TestCase
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
         Cache::swap($cache);
 
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo = $this->metadataProvider;
         $foo->shouldReceive('getIsCaching')->andReturn(false);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen)->atLeast(1);
 

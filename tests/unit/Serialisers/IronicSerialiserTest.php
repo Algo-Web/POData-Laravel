@@ -553,6 +553,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -613,6 +614,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $targ = new TestMonomorphicTarget($metadata);

@@ -62,6 +62,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $classen = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -117,6 +118,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $classen = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -180,6 +182,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -236,6 +239,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -295,6 +299,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -392,6 +397,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $classen = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -457,6 +463,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -544,6 +551,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
         $metaProv->boot();
 
         $meta = App::make('metadata');

@@ -21,6 +21,7 @@ class MetadataProvider extends MetadataBaseProvider
     protected $multConstraints = [ '0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
     protected static $metaNAMESPACE = 'Data';
     protected static $relationCache;
+    protected static $isBooted = false;
     const POLYMORPHIC = 'polyMorphicPlaceholder';
     const POLYMORPHIC_PLURAL = 'polyMorphicPlaceholders';
 
@@ -41,6 +42,7 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
 
+        assert(false === self::$isBooted, 'Provider booted twice');
         $isCaching = true === $this->getIsCaching();
         $meta = Cache::get('metadata');
         $hasCache = null != $meta;
@@ -74,6 +76,7 @@ class MetadataProvider extends MetadataBaseProvider
 
         $key = 'metadata';
         $this->handlePostBoot($isCaching, $hasCache, $key, $meta);
+        self::$isBooted = true;
     }
 
     /**
@@ -605,6 +608,7 @@ class MetadataProvider extends MetadataBaseProvider
     public function reset()
     {
         self::$relationCache = null;
+        self::$isBooted = false;
     }
 
     /**
