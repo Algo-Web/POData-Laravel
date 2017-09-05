@@ -470,9 +470,9 @@ class MetadataTraitTest extends TestCase
         $foo = new TestMorphTarget();
 
         $result = $foo->getRelationshipsFromMethods();
-        $this->assertEquals(0, count($result['HasOne']));
+        $this->assertEquals(1, count($result['HasOne']));
         $this->assertEquals(0, count($result['HasMany']));
-        $this->assertEquals(0, count($result['KnownPolyMorphSide']));
+        $this->assertEquals(1, count($result['KnownPolyMorphSide']));
         $this->assertEquals(1, count($result['UnknownPolyMorphSide']));
         $this->assertTrue(array_key_exists('morph', $result['UnknownPolyMorphSide']));
     }
@@ -680,7 +680,7 @@ class MetadataTraitTest extends TestCase
             [TestMorphOneSource::class, false],
             [TestMorphOneSourceAlternate::class, false],
             [TestMorphTarget::class, true],
-            [TestMorphTarget::class, true],
+            [TestMorphTargetChild::class, true],
             [TestMorphManySourceWithUnexposedTarget::class, false]
         ];
     }
@@ -713,7 +713,8 @@ class MetadataTraitTest extends TestCase
             [TestMorphManyToManyTarget::class, false],
             [TestMorphOneSource::class, true],
             [TestMorphOneSourceAlternate::class, true],
-            [TestMorphTarget::class, false],
+            [TestMorphTarget::class, true],
+            [TestMorphTargetChild::class, false],
             [TestMorphManySourceWithUnexposedTarget::class, false]
         ];
     }

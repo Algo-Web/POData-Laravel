@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Connection as Connection;
 use Mockery\Mockery;
 
-class TestMorphTarget extends Model
+class TestMorphTargetChild extends Model
 {
     use MetadataTrait {
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
@@ -39,7 +39,7 @@ class TestMorphTarget extends Model
 
     public function getTable()
     {
-        return 'testmorphtarget';
+        return 'testmorphtargetchild';
     }
 
     public function getConnectionName()
@@ -68,10 +68,5 @@ class TestMorphTarget extends Model
     public function morph()
     {
         return $this->morphTo();
-    }
-
-    public function childMorph()
-    {
-        return $this->morphOne(TestMorphTargetChild::class, 'morph');
     }
 }

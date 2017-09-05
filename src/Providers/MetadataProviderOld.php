@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema as Schema;
 use POData\Providers\Metadata\Type\TypeCode;
 
-class MetadataProviderOld extends MetadataBaseProvider
+abstract class MetadataProviderOld extends MetadataBaseProvider
 {
     protected $multConstraints = [ '0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
     protected static $metaNAMESPACE = 'Data';
@@ -275,11 +275,12 @@ class MetadataProviderOld extends MetadataBaseProvider
                 // if relation is not polymorphic, then move on
                 if (!($principalPoly || $dependentPoly)) {
                     continue;
+                } elseif ($principalPoly && $dependentPoly) {
+                    // both ends are known-side, so mark them appropriately and keep on trucking
+                    $rels[$i]['principalRSet'] = $placeholder;
+                    $rels[$i]['dependentRSet'] = $placeholder;
                 } else {
                     // if only one end is a known end of a polymorphic relation
-                    // for moment we're punting on both
-                    $oneEnd = $principalPoly !== $dependentPoly;
-                    assert($oneEnd, 'Multi-generational polymorphic relation chains not implemented');
                     $targRels = $principalPoly ? $groups[$principalType] : $groups[$dependentType];
                     $targUnknown = $targRels[$principalPoly ? $dependentType : $principalType];
                     $targProperty = $principalPoly ? $relation['dependentProp'] : $relation['principalProp'];

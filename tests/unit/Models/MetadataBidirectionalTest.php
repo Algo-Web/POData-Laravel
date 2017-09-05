@@ -158,12 +158,23 @@ class MetadataBidirectionalTest extends TestCase
     {
         $foo = new TestMorphTarget();
         $targ = TestMorphTarget::class;
+        $childTarg = TestMorphTargetChild::class;
 
         $expected = [
             'morph_id' =>
                 [
                     $targ => [ 'morph' => [
                         'property' => 'morph', 'local' => 'id', 'multiplicity' => '1', 'type' => 'known']]
+                ],
+            'id' =>
+                [
+                    $childTarg => [ 'childMorph' => [
+                        'property' => 'childMorph',
+                        'local' => 'morph_id',
+                        'multiplicity' => '0..1',
+                        'type' => 'unknown'
+                        ]
+                    ]
                 ]
         ];
 

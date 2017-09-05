@@ -17,6 +17,7 @@ use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphTargetAlternate;
+use AlgoWeb\PODataLaravel\Models\TestMorphTargetChild;
 use AlgoWeb\PODataLaravel\Models\TestPolymorphicDualSource;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -31,7 +32,7 @@ class MetadataProviderRelationTest extends TestCase
     public function testMonomorphicSourceAndTarget()
     {
         $app = App::make('app');
-        $foo = new MetadataProviderOld($app);
+        $foo = new MetadataProvider($app);
 
         // only add one side of the expected relationships here, and explicitly reverse expected before checking for
         // reversed actual
@@ -94,7 +95,7 @@ class MetadataProviderRelationTest extends TestCase
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
             "dependentMult" => "*",
-            "dependentProp" => "oneSource"
+            "dependentProp" => "manySource"
         ];
         $expected[] = [
             "principalType" => TestMorphManySource::class,
@@ -157,6 +158,17 @@ class MetadataProviderRelationTest extends TestCase
             "dependentProp" => "morph"
         ];
 
+        $expected[] = [
+            "principalType" => TestMorphTargetChild::class,
+            "principalRSet" => TestMorphTargetChild::class,
+            "principalMult" => "0..1",
+            "principalProp" => "morph",
+            "dependentType" => TestMorphTarget::class,
+            "dependentRSet" => TestMorphTarget::class,
+            "dependentMult" => "1",
+            "dependentProp" => "childMorph"
+        ];
+
         $actual = $foo->calculateRoundTripRelations();
         $this->assertTrue(is_array($actual), "Bidirectional relations result not an array");
         $counter = 0;
@@ -173,6 +185,22 @@ class MetadataProviderRelationTest extends TestCase
             $reverse['dependentProp'] = $forward['principalProp'];
             $reverse['dependentRSet'] = $forward['principalRSet'];
             $this->assertTrue(in_array($reverse, $actual), $counter);
+            $counter++;
+        }
+
+        $counter = 0;
+        foreach ($actual as $forward) {
+            $reverse = $forward;
+            $reverse['principalType'] = $forward['dependentType'];
+            $reverse['principalMult'] = $forward['dependentMult'];
+            $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
+            $reverse['dependentType'] = $forward['principalType'];
+            $reverse['dependentMult'] = $forward['principalMult'];
+            $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
+            $match = in_array($forward, $expected) || in_array($reverse, $expected);
+            $this->assertTrue($match, 'Reverse pass: '.$counter);
             $counter++;
         }
     }
@@ -273,6 +301,7 @@ class MetadataProviderRelationTest extends TestCase
         $expected[TestMorphTarget::class] = [];
         $expected[TestMorphTarget::class][TestMorphManySource::class] = ['morphTarget'];
         $expected[TestMorphTarget::class][TestMorphManySourceAlternate::class] = ['morphTarget'];
+        $expected[TestMorphTarget::class][TestMorphTarget::class] = ['morph'];
         $actual = $foo->getPolymorphicRelationGroups();
         $this->assertEquals($expected, $actual);
     }
