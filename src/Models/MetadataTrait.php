@@ -145,9 +145,9 @@ trait MetadataTrait
 
         $metadata = App::make('metadata');
 
-        $isUnknown = $this->isUnknownPolymorphSide();
+        $isKnown = $this->isKnownPolymorphSide();
         $isAbstract = false;
-        if ($isUnknown) {
+        if ($isKnown) {
             $baseType = $metadata->resolveResourceType('polyMorphicPlaceholder');
             assert($baseType instanceof ResourceEntityType);
             assert($baseType->isAbstract());

@@ -87,6 +87,7 @@ class MetadataProviderReverseTest extends TestCase
     {
         $meta = [];
         $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
@@ -169,6 +170,7 @@ class MetadataProviderReverseTest extends TestCase
     {
         $meta = [];
         $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
