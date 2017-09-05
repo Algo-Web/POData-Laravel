@@ -2,13 +2,13 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
-use AlgoWeb\PODataLaravel\Providers\MetadataProviderOld;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -60,8 +60,10 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
         $host->setServiceUri("/odata.svc/");
 
+        $holder = new MetadataRelationHolder();
         $classen = [TestModel::class];
-        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->reset();
         $metaProv->boot();
@@ -116,8 +118,10 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
         $host->setServiceUri("/odata.svc/");
 
+        $holder = new MetadataRelationHolder();
         $classen = [TestModel::class];
-        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->reset();
         $metaProv->boot();
@@ -180,8 +184,10 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
         $host->setServiceUri("/odata.svc/");
 
+        $holder = new MetadataRelationHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
-        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->reset();
         $metaProv->boot();
@@ -237,8 +243,10 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
         $host->setServiceUri("/odata.svc/");
 
+        $holder = new MetadataRelationHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
-        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->reset();
         $metaProv->boot();
@@ -297,8 +305,10 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
         $host->setServiceUri("/odata.svc/");
 
+        $holder = new MetadataRelationHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
-        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->reset();
         $metaProv->boot();
@@ -395,8 +405,10 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
         $host->setServiceUri("/odata.svc/");
 
+        $holder = new MetadataRelationHolder();
         $classen = [TestModel::class];
-        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->reset();
         $metaProv->boot();
@@ -461,8 +473,10 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
         $host->setServiceUri("/odata.svc/");
 
+        $holder = new MetadataRelationHolder();
         $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
-        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->reset();
         $metaProv->boot();
@@ -549,8 +563,10 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
         $host->setServiceUri("/odata.svc/");
 
+        $holder = new MetadataRelationHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
-        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->reset();
         $metaProv->boot();

@@ -2,10 +2,10 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
-use AlgoWeb\PODataLaravel\Providers\MetadataProviderOld;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
@@ -38,9 +38,7 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
         $host->setServiceUri("/odata.svc/");
 
         $classen = [TestModel::class];
-        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
-        $metaProv->reset();
+        $metaProv = $this->setupMockMetadataProvider($classen);
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -85,9 +83,7 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
         $host->setServiceUri("/odata.svc/");
 
         $classen = [TestModel::class];
-        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
-        $metaProv->reset();
+        $metaProv = $this->setupMockMetadataProvider($classen);
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -137,9 +133,7 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
         $host->setServiceUri("/odata.svc/");
 
         $classen = [TestModel::class];
-        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
-        $metaProv->reset();
+        $metaProv = $this->setupMockMetadataProvider($classen);
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -169,5 +163,19 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
         $ironicResult = $ironic->writeUrlElements($collection);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult);
+    }
+
+    /**
+     * @param $classen
+     * @return m\Mock
+     */
+    private function setupMockMetadataProvider($classen)
+    {
+        $holder = new MetadataRelationHolder();
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
+        $metaProv->reset();
+        return $metaProv;
     }
 }

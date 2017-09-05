@@ -10,7 +10,6 @@ use AlgoWeb\PODataLaravel\Models\TestBulkUpdateRequest;
 use AlgoWeb\PODataLaravel\Models\TestCase;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
-use AlgoWeb\PODataLaravel\Providers\MetadataProviderOld;
 use AlgoWeb\PODataLaravel\Requests\TestRequest;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
@@ -36,7 +35,7 @@ class LaravelQueryBulkTest extends TestCase
     {
         $foo = new LaravelQuery();
         $result = $foo->getMetadataProvider();
-        $this->assertTrue($result instanceof MetadataProviderOld);
+        $this->assertTrue($result instanceof MetadataProvider);
     }
 
     public function testBulkCreate()

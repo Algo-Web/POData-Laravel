@@ -2,10 +2,10 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
-use AlgoWeb\PODataLaravel\Providers\MetadataProviderOld;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Illuminate\Support\Facades\App;
 use POData\ObjectModel\ObjectModelSerializer;
@@ -312,6 +312,7 @@ class SerialiserWriteBagTest extends SerialiserTestBase
      */
     private function setUpDataServiceDeps($request)
     {
+        $holder = new MetadataRelationHolder();
         $metadata = [];
         $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
@@ -324,7 +325,8 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
 
         $classen = [TestModel::class];
-        $metaProv = m::mock(MetadataProviderOld::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->reset();
         $metaProv->boot();

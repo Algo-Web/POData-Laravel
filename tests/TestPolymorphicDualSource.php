@@ -39,7 +39,7 @@ class TestPolymorphicDualSource extends Model
 
     public function getTable()
     {
-        return 'testmorphonesource';
+        return 'testpolymorphicdualsource';
     }
 
     public function getConnectionName()

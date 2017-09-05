@@ -3,34 +3,21 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
-use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Mockery as m;
+use Illuminate\Database\Eloquent\Model as Model;
+use Illuminate\Database\Connection as Connection;
+use Mockery\Mockery;
 
-class TestMorphManySourceWithUnexposedTarget extends Model
+class TestMorphTargetChild extends Model
 {
     use MetadataTrait {
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
         // not bury ourselves under a stack overflow and segfault
         getRelationshipsFromMethods as getRel;
     }
-
     protected $metaArray;
     protected $connect;
     protected $grammar;
     protected $processor;
-
-    protected $morphRelation;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = ['*'];
-
-    public $primaryKey = 'alternate_id';
 
     public function __construct(array $meta = null, Connection $connect = null)
     {
@@ -46,20 +33,13 @@ class TestMorphManySourceWithUnexposedTarget extends Model
             $connect->shouldReceive('getQueryGrammar')->andReturn($this->grammar);
             $connect->shouldReceive('getPostProcessor')->andReturn($this->processor);
             $this->connect = $connect;
-            assert(null !== $this->connect);
-            assert(null !== $this->connect->getQueryGrammar());
-            assert(null !== $this->connect->getPostProcessor());
         }
         parent::__construct();
-        $morph = m::mock(MorphMany::class)->makePartial();
-        $related = m::mock(TestMorphUnexposedTarget::class)->makePartial();
-        $morph->shouldReceive('getRelated')->andReturn($related);
-        $this->morphRelation = $morph;
     }
 
     public function getTable()
     {
-        return 'testmorphmanysourcewithunexposedtarget';
+        return 'testmorphtargetchild';
     }
 
     public function getConnectionName()
@@ -85,8 +65,8 @@ class TestMorphManySourceWithUnexposedTarget extends Model
         return $this->getRel($biDir);
     }
 
-    public function morphTarget()
+    public function morph()
     {
-        return $this->morphRelation;
+        return $this->morphTo();
     }
 }
