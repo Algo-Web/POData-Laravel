@@ -1,5 +1,7 @@
 Unreleased
 ----------
+   * Fix bugs in base type generation
+   * Fix bugs in relation calculation
    * Add dry-run config option
    * Implement default and custom bulk-create/update handling
    * Implement relation hookup/disconnect

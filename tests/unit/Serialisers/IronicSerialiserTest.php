@@ -30,6 +30,7 @@ use POData\ObjectModel\ODataTitle;
 use POData\OperationContext\IOperationContext;
 use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext;
+use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSetWrapper;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\ProvidersWrapper;
@@ -398,7 +399,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testSerialisePolymorphicUnknownType()
+    public function testSerialisePolymorphicKnownType()
     {
         $known = Carbon::create(2017, 1, 1, 0, 0, 0, 'UTC');
         Carbon::setTestNow($known);
@@ -428,18 +429,18 @@ class IronicSerialiserTest extends SerialiserTestBase
         $metaProv->boot();
 
         $propContent = new ODataPropertyContent();
-        $propContent->properties = ['name' => new ODataProperty(), 'id' => new ODataProperty()];
+        $propContent->properties = ['name' => new ODataProperty(), 'alternate_id' => new ODataProperty()];
         $propContent->properties['name']->name = 'name';
-        $propContent->properties['id']->name = 'id';
+        $propContent->properties['alternate_id']->name = 'alternate_id';
         $propContent->properties['name']->typeName = 'Edm.String';
-        $propContent->properties['id']->typeName = 'Edm.Int32';
+        $propContent->properties['alternate_id']->typeName = 'Edm.Int32';
         $propContent->properties['name']->value = 'Hammer, M.C.';
 
         $odataLink = new ODataLink();
-        $odataLink->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morphTarget';
-        $odataLink->title = 'morphTarget';
+        $odataLink->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph';
+        $odataLink->title = 'morph';
         $odataLink->type = 'application/atom+xml;type=entry';
-        $odataLink->url = 'TestMorphOneSourceAlternates(PrimaryKey=\'42\')/morphTarget';
+        $odataLink->url = 'TestMorphTargets(PrimaryKey=\'42\')/morph';
 
         $mediaLink1 = new ODataMediaLink(
             'photo',
@@ -449,47 +450,49 @@ class IronicSerialiserTest extends SerialiserTestBase
             'eTag'
         );
         $mediaLink = new ODataMediaLink(
-            'TestMorphOneSourceAlternate',
+            'TestMorphTarget',
             '/$value',
-            'TestMorphOneSourceAlternates(PrimaryKey=\'42\')/$value',
+            'TestMorphTargets(PrimaryKey=\'42\')/$value',
             '*/*',
             'eTag',
             'edit-media'
         );
 
         $expected = new ODataEntry();
-        $expected->id = 'http://localhost/odata.svc/TestMorphOneSourceAlternates(PrimaryKey=\'42\')';
-        $expected->title = new ODataTitle('TestMorphOneSourceAlternate');
+        $expected->id = 'http://localhost/odata.svc/TestMorphTargets(PrimaryKey=\'42\')';
+        $expected->title = new ODataTitle('TestMorphTarget');
         $expected->editLink = new ODataLink();
-        $expected->editLink->url = 'TestMorphOneSourceAlternates(PrimaryKey=\'42\')';
+        $expected->editLink->url = 'TestMorphTargets(PrimaryKey=\'42\')';
         $expected->editLink->name = 'edit';
-        $expected->editLink->title = 'TestMorphOneSourceAlternate';
-        $expected->type = new ODataCategory('TestMorphOneSourceAlternate');
+        $expected->editLink->title = 'TestMorphTarget';
+        $expected->type = new ODataCategory('TestMorphTarget');
         $expected->propertyContent = $propContent;
         $expected->links[] = $odataLink;
         $expected->mediaLink = $mediaLink;
         $expected->mediaLinks[] = $mediaLink1;
         $expected->isMediaLinkEntry = true;
-        $expected->resourceSetName = 'TestMorphOneSourceAlternates';
+        $expected->resourceSetName = 'TestMorphTargets';
         $expected->updated = '2017-01-01T00:00:00+00:00';
         $expected->baseURI = 'http://localhost/odata.svc/';
 
-        $model = new TestMorphOneSourceAlternate($meta);
-        $model->alternate_id = 42;
+        $model = new TestMorphTarget($meta);
+        $model->id = 42;
         $model->name = 'Hammer, M.C.';
         $model->PrimaryKey = 42;
+        $this->assertTrue($model->isKnownPolymorphSide());
+        $this->assertTrue($model->isUnknownPolymorphSide());
 
         $payload = new QueryResult();
         $payload->results = $model;
 
         $service = new Url('http://localhost/odata.svc');
-        $request = new Url('http://localhost/odata.svc/TestMorphOneSourceAlternates(42)');
+        $request = new Url('http://localhost/odata.svc/TestMorphTargets(42)');
 
         $targType = $simple->resolveResourceType('polyMorphicPlaceholder');
 
         $request = m::mock(RequestDescription::class)->makePartial();
-        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMorphOneSourceAlternates(42)');
-        $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestMorphOneSourceAlternates(42)');
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMorphTargets(42)');
+        $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestMorphTargets(42)');
         $request->shouldReceive('getTargetResourceType')->andReturn($targType);
 
         $provWrap = m::mock(ProvidersWrapper::class);
@@ -516,6 +519,53 @@ class IronicSerialiserTest extends SerialiserTestBase
         $ironic = new IronicSerialiser($dataService, $request);
 
         $actual = $ironic->writeTopLevelElement($payload);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     *
+     */
+    public function testSerialiseKnownSideWithNoResourceMatch()
+    {
+        $known = Carbon::create(2017, 1, 1, 0, 0, 0, 'UTC');
+        Carbon::setTestNow($known);
+
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $model = new TestMorphTarget($meta);
+
+        $payload = new QueryResult();
+        $payload->results = $model;
+        
+        $concType = m::mock(ResourceEntityType::class)->makePartial();
+        $concType->shouldReceive('isAbstract')->andReturn(false)->atLeast(1);
+        $concType->shouldReceive('getInstanceType->getName')->andReturn('EatSleepMoshRepeat');
+
+        $targType = m::mock(ResourceEntityType::class)->makePartial();
+        $targType->shouldReceive('isAbstract')->andReturn(true)->atLeast(1);
+        $targType->shouldReceive('getName')->andReturn('polyMorphicPlaceholder')->atLeast(1);
+
+        $request = m::mock(RequestDescription::class)->makePartial();
+        $request->shouldReceive('getTargetResourceType')->andReturn($targType);
+
+        $foo = m::mock(IronicSerialiser::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getRequest')->andReturn($request);
+        $foo->shouldReceive('getService->getProvidersWrapper->resolveResourceType')->andReturn($targType);
+        $foo->shouldReceive('getMetadata->getDerivedTypes')->andReturn([$concType]);
+
+        $expected = 'assert(): Concrete resource type not selected for payload'.
+                    ' AlgoWeb\PODataLaravel\Models\TestMorphTarget failed';
+        $actual = null;
+
+        try {
+            $foo->writeTopLevelElement($payload);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
         $this->assertEquals($expected, $actual);
     }
 

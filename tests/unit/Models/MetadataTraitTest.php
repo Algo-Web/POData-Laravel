@@ -623,21 +623,21 @@ class MetadataTraitTest extends TestCase
         $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $entity = m::mock(ResourceEntityType::class);
-        $entity->shouldReceive('isAbstract')->withAnyArgs()->andReturn(true)->once();
+        $entity->shouldReceive('isAbstract')->withAnyArgs()->andReturn(false)->never();
 
         $iType = new StringType();
         $base = m::mock(ResourceEntityType::class)->makePartial();
         $base->shouldReceive('getInstanceType')->andReturn($iType);
         $base->shouldReceive('getName')->andReturn(TestMorphOneSource::class);
         $base->shouldReceive('getFullName')->andReturn(TestMorphOneSource::class);
-        $base->shouldReceive('addProperty')->andReturn(null)->times(1);
+        $base->shouldReceive('addProperty')->andReturn(null)->times(2);
         $base->shouldReceive('setMediaLinkEntry')->andReturn(null)->times(1);
         $base->shouldReceive('isMediaLinkEntry')->andReturn(true)->once();
         $base->shouldReceive('addNamedStream')->andReturn(null)->times(1);
         $base->shouldReceive('getKeyProperties')->andReturn(['a'])->times(1);
 
         $metaProv = m::mock(SimpleMetadataProvider::class)->makePartial();
-        $metaProv->shouldReceive('resolveResourceType')->andReturn($entity)->once();
+        $metaProv->shouldReceive('resolveResourceType')->andReturn($entity)->never();
         $metaProv->shouldReceive('addEntityType')->andReturn($base);
 
         App::instance('metadata', $metaProv);
@@ -645,7 +645,8 @@ class MetadataTraitTest extends TestCase
         //$foo = new TestMorphOneSource($meta);
         $foo = m::mock(TestMorphOneSource::class)->makePartial();
         $foo->shouldReceive('metadata')->andReturn($meta);
-        $foo->shouldReceive('isUnknownPolymorphSide')->andReturn(true)->once();
+        $foo->shouldReceive('isUnknownPolymorphSide')->andReturn(true)->never();
+        $foo->shouldReceive('isKnownPolymorphSide')->andReturn(false)->once();
 
         $result = $foo->getXmlSchema();
         $this->assertEquals(TestMorphOneSource::class, $result->getName());
