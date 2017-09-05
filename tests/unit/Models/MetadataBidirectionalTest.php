@@ -159,6 +159,8 @@ class MetadataBidirectionalTest extends TestCase
         $foo = new TestMorphTarget();
         $targ = TestMorphTarget::class;
         $childTarg = TestMorphTargetChild::class;
+        $monoParent = TestMonomorphicParentOfMorphTarget::class;
+        $monoChild = TestMonomorphicChildOfMorphTarget::class;
 
         $expected = [
             'morph_id' =>
@@ -173,7 +175,24 @@ class MetadataBidirectionalTest extends TestCase
                         'local' => 'morph_id',
                         'multiplicity' => '0..1',
                         'type' => 'unknown'
-                        ]
+                    ]
+                    ],
+                    $monoParent => [ 'monomorphicParent' => [
+                        'property' => 'monomorphicParent',
+                        'local' => 'child_id',
+                        'multiplicity' => '1',
+                        'type' => null
+                    ]
+                    ]
+                ],
+            'parent_id' =>
+                [
+                    $monoChild => [ 'monomorphicChildren' => [
+                        'property' => 'monomorphicChildren',
+                        'local' => 'id',
+                        'multiplicity' => '*',
+                        'type' => null
+                    ]
                     ]
                 ]
         ];

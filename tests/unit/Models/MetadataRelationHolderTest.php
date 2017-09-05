@@ -685,4 +685,40 @@ class MetadataRelationHolderTest extends TestCase
             $this->assertTrue(in_array($reverse, $actual));
         }
     }
+
+    public function testGetMonomorphicRelationWithKnownPolymorphicSideParent()
+    {
+        $expected = [];
+        $expected[] = [
+            "principalType" => TestMorphTarget::class,
+            "principalRSet" => TestMorphTarget::class,
+            "principalMult" => "1",
+            "principalProp" => "monomorphicChildren",
+            "dependentType" => TestMonomorphicChildOfMorphTarget::class,
+            "dependentRSet" => TestMonomorphicChildOfMorphTarget::class,
+            "dependentMult" => "*",
+            "dependentProp" => "morphTarget"
+        ];
+
+        $foo = new MetadataRelationHolder();
+        $foo->addModel(new TestMorphTarget());
+        $foo->addModel(new TestMonomorphicChildOfMorphTarget());
+
+        $actual = $foo->getRelations();
+
+        $this->assertEquals(2 * count($expected), count($actual));
+        foreach ($expected as $forward) {
+            $this->assertTrue(in_array($forward, $actual));
+            $reverse = $forward;
+            $reverse['principalType'] = $forward['dependentType'];
+            $reverse['principalMult'] = $forward['dependentMult'];
+            $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
+            $reverse['dependentType'] = $forward['principalType'];
+            $reverse['dependentMult'] = $forward['principalMult'];
+            $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
+            $this->assertTrue(in_array($reverse, $actual));
+        }
+    }
 }

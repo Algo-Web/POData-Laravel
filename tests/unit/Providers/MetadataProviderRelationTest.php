@@ -4,10 +4,12 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestCase;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicChildOfMorphTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManyTarget;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicParentOfMorphTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
@@ -168,6 +170,26 @@ class MetadataProviderRelationTest extends TestCase
             "dependentRSet" => TestMorphTarget::class,
             "dependentMult" => "1",
             "dependentProp" => "childMorph"
+        ];
+        $expected[] = [
+            "principalType" => TestMonomorphicChildOfMorphTarget::class,
+            "principalRSet" => TestMonomorphicChildOfMorphTarget::class,
+            "principalMult" => "*",
+            "principalProp" => "morphTarget",
+            "dependentType" => TestMorphTarget::class,
+            "dependentRSet" => TestMorphTarget::class,
+            "dependentMult" => "1",
+            "dependentProp" => "monomorphicChildren"
+        ];
+        $expected[] = [
+            "principalType" => TestMonomorphicParentOfMorphTarget::class,
+            "principalRSet" => TestMonomorphicParentOfMorphTarget::class,
+            "principalMult" => "1",
+            "principalProp" => "morphTargets",
+            "dependentType" => TestMorphTarget::class,
+            "dependentRSet" => TestMorphTarget::class,
+            "dependentMult" => "*",
+            "dependentProp" => "monomorphicParent"
         ];
 
         $actual = $foo->calculateRoundTripRelations();
@@ -451,10 +473,10 @@ class MetadataProviderRelationTest extends TestCase
 
         $rels = $foo->calculateRoundTripRelations();
         $expected = $foo->calculateRoundTripRelations();
-        $expected[0]['principalRSet'] = 'polyMorphicPlaceholder';
-        $expected[3]['principalRSet'] = 'polyMorphicPlaceholder';
-        $expected[1]['dependentRSet'] = 'polyMorphicPlaceholder';
-        $expected[2]['dependentRSet'] = 'polyMorphicPlaceholder';
+        $expected[1]['principalRSet'] = 'polyMorphicPlaceholder';
+        $expected[2]['principalRSet'] = 'polyMorphicPlaceholder';
+        $expected[0]['dependentRSet'] = 'polyMorphicPlaceholder';
+        $expected[3]['dependentRSet'] = 'polyMorphicPlaceholder';
 
         // if groups is empty, bail right back out - nothing to do
         // else - need to loop through rels

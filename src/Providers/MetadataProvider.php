@@ -264,26 +264,8 @@ class MetadataProvider extends MetadataBaseProvider
                 $dependentType = $relation['dependentType'];
                 $principalPoly = in_array($principalType, $groupKeys);
                 $dependentPoly = in_array($dependentType, $groupKeys);
-                // if relation is not polymorphic, then move on
-                if (!($principalPoly || $dependentPoly)) {
-                    continue;
-                } elseif ($principalPoly && $dependentPoly) {
-                    // both ends are known-side, so mark them appropriately and keep on trucking
-                    $rels[$i]['principalRSet'] = $placeholder;
-                    $rels[$i]['dependentRSet'] = $placeholder;
-                } else {
-                    // if only one end is a known end of a polymorphic relation
-                    $targRels = $principalPoly ? $groups[$principalType] : $groups[$dependentType];
-                    $targUnknown = $targRels[$principalPoly ? $dependentType : $principalType];
-                    $targProperty = $principalPoly ? $relation['dependentProp'] : $relation['principalProp'];
-                    $msg = 'Specified unknown-side property ' . $targProperty
-                           . ' not found in polymorphic relation map';
-                    assert(in_array($targProperty, $targUnknown), $msg);
-
-                    $targType = $principalPoly ? 'dependentRSet' : 'principalRSet';
-                    $rels[$i][$targType] = $placeholder;
-                    continue;
-                }
+                $rels[$i]['principalRSet'] = $principalPoly ? $placeholder : $principalType;
+                $rels[$i]['dependentRSet'] = $dependentPoly ? $placeholder : $dependentType;
             }
             self::$relationCache = $rels;
         }

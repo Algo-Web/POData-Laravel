@@ -2,7 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
-use AlgoWeb\PODataLaravel\Providers\TestMorphManySourceWithUnexposedTarget;
+use AlgoWeb\PODataLaravel\Models\TestMorphManySourceWithUnexposedTarget;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
@@ -470,8 +470,8 @@ class MetadataTraitTest extends TestCase
         $foo = new TestMorphTarget();
 
         $result = $foo->getRelationshipsFromMethods();
-        $this->assertEquals(1, count($result['HasOne']));
-        $this->assertEquals(0, count($result['HasMany']));
+        $this->assertEquals(2, count($result['HasOne']));
+        $this->assertEquals(1, count($result['HasMany']));
         $this->assertEquals(1, count($result['KnownPolyMorphSide']));
         $this->assertEquals(1, count($result['UnknownPolyMorphSide']));
         $this->assertTrue(array_key_exists('morph', $result['UnknownPolyMorphSide']));

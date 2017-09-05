@@ -9,14 +9,17 @@ use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestCastModel;
 use AlgoWeb\PODataLaravel\Models\TestGetterModel;
 use AlgoWeb\PODataLaravel\Models\TestModel;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicChildOfMorphTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManyTarget;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicParentOfMorphTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate;
+use AlgoWeb\PODataLaravel\Models\TestMorphManySourceWithUnexposedTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
@@ -26,6 +29,7 @@ use AlgoWeb\PODataLaravel\Models\TestMorphTargetAlternate;
 use AlgoWeb\PODataLaravel\Models\TestMorphTargetChild;
 use AlgoWeb\PODataLaravel\Models\TestPolymorphicDualSource;
 use Illuminate\Cache\ArrayStore;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
@@ -140,7 +144,8 @@ class MetadataProviderNewTest extends TestCase
             TestMorphManyToManyTarget::class, TestMonomorphicOneAndManySource::class, TestMorphTargetAlternate::class,
             TestMonomorphicOneAndManyTarget::class, TestCastModel::class, TestMorphOneSourceAlternate::class,
             TestMorphManySourceAlternate::class, TestMorphManySourceWithUnexposedTarget::class,
-            TestPolymorphicDualSource::class, TestMorphTargetChild::class];
+            TestPolymorphicDualSource::class, TestMorphTargetChild::class, TestMonomorphicChildOfMorphTarget::class,
+            TestMonomorphicParentOfMorphTarget::class];
 
         foreach ($classen as $className) {
             $testModel = m::mock($className)->makePartial();
@@ -357,6 +362,7 @@ class MetadataProviderNewTest extends TestCase
             TestMonomorphicSource::class, TestMonomorphicTarget::class, TestMorphManyToManySource::class,
             TestMorphManyToManyTarget::class, TestMonomorphicOneAndManySource::class,
             TestMonomorphicOneAndManyTarget::class];
+        shuffle($classen);
 
         $types = [];
         $i = 0;
@@ -382,6 +388,115 @@ class MetadataProviderNewTest extends TestCase
         $meta->createSingleton('single', $type, $functionName);
         $result = $meta->callSingleton('single');
         $this->assertEquals('VNV Nation', $result->name);
+    }
+
+    public function testMonomorphicChildOfKnownSidePolymorphicModel()
+    {
+        $expected = [];
+        $expected[] = [
+            "principalType" => TestMorphTarget::class,
+            "principalRSet" => 'polyMorphicPlaceholder',
+            "principalMult" => "1",
+            "principalProp" => "monomorphicChildren",
+            "dependentType" => TestMonomorphicChildOfMorphTarget::class,
+            "dependentRSet" => TestMonomorphicChildOfMorphTarget::class,
+            "dependentMult" => "*",
+            "dependentProp" => "morphTarget"
+        ];
+
+        $holder = new MetadataRelationHolder();
+
+        $classen = [TestMonomorphicChildOfMorphTarget::class, TestMorphTarget::class];
+        shuffle($classen);
+
+        $types = [];
+
+        foreach ($classen as $className) {
+            $testModel = m::mock($className)->makePartial();
+            $testModel->shouldReceive('metadata')->andReturn([]);
+            App::instance($className, $testModel);
+            $type = m::mock(ResourceType::class);
+            $types[$className] = $type;
+        }
+
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen);
+        $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
+        $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
+        $foo->reset();
+
+        $actual = $foo->getRepairedRoundTripRelations();
+
+        $this->assertEquals(2 * count($expected), count($actual));
+        foreach ($expected as $forward) {
+            $this->assertTrue(in_array($forward, $actual));
+            $reverse = $forward;
+            $reverse['principalType'] = $forward['dependentType'];
+            $reverse['principalMult'] = $forward['dependentMult'];
+            $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
+            $reverse['dependentType'] = $forward['principalType'];
+            $reverse['dependentMult'] = $forward['principalMult'];
+            $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
+            $this->assertTrue(in_array($reverse, $actual));
+        }
+    }
+
+    public function testMonomorphicParentOfKnownSidePolymorphicModel()
+    {
+        $expected = [];
+        $expected[] = [
+            "principalType" => TestMorphTarget::class,
+            "principalRSet" => 'polyMorphicPlaceholder',
+            "principalMult" => "*",
+            "principalProp" => "monomorphicParent",
+            "dependentType" => TestMonomorphicParentOfMorphTarget::class,
+            "dependentRSet" => TestMonomorphicParentOfMorphTarget::class,
+            "dependentMult" => "1",
+            "dependentProp" => "morphTargets"
+        ];
+
+        $holder = new MetadataRelationHolder();
+
+        $classen = [TestMonomorphicParentOfMorphTarget::class, TestMorphTarget::class];
+        shuffle($classen);
+
+        $types = [];
+
+        foreach ($classen as $className) {
+            $testModel = m::mock($className)->makePartial();
+            $this->assertTrue($testModel instanceof Model, get_class($testModel));
+            $testModel->shouldReceive('metadata')->andReturn([]);
+            App::instance($className, $testModel);
+            $type = m::mock(ResourceType::class);
+            $types[$className] = $type;
+        }
+
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen);
+        $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
+        $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
+        $foo->reset();
+
+        $actual = $foo->getRepairedRoundTripRelations();
+
+        $this->assertEquals(2 * count($expected), count($actual));
+        foreach ($expected as $forward) {
+            $this->assertTrue(in_array($forward, $actual));
+            $reverse = $forward;
+            $reverse['principalType'] = $forward['dependentType'];
+            $reverse['principalMult'] = $forward['dependentMult'];
+            $reverse['principalProp'] = $forward['dependentProp'];
+            $reverse['principalRSet'] = $forward['dependentRSet'];
+            $reverse['dependentType'] = $forward['principalType'];
+            $reverse['dependentMult'] = $forward['principalMult'];
+            $reverse['dependentProp'] = $forward['principalProp'];
+            $reverse['dependentRSet'] = $forward['principalRSet'];
+            $this->assertTrue(in_array($reverse, $actual));
+        }
     }
 
     public function testAddSingletonOverFacade()

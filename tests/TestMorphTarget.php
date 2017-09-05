@@ -74,4 +74,14 @@ class TestMorphTarget extends Model
     {
         return $this->morphOne(TestMorphTargetChild::class, 'morph');
     }
+
+    public function monomorphicChildren()
+    {
+        return $this->hasMany(TestMonomorphicChildOfMorphTarget::class, 'parent_id');
+    }
+
+    public function monomorphicParent()
+    {
+        return $this->belongsTo(TestMonomorphicParentOfMorphTarget::class, 'child_id');
+    }
 }

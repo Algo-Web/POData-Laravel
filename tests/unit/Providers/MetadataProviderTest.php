@@ -2,21 +2,22 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
-use AlgoWeb\ODataMetadata\MetadataManager;
-use AlgoWeb\ODataMetadata\MetadataV3\edm\TEntityTypeType;
 use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestCastModel;
 use AlgoWeb\PODataLaravel\Models\TestGetterModel;
 use AlgoWeb\PODataLaravel\Models\TestModel;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicChildOfMorphTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManyTarget;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicParentOfMorphTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate;
+use AlgoWeb\PODataLaravel\Models\TestMorphManySourceWithUnexposedTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
@@ -132,7 +133,8 @@ class MetadataProviderTest extends TestCase
             TestMorphManyToManyTarget::class, TestMonomorphicOneAndManySource::class, TestMorphTargetAlternate::class,
             TestMonomorphicOneAndManyTarget::class, TestCastModel::class, TestMorphOneSourceAlternate::class,
             TestMorphManySourceAlternate::class, TestMorphManySourceWithUnexposedTarget::class,
-            TestPolymorphicDualSource::class, TestMorphTargetChild::class];
+            TestPolymorphicDualSource::class, TestMorphTargetChild::class, TestMonomorphicChildOfMorphTarget::class,
+            TestMonomorphicParentOfMorphTarget::class];
 
         foreach ($classen as $className) {
             $testModel = m::mock($className)->makePartial();
@@ -348,7 +350,8 @@ class MetadataProviderTest extends TestCase
             TestMorphTarget::class, TestMonomorphicManySource::class, TestMonomorphicManyTarget::class,
             TestMonomorphicSource::class, TestMonomorphicTarget::class, TestMorphManyToManySource::class,
             TestMorphManyToManyTarget::class, TestMonomorphicOneAndManySource::class,
-            TestMonomorphicOneAndManyTarget::class];
+            TestMonomorphicOneAndManyTarget::class, TestMonomorphicChildOfMorphTarget::class,
+            TestMonomorphicParentOfMorphTarget::class];
 
         $types = [];
         $i = 0;
