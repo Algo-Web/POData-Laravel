@@ -6,13 +6,17 @@ use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicParentOfMorphTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
+use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
+use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -716,5 +720,176 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $actual->links[1]->expandedResult->entries[0]->links = [];
         $actual->links[1]->expandedResult->entries[1]->links = [];
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testExpandKnownSideModelOverOneToManyPolymorphic()
+    {
+        $known = Carbon::create(2017, 1, 1, 0, 0, 0, 'UTC');
+        Carbon::setTestNow($known);
+
+        $serialiser = new ModelSerialiser();
+        $serialiser->reset();
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMorphManySources');
+        $request->shouldReceive('fullUrl')
+            ->andReturn('http://localhost/odata.svc/TestMorphManySources(1)?$expand=morphTarget');
+
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = new TestMorphManySource($metadata);
+        $target = new TestMorphTarget($metadata);
+
+        App::instance(TestMorphManySource::class, $source);
+        App::instance(TestMorphTarget::class, $target);
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri("/odata.svc/");
+
+        $holder = new MetadataRelationHolder();
+        $classen = [TestMorphManySource::class, TestMorphTarget::class];
+        shuffle($classen);
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
+        $metaProv->boot();
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        $stack = [
+            ['type' => 'TestMorphManySource', 'prop' => 'TestMorphManySource', 'count' => 1],
+        ];
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri("/odata.svc/");
+
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $ironic = new IronicSerialiserDummy($service, $processor->getRequest());
+        $ironic->setLightStack($stack);
+        $ironic->setPropertyExpansion('morphTarget');
+        $ironic->setPropertyExpansion('morph', false);
+
+        $targ1 = new TestMorphTarget($metadata);
+        $targ1->id = 1;
+        $targ1->name = 'Inspector';
+
+        $targ2 = new TestMorphTarget($metadata);
+        $targ2->id = 2;
+        $targ2->name = 'Gadget';
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        $relation = m::mock(MorphMany::class)->makePartial();
+        $relation->shouldReceive('get')->andReturn(collect([$targ1, $targ2]));
+
+        $model = m::mock(TestMorphManySource::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->id = 1;
+        $model->name = 'Name';
+        $model->shouldReceive('getAttribute')->withArgs(['morphTarget'])->andReturn(([$targ1, $targ2]));
+
+        $result = new QueryResult();
+        $result->results = $model;
+
+        $actual = $ironic->writeTopLevelElement($result);
+        $expectedLinksCount = 2;
+        $actualLinksCount = count($actual->links[0]->expandedResult->entries);
+        $this->assertEquals($expectedLinksCount, $actualLinksCount);
+    }
+
+    public function testExpandKnownSideModelOverOneToManyMonomorphic()
+    {
+        $known = Carbon::create(2017, 1, 1, 0, 0, 0, 'UTC');
+        Carbon::setTestNow($known);
+
+        $serialiser = new ModelSerialiser();
+        $serialiser->reset();
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicParentOfMorphTargets');
+        $request->shouldReceive('fullUrl')
+            ->andReturn('http://localhost/odata.svc/TestMonomorphicParentOfMorphTargets(1)?$expand=morphTargets');
+
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = new TestMonomorphicParentOfMorphTarget($metadata);
+        $target = new TestMorphTarget($metadata);
+
+        App::instance(TestMonomorphicParentOfMorphTarget::class, $source);
+        App::instance(TestMorphTarget::class, $target);
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri("/odata.svc/");
+
+        $holder = new MetadataRelationHolder();
+        $classen = [TestMonomorphicParentOfMorphTarget::class, TestMorphTarget::class];
+        shuffle($classen);
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
+        $metaProv->boot();
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        $stack = [
+            ['type' => 'TestMonomorphicParentOfMorphTarget',
+                'prop' => 'TestMonomorphicParentOfMorphTarget',
+                'count' => 1],
+        ];
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri("/odata.svc/");
+
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $ironic = new IronicSerialiserDummy($service, $processor->getRequest());
+        $ironic->setLightStack($stack);
+        $ironic->setPropertyExpansion('morphTargets');
+        $ironic->setPropertyExpansion('monomorphicParent', false);
+
+        $targ1 = new TestMorphTarget($metadata);
+        $targ1->id = 1;
+        $targ1->name = 'Inspector';
+
+        $targ2 = new TestMorphTarget($metadata);
+        $targ2->id = 2;
+        $targ2->name = 'Gadget';
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        $relation = m::mock(HasMany::class)->makePartial();
+        $relation->shouldReceive('get')->andReturn(collect([$targ1, $targ2]));
+
+        $model = m::mock(TestMonomorphicParentOfMorphTarget::class)->makePartial()
+            ->shouldAllowMockingProtectedMethods();
+        $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->id = 1;
+        $model->name = 'Name';
+        $model->shouldReceive('getAttribute')->withArgs(['morphTargets'])->andReturn(collect([$targ1, $targ2]));
+
+        $result = new QueryResult();
+        $result->results = $model;
+
+        $actual = $ironic->writeTopLevelElement($result);
+        $expectedLinksCount = 2;
+        $actualLinksCount = count($actual->links[0]->expandedResult->entries);
+        $this->assertEquals($expectedLinksCount, $actualLinksCount);
     }
 }
