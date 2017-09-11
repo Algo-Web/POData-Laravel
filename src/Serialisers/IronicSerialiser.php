@@ -374,7 +374,13 @@ class IronicSerialiser implements IObjectSerialiser
         if (!empty($entryObjects->results)) {
             $i = 0;
             foreach ($entryObjects->results as $entryObject) {
-                $urls->urls[$i] = $this->writeUrlElement($entryObject);
+                if (!$entryObject instanceof QueryResult) {
+                    $query = new QueryResult();
+                    $query->results = $entryObject;
+                } else {
+                    $query = $entryObject;
+                }
+                $urls->urls[$i] = $this->writeUrlElement($query);
                 ++$i;
             }
 

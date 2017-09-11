@@ -94,7 +94,7 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
         $service = new TestDataService($query, $meta, $host);
         $processor = $service->handleRequest();
         $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
-        $processor->getRequest()->setCountValue(1);
+        $processor->getRequest()->setCountValue(2);
         $object = new ObjectModelSerializer($service, $processor->getRequest());
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
@@ -105,7 +105,7 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
         $result->results = $model;
 
         $collection = new QueryResult();
-        $collection->results = [$result];
+        $collection->results = [$result, $model];
 
         $objectResult = $object->writeUrlElements($collection);
         $ironicResult = $ironic->writeUrlElements($collection);
