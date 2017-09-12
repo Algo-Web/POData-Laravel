@@ -16,6 +16,7 @@ use POData\Providers\Metadata\SimpleMetadataProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema as Schema;
 use POData\Providers\Metadata\Type\TypeCode;
+use POData\Providers\ProvidersWrapper;
 
 class MetadataProvider extends MetadataBaseProvider
 {
@@ -300,7 +301,9 @@ class MetadataProvider extends MetadataBaseProvider
                 $principalProp,
                 $dependentProp,
                 $principalRSet,
-                $dependentRSet
+                $dependentRSet,
+                $principalType,
+                $dependentType
             );
             return null;
         }
@@ -394,7 +397,9 @@ class MetadataProvider extends MetadataBaseProvider
         $principalProp,
         $dependentProp,
         $principalRSet,
-        $dependentRSet
+        $dependentRSet,
+        $principalType,
+        $dependentType
     ) {
         $prinPoly = static::POLYMORPHIC == $principalRSet;
         $depPoly = static::POLYMORPHIC == $dependentRSet;
@@ -410,18 +415,31 @@ class MetadataProvider extends MetadataBaseProvider
         $prinMany = '*' == $principalMult;
         $depMany = '*' == $dependentMult;
 
+        $prinConcrete = null;
+        $depConcrete = null;
+        if ($prinPoly) {
+            $prinBitz = explode('\\', $principalType);
+            $prinConcrete = $meta->resolveResourceType($prinBitz[count($prinBitz)-1]);
+            assert(static::POLYMORPHIC !== $prinConcrete->getName());
+        }
+        if ($depPoly) {
+            $depBitz = explode('\\', $dependentType);
+            $depConcrete = $meta->resolveResourceType($depBitz[count($depBitz)-1]);
+            assert(static::POLYMORPHIC !== $depConcrete->getName());
+        }
+
         if (!$isPrincipalAdded) {
             if ('*' == $principalMult || $depMany) {
-                $meta->addResourceSetReferenceProperty($principal, $principalProp, $dependentSet);
+                $meta->addResourceSetReferenceProperty($principal, $principalProp, $dependentSet, $depConcrete);
             } else {
-                $meta->addResourceReferenceProperty($principal, $principalProp, $dependentSet, $prinPoly, $depMany);
+                $meta->addResourceReferenceProperty($principal, $principalProp, $dependentSet, $prinPoly, $depMany, $depConcrete);
             }
         }
         if (!$isDependentAdded) {
             if ('*' == $dependentMult || $prinMany) {
-                $meta->addResourceSetReferenceProperty($dependent, $dependentProp, $principalSet);
+                $meta->addResourceSetReferenceProperty($dependent, $dependentProp, $principalSet, $prinConcrete);
             } else {
-                $meta->addResourceReferenceProperty($dependent, $dependentProp, $principalSet, $depPoly, $prinMany);
+                $meta->addResourceReferenceProperty($dependent, $dependentProp, $principalSet, $depPoly, $prinMany, $prinConcrete);
             }
         }
         return;
