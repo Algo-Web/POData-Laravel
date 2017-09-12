@@ -432,14 +432,28 @@ class MetadataProvider extends MetadataBaseProvider
             if ('*' == $principalMult || $depMany) {
                 $meta->addResourceSetReferenceProperty($principal, $principalProp, $dependentSet, $depConcrete);
             } else {
-                $meta->addResourceReferenceProperty($principal, $principalProp, $dependentSet, $prinPoly, $depMany, $depConcrete);
+                $meta->addResourceReferenceProperty(
+                    $principal,
+                    $principalProp,
+                    $dependentSet,
+                    $prinPoly,
+                    $depMany,
+                    $depConcrete
+                );
             }
         }
         if (!$isDependentAdded) {
             if ('*' == $dependentMult || $prinMany) {
                 $meta->addResourceSetReferenceProperty($dependent, $dependentProp, $principalSet, $prinConcrete);
             } else {
-                $meta->addResourceReferenceProperty($dependent, $dependentProp, $principalSet, $depPoly, $prinMany, $prinConcrete);
+                $meta->addResourceReferenceProperty(
+                    $dependent,
+                    $dependentProp,
+                    $principalSet,
+                    $depPoly,
+                    $prinMany,
+                    $prinConcrete
+                );
             }
         }
         return;

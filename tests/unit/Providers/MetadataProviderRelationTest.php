@@ -605,6 +605,86 @@ class MetadataProviderRelationTest extends TestCase
         $this->assertEquals(TestMorphTarget::class, $name2);
     }
 
+    public function testMorphManyToMorphTargetConcreteTypes()
+    {
+        $metaRaw = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $this->setUpSchemaFacade();
+
+        $cacheStore = Cache::getFacadeRoot();
+        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+
+        $classen = [TestMorphManySource::class, TestMorphTarget::class];
+        shuffle($classen);
+
+        foreach ($classen as $className) {
+            $testModel = new $className($metaRaw);
+            App::instance($className, $testModel);
+        }
+
+        $app = App::make('app');
+        $foo = new MetadataProviderDummy($app);
+        $foo->setCandidateModels($classen);
+        $foo->boot();
+
+        $metadata = App::make('metadata');
+        $targAssoc = 'TestMorphManySource_morphTarget_polyMorphicPlaceholder';
+        $set = $metadata->resolveAssociationSet($targAssoc);
+        $end1Concrete = $set->getEnd1()->getConcreteType();
+        $this->assertTrue($end1Concrete instanceof ResourceEntityType);
+        $this->assertFalse($end1Concrete->isAbstract());
+        $name1 = $end1Concrete->getInstanceType()->getName();
+        $this->assertEquals(TestMorphManySource::class, $name1);
+        $end2Concrete = $set->getEnd2()->getConcreteType();
+        $this->assertTrue($end2Concrete instanceof ResourceEntityType);
+        $this->assertFalse($end2Concrete->isAbstract());
+        $name2 = $end2Concrete->getInstanceType()->getName();
+        $this->assertEquals(TestMorphTarget::class, $name2);
+    }
+
+    public function testMorphManyToManyConcreteTypes()
+    {
+        $metaRaw = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $this->setUpSchemaFacade();
+
+        $cacheStore = Cache::getFacadeRoot();
+        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+
+        $classen = [TestMorphManyToManySource::class, TestMorphManyToManyTarget::class];
+        shuffle($classen);
+
+        foreach ($classen as $className) {
+            $testModel = new $className($metaRaw);
+            App::instance($className, $testModel);
+        }
+
+        $app = App::make('app');
+        $foo = new MetadataProviderDummy($app);
+        $foo->setCandidateModels($classen);
+        $foo->boot();
+
+        $metadata = App::make('metadata');
+        $targAssoc = 'TestMorphManyToManySource_manySource_polyMorphicPlaceholder';
+        $set = $metadata->resolveAssociationSet($targAssoc);
+        $end1Concrete = $set->getEnd1()->getConcreteType();
+        $this->assertTrue($end1Concrete instanceof ResourceEntityType);
+        $this->assertFalse($end1Concrete->isAbstract());
+        $name1 = $end1Concrete->getInstanceType()->getName();
+        $this->assertEquals(TestMorphManyToManySource::class, $name1);
+        $end2Concrete = $set->getEnd2()->getConcreteType();
+        $this->assertTrue($end2Concrete instanceof ResourceEntityType);
+        $this->assertFalse($end2Concrete->isAbstract());
+        $name2 = $end2Concrete->getInstanceType()->getName();
+        $this->assertEquals(TestMorphManyToManyTarget::class, $name2);
+    }
+
     public function testKnownOnBothEndsConcreteTypes()
     {
         $metaRaw = [];
