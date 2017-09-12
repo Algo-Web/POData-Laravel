@@ -60,4 +60,12 @@ class TestMorphManyToManySource extends Model
     {
         return $this->getRel($biDir);
     }
+
+    public function metadata()
+    {
+        if (isset($this->metaArray)) {
+            return $this->metaArray;
+        }
+        return $this->traitmetadata();
+    }
 }

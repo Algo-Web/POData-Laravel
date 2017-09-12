@@ -244,6 +244,7 @@ class MetadataProviderTest extends TestCase
             $type = m::mock(ResourceEntityType::class);
             $type->shouldReceive('getCustomState')->andReturn(m::mock(ResourceSet::class));
             $type->shouldReceive('resolveProperty')->andReturn(null);
+            $type->shouldReceive('getName')->andReturn($className);
             $types[$className] = $type;
         }
 
@@ -272,6 +273,10 @@ class MetadataProviderTest extends TestCase
             ->withAnyArgs()->andReturn(null)->atLeast(1);
         $meta->shouldReceive('addResourceReferencePropertyBidirectional')
             ->withAnyArgs()->andReturn(null)->atLeast(1);
+        $meta->shouldReceive('resolveResourceType')->withArgs(['TestMorphManyToManyTarget'])
+            ->andReturn($types[TestMorphManyToManyTarget::class]);
+        $meta->shouldReceive('resolveResourceType')->withArgs(['TestMorphManyToManySource'])
+            ->andReturn($types[TestMorphManyToManySource::class]);
 
         App::instance('metadata', $meta);
 
@@ -297,6 +302,7 @@ class MetadataProviderTest extends TestCase
             $type = m::mock(ResourceEntityType::class);
             $type->shouldReceive('getCustomState')->andReturn(m::mock(ResourceSet::class));
             $type->shouldReceive('resolveProperty')->andReturn(null);
+            $type->shouldReceive('getName')->andReturn($className);
             $types[$className] = $type;
         }
 
@@ -318,11 +324,21 @@ class MetadataProviderTest extends TestCase
             ->with(m::type(ResourceEntityType::class), 'morphTarget', m::any())
             ->atLeast(1);
         $meta->shouldReceive('addResourceSetReferenceProperty')
-            ->with(m::type(ResourceEntityType::class), 'morphTarget', m::any())
+            ->with(m::type(ResourceEntityType::class), 'morphTarget', m::any(), m::any())
+            ->atLeast(1);
+        $meta->shouldReceive('addResourceSetReferenceProperty')
+            ->with(m::type(ResourceEntityType::class), 'morphTarget', m::any(), null)
+            ->atLeast(1);
+        $meta->shouldReceive('addResourceSetReferenceProperty')
+            ->with(m::type(ResourceEntityType::class), 'morph', m::any(), null)
             ->atLeast(1);
         $meta->shouldReceive('addResourceSetReferenceProperty')
             ->with(m::type(ResourceEntityType::class), 'morph', m::any())
             ->atLeast(1);
+        $meta->shouldReceive('resolveResourceType')->withArgs(['TestMorphManySource'])
+            ->andReturn($types[TestMorphManySource::class]);
+        $meta->shouldReceive('resolveResourceType')->withArgs(['TestMorphTarget'])
+            ->andReturn($types[TestMorphTarget::class]);
 
         App::instance('metadata', $meta);
 

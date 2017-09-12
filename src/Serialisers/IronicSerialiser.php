@@ -3,7 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Common\Messages;
