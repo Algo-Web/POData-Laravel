@@ -226,22 +226,23 @@ class MetadataRelationHolder
             in_array($principalMult, $this->multConstraints[$dependentMult]),
             'Cannot pair multiplicities ' . $principalMult . ' and ' . $dependentMult
         );
+        // each line should be consistent, else you're off course/turned around
         $forward = [
             'principalType' => $principalType,
-            'principalMult' => $dependentMult,
+            'principalMult' => $principalMult,
             'principalProp' => $principalProperty,
             'dependentType' => $dependentType,
-            'dependentMult' => $principalMult,
+            'dependentMult' => $dependentMult,
             'dependentProp' => $dependentProperty,
             'principalRSet' => $principalType,
             'dependentRSet' => $dependentType
         ];
         $reverse = [
             'principalType' => $dependentType,
-            'principalMult' => $principalMult,
+            'principalMult' => $dependentMult,
             'principalProp' => $dependentProperty,
             'dependentType' => $principalType,
-            'dependentMult' => $dependentMult,
+            'dependentMult' => $principalMult,
             'dependentProp' => $principalProperty,
             'principalRSet' => $dependentType,
             'dependentRSet' => $principalType

@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
@@ -150,7 +151,8 @@ class IronicSerialiser implements IObjectSerialiser
             array_pop($this->lightStack);
             return null;
         }
-
+        assert($entryObject instanceof QueryResult, get_class($entryObject));
+        assert($entryObject->results instanceof Model, get_class($entryObject->results));
         $this->loadStackIfEmpty();
 
         $baseURI = $this->isBaseWritten ? null : $this->absoluteServiceUriWithSlash;
@@ -316,6 +318,8 @@ class IronicSerialiser implements IObjectSerialiser
             } else {
                 $query = $entry;
             }
+            assert($query instanceof QueryResult, get_class($query));
+            assert($query->results instanceof Model, get_class($query->results));
             $odata->entries[] = $this->writeTopLevelElement($query);
         }
 
@@ -868,9 +872,10 @@ class IronicSerialiser implements IObjectSerialiser
     {
         $nextName = $prop->getResourceType()->getName();
         $nuLink->isExpanded = true;
-        $isCollection = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
-        $nuLink->isCollection = $isCollection;
         $value = $entryObject->results->$propName;
+        $isCombo = is_array($value) || $value instanceof Collection;
+        $isCollection = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind || $isCombo;
+        $nuLink->isCollection = $isCollection;
 
         $result = new QueryResult();
         $result->results = $value;
@@ -880,8 +885,10 @@ class IronicSerialiser implements IObjectSerialiser
             $newStackLine = ['type' => $nextName, 'prop' => $propName, 'count' => $resultCount];
             array_push($this->lightStack, $newStackLine);
             if (!$isCollection) {
+                $nuLink->type = 'application/atom+xml;type=entry';
                 $expandedResult = $this->writeTopLevelElement($result);
             } else {
+                $nuLink->type = 'application/atom+xml;type=feed';
                 $expandedResult = $this->writeTopLevelElements($result);
             }
             $nuLink->expandedResult = $expandedResult;

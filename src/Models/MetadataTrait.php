@@ -709,8 +709,10 @@ trait MetadataTrait
      */
     public function isKnownPolymorphSide()
     {
+        // isKnownPolymorph needs to be checking KnownPolymorphSide results - if you're checking UnknownPolymorphSide,
+        // you're turned around
         $rels = $this->getRelationshipsFromMethods();
-        return !empty($rels['UnknownPolyMorphSide']);
+        return !empty($rels['KnownPolyMorphSide']);
     }
 
     /*
@@ -718,7 +720,9 @@ trait MetadataTrait
      */
     public function isUnknownPolymorphSide()
     {
+        // isUnknownPolymorph needs to be checking UnknownPolymorphSide results - if you're checking KnownPolymorphSide,
+        // you're turned around
         $rels = $this->getRelationshipsFromMethods();
-        return !empty($rels['KnownPolyMorphSide']);
+        return !empty($rels['UnknownPolyMorphSide']);
     }
 }
