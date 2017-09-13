@@ -345,7 +345,7 @@ class MetadataProviderNewTest extends TestCase
             ->with(m::type(ResourceEntityType::class), 'morph', m::any(), null)
             ->atLeast(1);
         $meta->shouldReceive('addResourceSetReferenceProperty')
-            ->with(m::type(ResourceEntityType::class), 'morph', m::any())
+            ->with(m::type(ResourceEntityType::class), 'morph', m::any(), m::any())
             ->atLeast(1);
         $meta->shouldReceive('resolveResourceType')->withArgs(['TestMorphManySource'])
             ->andReturn($types[TestMorphManySource::class]);
@@ -413,11 +413,11 @@ class MetadataProviderNewTest extends TestCase
         $expected[] = [
             "principalType" => TestMorphTarget::class,
             "principalRSet" => 'polyMorphicPlaceholder',
-            "principalMult" => "1",
+            "principalMult" => "*",
             "principalProp" => "monomorphicChildren",
             "dependentType" => TestMonomorphicChildOfMorphTarget::class,
             "dependentRSet" => TestMonomorphicChildOfMorphTarget::class,
-            "dependentMult" => "*",
+            "dependentMult" => "1",
             "dependentProp" => "morphTarget"
         ];
 
@@ -467,11 +467,11 @@ class MetadataProviderNewTest extends TestCase
         $expected[] = [
             "principalType" => TestMorphTarget::class,
             "principalRSet" => 'polyMorphicPlaceholder',
-            "principalMult" => "*",
+            "principalMult" => "1",
             "principalProp" => "monomorphicParent",
             "dependentType" => TestMonomorphicParentOfMorphTarget::class,
             "dependentRSet" => TestMonomorphicParentOfMorphTarget::class,
-            "dependentMult" => "1",
+            "dependentMult" => "*",
             "dependentProp" => "morphTargets"
         ];
 

@@ -657,46 +657,13 @@ class MetadataTraitTest extends TestCase
      */
     public function testCheckKnownSide($modelName, $expected)
     {
+        $bitz = explode('\\', $modelName);
         $foo = new $modelName();
         $actual = $foo->isKnownPolymorphSide();
-        $this->assertTrue($expected === $actual);
+        $this->assertTrue($expected === $actual, $bitz[count($bitz)-1]);
     }
 
     public function knownSideProvider()
-    {
-        return [
-            [TestCastModel::class, false],
-            [TestGetterModel::class, false],
-            [TestModel::class, false],
-            [TestMonomorphicManySource::class, false],
-            [TestMonomorphicManyTarget::class, false],
-            [TestMonomorphicOneAndManySource::class, false],
-            [TestMonomorphicOneAndManyTarget::class, false],
-            [TestMonomorphicSource::class, false],
-            [TestMonomorphicTarget::class, false],
-            [TestMorphManySource::class, false],
-            [TestMorphManySourceAlternate::class, false],
-            [TestMorphManyToManySource::class, false],
-            [TestMorphManyToManyTarget::class, true],
-            [TestMorphOneSource::class, false],
-            [TestMorphOneSourceAlternate::class, false],
-            [TestMorphTarget::class, true],
-            [TestMorphTargetChild::class, true],
-            [TestMorphManySourceWithUnexposedTarget::class, false]
-        ];
-    }
-
-    /**
-     * @dataProvider unknownSideProvider
-     */
-    public function testCheckUnknownSide($modelName, $expected)
-    {
-        $foo = new $modelName();
-        $actual = $foo->isUnknownPolymorphSide();
-        $this->assertTrue($expected === $actual);
-    }
-
-    public function unknownSideProvider()
     {
         return [
             [TestCastModel::class, false],
@@ -716,6 +683,41 @@ class MetadataTraitTest extends TestCase
             [TestMorphOneSourceAlternate::class, true],
             [TestMorphTarget::class, true],
             [TestMorphTargetChild::class, false],
+            [TestMorphManySourceWithUnexposedTarget::class, false]
+        ];
+    }
+
+    /**
+     * @dataProvider unknownSideProvider
+     */
+    public function testCheckUnknownSide($modelName, $expected)
+    {
+        $bitz = explode('\\', $modelName);
+        $foo = new $modelName();
+        $actual = $foo->isUnknownPolymorphSide();
+        $this->assertTrue($expected === $actual, $bitz[count($bitz)-1]);
+    }
+
+    public function unknownSideProvider()
+    {
+        return [
+            [TestCastModel::class, false],
+            [TestGetterModel::class, false],
+            [TestModel::class, false],
+            [TestMonomorphicManySource::class, false],
+            [TestMonomorphicManyTarget::class, false],
+            [TestMonomorphicOneAndManySource::class, false],
+            [TestMonomorphicOneAndManyTarget::class, false],
+            [TestMonomorphicSource::class, false],
+            [TestMonomorphicTarget::class, false],
+            [TestMorphManySource::class, false],
+            [TestMorphManySourceAlternate::class, false],
+            [TestMorphManyToManySource::class, false],
+            [TestMorphManyToManyTarget::class, true],
+            [TestMorphOneSource::class, false],
+            [TestMorphOneSourceAlternate::class, false],
+            [TestMorphTarget::class, true],
+            [TestMorphTargetChild::class, true],
             [TestMorphManySourceWithUnexposedTarget::class, false]
         ];
     }

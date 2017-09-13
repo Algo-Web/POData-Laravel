@@ -82,11 +82,11 @@ class MetadataRelationHolderTest extends TestCase
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
             "principalRSet" => TestMonomorphicOneAndManySource::class,
-            "principalMult" => "1",
+            "principalMult" => "*",
             "principalProp" => "manyTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
-            "dependentMult" => "*",
+            "dependentMult" => "1",
             "dependentProp" => "manySource"
         ];
 
@@ -121,11 +121,11 @@ class MetadataRelationHolderTest extends TestCase
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
             "principalRSet" => TestMonomorphicOneAndManySource::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "oneTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "oneSource"
         ];
 
@@ -160,21 +160,21 @@ class MetadataRelationHolderTest extends TestCase
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
             "principalRSet" => TestMonomorphicOneAndManySource::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "oneTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "oneSource"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
             "principalRSet" => TestMonomorphicOneAndManySource::class,
-            "principalMult" => "1",
+            "principalMult" => "*",
             "principalProp" => "manyTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
-            "dependentMult" => "*",
+            "dependentMult" => "1",
             "dependentProp" => "manySource"
         ];
 
@@ -209,21 +209,21 @@ class MetadataRelationHolderTest extends TestCase
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
             "principalRSet" => TestMonomorphicOneAndManySource::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "oneTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "oneSource"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
             "principalRSet" => TestMonomorphicOneAndManySource::class,
-            "principalMult" => "1",
+            "principalMult" => "*",
             "principalProp" => "manyTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
-            "dependentMult" => "*",
+            "dependentMult" => "1",
             "dependentProp" => "manySource"
         ];
 
@@ -316,11 +316,11 @@ class MetadataRelationHolderTest extends TestCase
         $expected[] = [
             "principalType" => TestMorphOneSource::class,
             "principalRSet" => TestMorphOneSource::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
             "dependentRSet" => TestMorphTarget::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "morph"
         ];
 
@@ -355,11 +355,11 @@ class MetadataRelationHolderTest extends TestCase
         $expected[] = [
             "principalType" => TestMorphOneSource::class,
             "principalRSet" => TestMorphOneSource::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
             "dependentRSet" => TestMorphTarget::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "morph"
         ];
 
@@ -472,21 +472,21 @@ class MetadataRelationHolderTest extends TestCase
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
             "principalRSet" => TestMonomorphicOneAndManySource::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "oneTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "oneSource"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
             "principalRSet" => TestMonomorphicOneAndManySource::class,
-            "principalMult" => "1",
+            "principalMult" => "*",
             "principalProp" => "manyTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
-            "dependentMult" => "*",
+            "dependentMult" => "1",
             "dependentProp" => "manySource"
         ];
 
@@ -521,41 +521,41 @@ class MetadataRelationHolderTest extends TestCase
         $expected[] = [
             "principalType" => TestMorphOneSource::class,
             "principalRSet" => TestMorphOneSource::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
             "dependentRSet" => TestMorphTarget::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "morph"
         ];
         $expected[] = [
             "principalType" => TestMorphOneSourceAlternate::class,
             "principalRSet" => TestMorphOneSourceAlternate::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
             "dependentRSet" => TestMorphTarget::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "morph"
         ];
         $expected[] = [
             "principalType" => TestMorphManySource::class,
             "principalRSet" => TestMorphManySource::class,
-            "principalMult" => "1",
+            "principalMult" => "*",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
             "dependentRSet" => TestMorphTarget::class,
-            "dependentMult" => "*",
+            "dependentMult" => "1",
             "dependentProp" => "morph"
         ];
         $expected[] = [
             "principalType" => TestMorphManySourceAlternate::class,
             "principalRSet" => TestMorphManySourceAlternate::class,
-            "principalMult" => "1",
+            "principalMult" => "*",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
             "dependentRSet" => TestMorphTarget::class,
-            "dependentMult" => "*",
+            "dependentMult" => "1",
             "dependentProp" => "morph"
         ];
 
@@ -590,11 +590,11 @@ class MetadataRelationHolderTest extends TestCase
         $expected[] = [
             "principalType" => TestPolymorphicDualSource::class,
             "principalRSet" => TestPolymorphicDualSource::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "morphAlternate",
             "dependentType" => TestMorphTargetAlternate::class,
             "dependentRSet" => TestMorphTargetAlternate::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "morph"
         ];
 
@@ -645,21 +645,21 @@ class MetadataRelationHolderTest extends TestCase
         $expected[] = [
             "principalType" => TestMorphTarget::class,
             "principalRSet" => TestMorphTarget::class,
-            "principalMult" => "0..1",
+            "principalMult" => "1",
             "principalProp" => "morph",
             "dependentType" => TestMorphOneSourceAlternate::class,
             "dependentRSet" => TestMorphOneSourceAlternate::class,
-            "dependentMult" => "1",
+            "dependentMult" => "0..1",
             "dependentProp" => "morphTarget"
         ];
         $expected[] = [
             "principalType" => TestMorphTarget::class,
             "principalRSet" => TestMorphTarget::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "childMorph",
             "dependentType" => TestMorphTargetChild::class,
             "dependentRSet" => TestMorphTargetChild::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "morph"
         ];
 
@@ -692,11 +692,11 @@ class MetadataRelationHolderTest extends TestCase
         $expected[] = [
             "principalType" => TestMorphTarget::class,
             "principalRSet" => TestMorphTarget::class,
-            "principalMult" => "1",
+            "principalMult" => "*",
             "principalProp" => "monomorphicChildren",
             "dependentType" => TestMonomorphicChildOfMorphTarget::class,
             "dependentRSet" => TestMonomorphicChildOfMorphTarget::class,
-            "dependentMult" => "*",
+            "dependentMult" => "1",
             "dependentProp" => "morphTarget"
         ];
 

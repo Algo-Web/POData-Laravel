@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
+use POData\Providers\Metadata\ResourceAssociationSet;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\SimpleMetadataProvider;
@@ -54,21 +55,21 @@ class MetadataProviderRelationTest extends TestCase
         $expected[] = [
             "principalType" => TestMonomorphicSource::class,
             "principalRSet" => TestMonomorphicSource::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "oneSource",
             "dependentType" => TestMonomorphicTarget::class,
             "dependentRSet" => TestMonomorphicTarget::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "oneTarget"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicSource::class,
             "principalRSet" => TestMonomorphicSource::class,
-            "principalMult" => "1",
+            "principalMult" => "*",
             "principalProp" => "manySource",
             "dependentType" => TestMonomorphicTarget::class,
             "dependentRSet" => TestMonomorphicTarget::class,
-            "dependentMult" => "*",
+            "dependentMult" => "1",
             "dependentProp" => "manyTarget"
         ];
         $expected[] = [
@@ -84,112 +85,112 @@ class MetadataProviderRelationTest extends TestCase
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
             "principalRSet" => TestMonomorphicOneAndManySource::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "oneTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "oneSource"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicOneAndManySource::class,
             "principalRSet" => TestMonomorphicOneAndManySource::class,
-            "principalMult" => "1",
+            "principalMult" => "*",
             "principalProp" => "manyTarget",
             "dependentType" => TestMonomorphicOneAndManyTarget::class,
             "dependentRSet" => TestMonomorphicOneAndManyTarget::class,
-            "dependentMult" => "*",
+            "dependentMult" => "1",
             "dependentProp" => "manySource"
         ];
         $expected[] = [
             "principalType" => TestMorphManySource::class,
             "principalRSet" => TestMorphManySource::class,
-            "principalMult" => "1",
+            "principalMult" => "*",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
             "dependentRSet" => TestMorphTarget::class,
-            "dependentMult" => "*",
+            "dependentMult" => "1",
             "dependentProp" => "morph"
         ];
         $expected[] = [
             "principalType" => TestMorphManySourceAlternate::class,
             "principalRSet" => TestMorphManySourceAlternate::class,
-            "principalMult" => "1",
+            "principalMult" => "*",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
             "dependentRSet" => TestMorphTarget::class,
-            "dependentMult" => "*",
+            "dependentMult" => "1",
             "dependentProp" => "morph"
         ];
         $expected[] = [
             "principalType" => TestMorphOneSource::class,
             "principalRSet" => TestMorphOneSource::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
             "dependentRSet" => TestMorphTarget::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "morph"
         ];
         $expected[] = [
             "principalType" => TestMorphOneSourceAlternate::class,
             "principalRSet" => TestMorphOneSourceAlternate::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
             "dependentRSet" => TestMorphTarget::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "morph"
         ];
         $expected[] = [
             "principalType" => TestPolymorphicDualSource::class,
             "principalRSet" => TestPolymorphicDualSource::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "morphAlternate",
             "dependentType" => TestMorphTargetAlternate::class,
             "dependentRSet" => TestMorphTargetAlternate::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "morph"
         ];
         $expected[] = [
             "principalType" => TestPolymorphicDualSource::class,
             "principalRSet" => TestPolymorphicDualSource::class,
-            "principalMult" => "1",
+            "principalMult" => "0..1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
             "dependentRSet" => TestMorphTarget::class,
-            "dependentMult" => "0..1",
+            "dependentMult" => "1",
             "dependentProp" => "morph"
         ];
 
         $expected[] = [
             "principalType" => TestMorphTargetChild::class,
             "principalRSet" => TestMorphTargetChild::class,
-            "principalMult" => "0..1",
+            "principalMult" => "1",
             "principalProp" => "morph",
             "dependentType" => TestMorphTarget::class,
             "dependentRSet" => TestMorphTarget::class,
-            "dependentMult" => "1",
+            "dependentMult" => "0..1",
             "dependentProp" => "childMorph"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicChildOfMorphTarget::class,
             "principalRSet" => TestMonomorphicChildOfMorphTarget::class,
-            "principalMult" => "*",
+            "principalMult" => "1",
             "principalProp" => "morphTarget",
             "dependentType" => TestMorphTarget::class,
             "dependentRSet" => TestMorphTarget::class,
-            "dependentMult" => "1",
+            "dependentMult" => "*",
             "dependentProp" => "monomorphicChildren"
         ];
         $expected[] = [
             "principalType" => TestMonomorphicParentOfMorphTarget::class,
             "principalRSet" => TestMonomorphicParentOfMorphTarget::class,
-            "principalMult" => "1",
+            "principalMult" => "*",
             "principalProp" => "morphTargets",
             "dependentType" => TestMorphTarget::class,
             "dependentRSet" => TestMorphTarget::class,
-            "dependentMult" => "*",
+            "dependentMult" => "1",
             "dependentProp" => "monomorphicParent"
         ];
 
@@ -329,8 +330,8 @@ class MetadataProviderRelationTest extends TestCase
 
         $expected = [];
         $expected[TestMorphTarget::class] = [];
-        $expected[TestMorphTarget::class][TestMorphManySource::class] = ['morphTarget'];
-        $expected[TestMorphTarget::class][TestMorphManySourceAlternate::class] = ['morphTarget'];
+        $expected[TestMorphManySource::class] = [];
+        $expected[TestMorphManySourceAlternate::class] = [];
         $expected[TestMorphTarget::class][TestMorphTarget::class] = ['morph'];
         $actual = $foo->getPolymorphicRelationGroups();
         $this->assertEquals($expected, $actual);
@@ -474,9 +475,13 @@ class MetadataProviderRelationTest extends TestCase
 
         $rels = $foo->calculateRoundTripRelations();
         $expected = $foo->calculateRoundTripRelations();
+        $expected[0]['principalRSet'] = 'polyMorphicPlaceholder';
         $expected[1]['principalRSet'] = 'polyMorphicPlaceholder';
         $expected[2]['principalRSet'] = 'polyMorphicPlaceholder';
+        $expected[3]['principalRSet'] = 'polyMorphicPlaceholder';
         $expected[0]['dependentRSet'] = 'polyMorphicPlaceholder';
+        $expected[1]['dependentRSet'] = 'polyMorphicPlaceholder';
+        $expected[2]['dependentRSet'] = 'polyMorphicPlaceholder';
         $expected[3]['dependentRSet'] = 'polyMorphicPlaceholder';
 
         // if groups is empty, bail right back out - nothing to do
@@ -593,6 +598,7 @@ class MetadataProviderRelationTest extends TestCase
         $metadata = App::make('metadata');
         $targAssoc = 'TestMorphOneSource_morphTarget_polyMorphicPlaceholder';
         $set = $metadata->resolveAssociationSet($targAssoc);
+        $this->assertTrue($set instanceof ResourceAssociationSet, get_class($set));
         $end1Concrete = $set->getEnd1()->getConcreteType();
         $this->assertTrue($end1Concrete instanceof ResourceEntityType);
         $this->assertFalse($end1Concrete->isAbstract());
@@ -633,6 +639,7 @@ class MetadataProviderRelationTest extends TestCase
         $metadata = App::make('metadata');
         $targAssoc = 'TestMorphManySource_morphTarget_polyMorphicPlaceholder';
         $set = $metadata->resolveAssociationSet($targAssoc);
+        $this->assertTrue($set instanceof ResourceAssociationSet, get_class($set));
         $end1Concrete = $set->getEnd1()->getConcreteType();
         $this->assertTrue($end1Concrete instanceof ResourceEntityType);
         $this->assertFalse($end1Concrete->isAbstract());
@@ -671,18 +678,19 @@ class MetadataProviderRelationTest extends TestCase
         $foo->boot();
 
         $metadata = App::make('metadata');
-        $targAssoc = 'TestMorphManyToManySource_manySource_polyMorphicPlaceholder';
+        $targAssoc = 'TestMorphManyToManyTarget_manyTarget_polyMorphicPlaceholder';
         $set = $metadata->resolveAssociationSet($targAssoc);
+        $this->assertTrue($set instanceof ResourceAssociationSet, get_class($set));
         $end1Concrete = $set->getEnd1()->getConcreteType();
         $this->assertTrue($end1Concrete instanceof ResourceEntityType);
         $this->assertFalse($end1Concrete->isAbstract());
         $name1 = $end1Concrete->getInstanceType()->getName();
-        $this->assertEquals(TestMorphManyToManySource::class, $name1);
+        $this->assertEquals(TestMorphManyToManyTarget::class, $name1);
         $end2Concrete = $set->getEnd2()->getConcreteType();
         $this->assertTrue($end2Concrete instanceof ResourceEntityType);
         $this->assertFalse($end2Concrete->isAbstract());
         $name2 = $end2Concrete->getInstanceType()->getName();
-        $this->assertEquals(TestMorphManyToManyTarget::class, $name2);
+        $this->assertEquals(TestMorphManyToManySource::class, $name2);
     }
 
     public function testKnownOnBothEndsConcreteTypes()
@@ -713,6 +721,7 @@ class MetadataProviderRelationTest extends TestCase
         $metadata = App::make('metadata');
         $targAssoc = 'TestMorphTargetChild_morph_polyMorphicPlaceholder';
         $set = $metadata->resolveAssociationSet($targAssoc);
+        $this->assertTrue($set instanceof ResourceAssociationSet, get_class($set));
         $end1Concrete = $set->getEnd1()->getConcreteType();
         $this->assertTrue($end1Concrete instanceof ResourceEntityType);
         $this->assertFalse($end1Concrete->isAbstract());
@@ -724,8 +733,9 @@ class MetadataProviderRelationTest extends TestCase
         $name2 = $end2Concrete->getInstanceType()->getName();
         $this->assertEquals(TestMorphTarget::class, $name2);
 
-        $revAssoc = 'TestMorphTarget_childMorph_polyMorphicPlaceholder';
+        $revAssoc = 'TestMorphTarget_childMorph_TestMorphTargetChild';
         $set = $metadata->resolveAssociationSet($revAssoc);
+        $this->assertTrue($set instanceof ResourceAssociationSet, get_class($set));
         $end1Concrete = $set->getEnd1()->getConcreteType();
         $this->assertTrue($end1Concrete instanceof ResourceEntityType);
         $this->assertFalse($end1Concrete->isAbstract());
@@ -736,6 +746,26 @@ class MetadataProviderRelationTest extends TestCase
         $this->assertFalse($end2Concrete->isAbstract());
         $name2 = $end2Concrete->getInstanceType()->getName();
         $this->assertEquals(TestMorphTargetChild::class, $name2);
+
+        // now verify xml output to reduce chances of tripping ourselves up in future
+        // model on known-side of relation - TestMorphTargetChild - must have its relation glommed onto placeholder
+        // model on unknown-side - TestMorphTarget - must have its relation glommed onto child model
+        $xml = $metadata->getXML();
+        $accTail = 'cg:GetterAccess="Public" cg:SetterAccess="Public"/>';
+
+        $rel1 = '<NavigationProperty Name="morph" Relationship="Data.TestMorphTargetChild_morph_polyMorphicPlaceholder"'
+                .' ToRole="polyMorphicPlaceholders" FromRole="TestMorphTargetChildren_morph" '.$accTail;
+        $rel2 = '<NavigationProperty Name="childMorph" Relationship="Data.TestMorphTarget_childMorph_'
+                .'TestMorphTargetChild" ToRole="TestMorphTargetChildren" FromRole="TestMorphTargets_childMorph" '
+                .$accTail;
+        $type1 = '<EntityType OpenType="false" Abstract="false" Name="TestMorphTargetChild">';
+        $type2 = '<EntityType OpenType="false" BaseType="Data.polyMorphicPlaceholder" Abstract="false" '
+                 .'Name="TestMorphTarget">';
+
+        $this->assertTrue(false !== strpos($xml, $rel1));
+        $this->assertTrue(false !== strpos($xml, $rel2));
+        $this->assertTrue(false !== strpos($xml, $type1));
+        $this->assertTrue(false !== strpos($xml, $type2));
     }
 
     private function setUpSchemaFacade()
