@@ -360,7 +360,7 @@ class MetadataProvider extends MetadataBaseProvider
         }
         assert($principalMult != $dependentMult, 'Cannot have both ends same multiplicity for 1:N relation');
         //principal-one-to-dependent-many
-        if ('*' == $principalMult) {
+        if ('1' == $principalMult) {
             $meta->addResourceReferencePropertyBidirectional(
                 $principal,
                 $dependent,
