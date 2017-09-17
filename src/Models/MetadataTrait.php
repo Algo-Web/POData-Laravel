@@ -768,6 +768,7 @@ trait MetadataTrait
                     $isPoly = isset($gubbinsType);
                     $targType = 'known' != $gubbinsType ? $rawName : null;
                     $stub = $isPoly ? new AssociationStubPolymorphic() : new AssociationStubMonomorphic();
+                    $stub->setBaseType(get_class($this));
                     $stub->setRelationName($property);
                     $stub->setKeyField($relGubbins['local']);
                     $stub->setMultiplicity($multArray[$relGubbins['multiplicity']]);

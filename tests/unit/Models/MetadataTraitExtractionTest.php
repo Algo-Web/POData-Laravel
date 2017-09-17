@@ -22,7 +22,8 @@ class MetadataTraitExtractionTest extends TestCase
 
         $result = $foo->extractGubbins();
         $this->assertEquals(1, count($result->getKeyFields()));
-        $this->assertEquals('id', $result->getKeyFields()[0]->getName());
+
+        $this->assertEquals('id', $result->getKeyFields()['id']->getName());
         $this->assertEquals(3, count($result->getFields()));
         $fields = $result->getFields();
         foreach ($fields as $field) {
@@ -53,7 +54,7 @@ class MetadataTraitExtractionTest extends TestCase
 
         $result = $foo->extractGubbins();
         $this->assertEquals(1, count($result->getKeyFields()));
-        $this->assertEquals('id', $result->getKeyFields()[0]->getName());
+        $this->assertEquals('id', $result->getKeyFields()['id']->getName());
         $this->assertEquals(3, count($result->getFields()));
         $fields = $result->getFields();
         foreach ($fields as $field) {
@@ -61,8 +62,8 @@ class MetadataTraitExtractionTest extends TestCase
         }
         $this->assertEquals(1, count($result->getStubs()));
         $stubs = $result->getStubs();
-        $this->assertTrue($stubs[0] instanceof AssociationStubPolymorphic, get_class($stubs[0]));
-        $this->assertNull($stubs[0]->getTargType());
+        $this->assertTrue($stubs['morph'] instanceof AssociationStubPolymorphic, get_class($stubs['morph']));
+        $this->assertNull($stubs['morph']->getTargType());
         foreach ($stubs as $stub) {
             $this->assertTrue($stub->isOk());
             $this->assertTrue(in_array($stub->getKeyField(), $relKeys));

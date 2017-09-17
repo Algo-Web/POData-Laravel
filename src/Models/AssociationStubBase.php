@@ -25,6 +25,12 @@ abstract class AssociationStubBase
     protected $targType;
 
     /**
+     * Base type this relation is attached to
+     * @var string
+     */
+    protected $baseType;
+
+    /**
      * @return mixed
      */
     public function getRelationName()
@@ -119,6 +125,10 @@ abstract class AssociationStubBase
         if (null === $keyField || !is_string($keyField) || empty($keyField)) {
             return false;
         }
+        $baseType = $this->baseType;
+        if (null === $baseType || !is_string($baseType) || empty($baseType)) {
+            return false;
+        }
         $targType = $this->targType;
         if ($this instanceof AssociationStubMonomorphic && null === $targType) {
             return false;
@@ -144,5 +154,21 @@ abstract class AssociationStubBase
     public function setTargType($targType)
     {
         $this->targType = $targType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBaseType()
+    {
+        return $this->baseType;
+    }
+
+    /**
+     * @param string $baseType
+     */
+    public function setBaseType($baseType)
+    {
+        $this->baseType = $baseType;
     }
 }
