@@ -87,13 +87,13 @@ class EntityGubbins
             throw new \Exception($msg);
         }
         $keys = [];
-        foreach ($fields as $field) {
+        foreach ($fields as $propName => $field) {
             if (!$field instanceof EntityField) {
                 $msg = 'Fields array must only have EntityField objects';
                 throw new \Exception($msg);
             }
             if ($field->getIsKeyField()) {
-                $keys[] = $field;
+                $keys[$propName] = $field;
             }
         }
         if (0 == count($keys)) {

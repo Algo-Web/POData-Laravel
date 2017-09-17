@@ -754,7 +754,7 @@ trait MetadataTrait
             $nuField->setDefaultValue($field['default']);
             $nuField->setIsKeyField($this->getKeyName() == $name);
             $nuField->setFieldType(EntityFieldType::PRIMITIVE());
-            $entityFields[] = $nuField;
+            $entityFields[$name] = $nuField;
         }
         $gubbins->setFields($entityFields);
 
@@ -764,15 +764,16 @@ trait MetadataTrait
             foreach ($rel as $rawName => $deets) {
                 foreach ($deets as $relName => $relGubbins) {
                     $gubbinsType = $relGubbins['type'];
+                    $property = $relGubbins['property'];
                     $isPoly = isset($gubbinsType);
                     $targType = 'known' != $gubbinsType ? $rawName : null;
                     $stub = $isPoly ? new AssociationStubPolymorphic() : new AssociationStubMonomorphic();
-                    $stub->setRelationName($relGubbins['property']);
+                    $stub->setRelationName($property);
                     $stub->setKeyField($relGubbins['local']);
                     $stub->setMultiplicity($multArray[$relGubbins['multiplicity']]);
                     $stub->setTargType($targType);
                     assert($stub->isOk());
-                    $stubs[] = $stub;
+                    $stubs[$property] = $stub;
                 }
             }
         }
