@@ -111,4 +111,16 @@ class AssociationStubTest extends TestCase
         $actualMorph = $foo->getMorphType();
         $this->assertEquals($expectedMorph, $actualMorph);
     }
+
+    public function testMonomorphicNotOkWithNullTargetType()
+    {
+        $expectedKey = 'key';
+        $expectedRel = 'rel';
+
+        $foo = new AssociationStubMonomorphic();
+        $foo->setKeyField($expectedKey);
+        $foo->setRelationName($expectedRel);
+        $foo->setMultiplicity(AssociationStubRelationType::NULL_ONE());
+        $this->assertFalse($foo->isOk());
+    }
 }

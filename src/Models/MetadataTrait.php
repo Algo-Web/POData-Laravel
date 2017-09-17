@@ -763,11 +763,14 @@ trait MetadataTrait
         foreach ($rawRels as $key => $rel) {
             foreach ($rel as $rawName => $deets) {
                 foreach ($deets as $relName => $relGubbins) {
-                    $isPoly = isset($relGubbins['type']);
+                    $gubbinsType = $relGubbins['type'];
+                    $isPoly = isset($gubbinsType);
+                    $targType = 'known' != $gubbinsType ? $rawName : null;
                     $stub = $isPoly ? new AssociationStubPolymorphic() : new AssociationStubMonomorphic();
                     $stub->setRelationName($relGubbins['property']);
                     $stub->setKeyField($relGubbins['local']);
                     $stub->setMultiplicity($multArray[$relGubbins['multiplicity']]);
+                    $stub->setTargType($targType);
                     assert($stub->isOk());
                     $stubs[] = $stub;
                 }

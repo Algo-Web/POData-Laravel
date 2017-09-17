@@ -12,10 +12,17 @@ abstract class AssociationStubBase
      * @var string
      */
     protected $keyField;
+
     /**
      * @var string
      */
     protected $relationName;
+
+    /**
+     * Target type this relation points to, if known.  Is null for known-side polymorphic relations.
+     * @var string
+     */
+    protected $targType;
 
     /**
      * @return mixed
@@ -112,7 +119,30 @@ abstract class AssociationStubBase
         if (null === $keyField || !is_string($keyField) || empty($keyField)) {
             return false;
         }
+        $targType = $this->targType;
+        if ($this instanceof AssociationStubMonomorphic && null === $targType) {
+            return false;
+        }
+        if (null !== $targType && (!is_string($targType) || empty($targType))) {
+            return false;
+        }
 
         return true;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTargType()
+    {
+        return $this->targType;
+    }
+
+    /**
+     * @param string $targType
+     */
+    public function setTargType($targType)
+    {
+        $this->targType = $targType;
     }
 }

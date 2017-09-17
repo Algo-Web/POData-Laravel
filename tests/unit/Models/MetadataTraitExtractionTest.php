@@ -31,6 +31,7 @@ class MetadataTraitExtractionTest extends TestCase
         $this->assertEquals(2, count($result->getStubs()));
         $stubs = $result->getStubs();
         foreach ($stubs as $stub) {
+            $this->assertTrue($stub->isOk());
             $this->assertTrue(in_array($stub->getKeyField(), $relKeys));
             $this->assertTrue(in_array($stub->getRelationName(), $relations));
         }
@@ -61,7 +62,9 @@ class MetadataTraitExtractionTest extends TestCase
         $this->assertEquals(1, count($result->getStubs()));
         $stubs = $result->getStubs();
         $this->assertTrue($stubs[0] instanceof AssociationStubPolymorphic, get_class($stubs[0]));
+        $this->assertNull($stubs[0]->getTargType());
         foreach ($stubs as $stub) {
+            $this->assertTrue($stub->isOk());
             $this->assertTrue(in_array($stub->getKeyField(), $relKeys));
             $this->assertTrue(in_array($stub->getRelationName(), $relations));
         }
