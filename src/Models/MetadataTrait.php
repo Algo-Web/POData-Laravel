@@ -725,4 +725,57 @@ trait MetadataTrait
         $rels = $this->getRelationshipsFromMethods();
         return !empty($rels['UnknownPolyMorphSide']);
     }
+
+    /**
+     * Extract entity gubbins detail for later downstream use
+     *
+     * @return EntityGubbins
+     */
+    public function extractGubbins()
+    {
+        $multArray = [
+            '*' => AssociationStubRelationType::MANY(),
+            '1' => AssociationStubRelationType::ONE(),
+            '0..1' => AssociationStubRelationType::NULL_ONE()
+        ];
+
+        $gubbins = new EntityGubbins();
+        $gubbins->setName($this->getEndpointName());
+        $gubbins->setClassName(get_class($this));
+
+        $fields = $this->metadata();
+        $entityFields = [];
+        foreach ($fields as $name => $field) {
+            $nuField = new EntityField();
+            $nuField->setName($name);
+            $nuField->setIsNullable($field['nullable']);
+            $nuField->setReadOnly(false);
+            $nuField->setCreateOnly(false);
+            $nuField->setDefaultValue($field['default']);
+            $nuField->setIsKeyField($this->getKeyName() == $name);
+            $nuField->setFieldType(EntityFieldType::PRIMITIVE());
+            $entityFields[] = $nuField;
+        }
+        $gubbins->setFields($entityFields);
+
+        $rawRels = $this->getRelationships();
+        $stubs = [];
+        foreach ($rawRels as $key => $rel) {
+            foreach ($rel as $rawName => $deets) {
+                foreach ($deets as $relName => $relGubbins) {
+                    $isPoly = isset($relGubbins['type']);
+                    $stub = $isPoly ? new AssociationStubPolymorphic() : new AssociationStubMonomorphic();
+                    $stub->setRelationName($relGubbins['property']);
+                    $stub->setKeyField($relGubbins['local']);
+                    $stub->setMultiplicity($multArray[$relGubbins['multiplicity']]);
+                    assert($stub->isOk());
+                    $stubs[] = $stub;
+                }
+            }
+        }
+
+        $gubbins->setStubs($stubs);
+
+        return $gubbins;
+    }
 }
