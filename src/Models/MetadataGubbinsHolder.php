@@ -43,6 +43,47 @@ class MetadataGubbinsHolder
         return $relStubs;
     }
 
+    public function getRelationsByClass($className)
+    {
+        $this->checkClassExists($className);
+
+        $rels = $this->relations[$className];
+        $stubs = $rels->getStubs();
+
+        $associations = [];
+        foreach ($stubs as $relName => $stub) {
+            $others = $this->getRelationsByRelationName($className, $relName);
+            if (1 === count($others)) {
+                $others = $others[0];
+                $assoc = new Association();
+                $first = -1 === $stub->compare($others);
+                $assoc->setFirst($first ? $stub : $others);
+                $assoc->setLast($first ? $others : $stub);
+                assert($assoc->isOk());
+                $associations[] = $assoc;
+            }
+        }
+        return $associations;
+    }
+
+    public function getRelations()
+    {
+        $classNames = array_keys($this->relations);
+
+        $associations = [];
+
+        foreach ($classNames as $class) {
+            $rawAssoc = $this->getRelationsByClass($class);
+            foreach ($rawAssoc as $raw) {
+                if (!in_array($raw, $associations)) {
+                    $associations[] = $raw;
+                }
+            }
+        }
+
+        return $associations;
+    }
+
     /**
      * @param $className
      */
