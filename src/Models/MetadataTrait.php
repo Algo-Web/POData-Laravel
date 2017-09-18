@@ -725,4 +725,63 @@ trait MetadataTrait
         $rels = $this->getRelationshipsFromMethods();
         return !empty($rels['UnknownPolyMorphSide']);
     }
+
+    /**
+     * Extract entity gubbins detail for later downstream use
+     *
+     * @return EntityGubbins
+     */
+    public function extractGubbins()
+    {
+        $multArray = [
+            '*' => AssociationStubRelationType::MANY(),
+            '1' => AssociationStubRelationType::ONE(),
+            '0..1' => AssociationStubRelationType::NULL_ONE()
+        ];
+
+        $gubbins = new EntityGubbins();
+        $gubbins->setName($this->getEndpointName());
+        $gubbins->setClassName(get_class($this));
+
+        $fields = $this->metadata();
+        $entityFields = [];
+        foreach ($fields as $name => $field) {
+            $nuField = new EntityField();
+            $nuField->setName($name);
+            $nuField->setIsNullable($field['nullable']);
+            $nuField->setReadOnly(false);
+            $nuField->setCreateOnly(false);
+            $nuField->setDefaultValue($field['default']);
+            $nuField->setIsKeyField($this->getKeyName() == $name);
+            $nuField->setFieldType(EntityFieldType::PRIMITIVE());
+            $entityFields[$name] = $nuField;
+        }
+        $gubbins->setFields($entityFields);
+
+        $rawRels = $this->getRelationships();
+        $stubs = [];
+        foreach ($rawRels as $key => $rel) {
+            foreach ($rel as $rawName => $deets) {
+                foreach ($deets as $relName => $relGubbins) {
+                    $gubbinsType = $relGubbins['type'];
+                    $property = $relGubbins['property'];
+                    $isPoly = isset($gubbinsType);
+                    $targType = 'known' != $gubbinsType ? $rawName : null;
+                    $stub = $isPoly ? new AssociationStubPolymorphic() : new AssociationStubMonomorphic();
+                    $stub->setBaseType(get_class($this));
+                    $stub->setRelationName($property);
+                    $stub->setKeyField($relGubbins['local']);
+                    $stub->setForeignField($targType ? $key : null);
+                    $stub->setMultiplicity($multArray[$relGubbins['multiplicity']]);
+                    $stub->setTargType($targType);
+                    assert($stub->isOk());
+                    $stubs[$property] = $stub;
+                }
+            }
+        }
+
+        $gubbins->setStubs($stubs);
+
+        return $gubbins;
+    }
 }
