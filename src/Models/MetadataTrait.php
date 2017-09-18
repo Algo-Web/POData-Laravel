@@ -771,6 +771,7 @@ trait MetadataTrait
                     $stub->setBaseType(get_class($this));
                     $stub->setRelationName($property);
                     $stub->setKeyField($relGubbins['local']);
+                    $stub->setForeignField($targType ? $key : null);
                     $stub->setMultiplicity($multArray[$relGubbins['multiplicity']]);
                     $stub->setTargType($targType);
                     assert($stub->isOk());

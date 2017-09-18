@@ -8,10 +8,20 @@ abstract class AssociationStubBase
      * @var AssociationStubRelationType
      */
     protected $multiplicity;
+
     /**
+     * Foreign key field of this end of relation
+     *
      * @var string
      */
     protected $keyField;
+
+    /**
+     * Foreign key field of other end of relation
+     *
+     * @var string
+     */
+    protected $foreignField;
 
     /**
      * @var string
@@ -136,6 +146,13 @@ abstract class AssociationStubBase
         if (null !== $targType && (!is_string($targType) || empty($targType))) {
             return false;
         }
+        $foreignField = $this->foreignField;
+        if (null !== $targType && (null === $foreignField || !is_string($foreignField) || empty($foreignField))) {
+            return false;
+        }
+        if (null === $targType && null !== $foreignField) {
+            return false;
+        }
 
         return true;
     }
@@ -170,5 +187,21 @@ abstract class AssociationStubBase
     public function setBaseType($baseType)
     {
         $this->baseType = $baseType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getForeignField()
+    {
+        return $this->foreignField;
+    }
+
+    /**
+     * @param string $foreignField
+     */
+    public function setForeignField($foreignField)
+    {
+        $this->foreignField = $foreignField;
     }
 }

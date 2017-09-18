@@ -15,6 +15,31 @@ class AssociationStubTest extends TestCase
         $this->assertFalse($bar->isCompatible($foo));
     }
 
+    public function testMonomorphicAssociationIsOkBadForeignField()
+    {
+        $foo = new AssociationStubMonomorphic();
+        $foo->setKeyField('key');
+        $foo->setRelationName('rel');
+        $foo->setMultiplicity(AssociationStubRelationType::NULL_ONE());
+        $foo->setBaseType(TestMorphTarget::class);
+        $foo->setTargType(TestMorphTargetChild::class);
+        $this->assertFalse($foo->isOk());
+        $foo->setForeignField(123);
+        $this->assertFalse($foo->isOk());
+    }
+
+    public function testPolymorphicAssociationIsOkBadForeignField()
+    {
+        $foo = new AssociationStubPolymorphic();
+        $foo->setKeyField('key');
+        $foo->setRelationName('rel');
+        $foo->setMultiplicity(AssociationStubRelationType::NULL_ONE());
+        $foo->setBaseType(TestMorphTarget::class);
+        $foo->setTargType(null);
+        $foo->setForeignField(123);
+        $this->assertFalse($foo->isOk());
+    }
+
     public function testAssociationIncompatibleOnBothNullableOne()
     {
         $foo = new AssociationStubPolymorphic();
@@ -28,6 +53,8 @@ class AssociationStubTest extends TestCase
         $foo->setBaseType(TestMorphTarget::class);
         $foo->setTargType(TestMorphTargetChild::class);
         $bar->setBaseType(TestMorphTargetChild::class);
+        $foo->setForeignField('foreign');
+        $bar->setForeignField(null);
         $this->assertTrue($foo->isOk());
         $this->assertTrue($bar->isOk());
 
@@ -48,6 +75,8 @@ class AssociationStubTest extends TestCase
         $bar->setBaseType(TestMorphManyToManyTarget::class);
         $foo->setMultiplicity(AssociationStubRelationType::MANY());
         $bar->setMultiplicity(AssociationStubRelationType::MANY());
+        $foo->setForeignField('foreign');
+        $bar->setForeignField(null);
         $this->assertTrue($foo->isOk());
         $this->assertTrue($bar->isOk());
 
@@ -68,6 +97,8 @@ class AssociationStubTest extends TestCase
         $foo->setBaseType(TestMorphTarget::class);
         $foo->setTargType(TestMorphTargetChild::class);
         $bar->setBaseType(TestMorphTargetChild::class);
+        $foo->setForeignField('foreign');
+        $bar->setForeignField(null);
         $this->assertTrue($foo->isOk());
         $this->assertTrue($bar->isOk());
 
@@ -107,6 +138,8 @@ class AssociationStubTest extends TestCase
         $foo->setBaseType(TestMorphTarget::class);
         $foo->setTargType(TestMonomorphicSource::class);
         $bar->setBaseType(TestMorphTarget::class);
+        $foo->setForeignField('foreign');
+        $bar->setForeignField(null);
         $this->assertTrue($foo->isOk());
         $this->assertTrue($bar->isOk());
 
