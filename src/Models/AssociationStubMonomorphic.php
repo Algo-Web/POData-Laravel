@@ -9,9 +9,6 @@ class AssociationStubMonomorphic extends AssociationStubBase
         if (!parent::isCompatible($otherStub)) {
             return false;
         }
-        if ($this->getForeignField() !== $otherStub->getKeyField()) {
-            return false;
-        }
-        return true;
+        return $this->getForeignField() === $otherStub->getKeyField();
     }
 }

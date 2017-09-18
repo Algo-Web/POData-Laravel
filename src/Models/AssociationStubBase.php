@@ -41,7 +41,7 @@ abstract class AssociationStubBase
     protected $baseType;
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getRelationName()
     {
@@ -112,11 +112,7 @@ abstract class AssociationStubBase
         }
         $thisMult = $this->getMultiplicity();
         $thatMult = $otherStub->getMultiplicity();
-        if (AssociationStubRelationType::MANY() != $thisMult && $thisMult == $thatMult) {
-            return false;
-        }
-
-        return true;
+        return (AssociationStubRelationType::MANY() == $thisMult || $thisMult != $thatMult);
     }
 
     /**
@@ -150,11 +146,7 @@ abstract class AssociationStubBase
         if (null !== $targType && (null === $foreignField || !is_string($foreignField) || empty($foreignField))) {
             return false;
         }
-        if (null === $targType && null !== $foreignField) {
-            return false;
-        }
-
-        return true;
+        return (null === $targType) === (null === $foreignField);
     }
 
     /**
@@ -210,7 +202,7 @@ abstract class AssociationStubBase
      *
      * @param AssociationStubBase $other
      *
-     * @return int
+     * @return integer
      */
     public function compare(AssociationStubBase $other)
     {

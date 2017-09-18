@@ -59,9 +59,6 @@ class Association
         if (!$first->isCompatible($last)) {
             return false;
         }
-        if (-1 !== $first->compare($last)) {
-            return false;
-        }
-        return true;
+        return -1 === $first->compare($last);
     }
 }

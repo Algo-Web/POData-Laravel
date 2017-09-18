@@ -144,7 +144,7 @@ class EntityField
     }
 
     /**
-     * @param boolean $createOnly
+     * @param boolean $keyField
      */
     public function setIsKeyField($keyField)
     {
