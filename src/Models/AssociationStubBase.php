@@ -204,4 +204,29 @@ abstract class AssociationStubBase
     {
         $this->foreignField = $foreignField;
     }
+
+    /**
+     * Supply a canonical sort ordering to determine order in associations
+     *
+     * @param AssociationStubBase $other
+     *
+     * @return int
+     */
+    public function compare(AssociationStubBase $other)
+    {
+        $thisClass = get_class($this);
+        $otherClass = get_class($other);
+        if ($thisClass !== $otherClass) {
+            return $thisClass < $otherClass ? -1 : 1;
+        }
+        $thisBase = $this->getBaseType();
+        $otherBase = $other->getBaseType();
+        if ($thisBase !== $otherBase) {
+            return $thisBase < $otherBase ? -1 : 1;
+        }
+        $thisMethod = $this->getRelationName();
+        $otherMethod = $other->getRelationName();
+        $methodComp = strcmp($thisMethod, $otherMethod);
+        return 0 === $methodComp ? 0 : $methodComp / abs($methodComp);
+    }
 }

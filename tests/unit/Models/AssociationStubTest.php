@@ -219,4 +219,47 @@ class AssociationStubTest extends TestCase
         $foo->setMultiplicity(AssociationStubRelationType::NULL_ONE());
         $this->assertFalse($foo->isOk());
     }
+
+    public function testCompareWithMonomorphicSelf()
+    {
+        $foo = new AssociationStubMonomorphic();
+        $this->assertEquals(0, $foo->compare($foo));
+    }
+
+    public function testCompareWithPolymorphicSelf()
+    {
+        $foo = new AssociationStubPolymorphic();
+        $this->assertEquals(0, $foo->compare($foo));
+    }
+
+    public function testCompareDifferentTypes()
+    {
+        $foo = new AssociationStubMonomorphic();
+        $bar = new AssociationStubPolymorphic();
+
+        $this->assertEquals(-1, $foo->compare($bar));
+        $this->assertEquals(1, $bar->compare($foo));
+    }
+
+    public function testCompareDifferentBaseTypes()
+    {
+        $foo = new AssociationStubMonomorphic();
+        $foo->setBaseType('def');
+        $bar = new AssociationStubMonomorphic();
+        $bar->setBaseType('abc');
+        $this->assertEquals(1, $foo->compare($bar));
+        $this->assertEquals(-1, $bar->compare($foo));
+    }
+
+    public function testCompareDifferentMethods()
+    {
+        $foo = new AssociationStubMonomorphic();
+        $foo->setBaseType('abc');
+        $foo->setRelationName('slash');
+        $bar = new AssociationStubMonomorphic();
+        $bar->setBaseType('abc');
+        $bar->setRelationName('dot');
+        $this->assertEquals(1, $foo->compare($bar));
+        $this->assertEquals(-1, $bar->compare($foo));
+    }
 }
