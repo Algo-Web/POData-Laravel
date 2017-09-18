@@ -6,12 +6,19 @@ use Mockery as m;
 
 class AssociationStubTest extends TestCase
 {
-    public function testAssociationIncompatibleDifferentTypes()
+    public function testAssociationIncompatibleDifferentTypesPoly()
     {
         $foo = new AssociationStubPolymorphic();
         $bar = new AssociationStubMonomorphic();
 
         $this->assertFalse($foo->isCompatible($bar));
+    }
+
+    public function testAssociationIncompatibleDifferentTypesMono()
+    {
+        $foo = new AssociationStubPolymorphic();
+        $bar = new AssociationStubMonomorphic();
+
         $this->assertFalse($bar->isCompatible($foo));
     }
 

@@ -208,13 +208,15 @@ abstract class AssociationStubBase
     {
         $thisClass = get_class($this);
         $otherClass = get_class($other);
-        if ($thisClass !== $otherClass) {
-            return $thisClass < $otherClass ? -1 : 1;
+        $classComp = strcmp($thisClass, $otherClass);
+        if (0 !== $classComp) {
+            return $classComp / abs($classComp);
         }
         $thisBase = $this->getBaseType();
         $otherBase = $other->getBaseType();
-        if ($thisBase !== $otherBase) {
-            return $thisBase < $otherBase ? -1 : 1;
+        $baseComp = strcmp($thisBase, $otherBase);
+        if (0 !== $baseComp) {
+            return $baseComp / abs($baseComp);
         }
         $thisMethod = $this->getRelationName();
         $otherMethod = $other->getRelationName();
