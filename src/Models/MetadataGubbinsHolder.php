@@ -87,6 +87,11 @@ class MetadataGubbinsHolder
         return $associations;
     }
 
+    public function hasClass($className)
+    {
+        return array_key_exists($className, $this->relations);
+    }
+
     /**
      * @param $className
      */

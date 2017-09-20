@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
@@ -422,7 +423,7 @@ class IronicSerialiserTest extends SerialiserTestBase
             App::instance($className, $testModel);
         }
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
@@ -601,7 +602,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
         $host->setServiceUri('/odata.svc/');
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -664,7 +665,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
         $host->setServiceUri('/odata.svc/');
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);

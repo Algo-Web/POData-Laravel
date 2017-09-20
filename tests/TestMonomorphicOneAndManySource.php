@@ -70,4 +70,12 @@ class TestMonomorphicOneAndManySource extends Model
     {
         return $this->hasMany(TestMonomorphicOneAndManyTarget::class, 'many_id');
     }
+
+    public function metadata()
+    {
+        if (isset($this->metaArray)) {
+            return $this->metaArray;
+        }
+        return $this->traitmetadata();
+    }
 }

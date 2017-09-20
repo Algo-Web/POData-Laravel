@@ -240,7 +240,7 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * @return MetadataRelationHolder
+     * @return MetadataGubbinsHolder
      */
     public function getRelationHolder()
     {

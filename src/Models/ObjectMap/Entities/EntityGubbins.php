@@ -73,6 +73,10 @@ class EntityGubbins
 
     public function setOdataResourceType(ResourceEntityType $odataType)
     {
+        if ($odataType->isAbstract()) {
+            $msg = 'OData resource entity type must be concrete';
+            throw new \InvalidArgumentException($msg);
+        }
         $this->odataResourceType = $odataType;
     }
 

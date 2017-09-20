@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestCase;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
@@ -32,7 +33,7 @@ class MetadataProviderReverseTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $this->metadataProvider = m::mock(MetadataProvider::class)
             ->makePartial()->shouldAllowMockingProtectedMethods();
         $this->metadataProvider->shouldReceive('getRelationHolder')->andReturn($holder);
