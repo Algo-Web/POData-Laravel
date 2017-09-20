@@ -32,7 +32,7 @@ class MetadataProvider extends MetadataBaseProvider
     public function __construct($app)
     {
         parent::__construct($app);
-        $this->relationHolder = new MetadataRelationHolder();
+        $this->relationHolder = new MetadataGubbinsHolder();
         self::$isBooted = false;
     }
 
@@ -48,7 +48,7 @@ class MetadataProvider extends MetadataBaseProvider
 
     private function unify(Map $ObjectMap)
     {
-        $mgh = new MetadataGubbinsHolder();
+        $mgh = $this->getRelationHolder();
         foreach ($ObjectMap->getEntities() as $entity) {
             $mgh->addEntity($entity);
         }
@@ -65,17 +65,27 @@ class MetadataProvider extends MetadataBaseProvider
     private function imploment(Map $objectModel)
     {
         $meta = App::make('metadata');
-        foreach ($objectModel->getEntities() as $entity) {
+        $entities = $objectModel->getEntities();
+        foreach ($entities as $entity) {
             $baseType = $entity->isPolymorphicAffected() ? $meta->resolveResourceType('polyMorphicPlaceholder') : null;
-            $EntityType = $meta->addEntityType(new \ReflectionClass($entity->getClassName()), $entity->getName(), false, $baseType);
+            $className = $entity->getClassName();
+            $entityName = $entity->getName();
+            $EntityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, false, $baseType);
             $entity->setOdataResourceType($EntityType);
             $this->implomntProperties($entity);
-            $meta->addResourceSet($entity->getName(), $EntityType);
+            $meta->addResourceSet($entity->getClassName(), $EntityType);
+            $meta->oDataEntityMap[$className] = $meta->oDataEntityMap[$entityName];
         }
+        $metaCount = count($meta->oDataEntityMap);
+        $entityCount = count($entities);
+        assert($metaCount == 2 * $entityCount + 1);
+
         if (null === $objectModel->getAssociations()) {
             return;
         }
-        foreach ($objectModel->getAssociations() as $association) {
+        $assoc = $objectModel->getAssociations();
+        $assoc = null === $assoc ? [] : $assoc;
+        foreach ($assoc as $association) {
             $this->implomentAssocations($objectModel, $association);
         }
     }
@@ -83,40 +93,42 @@ class MetadataProvider extends MetadataBaseProvider
     private function implomentAssocations(Map $objectModel, Association $associationUnderHammer)
     {
         $meta = App::make('metadata');
+        $first = $associationUnderHammer->getFirst();
+        $last = $associationUnderHammer->getLast();
         switch ($associationUnderHammer->getAssocationType()) {
             case AssociationType::NULL_ONE_TO_NULL_ONE():
             case AssociationType::NULL_ONE_TO_ONE():
             case AssociationType::ONE_TO_ONE():
                 $meta->addResourceReferenceSinglePropertyBidirectional(
-                    $objectModel->getEntities()[$associationUnderHammer->getFirst()->getBaseType()]->getOdataResourceType(),
-                    $objectModel->getEntities()[$associationUnderHammer->getLast()->getBaseType()]->getOdataResourceType(),
-                    $associationUnderHammer->getFirst()->getRelationName(),
-                    $associationUnderHammer->getLast()->getRelationName());
+                    $objectModel->getEntities()[$first->getBaseType()]->getOdataResourceType(),
+                    $objectModel->getEntities()[$last->getBaseType()]->getOdataResourceType(),
+                    $first->getRelationName(),
+                    $last->getRelationName()
+                );
                 break;
             case AssociationType::NULL_ONE_TO_MANY():
             case AssociationType::ONE_TO_MANY():
-
-                if ($associationUnderHammer->getFirst()->getMultiplicity()->getValue() == AssociationStubRelationType::MANY) {
-                    $oneSide = $associationUnderHammer->getLast();
-                    $manyside = $associationUnderHammer->getFirst();
+                if ($first->getMultiplicity()->getValue() == AssociationStubRelationType::MANY) {
+                    $oneSide = $last;
+                    $manySide = $first;
                 } else {
-                    $oneSide = $associationUnderHammer->getFirst();
-                    $manyside = $associationUnderHammer->getLast();
+                    $oneSide = $first;
+                    $manySide = $last;
                 }
                 $meta->addResourceReferencePropertyBidirectional(
                     $objectModel->getEntities()[$oneSide->getBaseType()]->getOdataResourceType(),
-                    $objectModel->getEntities()[$manyside->getBaseType()]->getOdataResourceType(),
+                    $objectModel->getEntities()[$manySide->getBaseType()]->getOdataResourceType(),
                     $oneSide->getRelationName(),
-                    $manyside->getRelationName()
+                    $manySide->getRelationName()
                 );
                 break;
             case AssociationType::MANY_TO_MANY():
                 $meta->addResourceSetReferencePropertyBidirectional(
-                    $objectModel->getEntities()[$associationUnderHammer->getFirst()->getBaseType()]->getOdataResourceType(),
-                    $objectModel->getEntities()[$associationUnderHammer->getLast()->getBaseType()]->getOdataResourceType(),
-                    $associationUnderHammer->getFirst()->getRelationName(),
-                    $associationUnderHammer->getLast()->getRelationName());
-
+                    $objectModel->getEntities()[$first->getBaseType()]->getOdataResourceType(),
+                    $objectModel->getEntities()[$last->getBaseType()]->getOdataResourceType(),
+                    $first->getRelationName(),
+                    $last->getRelationName()
+                );
         }
 
     }
@@ -204,11 +216,9 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function register()
     {
-        $this->app->singleton(
-            'metadata', function ($app) {
+        $this->app->singleton('metadata', function ($app) {
             return new SimpleMetadataProvider('Data', self::$metaNAMESPACE);
-        }
-        );
+        });
     }
 
     /**
