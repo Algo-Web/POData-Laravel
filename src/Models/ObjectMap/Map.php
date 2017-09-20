@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Barnso
- * Date: 20/09/2017
- * Time: 4:58 PM
- */
-
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap;
 
 
