@@ -2,8 +2,8 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Connection as Connection;
+use Illuminate\Database\Eloquent\Model;
 use Mockery as m;
 
 class TestPolymorphicDualSource extends Model

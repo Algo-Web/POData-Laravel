@@ -2,12 +2,12 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
-use AlgoWeb\PODataLaravel\Models\TestMorphManySourceWithUnexposedTarget;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\App;
-use Illuminate\Database\Connection;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use AlgoWeb\PODataLaravel\Models\TestMorphManySourceWithUnexposedTarget;
+use Illuminate\Database\Connection;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
@@ -148,7 +148,7 @@ class MetadataTraitTest extends TestCase
         $expected['added_at'] = ['type' => 'integer', 'nullable' => false, 'fillable' => true, 'default' => null];
         $expected['weight'] = ['type' => 'integer', 'nullable' => false, 'fillable' => true, 'default' => null];
         $expected['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $expected['WeightCode'] = ['type' => 'text', 'nullable' => true, 'fillable' => false, 'default' => ""];
+        $expected['WeightCode'] = ['type' => 'text', 'nullable' => true, 'fillable' => false, 'default' => ''];
 
         $intType = \Mockery::mock(\Doctrine\DBAL\Types\IntegerType::class);
         $intType->shouldReceive('getName')->andReturn('integer');
@@ -595,7 +595,7 @@ class MetadataTraitTest extends TestCase
         $foo = new TestMonomorphicSource();
         $relations = [new \DateTime()];
 
-        $expected = "Object of class DateTime could not be converted to string";
+        $expected = 'Object of class DateTime could not be converted to string';
         $actual = null;
 
         try {
@@ -611,7 +611,7 @@ class MetadataTraitTest extends TestCase
         $foo = new TestMonomorphicSource();
         $relations = [[]];
 
-        $expected = "Array to string conversion";
+        $expected = 'Array to string conversion';
         $actual = null;
 
         try {
@@ -660,6 +660,8 @@ class MetadataTraitTest extends TestCase
 
     /**
      * @dataProvider knownSideProvider
+     * @param mixed $modelName
+     * @param mixed $expected
      */
     public function testCheckKnownSide($modelName, $expected)
     {
@@ -695,6 +697,8 @@ class MetadataTraitTest extends TestCase
 
     /**
      * @dataProvider unknownSideProvider
+     * @param mixed $modelName
+     * @param mixed $expected
      */
     public function testCheckUnknownSide($modelName, $expected)
     {

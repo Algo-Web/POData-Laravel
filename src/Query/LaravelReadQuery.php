@@ -10,15 +10,15 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
-use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
-use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
-use Symfony\Component\Process\Exception\InvalidArgumentException;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
 use POData\UriProcessor\QueryProcessor\ExpressionParser\FilterInfo;
+use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
+use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
+use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 class LaravelReadQuery
 {
@@ -34,16 +34,16 @@ class LaravelReadQuery
     /**
      * Gets collection of entities belongs to an entity set
      * IE: http://host/EntitySet
-     *  http://host/EntitySet?$skip=10&$top=5&filter=Prop gt Value
+     *  http://host/EntitySet?$skip=10&$top=5&filter=Prop gt Value.
      *
-     * @param QueryType                $queryType   Is this is a query for a count, entities, or entities-with-count
-     * @param ResourceSet              $resourceSet The entity set containing the entities to fetch
-     * @param FilterInfo|null          $filterInfo  The $filter parameter of the OData query.  NULL if none specified
-     * @param null|InternalOrderByInfo $orderBy     sorted order if we want to get the data in some specific order
-     * @param integer|null             $top         number of records which need to be retrieved
-     * @param integer|null             $skip        number of records which need to be skipped
-     * @param SkipTokenInfo|null       $skipToken   value indicating what records to skip
-     * @param Model|Relation|null $sourceEntityInstance Starting point of query
+     * @param QueryType                $queryType            Is this is a query for a count, entities, or entities-with-count
+     * @param ResourceSet              $resourceSet          The entity set containing the entities to fetch
+     * @param FilterInfo|null          $filterInfo           The $filter parameter of the OData query.  NULL if none specified
+     * @param null|InternalOrderByInfo $orderBy              sorted order if we want to get the data in some specific order
+     * @param int|null                 $top                  number of records which need to be retrieved
+     * @param int|null                 $skip                 number of records which need to be skipped
+     * @param SkipTokenInfo|null       $skipToken            value indicating what records to skip
+     * @param Model|Relation|null      $sourceEntityInstance Starting point of query
      *
      * @return QueryResult
      */
@@ -215,7 +215,7 @@ class LaravelReadQuery
     /**
      * Get related resource set for a resource
      * IE: http://host/EntitySet(1L)/NavigationPropertyToCollection
-     * http://host/EntitySet?$expand=NavigationPropertyToCollection
+     * http://host/EntitySet?$expand=NavigationPropertyToCollection.
      *
      * @param QueryType          $queryType            Is this is a query for a count, entities, or entities-with-count
      * @param ResourceSet        $sourceResourceSet    The entity set containing the source entity
@@ -224,12 +224,11 @@ class LaravelReadQuery
      * @param ResourceProperty   $targetProperty       The navigation property to retrieve
      * @param FilterInfo|null    $filter               The $filter parameter of the OData query.  NULL if none specified
      * @param mixed|null         $orderBy              sorted order if we want to get the data in some specific order
-     * @param integer|null       $top                  number of records which need to be retrieved
-     * @param integer|null       $skip                 number of records which need to be skipped
+     * @param int|null           $top                  number of records which need to be retrieved
+     * @param int|null           $skip                 number of records which need to be skipped
      * @param SkipTokenInfo|null $skipToken            value indicating what records to skip
      *
      * @return QueryResult
-     *
      */
     public function getRelatedResourceSet(
         QueryType $queryType,
@@ -263,10 +262,10 @@ class LaravelReadQuery
     /**
      * Gets an entity instance from an entity set identified by a key
      * IE: http://host/EntitySet(1L)
-     * http://host/EntitySet(KeyA=2L,KeyB='someValue')
+     * http://host/EntitySet(KeyA=2L,KeyB='someValue').
      *
-     * @param ResourceSet           $resourceSet    The entity set containing the entity to fetch
-     * @param KeyDescriptor|null    $keyDescriptor  The key identifying the entity to fetch
+     * @param ResourceSet        $resourceSet   The entity set containing the entity to fetch
+     * @param KeyDescriptor|null $keyDescriptor The key identifying the entity to fetch
      *
      * @return Model|null Returns entity instance if found else null
      */
@@ -279,10 +278,10 @@ class LaravelReadQuery
 
 
     /**
-     * Common method for getResourceFromRelatedResourceSet() and getResourceFromResourceSet()
-     * @param ResourceSet|null      $resourceSet
-     * @param KeyDescriptor|null    $keyDescriptor
-     * @param Model|Relation|null   $sourceEntityInstance   Starting point of query
+     * Common method for getResourceFromRelatedResourceSet() and getResourceFromResourceSet().
+     * @param ResourceSet|null    $resourceSet
+     * @param KeyDescriptor|null  $keyDescriptor
+     * @param Model|Relation|null $sourceEntityInstance Starting point of query
      *
      * @return Model|null
      */
@@ -323,12 +322,12 @@ class LaravelReadQuery
     /**
      * Get related resource for a resource
      * IE: http://host/EntitySet(1L)/NavigationPropertyToSingleEntity
-     * http://host/EntitySet?$expand=NavigationPropertyToSingleEntity
+     * http://host/EntitySet?$expand=NavigationPropertyToSingleEntity.
      *
-     * @param ResourceSet $sourceResourceSet The entity set containing the source entity
-     * @param Model  $sourceEntityInstance The source entity instance.
-     * @param ResourceSet $targetResourceSet The entity set containing the entity pointed to by the navigation property
-     * @param ResourceProperty $targetProperty The navigation property to fetch
+     * @param ResourceSet      $sourceResourceSet    The entity set containing the source entity
+     * @param Model            $sourceEntityInstance the source entity instance
+     * @param ResourceSet      $targetResourceSet    The entity set containing the entity pointed to by the navigation property
+     * @param ResourceProperty $targetProperty       The navigation property to fetch
      *
      * @return object|null The related resource if found else null
      */
@@ -348,13 +347,13 @@ class LaravelReadQuery
 
     /**
      * Gets a related entity instance from an entity set identified by a key
-     * IE: http://host/EntitySet(1L)/NavigationPropertyToCollection(33)
+     * IE: http://host/EntitySet(1L)/NavigationPropertyToCollection(33).
      *
-     * @param ResourceSet $sourceResourceSet The entity set containing the source entity
-     * @param Model $sourceEntityInstance The source entity instance.
-     * @param ResourceSet $targetResourceSet The entity set containing the entity to fetch
-     * @param ResourceProperty $targetProperty The metadata of the target property.
-     * @param KeyDescriptor $keyDescriptor The key identifying the entity to fetch
+     * @param ResourceSet      $sourceResourceSet    The entity set containing the source entity
+     * @param Model            $sourceEntityInstance the source entity instance
+     * @param ResourceSet      $targetResourceSet    The entity set containing the entity to fetch
+     * @param ResourceProperty $targetProperty       the metadata of the target property
+     * @param KeyDescriptor    $keyDescriptor        The key identifying the entity to fetch
      *
      * @return Model|null Returns entity instance if found else null
      */
@@ -383,7 +382,7 @@ class LaravelReadQuery
 
 
     /**
-     * @param ResourceSet $resourceSet
+     * @param  ResourceSet $resourceSet
      * @return mixed
      */
     protected function getSourceEntityInstance(ResourceSet $resourceSet)
@@ -409,6 +408,7 @@ class LaravelReadQuery
 
     /**
      * @param $sourceEntityInstance
+     * @param  null|mixed     $checkInstance
      * @throws ODataException
      */
     private function checkAuth($sourceEntityInstance, $checkInstance = null)
@@ -425,7 +425,7 @@ class LaravelReadQuery
 
     /**
      * @param $sourceEntityInstance
-     * @param KeyDescriptor|null    $keyDescriptor
+     * @param  KeyDescriptor|null        $keyDescriptor
      * @throws InvalidOperationException
      */
     private function processKeyDescriptor(&$sourceEntityInstance, KeyDescriptor $keyDescriptor = null)

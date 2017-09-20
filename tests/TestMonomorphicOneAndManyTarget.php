@@ -2,8 +2,8 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
-use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Connection as Connection;
+use Illuminate\Database\Eloquent\Model as Model;
 use Mockery\Mockery;
 
 class TestMonomorphicOneAndManyTarget extends Model

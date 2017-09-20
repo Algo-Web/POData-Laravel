@@ -5,8 +5,8 @@ namespace AlgoWeb\PODataLaravel\Controllers;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Requests\TestRequest;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ElectricBoogalooController extends \Illuminate\Routing\Controller
 {
@@ -38,7 +38,7 @@ class ElectricBoogalooController extends \Illuminate\Routing\Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function storeTestModel(TestRequest $request)
@@ -66,7 +66,7 @@ class ElectricBoogalooController extends \Illuminate\Routing\Controller
     /**
      * Display the specified resource.
      *
-     * @param  int $id
+     * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
     public function showTestModel($id)
@@ -84,8 +84,8 @@ class ElectricBoogalooController extends \Illuminate\Routing\Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $id
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
     public function updateTestModel(TestRequest $request, $id)
@@ -112,7 +112,7 @@ class ElectricBoogalooController extends \Illuminate\Routing\Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $id
+     * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
     public function destroyTestModel($id)

@@ -2,13 +2,13 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
-use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\ExpressionType;
-use POData\Providers\Metadata\Type\IType;
 use POData\Common\ODataConstants;
+use POData\Providers\Expression\IExpressionProvider;
 use POData\Providers\Metadata\ResourceType;
+use POData\Providers\Metadata\Type\IType;
+use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\ExpressionType;
 use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\PropertyAccessExpression;
 use POData\UriProcessor\QueryProcessor\FunctionDescription;
-use POData\Providers\Expression\IExpressionProvider;
 
 class LaravelExpressionProvider implements IExpressionProvider
 {
@@ -47,8 +47,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      * @var ResourceType
      */
     private $resourceType;
-    /**
-     */
+    
     public function __construct()
     {
         $this->functionDescriptionParsers[ODataConstants::STRFUN_COMPARE] = function ($params) {
@@ -140,7 +139,7 @@ class LaravelExpressionProvider implements IExpressionProvider
     }
 
     /**
-     * Get the resource type
+     * Get the resource type.
      *
      * @return object|null
      */
@@ -265,7 +264,7 @@ class LaravelExpressionProvider implements IExpressionProvider
     {
         if (is_bool($value)) {
             return var_export($value, true);
-        } elseif (is_null($value)) {
+        } elseif (null === $value) {
             return var_export(null, true);
         }
         return $value;

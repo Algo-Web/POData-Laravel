@@ -120,7 +120,7 @@ class ODataControllerTest extends TestCase
         $knownDate = new Carbon(2017, 6, 15, 15, 14, 19);
         Carbon::setTestNow($knownDate);
 
-        $root = "GET;-;15:17:00;";
+        $root = 'GET;-;15:17:00;';
         $this->object->shouldReceive('isDumping')->andReturn(true);
 
         $db = DB::getFacadeRoot();

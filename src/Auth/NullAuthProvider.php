@@ -2,9 +2,9 @@
 
 namespace AlgoWeb\PODataLaravel\Auth;
 
+use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use Illuminate\Database\Eloquent\Model;
-use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 class NullAuthProvider implements AuthInterface
@@ -14,7 +14,7 @@ class NullAuthProvider implements AuthInterface
      *
      * @param ActionVerb $verb
      * @param $modelname  Model class to access
-     * @param Model|Relation|null $model  Specific model or relation to access
+     * @param  Model|Relation|null $model Specific model or relation to access
      * @return bool
      */
     public function canAuth(ActionVerb $verb, $modelname, $model = null)

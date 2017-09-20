@@ -4,11 +4,11 @@ namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Concerns\BuildsQueries;
+use Illuminate\Database\Connection as Connection;
 use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
-use Illuminate\Database\Connection as Connection;
 
 class TestModel extends Model
 {
@@ -102,8 +102,8 @@ class TestModel extends Model
     /**
      * Chunk the results of the query.
      *
-     * @param  int  $count
-     * @param  callable  $callback
+     * @param  int      $count
+     * @param  callable $callback
      * @return bool
      */
     public function chunk($count, callable $callback)

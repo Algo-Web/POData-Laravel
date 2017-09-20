@@ -2,21 +2,21 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
+use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolver;
 use Illuminate\Filesystem\FilesystemAdapter;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Mockery;
-use PHPUnit_Framework_TestCase;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-use POData\Providers\Metadata\SimpleMetadataProvider;
-use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
-
 use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamWrapper;
 use org\bovigo\vfs\vfsStreamDirectory;
+
+use org\bovigo\vfs\vfsStreamWrapper;
+use PHPUnit_Framework_TestCase;
+use POData\Providers\Metadata\SimpleMetadataProvider;
 
 class TestCase extends BaseTestCase
 {
@@ -29,9 +29,7 @@ class TestCase extends BaseTestCase
      */
     protected $baseUrl = 'http://localhost/';
 
-    /**
-     *
-     */
+    
     public function setUp()
     {
         if (!defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE')) {

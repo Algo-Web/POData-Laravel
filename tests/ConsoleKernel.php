@@ -3,9 +3,9 @@
 namespace AlgoWeb\PODataLaravel\Kernels;
 
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Foundation\Console\Kernel;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Foundation\Console\Kernel;
 
 class ConsoleKernel extends Kernel
 {
@@ -38,8 +38,8 @@ class ConsoleKernel extends Kernel
     /**
      * Create a new console kernel instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @param  \Illuminate\Contracts\Foundation\Application $app
+     * @param  \Illuminate\Contracts\Events\Dispatcher      $events
      * @return void
      */
     public function __construct(Application $app, Dispatcher $events)

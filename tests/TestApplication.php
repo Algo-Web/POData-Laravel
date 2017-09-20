@@ -2,8 +2,8 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
-use Illuminate\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\ProviderRepository;
 
 class TestApplication extends Application

@@ -5,7 +5,7 @@ namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 use MyCLabs\Enum\Enum;
 
 /**
- * Class AssociationStubRelationType
+ * Class AssociationStubRelationType.
  *
  * @method static AssociationStubRelationType NULL_ONE()
  * @method static AssociationStubRelationType ONE()

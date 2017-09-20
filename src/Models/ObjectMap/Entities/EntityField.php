@@ -72,7 +72,7 @@ class EntityField
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getIsNullable()
     {
@@ -80,7 +80,7 @@ class EntityField
     }
 
     /**
-     * @param boolean $isNullable
+     * @param bool $isNullable
      */
     public function setIsNullable($isNullable)
     {
@@ -104,7 +104,7 @@ class EntityField
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getReadOnly()
     {
@@ -112,7 +112,7 @@ class EntityField
     }
 
     /**
-     * @param boolean $readOnly
+     * @param bool $readOnly
      */
     public function setReadOnly($readOnly)
     {
@@ -120,7 +120,7 @@ class EntityField
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getCreateOnly()
     {
@@ -128,7 +128,7 @@ class EntityField
     }
 
     /**
-     * @param boolean $createOnly
+     * @param bool $createOnly
      */
     public function setCreateOnly($createOnly)
     {
@@ -136,7 +136,7 @@ class EntityField
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getIsKeyField()
     {
@@ -144,7 +144,7 @@ class EntityField
     }
 
     /**
-     * @param boolean $keyField
+     * @param bool $keyField
      */
     public function setIsKeyField($keyField)
     {

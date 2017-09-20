@@ -5,16 +5,16 @@ namespace AlgoWeb\PODataLaravel\Providers;
 use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema as Schema;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use POData\Providers\Metadata\IMetadataProvider;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema as Schema;
 use POData\Providers\Metadata\Type\TypeCode;
 use POData\Providers\ProvidersWrapper;
 
@@ -238,7 +238,7 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * Get round-trip relations after inserting polymorphic-powered placeholders
+     * Get round-trip relations after inserting polymorphic-powered placeholders.
      *
      * @return array
      */
@@ -387,6 +387,10 @@ class MetadataProvider extends MetadataBaseProvider
      * @param $dependent
      * @param $principalProp
      * @param $dependentProp
+     * @param mixed $principalRSet
+     * @param mixed $dependentRSet
+     * @param mixed $principalType
+     * @param mixed $dependentType
      */
     private function attachReferencePolymorphic(
         &$meta,
@@ -466,7 +470,7 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * Resolve possible reverse relation property names
+     * Resolve possible reverse relation property names.
      *
      * @param Model $source
      * @param Model $target

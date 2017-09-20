@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
+use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
@@ -22,7 +23,6 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
-use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use POData\ObjectModel\ObjectModelSerializer;
 use POData\ObjectModel\ODataCategory;
 use POData\ObjectModel\ODataEntry;
@@ -62,7 +62,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $holder = new MetadataRelationHolder();
         $classen = [TestModel::class];
@@ -120,7 +120,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $holder = new MetadataRelationHolder();
         $classen = [TestModel::class];
@@ -186,7 +186,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $holder = new MetadataRelationHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
@@ -245,7 +245,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $holder = new MetadataRelationHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
@@ -293,7 +293,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
             ->andReturn('/odata.svc/TestMonomorphicSources(id=42)?$expand=oneSource,manySource');
         $request->shouldReceive('fullUrl')
             ->andReturn('http://localhost/odata.svc/TestMonomorphicSources(id=42)?$expand=oneSource,manySource');
-        $request->request = new ParameterBag(['$expand' => "oneSource,manySource"]);
+        $request->request = new ParameterBag(['$expand' => 'oneSource,manySource']);
 
         $metadata = [];
         $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -307,7 +307,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $holder = new MetadataRelationHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
@@ -407,7 +407,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $holder = new MetadataRelationHolder();
         $classen = [TestModel::class];
@@ -475,7 +475,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $holder = new MetadataRelationHolder();
         $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
@@ -565,7 +565,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $holder = new MetadataRelationHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
@@ -585,7 +585,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $service = new TestDataService($query, $meta, $host);
         $processor = $service->handleRequest();
@@ -746,7 +746,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $holder = new MetadataRelationHolder();
         $classen = [TestMorphManySource::class, TestMorphTarget::class];
@@ -767,7 +767,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $service = new TestDataService($query, $meta, $host);
         $processor = $service->handleRequest();
@@ -830,7 +830,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $holder = new MetadataRelationHolder();
         $classen = [TestMonomorphicParentOfMorphTarget::class, TestMorphTarget::class];
@@ -853,7 +853,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $service = new TestDataService($query, $meta, $host);
         $processor = $service->handleRequest();
