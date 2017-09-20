@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities;
 
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase;
 
 class EntityGubbins
@@ -30,6 +31,11 @@ class EntityGubbins
      * @var AssociationStubBase[]
      */
     private $stubs;
+
+    /**
+     * @var Association[]
+     */
+    private $associations;
 
     /**
      * @return string
@@ -131,4 +137,11 @@ class EntityGubbins
         }
         $this->stubs = $stubs;
     }
+
+    public function addAssociation(Association $association, $isFirst = true)
+    {
+        $propertyName = ($isFirst ? $association->getFirst() : $association->getLast())->getRelationName();
+        $this->associations[$propertyName] = $association;
+    }
+
 }

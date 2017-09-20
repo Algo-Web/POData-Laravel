@@ -2,21 +2,15 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema as Schema;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
-use POData\Providers\Metadata\IMetadataProvider;
-use POData\Providers\Metadata\ResourceEntityType;
-use POData\Providers\Metadata\ResourceSet;
-use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Metadata\Type\TypeCode;
-use POData\Providers\ProvidersWrapper;
 
 class MetadataProvider extends MetadataBaseProvider
 {
@@ -34,6 +28,26 @@ class MetadataProvider extends MetadataBaseProvider
         parent::__construct($app);
         $this->relationHolder = new MetadataRelationHolder();
         self::$isBooted = false;
+    }
+
+    private function extract(array $modelNames)
+    {
+        $objectMap = new Map();
+        foreach ($modelNames as $modelName) {
+            $modelInstance = App::make($modelName);
+            $objectMap->addEntity($modelInstance->extractGubbins());
+        }
+        return $objectMap;
+    }
+
+    private function unify(Map $ObjectMap)
+    {
+        $mgh = new MetadataGubbinsHolder();
+        foreach ($ObjectMap->getEntities() as $entity) {
+            $mgh->addEntity($entity);
+        }
+        $ObjectMap->setAssociations($mgh->getRelations());
+        return $ObjectMap;
     }
 
     /**
@@ -72,18 +86,7 @@ class MetadataProvider extends MetadataBaseProvider
         $meta->addResourceSet(static::POLYMORPHIC, $abstract);
 
         $modelNames = $this->getCandidateModels();
-
-        list($entityTypes) = $this->getEntityTypesAndResourceSets($meta, $modelNames);
-        $entityTypes[static::POLYMORPHIC] = $abstract;
-
-        // need to lift EntityTypes, adjust for polymorphic-affected relations, etc
-        $biDirect = $this->getRepairedRoundTripRelations();
-
-        // now that endpoints are hooked up, tackle the relationships
-        // if we'd tried earlier, we'd be guaranteed to try to hook a relation up to null, which would be bad
-        foreach ($biDirect as $line) {
-            $this->processRelationLine($line, $entityTypes, $meta);
-        }
+        dd($this->unify($this->extract($modelNames)));
 
         $key = 'metadata';
         $this->handlePostBoot($isCaching, $hasCache, $key, $meta);
@@ -118,40 +121,6 @@ class MetadataProvider extends MetadataBaseProvider
             }
         }
         return $ends;
-    }
-
-    /**
-     * @param $meta
-     * @param $ends
-     * @return array[]
-     */
-    protected function getEntityTypesAndResourceSets($meta, $ends)
-    {
-        assert($meta instanceof IMetadataProvider, get_class($meta));
-        $entityTypes = [];
-        $resourceSets = [];
-        $begins = [];
-        $numEnds = count($ends);
-
-        for ($i = 0; $i < $numEnds; $i++) {
-            $bitter = $ends[$i];
-            $fqModelName = $bitter;
-
-            $instance = App::make($fqModelName);
-            $name = strtolower($instance->getEndpointName());
-            $metaSchema = $instance->getXmlSchema();
-
-            // if for whatever reason we don't get an XML schema, move on to next entry and drop current one from
-            // further processing
-            if (null == $metaSchema) {
-                continue;
-            }
-            $entityTypes[$fqModelName] = $metaSchema;
-            $resourceSets[$fqModelName] = $meta->addResourceSet($name, $metaSchema);
-            $begins[] = $bitter;
-        }
-
-        return [$entityTypes, $resourceSets, $begins];
     }
 
     /**
@@ -273,195 +242,6 @@ class MetadataProvider extends MetadataBaseProvider
         return self::$relationCache;
     }
 
-    private function processRelationLine($line, $entityTypes, &$meta)
-    {
-        $principalType = $line['principalType'];
-        $principalMult = $line['principalMult'];
-        $principalProp = $line['principalProp'];
-        $principalRSet = $line['principalRSet'];
-        $dependentType = $line['dependentType'];
-        $dependentMult = $line['dependentMult'];
-        $dependentProp = $line['dependentProp'];
-        $dependentRSet = $line['dependentRSet'];
-
-        if (!isset($entityTypes[$principalType]) || !isset($entityTypes[$dependentType])) {
-            return;
-        }
-        $principal = $entityTypes[$principalType];
-        $dependent = $entityTypes[$dependentType];
-        $isPoly = static::POLYMORPHIC == $principalRSet || static::POLYMORPHIC == $dependentRSet;
-
-        if ($isPoly) {
-            $this->attachReferencePolymorphic(
-                $meta,
-                $principalMult,
-                $dependentMult,
-                $principal,
-                $dependent,
-                $principalProp,
-                $dependentProp,
-                $principalRSet,
-                $dependentRSet,
-                $principalType,
-                $dependentType
-            );
-            return null;
-        }
-        $this->attachReferenceNonPolymorphic(
-            $meta,
-            $principalMult,
-            $dependentMult,
-            $principal,
-            $dependent,
-            $principalProp,
-            $dependentProp
-        );
-        return null;
-    }
-
-    /**
-     * @param $meta
-     * @param $principalMult
-     * @param $dependentMult
-     * @param $principal
-     * @param $dependent
-     * @param $principalProp
-     * @param $dependentProp
-     */
-    private function attachReferenceNonPolymorphic(
-        &$meta,
-        $principalMult,
-        $dependentMult,
-        $principal,
-        $dependent,
-        $principalProp,
-        $dependentProp
-    ) {
-        //many-to-many
-        if ('*' == $principalMult && '*' == $dependentMult) {
-            $meta->addResourceSetReferencePropertyBidirectional(
-                $principal,
-                $dependent,
-                $principalProp,
-                $dependentProp
-            );
-            return;
-        }
-        //one-to-one
-        if ('0..1' == $principalMult || '0..1' == $dependentMult) {
-            assert($principalMult != $dependentMult, 'Cannot have both ends with 0..1 multiplicity');
-            $meta->addResourceReferenceSinglePropertyBidirectional(
-                $principal,
-                $dependent,
-                $principalProp,
-                $dependentProp
-            );
-            return;
-        }
-        assert($principalMult != $dependentMult, 'Cannot have both ends same multiplicity for 1:N relation');
-        //principal-one-to-dependent-many
-        if ('1' == $principalMult) {
-            $meta->addResourceReferencePropertyBidirectional(
-                $principal,
-                $dependent,
-                $principalProp,
-                $dependentProp
-            );
-            return;
-        }
-        //dependent-one-to-principal-many
-        $meta->addResourceReferencePropertyBidirectional(
-            $dependent,
-            $principal,
-            $dependentProp,
-            $principalProp
-        );
-        return;
-    }
-
-    /**
-     * @param $meta
-     * @param $principalMult
-     * @param $dependentMult
-     * @param $principal
-     * @param $dependent
-     * @param $principalProp
-     * @param $dependentProp
-     * @param mixed $principalRSet
-     * @param mixed $dependentRSet
-     * @param mixed $principalType
-     * @param mixed $dependentType
-     */
-    private function attachReferencePolymorphic(
-        &$meta,
-        $principalMult,
-        $dependentMult,
-        $principal,
-        $dependent,
-        $principalProp,
-        $dependentProp,
-        $principalRSet,
-        $dependentRSet,
-        $principalType,
-        $dependentType
-    ) {
-        $prinPoly = static::POLYMORPHIC == $principalRSet;
-        $depPoly = static::POLYMORPHIC == $dependentRSet;
-        $principalSet = (!$prinPoly) ? $principal->getCustomState()
-            : $meta->resolveResourceSet(static::POLYMORPHIC_PLURAL);
-        $dependentSet = (!$depPoly) ? $dependent->getCustomState()
-            : $meta->resolveResourceSet(static::POLYMORPHIC_PLURAL);
-        assert($principalSet instanceof ResourceSet, $principalRSet);
-        assert($dependentSet instanceof ResourceSet, $dependentRSet);
-
-        $isPrincipalAdded = null !== $principal->resolveProperty($principalProp);
-        $isDependentAdded = null !== $dependent->resolveProperty($dependentProp);
-        $prinMany = '*' == $principalMult;
-        $depMany = '*' == $dependentMult;
-
-        $prinConcrete = null;
-        $depConcrete = null;
-        if ($prinPoly) {
-            $prinBitz = explode('\\', $principalType);
-            $prinConcrete = $meta->resolveResourceType($prinBitz[count($prinBitz)-1]);
-            assert(static::POLYMORPHIC !== $prinConcrete->getName());
-        }
-        if ($depPoly) {
-            $depBitz = explode('\\', $dependentType);
-            $depConcrete = $meta->resolveResourceType($depBitz[count($depBitz)-1]);
-            assert(static::POLYMORPHIC !== $depConcrete->getName());
-        }
-
-        if (!$isPrincipalAdded) {
-            if ('*' == $principalMult || $depMany) {
-                $meta->addResourceSetReferenceProperty($principal, $principalProp, $dependentSet, $depConcrete);
-            } else {
-                $meta->addResourceReferenceProperty(
-                    $principal,
-                    $principalProp,
-                    $dependentSet,
-                    $prinPoly,
-                    $depMany,
-                    $depConcrete
-                );
-            }
-        }
-        if (!$isDependentAdded) {
-            if ('*' == $dependentMult || $prinMany) {
-                $meta->addResourceSetReferenceProperty($dependent, $dependentProp, $principalSet, $prinConcrete);
-            } else {
-                $meta->addResourceReferenceProperty(
-                    $dependent,
-                    $dependentProp,
-                    $principalSet,
-                    $depPoly,
-                    $prinMany,
-                    $prinConcrete
-                );
-            }
-        }
-        return;
-    }
 
     public function reset()
     {
