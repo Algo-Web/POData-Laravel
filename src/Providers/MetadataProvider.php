@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema as Schema;
+use POData\Providers\Metadata\ResourceStreamInfo;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Metadata\Type\TypeCode;
 
@@ -131,6 +132,13 @@ class MetadataProvider extends MetadataBaseProvider
         }
         foreach ($unifiedEntity->getFields() as $field) {
             if (in_array($field, $unifiedEntity->getKeyFields())) {
+                continue;
+            }
+            if ($field->getPrimitiveType() == 'blob') {
+                $odataEntity->setMediaLinkEntry(true);
+                $streamInfo = new ResourceStreamInfo($field->getName());
+                assert($odataEntity->isMediaLinkEntry());
+                $odataEntity->addNamedStream($streamInfo);
                 continue;
             }
             $meta->addPrimitiveProperty($odataEntity,
