@@ -100,9 +100,11 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function register()
     {
-        $this->app->singleton('metadata', function ($app) {
+        $this->app->singleton(
+            'metadata', function ($app) {
             return new SimpleMetadataProvider('Data', self::$metaNAMESPACE);
-        });
+        }
+        );
     }
 
     /**
@@ -252,9 +254,10 @@ class MetadataProvider extends MetadataBaseProvider
     /**
      * Resolve possible reverse relation property names.
      *
-     * @param Model $source
-     * @param Model $target
-     * @param $propName
+     * @param  Model $source
+     * @param  Model $target
+     * @param        $propName
+     *
      * @return string|null
      */
     public function resolveReverseProperty(Model $source, Model $target, $propName)

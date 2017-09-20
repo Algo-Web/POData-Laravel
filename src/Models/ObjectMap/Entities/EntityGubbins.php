@@ -140,7 +140,11 @@ class EntityGubbins
 
     public function addAssociation(Association $association, $isFirst = true)
     {
-        $propertyName = ($isFirst ? $association->getFirst() : $association->getLast())->getRelationName();
+        $stub = $isFirst ? $association->getFirst() : $association->getLast();
+        if (!in_array($stub, $this->stubs)) {
+            throw new \InvalidArgumentException('Association cannot be connected to this entity');
+        }
+        $propertyName = $stub->getRelationName();
         $this->associations[$propertyName] = $association;
     }
 

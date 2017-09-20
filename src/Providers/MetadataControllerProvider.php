@@ -4,11 +4,9 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerTrait;
-use AlgoWeb\PODataLaravel\Controllers\TestController;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\ServiceProvider;
 
 class MetadataControllerProvider extends MetadataBaseProvider
 {
@@ -83,9 +81,11 @@ class MetadataControllerProvider extends MetadataBaseProvider
      */
     public function register()
     {
-        $this->app->singleton('metadataControllers', function ($app) {
+        $this->app->singleton(
+            'metadataControllers', function ($app) {
             return new MetadataControllerContainer();
-        });
+        }
+        );
     }
 
     /**
