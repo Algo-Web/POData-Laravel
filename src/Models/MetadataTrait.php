@@ -5,6 +5,7 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStub
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 use Illuminate\Database\Eloquent\Model;
@@ -132,9 +133,9 @@ trait MetadataTrait
         if (!isset($endpoint)) {
             $bitter = get_class();
             $name = substr($bitter, strrpos($bitter, '\\')+1);
-            return strtolower($name);
+            return ($name);
         }
-        return strtolower($endpoint);
+        return ($endpoint);
     }
 
     /*
@@ -762,6 +763,7 @@ trait MetadataTrait
             $nuField->setDefaultValue($field['default']);
             $nuField->setIsKeyField($this->getKeyName() == $name);
             $nuField->setFieldType(EntityFieldType::PRIMITIVE());
+            $nuField->setPrimitiveType(new EntityFieldPrimitiveType($field['type']));
             $entityFields[$name] = $nuField;
         }
         $gubbins->setFields($entityFields);

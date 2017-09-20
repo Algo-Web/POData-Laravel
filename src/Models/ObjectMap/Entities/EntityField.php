@@ -2,6 +2,8 @@
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities;
 
+use POData\Providers\Metadata\Type\EdmPrimitiveType;
+
 class EntityField
 {
     /**
@@ -38,6 +40,31 @@ class EntityField
      * @var bool
      */
     private $isKeyField;
+
+    /**
+     * @var EntityFieldPrimitiveType
+     */
+    private $primitiveType;
+    /**
+     * @var EdmPrimitiveType
+     */
+    private $edmFieldType;
+
+    public function getEdmFieldType()
+    {
+        return $this->edmFieldType;
+    }
+
+    public function getPrimitiveType()
+    {
+        return $this->primitiveType;
+    }
+
+    public function setPrimitiveType(EntityFieldPrimitiveType $primitiveType)
+    {
+        $this->primitiveType = $primitiveType;
+        $this->edmFieldType = $this->PrimitiveTypeToEdmType($primitiveType);
+    }
 
     /**
      * @return string
@@ -149,5 +176,31 @@ class EntityField
     public function setIsKeyField($keyField)
     {
         $this->isKeyField = boolval($keyField);
+    }
+
+    /**
+     * @var array
+     */
+    private static $primativeToEdmMapping = [
+        EntityFieldPrimitiveType::INTEGER => EdmPrimitiveType::INT32,
+        EntityFieldPrimitiveType::STRING => EdmPrimitiveType::STRING,
+        EntityFieldPrimitiveType::DATETIME => EdmPrimitiveType::DATETIME,
+        EntityFieldPrimitiveType::FLOAT => EdmPrimitiveType::SINGLE,
+        EntityFieldPrimitiveType::DECIMAL => EdmPrimitiveType::DECIMAL,
+        EntityFieldPrimitiveType::STRING => EdmPrimitiveType::STRING,
+        EntityFieldPrimitiveType::BOOLEAN => EdmPrimitiveType::BOOLEAN,
+        EntityFieldPrimitiveType::BLOB => 'stream'
+    ];
+
+    /**
+     * @param \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType $primitiveType
+     *
+     * @return EdmPrimitiveType
+     */
+    private function PrimitiveTypeToEdmType(EntityFieldPrimitiveType $primitiveType)
+    {
+        return in_array($primitiveType, self::$primativeToEdmMapping) ?
+            self::$primativeToEdmMapping[$primitiveType] :
+            EdmPrimitiveType::STRING;
     }
 }

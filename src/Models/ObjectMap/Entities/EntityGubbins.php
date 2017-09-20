@@ -4,6 +4,8 @@ namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
+use POData\Providers\Metadata\ResourceEntityType;
 
 class EntityGubbins
 {
@@ -36,6 +38,40 @@ class EntityGubbins
      * @var Association[]
      */
     private $associations;
+    /**
+     * @var ResourceEntityType
+     */
+    private $odataResourceType;
+
+    private $isPolymorphicAffected = null;
+
+    public function isPolymorphicAffected()
+    {
+        if (null !== $this->isPolymorphicAffected) {
+            return $this->isPolymorphicAffected;
+        }
+        $this->isPolymorphicAffected = false;
+        foreach ($this->stubs as $stub) {
+            if (!$stub instanceof AssociationStubPolymorphic) {
+                continue;
+            }
+            if (null !== $stub->getTargType()) {
+                $this->isPolymorphicAffected = true;
+                break;
+            }
+        }
+        return $this->isPolymorphicAffected;
+    }
+
+    public function getOdataResourceType()
+    {
+        return $this->odataResourceType;
+    }
+
+    public function setOdataResourceType(ResourceEntityType $odataType)
+    {
+        $this->odataResourceType = $odataType;
+    }
 
     /**
      * @return string
@@ -70,7 +106,7 @@ class EntityGubbins
     }
 
     /**
-     * @return array
+     * @return EntityField[]
      */
     public function getKeyFields()
     {
@@ -78,7 +114,7 @@ class EntityGubbins
     }
 
     /**
-     * @return mixed
+     * @return EntityField[]
      */
     public function getFields()
     {

@@ -4,11 +4,14 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema as Schema;
+use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Metadata\Type\TypeCode;
 
@@ -50,6 +53,41 @@ class MetadataProvider extends MetadataBaseProvider
         return $ObjectMap;
     }
 
+    private function verify(Map $objectModel)
+    {
+
+    }
+
+    private function imploment(Map $objectModel)
+    {
+        $meta = App::make('metadata');
+        foreach ($objectModel->getEntities() as $entity) {
+            $baseType = $entity->isPolymorphicAffected() ? $meta->resolveResourceType('polyMorphicPlaceholder') : null;
+            $EntityType = $meta->addEntityType(new \ReflectionClass($entity->getClassName()), $entity->getName(), false, $baseType);
+            $this->implomntProperties($entity, $EntityType);
+        }
+    }
+
+
+    private function implomntProperties(EntityGubbins $unifiedEntity, ResourceEntityType $odataEntity)
+    {
+        $meta = App::make('metadata');
+        if (!$unifiedEntity->isPolymorphicAffected()) {
+            foreach ($unifiedEntity->getKeyFields() as $keyField) {
+                $meta->addKeyProperty($odataEntity, $keyField->getName(), $keyField->getEdmFieldType());
+            }
+        }
+        foreach ($unifiedEntity->getFields() as $field) {
+            $meta->addPrimitiveProperty($odataEntity,
+                $field->getName(),
+                $field->getEdmFieldType(),
+                $field->getFieldType() == EntityFieldType::PRIMITIVE_BAG,
+                $field->getDefaultValue(),
+                $field->getIsNullable());
+        }
+
+    }
+
     /**
      * Bootstrap the application services.  Post-boot.
      *
@@ -86,8 +124,11 @@ class MetadataProvider extends MetadataBaseProvider
         $meta->addResourceSet(static::POLYMORPHIC, $abstract);
 
         $modelNames = $this->getCandidateModels();
-        dd($this->unify($this->extract($modelNames)));
-
+        $objectModel = $this->extract($modelNames);
+        $objectModel = $this->unify($objectModel);
+        $this->verify($objectModel);
+        $this->imploment($objectModel);
+        dd($objectModel);
         $key = 'metadata';
         $this->handlePostBoot($isCaching, $hasCache, $key, $meta);
         self::$isBooted = true;
