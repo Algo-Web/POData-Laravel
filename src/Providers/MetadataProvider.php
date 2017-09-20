@@ -58,7 +58,7 @@ class MetadataProvider extends MetadataBaseProvider
 
     private function verify(Map $objectModel)
     {
-
+//dd($objectModel);
     }
 
     private function imploment(Map $objectModel)
@@ -69,6 +69,10 @@ class MetadataProvider extends MetadataBaseProvider
             $EntityType = $meta->addEntityType(new \ReflectionClass($entity->getClassName()), $entity->getName(), false, $baseType);
             $entity->setOdataResourceType($EntityType);
             $this->implomntProperties($entity);
+            $meta->addResourceSet($entity->getName(), $EntityType);
+        }
+        if (null === $objectModel->getAssociations()) {
+            return;
         }
         foreach ($objectModel->getAssociations() as $association) {
             $this->implomentAssocations($objectModel, $association);
@@ -78,7 +82,6 @@ class MetadataProvider extends MetadataBaseProvider
     private function implomentAssocations(Map $objectModel, Association $associationUnderHammer)
     {
         $meta = App::make('metadata');
-        $meta = new SimpleMetadataProvider('Data', self::$metaNAMESPACE);
         switch ($associationUnderHammer->getAssocationType()) {
             case AssociationType::NULL_ONE_TO_NULL_ONE():
             case AssociationType::NULL_ONE_TO_ONE():

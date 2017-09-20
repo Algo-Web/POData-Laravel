@@ -3,15 +3,11 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
-use AlgoWeb\PODataLaravel\Models\TestMorphManySourceWithUnexposedTarget;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
-use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Metadata\Type\StringType;
 
@@ -550,7 +546,7 @@ class MetadataTraitTest extends TestCase
     {
         $foo = new TestModel();
 
-        $expected = 'testmodel';
+        $expected = 'TestModel';
         $actual = $foo->getEndpointName();
         $this->assertEquals($expected, $actual);
     }
@@ -558,7 +554,7 @@ class MetadataTraitTest extends TestCase
     public function testGetEndpointSpecifiedName()
     {
         $foo = new TestModel(null, 'EndPoint');
-        $expected = 'endpoint';
+        $expected = 'EndPoint';
         $actual = $foo->getEndpointName();
         $this->assertEquals($expected, $actual);
     }

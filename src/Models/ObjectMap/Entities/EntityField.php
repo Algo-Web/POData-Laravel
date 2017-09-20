@@ -201,6 +201,7 @@ class EntityField
     private function PrimitiveTypeToEdmType(EntityFieldPrimitiveType $primitiveType)
     {
         $value = $primitiveType->getValue();
+        return self::$primativeToEdmMapping[$value];
         return in_array($value, self::$primativeToEdmMapping) ?
             self::$primativeToEdmMapping[$value] :
             EdmPrimitiveType::STRING;
