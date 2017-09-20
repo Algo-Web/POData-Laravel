@@ -33,6 +33,15 @@ class MetadataTraitTest extends TestCase
     {
         parent::setUp();
         $this->object = $this->getMockForTrait('\AlgoWeb\PODataLaravel\Models\MetadataTrait');
+        $msg = 'Simple metadata provider cannot be called from metadata trait';
+        $meta = m::mock(SimpleMetadataProvider::class);
+        $meta->shouldReceive('resolveResourceProperty')->andThrow(new \Exception($msg))->never();
+        $meta->shouldReceive('addEntityType')->andThrow(new \Exception($msg))->never();
+        $meta->shouldReceive('addKeyProperty')->andThrow(new \Exception($msg))->never();
+        $meta->shouldReceive('addPrimitiveProperty')->andThrow(new \Exception($msg))->never();
+        $meta->shouldReceive('addResourceReferenceProperty')->andThrow(new \Exception($msg))->never();
+        $meta->shouldReceive('addResourceSetReferenceProperty')->andThrow(new \Exception($msg))->never();
+        App::instance('metadata', $meta);
     }
 
     /**
@@ -411,7 +420,6 @@ class MetadataTraitTest extends TestCase
         $meta = m::mock(SimpleMetadataProvider::class);
         $meta->shouldReceive('addResourceReferenceProperty')->withAnyArgs()->andReturnNull()->once();
         $meta->shouldReceive('addResourceSetReferenceProperty')->withAnyArgs()->andReturnNull()->never();
-        App::instance('metadata', $meta);
 
         $foo = m::mock(TestModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $fooName = get_class($foo);
@@ -439,7 +447,6 @@ class MetadataTraitTest extends TestCase
         $meta = m::mock(SimpleMetadataProvider::class);
         $meta->shouldReceive('addResourceReferenceProperty')->withAnyArgs()->andReturnNull()->never();
         $meta->shouldReceive('addResourceSetReferenceProperty')->withAnyArgs()->andReturnNull()->once();
-        App::instance('metadata', $meta);
 
         $foo = m::mock(TestModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $fooName = get_class($foo);
@@ -640,7 +647,6 @@ class MetadataTraitTest extends TestCase
         $metaProv->shouldReceive('resolveResourceType')->andReturn($entity)->never();
         $metaProv->shouldReceive('addEntityType')->andReturn($base);
 
-        App::instance('metadata', $metaProv);
 
         //$foo = new TestMorphOneSource($meta);
         $foo = m::mock(TestMorphOneSource::class)->makePartial();
