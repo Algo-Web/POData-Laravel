@@ -1,17 +1,23 @@
 <?php
 namespace AlgoWeb\PODataLaravel\Models;
 
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Support\Facades\App as App;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\App as App;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceStreamInfo;
 use POData\Providers\Metadata\Type\EdmPrimitiveType;
-use Illuminate\Database\Eloquent\Model;
 
 trait MetadataTrait
 {

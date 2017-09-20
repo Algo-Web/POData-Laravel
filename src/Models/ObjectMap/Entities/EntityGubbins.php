@@ -1,6 +1,8 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models;
+namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities;
+
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase;
 
 class EntityGubbins
 {
