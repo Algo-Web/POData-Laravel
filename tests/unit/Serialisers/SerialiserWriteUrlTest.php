@@ -35,7 +35,7 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $classen = [TestModel::class];
         $metaProv = $this->setupMockMetadataProvider($classen);
@@ -80,7 +80,7 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $classen = [TestModel::class];
         $metaProv = $this->setupMockMetadataProvider($classen);
@@ -130,7 +130,7 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $classen = [TestModel::class];
         $metaProv = $this->setupMockMetadataProvider($classen);

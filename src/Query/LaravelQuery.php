@@ -2,10 +2,14 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
+use \POData\Common\ODataException;
+use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
+use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
@@ -13,24 +17,20 @@ use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use POData\Common\InvalidOperationException;
+use POData\Providers\Expression\MySQLExpressionProvider;
+use POData\Providers\Expression\PHPExpressionProvider;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
+use POData\Providers\Query\IQueryProvider;
+use POData\Providers\Query\QueryResult;
+use POData\Providers\Query\QueryType;
 use POData\UriProcessor\QueryProcessor\ExpressionParser\FilterInfo;
 use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
 use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
-use POData\Providers\Query\IQueryProvider;
-use POData\Providers\Expression\MySQLExpressionProvider;
-use POData\Providers\Query\QueryType;
-use POData\Providers\Query\QueryResult;
-use POData\Providers\Expression\PHPExpressionProvider;
-use \POData\Common\ODataException;
-use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
-use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
-use Illuminate\Support\Facades\App;
-use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 class LaravelQuery implements IQueryProvider
@@ -60,7 +60,7 @@ class LaravelQuery implements IQueryProvider
     /**
      * Indicates if the QueryProvider can handle ordered paging, this means respecting order, skip, and top parameters
      * If the query provider can not handle ordered paging, it must return the entire result set and POData will
-     * perform the ordering and paging
+     * perform the ordering and paging.
      *
      * @return Boolean True if the query provider can handle ordered paging, false if POData should perform the paging
      */
@@ -80,7 +80,7 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Gets the LaravelReadQuery instance used to handle read queries (repetitious, nyet?)
+     * Gets the LaravelReadQuery instance used to handle read queries (repetitious, nyet?).
      *
      * @return LaravelReadQuery
      */
@@ -90,7 +90,7 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Dig out local copy of POData-Laravel metadata provider
+     * Dig out local copy of POData-Laravel metadata provider.
      *
      * @return MetadataProvider
      */
@@ -100,7 +100,7 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Dig out local copy of controller metadata mapping
+     * Dig out local copy of controller metadata mapping.
      *
      * @return MetadataControllerContainer
      */
@@ -113,16 +113,16 @@ class LaravelQuery implements IQueryProvider
     /**
      * Gets collection of entities belongs to an entity set
      * IE: http://host/EntitySet
-     *  http://host/EntitySet?$skip=10&$top=5&filter=Prop gt Value
+     *  http://host/EntitySet?$skip=10&$top=5&filter=Prop gt Value.
      *
-     * @param QueryType                $queryType   Is this is a query for a count, entities, or entities-with-count
-     * @param ResourceSet              $resourceSet The entity set containing the entities to fetch
-     * @param FilterInfo|null          $filterInfo  The $filter parameter of the OData query.  NULL if none specified
-     * @param null|InternalOrderByInfo $orderBy     sorted order if we want to get the data in some specific order
-     * @param integer|null             $top         number of records which need to be retrieved
-     * @param integer|null             $skip        number of records which need to be skipped
-     * @param SkipTokenInfo|null       $skipToken   value indicating what records to skip
-     * @param Model|Relation|null       $sourceEntityInstance Starting point of query
+     * @param QueryType                $queryType            Is this is a query for a count, entities, or entities-with-count
+     * @param ResourceSet              $resourceSet          The entity set containing the entities to fetch
+     * @param FilterInfo|null          $filterInfo           The $filter parameter of the OData query.  NULL if none specified
+     * @param null|InternalOrderByInfo $orderBy              sorted order if we want to get the data in some specific order
+     * @param int|null                 $top                  number of records which need to be retrieved
+     * @param int|null                 $skip                 number of records which need to be skipped
+     * @param SkipTokenInfo|null       $skipToken            value indicating what records to skip
+     * @param Model|Relation|null      $sourceEntityInstance Starting point of query
      *
      * @return QueryResult
      */
@@ -151,10 +151,10 @@ class LaravelQuery implements IQueryProvider
     /**
      * Gets an entity instance from an entity set identified by a key
      * IE: http://host/EntitySet(1L)
-     * http://host/EntitySet(KeyA=2L,KeyB='someValue')
+     * http://host/EntitySet(KeyA=2L,KeyB='someValue').
      *
-     * @param ResourceSet           $resourceSet    The entity set containing the entity to fetch
-     * @param KeyDescriptor|null    $keyDescriptor  The key identifying the entity to fetch
+     * @param ResourceSet        $resourceSet   The entity set containing the entity to fetch
+     * @param KeyDescriptor|null $keyDescriptor The key identifying the entity to fetch
      *
      * @return Model|null Returns entity instance if found else null
      */
@@ -168,7 +168,7 @@ class LaravelQuery implements IQueryProvider
     /**
      * Get related resource set for a resource
      * IE: http://host/EntitySet(1L)/NavigationPropertyToCollection
-     * http://host/EntitySet?$expand=NavigationPropertyToCollection
+     * http://host/EntitySet?$expand=NavigationPropertyToCollection.
      *
      * @param QueryType          $queryType            Is this is a query for a count, entities, or entities-with-count
      * @param ResourceSet        $sourceResourceSet    The entity set containing the source entity
@@ -177,12 +177,11 @@ class LaravelQuery implements IQueryProvider
      * @param ResourceProperty   $targetProperty       The navigation property to retrieve
      * @param FilterInfo|null    $filter               The $filter parameter of the OData query.  NULL if none specified
      * @param mixed|null         $orderBy              sorted order if we want to get the data in some specific order
-     * @param integer|null       $top                  number of records which need to be retrieved
-     * @param integer|null       $skip                 number of records which need to be skipped
+     * @param int|null           $top                  number of records which need to be retrieved
+     * @param int|null           $skip                 number of records which need to be skipped
      * @param SkipTokenInfo|null $skipToken            value indicating what records to skip
      *
      * @return QueryResult
-     *
      */
     public function getRelatedResourceSet(
         QueryType $queryType,
@@ -213,13 +212,13 @@ class LaravelQuery implements IQueryProvider
 
     /**
      * Gets a related entity instance from an entity set identified by a key
-     * IE: http://host/EntitySet(1L)/NavigationPropertyToCollection(33)
+     * IE: http://host/EntitySet(1L)/NavigationPropertyToCollection(33).
      *
-     * @param ResourceSet $sourceResourceSet The entity set containing the source entity
-     * @param object $sourceEntityInstance The source entity instance.
-     * @param ResourceSet $targetResourceSet The entity set containing the entity to fetch
-     * @param ResourceProperty $targetProperty The metadata of the target property.
-     * @param KeyDescriptor $keyDescriptor The key identifying the entity to fetch
+     * @param ResourceSet      $sourceResourceSet    The entity set containing the source entity
+     * @param object           $sourceEntityInstance the source entity instance
+     * @param ResourceSet      $targetResourceSet    The entity set containing the entity to fetch
+     * @param ResourceProperty $targetProperty       the metadata of the target property
+     * @param KeyDescriptor    $keyDescriptor        The key identifying the entity to fetch
      *
      * @return Model|null Returns entity instance if found else null
      */
@@ -243,12 +242,12 @@ class LaravelQuery implements IQueryProvider
     /**
      * Get related resource for a resource
      * IE: http://host/EntitySet(1L)/NavigationPropertyToSingleEntity
-     * http://host/EntitySet?$expand=NavigationPropertyToSingleEntity
+     * http://host/EntitySet?$expand=NavigationPropertyToSingleEntity.
      *
-     * @param ResourceSet $sourceResourceSet The entity set containing the source entity
-     * @param object $sourceEntityInstance The source entity instance.
-     * @param ResourceSet $targetResourceSet The entity set containing the entity pointed to by the navigation property
-     * @param ResourceProperty $targetProperty The navigation property to fetch
+     * @param ResourceSet      $sourceResourceSet    The entity set containing the source entity
+     * @param object           $sourceEntityInstance the source entity instance
+     * @param ResourceSet      $targetResourceSet    The entity set containing the entity pointed to by the navigation property
+     * @param ResourceProperty $targetProperty       The navigation property to fetch
      *
      * @return object|null The related resource if found else null
      */
@@ -270,15 +269,15 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Updates a resource
+     * Updates a resource.
      *
-     * @param ResourceSet      $sourceResourceSet    The entity set containing the source entity
-     * @param object           $sourceEntityInstance The source entity instance
-     * @param KeyDescriptor    $keyDescriptor        The key identifying the entity to fetch
-     * @param object           $data                 The New data for the entity instance.
-     * @param bool             $shouldUpdate        Should undefined values be updated or reset to default
+     * @param ResourceSet   $sourceResourceSet    The entity set containing the source entity
+     * @param object        $sourceEntityInstance The source entity instance
+     * @param KeyDescriptor $keyDescriptor        The key identifying the entity to fetch
+     * @param object        $data                 the New data for the entity instance
+     * @param bool          $shouldUpdate         Should undefined values be updated or reset to default
      *
-     * @return object|null The new resource value if it is assignable or throw exception for null.
+     * @return object|null the new resource value if it is assignable or throw exception for null
      */
     public function updateResource(
         ResourceSet $sourceResourceSet,
@@ -294,10 +293,10 @@ class LaravelQuery implements IQueryProvider
     }
     /**
      * Delete resource from a resource set.
-     * @param ResourceSet      $sourceResourceSet
-     * @param object           $sourceEntityInstance
+     * @param ResourceSet $sourceResourceSet
+     * @param object      $sourceEntityInstance
      *
-     * return bool true if resources sucessfully deteled, otherwise false.
+     * return bool true if resources sucessfully deteled, otherwise false
      */
     public function deleteResource(
         ResourceSet $sourceResourceSet,
@@ -324,9 +323,9 @@ class LaravelQuery implements IQueryProvider
         throw new ODataException('Target model not successfully deleted', 422);
     }
     /**
-     * @param ResourceSet      $resourceSet   The entity set containing the entity to fetch
-     * @param object           $sourceEntityInstance The source entity instance
-     * @param object           $data                 The New data for the entity instance.
+     * @param ResourceSet $resourceSet          The entity set containing the entity to fetch
+     * @param object      $sourceEntityInstance The source entity instance
+     * @param object      $data                 The New data for the entity instance.
      *
      * returns object|null returns the newly created model if sucessful or null if model creation failed.
      */
@@ -345,10 +344,10 @@ class LaravelQuery implements IQueryProvider
      * @param $sourceEntityInstance
      * @param $data
      * @param $class
-     * @param string $verb
-     * @return array|mixed
+     * @param  string                    $verb
      * @throws ODataException
      * @throws InvalidOperationException
+     * @return array|mixed
      */
     private function createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb)
     {
@@ -392,7 +391,7 @@ class LaravelQuery implements IQueryProvider
     /**
      * Puts an entity instance to entity set identified by a key.
      *
-     * @param ResourceSet $resourceSet The entity set containing the entity to update
+     * @param ResourceSet   $resourceSet   The entity set containing the entity to update
      * @param KeyDescriptor $keyDescriptor The key identifying the entity to update
      * @param $data
      *
@@ -411,10 +410,10 @@ class LaravelQuery implements IQueryProvider
      * @param ResourceSet $sourceResourceSet
      * @param $data
      * @param $verb
-     * @param Model|null $source
-     * @return mixed
+     * @param  Model|null                $source
      * @throws InvalidOperationException
      * @throws ODataException
+     * @return mixed
      */
     private function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $data, $verb, Model $source = null)
     {
@@ -441,7 +440,7 @@ class LaravelQuery implements IQueryProvider
     /**
      * @param $data
      * @param $paramList
-     * @param Model|null $sourceEntityInstance
+     * @param  Model|null $sourceEntityInstance
      * @return array
      */
     private function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance = null)
@@ -468,8 +467,8 @@ class LaravelQuery implements IQueryProvider
 
     /**
      * @param $result
-     * @return array|mixed
      * @throws ODataException
+     * @return array|mixed
      */
     private function createUpdateDeleteProcessOutput($result)
     {
@@ -509,7 +508,7 @@ class LaravelQuery implements IQueryProvider
     /**
      * Create multiple new resources in a resource set.
      * @param ResourceSet $sourceResourceSet The entity set containing the entity to fetch
-     * @param object[] $data The new data for the entity instance
+     * @param object[]    $data              The new data for the entity instance
      *
      * @return object[] returns the newly created model if successful, or throws an exception if model creation failed
      * @throw \Exception
@@ -548,11 +547,11 @@ class LaravelQuery implements IQueryProvider
     /**
      * Updates a group of resources in a resource set.
      *
-     * @param ResourceSet $sourceResourceSet The entity set containing the source entity
-     * @param object $sourceEntityInstance The source entity instance
-     * @param KeyDescriptor[] $keyDescriptor The key identifying the entity to fetch
-     * @param object[] $data The new data for the entity instances
-     * @param bool $shouldUpdate Should undefined values be updated or reset to default
+     * @param ResourceSet     $sourceResourceSet    The entity set containing the source entity
+     * @param object          $sourceEntityInstance The source entity instance
+     * @param KeyDescriptor[] $keyDescriptor        The key identifying the entity to fetch
+     * @param object[]        $data                 The new data for the entity instances
+     * @param bool            $shouldUpdate         Should undefined values be updated or reset to default
      *
      * @return object[] the new resource value if it is assignable, or throw exception for null
      * @throw \Exception
@@ -599,12 +598,12 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Attaches child model to parent model
+     * Attaches child model to parent model.
      *
      * @param ResourceSet $sourceResourceSet
-     * @param object $sourceEntityInstance
+     * @param object      $sourceEntityInstance
      * @param ResourceSet $targetResourceSet
-     * @param object $targetEntityInstance
+     * @param object      $targetEntityInstance
      * @param $navPropName
      *
      * @return bool
@@ -635,12 +634,12 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Removes child model from parent model
+     * Removes child model from parent model.
      *
      * @param ResourceSet $sourceResourceSet
-     * @param object $sourceEntityInstance
+     * @param object      $sourceEntityInstance
      * @param ResourceSet $targetResourceSet
-     * @param object $targetEntityInstance
+     * @param object      $targetEntityInstance
      * @param $navPropName
      *
      * @return bool
@@ -688,8 +687,8 @@ class LaravelQuery implements IQueryProvider
      * @param $sourceEntityInstance
      * @param $targetEntityInstance
      * @param $navPropName
-     * @return Relation
      * @throws \InvalidArgumentException
+     * @return Relation
      */
     protected function isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName)
     {
@@ -712,8 +711,8 @@ class LaravelQuery implements IQueryProvider
 
     /**
      * @param ResourceSet $sourceResourceSet
-     * @return array|null
      * @param $verbName
+     * @return array|null
      */
     protected function getOptionalVerbMapping(ResourceSet $sourceResourceSet, $verbName)
     {
@@ -729,7 +728,7 @@ class LaravelQuery implements IQueryProvider
      * correspond 1-1 to those in $data.
      *
      * @param $paramList
-     * @param array $data
+     * @param array                $data
      * @param KeyDescriptor[]|null $keyDescriptors
      */
     protected function prepareBulkRequestInput($paramList, array $data, array $keyDescriptors = null)
@@ -768,12 +767,12 @@ class LaravelQuery implements IQueryProvider
 
     /**
      * @param ResourceSet $sourceResourceSet
-     * @param array $data
+     * @param array       $data
      * @param $mapping
      * @param $pastVerb
-     * @param KeyDescriptor[]|null $keyDescriptor
-     * @return array
+     * @param  KeyDescriptor[]|null $keyDescriptor
      * @throws ODataException
+     * @return array
      */
     protected function processBulkCustom(
         ResourceSet $sourceResourceSet,
@@ -806,7 +805,7 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Start database transaction
+     * Start database transaction.
      */
     public function startTransaction()
     {
@@ -814,7 +813,7 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Commit database transaction
+     * Commit database transaction.
      */
     public function commitTransaction()
     {
@@ -822,7 +821,7 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Abort database transaction
+     * Abort database transaction.
      */
     public function rollBackTransaction()
     {

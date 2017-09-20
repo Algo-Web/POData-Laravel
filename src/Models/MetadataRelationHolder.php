@@ -14,7 +14,7 @@ class MetadataRelationHolder
     }
 
     /**
-     * Add model's relationships to holder
+     * Add model's relationships to holder.
      *
      * @param Model $model
      */

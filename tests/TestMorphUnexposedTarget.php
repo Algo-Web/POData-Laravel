@@ -12,7 +12,7 @@ class TestMorphUnexposedTarget extends Model
 
     /**
      * TestMorphUnexposedTarget constructor.
-     * @param array|null $meta
+     * @param array|null      $meta
      * @param Connection|null $connect
      */
     public function __construct(Connection $connect = null)

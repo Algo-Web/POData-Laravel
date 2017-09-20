@@ -522,9 +522,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     *
-     */
+    
     public function testSerialiseKnownSideWithNoResourceMatch()
     {
         $known = Carbon::create(2017, 1, 1, 0, 0, 0, 'UTC');
@@ -601,7 +599,7 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $op = new IlluminateOperationContext($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $holder = new MetadataRelationHolder();
         $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
@@ -664,7 +662,7 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $op = new IlluminateOperationContext($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $holder = new MetadataRelationHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];

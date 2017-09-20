@@ -3,8 +3,8 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
-use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Connection as Connection;
+use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Mockery\Mockery;
 
@@ -65,12 +65,12 @@ class TestMonomorphicTarget extends Model
 
     public function manyTarget()
     {
-        return $this->belongsTo(TestMonomorphicSource::class, "many_source", "many_id");
+        return $this->belongsTo(TestMonomorphicSource::class, 'many_source', 'many_id');
     }
 
     public function oneTarget()
     {
-        return $this->belongsTo(TestMonomorphicSource::class, "one_source", "one_id");
+        return $this->belongsTo(TestMonomorphicSource::class, 'one_source', 'one_id');
     }
 
     public static function findOrFail($id, $columns = ['*'])

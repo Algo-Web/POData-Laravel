@@ -10,14 +10,14 @@ abstract class AssociationStubBase
     protected $multiplicity;
 
     /**
-     * Foreign key field of this end of relation
+     * Foreign key field of this end of relation.
      *
      * @var string
      */
     protected $keyField;
 
     /**
-     * Foreign key field of other end of relation
+     * Foreign key field of other end of relation.
      *
      * @var string
      */
@@ -35,7 +35,7 @@ abstract class AssociationStubBase
     protected $targType;
 
     /**
-     * Base type this relation is attached to
+     * Base type this relation is attached to.
      * @var string
      */
     protected $baseType;
@@ -198,11 +198,11 @@ abstract class AssociationStubBase
     }
 
     /**
-     * Supply a canonical sort ordering to determine order in associations
+     * Supply a canonical sort ordering to determine order in associations.
      *
      * @param AssociationStubBase $other
      *
-     * @return integer
+     * @return int
      */
     public function compare(AssociationStubBase $other)
     {

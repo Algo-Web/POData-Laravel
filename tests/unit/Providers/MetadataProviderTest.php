@@ -30,15 +30,15 @@ use Illuminate\Cache\ArrayStore;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Mockery as m;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\ResourceTypeKind;
 use POData\Providers\Metadata\SimpleMetadataProvider;
-use Mockery as m;
 use POData\Providers\Metadata\Type\StringType;
 
 /**
@@ -438,7 +438,7 @@ class MetadataProviderTest extends TestCase
     public static function getterSingleton()
     {
         $model = new TestModel();
-        $model->name = "VNV Nation";
+        $model->name = 'VNV Nation';
         return $model;
     }
 

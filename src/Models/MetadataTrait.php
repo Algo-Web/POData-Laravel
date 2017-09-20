@@ -237,7 +237,7 @@ trait MetadataTrait
     }
 
     /**
-     * Get model's relationships
+     * Get model's relationships.
      *
      * @return array
      */
@@ -289,7 +289,7 @@ trait MetadataTrait
     }
 
     /**
-     * @param bool $biDir
+     * @param  bool  $biDir
      * @return array
      */
     protected function getRelationshipsFromMethods($biDir = false)
@@ -445,7 +445,7 @@ trait MetadataTrait
     abstract public function getFillable();
 
     /**
-     * Dig up all defined getters on the model
+     * Dig up all defined getters on the model.
      *
      * @return array
      */
@@ -472,6 +472,7 @@ trait MetadataTrait
 
     /**
      * @param $foo
+     * @param  mixed $condition
      * @return array
      */
     private function polyglotKeyMethodNames($foo, $condition = false)
@@ -548,6 +549,7 @@ trait MetadataTrait
      * @param $mult
      * @param $targ
      * @param string|null $targ
+     * @param null|mixed  $type
      */
     private function addRelationsHook(&$hooks, $first, $property, $last, $mult, $targ, $type = null)
     {
@@ -678,7 +680,7 @@ trait MetadataTrait
     }
 
     /**
-     * SUpplemental function to retrieve cast array for Laravel versions that do not supply hasCasts
+     * SUpplemental function to retrieve cast array for Laravel versions that do not supply hasCasts.
      *
      * @return array
      */
@@ -688,7 +690,7 @@ trait MetadataTrait
     }
 
     /**
-     * Return list of relations to be eager-loaded by Laravel query provider
+     * Return list of relations to be eager-loaded by Laravel query provider.
      *
      * @return array
      */
@@ -699,7 +701,7 @@ trait MetadataTrait
     }
 
     /**
-     * Set list of relations to be eager-loaded
+     * Set list of relations to be eager-loaded.
      *
      * @param array $relations
      */
@@ -733,7 +735,7 @@ trait MetadataTrait
     }
 
     /**
-     * Extract entity gubbins detail for later downstream use
+     * Extract entity gubbins detail for later downstream use.
      *
      * @return EntityGubbins
      */

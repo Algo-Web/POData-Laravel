@@ -3,8 +3,8 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
-use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Connection as Connection;
+use Illuminate\Database\Eloquent\Model as Model;
 use Mockery\Mockery;
 
 class TestMonomorphicManyTarget extends Model
@@ -49,7 +49,7 @@ class TestMonomorphicManyTarget extends Model
 
     public function manyTarget()
     {
-        return $this->belongsToMany(TestMonomorphicManySource::class, "target_source", "many_id", "many_source");
+        return $this->belongsToMany(TestMonomorphicManySource::class, 'target_source', 'many_id', 'many_source');
     }
 
     public function metadata()

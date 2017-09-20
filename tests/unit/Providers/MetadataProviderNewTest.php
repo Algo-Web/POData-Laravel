@@ -33,15 +33,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Mockery as m;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\ResourceTypeKind;
 use POData\Providers\Metadata\SimpleMetadataProvider;
-use Mockery as m;
 use POData\Providers\Metadata\Type\StringType;
 
 /**
@@ -411,14 +411,14 @@ class MetadataProviderNewTest extends TestCase
     {
         $expected = [];
         $expected[] = [
-            "principalType" => TestMorphTarget::class,
-            "principalRSet" => 'polyMorphicPlaceholder',
-            "principalMult" => "*",
-            "principalProp" => "monomorphicChildren",
-            "dependentType" => TestMonomorphicChildOfMorphTarget::class,
-            "dependentRSet" => TestMonomorphicChildOfMorphTarget::class,
-            "dependentMult" => "1",
-            "dependentProp" => "morphTarget"
+            'principalType' => TestMorphTarget::class,
+            'principalRSet' => 'polyMorphicPlaceholder',
+            'principalMult' => '*',
+            'principalProp' => 'monomorphicChildren',
+            'dependentType' => TestMonomorphicChildOfMorphTarget::class,
+            'dependentRSet' => TestMonomorphicChildOfMorphTarget::class,
+            'dependentMult' => '1',
+            'dependentProp' => 'morphTarget'
         ];
 
         $holder = new MetadataRelationHolder();
@@ -465,14 +465,14 @@ class MetadataProviderNewTest extends TestCase
     {
         $expected = [];
         $expected[] = [
-            "principalType" => TestMorphTarget::class,
-            "principalRSet" => 'polyMorphicPlaceholder',
-            "principalMult" => "1",
-            "principalProp" => "monomorphicParent",
-            "dependentType" => TestMonomorphicParentOfMorphTarget::class,
-            "dependentRSet" => TestMonomorphicParentOfMorphTarget::class,
-            "dependentMult" => "*",
-            "dependentProp" => "morphTargets"
+            'principalType' => TestMorphTarget::class,
+            'principalRSet' => 'polyMorphicPlaceholder',
+            'principalMult' => '1',
+            'principalProp' => 'monomorphicParent',
+            'dependentType' => TestMonomorphicParentOfMorphTarget::class,
+            'dependentRSet' => TestMonomorphicParentOfMorphTarget::class,
+            'dependentMult' => '*',
+            'dependentProp' => 'morphTargets'
         ];
 
         $holder = new MetadataRelationHolder();
@@ -559,7 +559,7 @@ class MetadataProviderNewTest extends TestCase
     public static function getterSingleton()
     {
         $model = new TestModel();
-        $model->name = "VNV Nation";
+        $model->name = 'VNV Nation';
         return $model;
     }
 

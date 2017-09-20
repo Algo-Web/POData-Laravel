@@ -2,8 +2,8 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery as LaravelQuery;
+use Illuminate\Support\ServiceProvider;
 
 class QueryProvider extends ServiceProvider
 {
