@@ -61,4 +61,12 @@ class Association
         }
         return -1 === $first->compare($last);
     }
+
+    /**
+     * @return \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType
+     */
+    public function getAssocationType()
+    {
+        return new AssociationType($this->first->getMultiplicity()->getValue() | $this->last->getMultiplicity()->getValue());
+    }
 }

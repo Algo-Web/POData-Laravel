@@ -132,7 +132,7 @@ trait MetadataTrait
 
         if (!isset($endpoint)) {
             $bitter = get_class();
-            $name = substr($bitter, strrpos($bitter, '\\')+1);
+            $name = substr($bitter, strrpos($bitter, '\\') + 1);
             return ($name);
         }
         return ($endpoint);
@@ -202,6 +202,7 @@ trait MetadataTrait
     /**
      * @param $entityTypes
      * @param $resourceSets
+     *
      * @return array
      */
     public function hookUpRelationships($entityTypes, $resourceSets)
@@ -290,7 +291,8 @@ trait MetadataTrait
     }
 
     /**
-     * @param  bool  $biDir
+     * @param  bool $biDir
+     *
      * @return array
      */
     protected function getRelationshipsFromMethods($biDir = false)
@@ -472,8 +474,9 @@ trait MetadataTrait
     }
 
     /**
-     * @param $foo
+     * @param        $foo
      * @param  mixed $condition
+     *
      * @return array
      */
     private function polyglotKeyMethodNames($foo, $condition = false)
@@ -497,7 +500,7 @@ trait MetadataTrait
                         break;
                     }
                 }
-                assert(in_array($fkMethodName, $methodList), 'Selected method, '.$fkMethodName.', not in method list');
+                assert(in_array($fkMethodName, $methodList), 'Selected method, ' . $fkMethodName . ', not in method list');
                 $rkMethodName = 'getQualifiedRelatedPivotKeyName';
                 foreach ($rkList as $option) {
                     if (in_array($option, $methodList)) {
@@ -505,7 +508,7 @@ trait MetadataTrait
                         break;
                     }
                 }
-                assert(in_array($rkMethodName, $methodList), 'Selected method, '.$rkMethodName.', not in method list');
+                assert(in_array($rkMethodName, $methodList), 'Selected method, ' . $rkMethodName . ', not in method list');
                 $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
                 static::$methodPrimary[get_class($foo)] = $line;
             }
@@ -528,13 +531,13 @@ trait MetadataTrait
             } else {
                 $methodList = get_class_methods(get_class($foo));
                 $fkCombo = array_values(array_intersect($fkList, $methodList));
-                assert(1 <= count($fkCombo), 'Expected at least 1 element in foreign-key list, got '.count($fkCombo));
+                assert(1 <= count($fkCombo), 'Expected at least 1 element in foreign-key list, got ' . count($fkCombo));
                 $fkMethodName = $fkCombo[0];
-                assert(in_array($fkMethodName, $methodList), 'Selected method, '.$fkMethodName.', not in method list');
+                assert(in_array($fkMethodName, $methodList), 'Selected method, ' . $fkMethodName . ', not in method list');
                 $rkCombo = array_values(array_intersect($rkList, $methodList));
-                assert(1 <= count($rkCombo), 'Expected at least 1 element in related-key list, got '.count($rkCombo));
+                assert(1 <= count($rkCombo), 'Expected at least 1 element in related-key list, got ' . count($rkCombo));
                 $rkMethodName = $rkCombo[0];
-                assert(in_array($rkMethodName, $methodList), 'Selected method, '.$rkMethodName.', not in method list');
+                assert(in_array($rkMethodName, $methodList), 'Selected method, ' . $rkMethodName . ', not in method list');
                 $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
                 static::$methodAlternate[get_class($foo)] = $line;
             }
@@ -543,12 +546,12 @@ trait MetadataTrait
     }
 
     /**
-     * @param $hooks
-     * @param $first
-     * @param $property
-     * @param $last
-     * @param $mult
-     * @param $targ
+     * @param             $hooks
+     * @param             $first
+     * @param             $property
+     * @param             $last
+     * @param             $mult
+     * @param             $targ
      * @param string|null $targ
      * @param null|mixed  $type
      */
@@ -789,8 +792,8 @@ trait MetadataTrait
                 }
             }
         }
-
         $gubbins->setStubs($stubs);
+
 
         return $gubbins;
     }

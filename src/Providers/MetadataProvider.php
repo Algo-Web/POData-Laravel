@@ -4,6 +4,9 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
@@ -11,7 +14,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema as Schema;
-use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Metadata\Type\TypeCode;
 
@@ -50,6 +52,7 @@ class MetadataProvider extends MetadataBaseProvider
             $mgh->addEntity($entity);
         }
         $ObjectMap->setAssociations($mgh->getRelations());
+        //TODO: sandi, look here.
         return $ObjectMap;
     }
 
@@ -64,24 +67,73 @@ class MetadataProvider extends MetadataBaseProvider
         foreach ($objectModel->getEntities() as $entity) {
             $baseType = $entity->isPolymorphicAffected() ? $meta->resolveResourceType('polyMorphicPlaceholder') : null;
             $EntityType = $meta->addEntityType(new \ReflectionClass($entity->getClassName()), $entity->getName(), false, $baseType);
-            $this->implomntProperties($entity, $EntityType);
+            $entity->setOdataResourceType($EntityType);
+            $this->implomntProperties($entity);
+        }
+        foreach ($objectModel->getAssociations() as $association) {
+            $this->implomentAssocations($objectModel, $association);
         }
     }
 
-
-    private function implomntProperties(EntityGubbins $unifiedEntity, ResourceEntityType $odataEntity)
+    private function implomentAssocations(Map $objectModel, Association $associationUnderHammer)
     {
         $meta = App::make('metadata');
+        $meta = new SimpleMetadataProvider('Data', self::$metaNAMESPACE);
+        switch ($associationUnderHammer->getAssocationType()) {
+            case AssociationType::NULL_ONE_TO_NULL_ONE():
+            case AssociationType::NULL_ONE_TO_ONE():
+            case AssociationType::ONE_TO_ONE():
+                $meta->addResourceReferenceSinglePropertyBidirectional(
+                    $objectModel->getEntities()[$associationUnderHammer->getFirst()->getBaseType()]->getOdataResourceType(),
+                    $objectModel->getEntities()[$associationUnderHammer->getLast()->getBaseType()]->getOdataResourceType(),
+                    $associationUnderHammer->getFirst()->getRelationName(),
+                    $associationUnderHammer->getLast()->getRelationName());
+                break;
+            case AssociationType::NULL_ONE_TO_MANY():
+            case AssociationType::ONE_TO_MANY():
+
+                if ($associationUnderHammer->getFirst()->getMultiplicity()->getValue() == AssociationStubRelationType::MANY) {
+                    $oneSide = $associationUnderHammer->getLast();
+                    $manyside = $associationUnderHammer->getFirst();
+                } else {
+                    $oneSide = $associationUnderHammer->getFirst();
+                    $manyside = $associationUnderHammer->getLast();
+                }
+                $meta->addResourceReferencePropertyBidirectional(
+                    $objectModel->getEntities()[$oneSide->getBaseType()]->getOdataResourceType(),
+                    $objectModel->getEntities()[$manyside->getBaseType()]->getOdataResourceType(),
+                    $oneSide->getRelationName(),
+                    $manyside->getRelationName()
+                );
+                break;
+            case AssociationType::MANY_TO_MANY():
+                $meta->addResourceSetReferencePropertyBidirectional(
+                    $objectModel->getEntities()[$associationUnderHammer->getFirst()->getBaseType()]->getOdataResourceType(),
+                    $objectModel->getEntities()[$associationUnderHammer->getLast()->getBaseType()]->getOdataResourceType(),
+                    $associationUnderHammer->getFirst()->getRelationName(),
+                    $associationUnderHammer->getLast()->getRelationName());
+
+        }
+
+    }
+
+    private function implomntProperties(EntityGubbins $unifiedEntity)
+    {
+        $meta = App::make('metadata');
+        $odataEntity = $unifiedEntity->getOdataResourceType();
         if (!$unifiedEntity->isPolymorphicAffected()) {
             foreach ($unifiedEntity->getKeyFields() as $keyField) {
                 $meta->addKeyProperty($odataEntity, $keyField->getName(), $keyField->getEdmFieldType());
             }
         }
         foreach ($unifiedEntity->getFields() as $field) {
+            if (in_array($field, $unifiedEntity->getKeyFields())) {
+                continue;
+            }
             $meta->addPrimitiveProperty($odataEntity,
                 $field->getName(),
                 $field->getEdmFieldType(),
-                $field->getFieldType() == EntityFieldType::PRIMITIVE_BAG,
+                $field->getFieldType() == EntityFieldType::PRIMITIVE_BAG(),
                 $field->getDefaultValue(),
                 $field->getIsNullable());
         }
@@ -128,7 +180,7 @@ class MetadataProvider extends MetadataBaseProvider
         $objectModel = $this->unify($objectModel);
         $this->verify($objectModel);
         $this->imploment($objectModel);
-        dd($objectModel);
+        //dd($objectModel);
         $key = 'metadata';
         $this->handlePostBoot($isCaching, $hasCache, $key, $meta);
         self::$isBooted = true;

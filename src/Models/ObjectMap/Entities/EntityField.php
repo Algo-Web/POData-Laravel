@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities;
 
 use POData\Providers\Metadata\Type\EdmPrimitiveType;
+use POData\Providers\Metadata\Type\TypeCode;
 
 class EntityField
 {
@@ -46,7 +47,7 @@ class EntityField
      */
     private $primitiveType;
     /**
-     * @var EdmPrimitiveType
+     * @var TypeCode
      */
     private $edmFieldType;
 
@@ -195,12 +196,13 @@ class EntityField
     /**
      * @param \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType $primitiveType
      *
-     * @return EdmPrimitiveType
+     * @return TypeCode
      */
     private function PrimitiveTypeToEdmType(EntityFieldPrimitiveType $primitiveType)
     {
-        return in_array($primitiveType, self::$primativeToEdmMapping) ?
-            self::$primativeToEdmMapping[$primitiveType] :
+        $value = $primitiveType->getValue();
+        return in_array($value, self::$primativeToEdmMapping) ?
+            self::$primativeToEdmMapping[$value] :
             EdmPrimitiveType::STRING;
     }
 }

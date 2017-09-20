@@ -42,9 +42,12 @@ class EntityGubbins
      * @var ResourceEntityType
      */
     private $odataResourceType;
-
+    /**
+     * @var bool|null
+     */
     private $isPolymorphicAffected = null;
 
+//TODO: move the checking part of this to the set stubs method.
     public function isPolymorphicAffected()
     {
         if (null !== $this->isPolymorphicAffected) {
@@ -159,12 +162,9 @@ class EntityGubbins
     /**
      * @param AssociationStubBase[] $stubs
      */
-    public function setStubs($stubs)
+    public function setStubs(array $stubs)
     {
-        if (0 == count($stubs)) {
-            $msg = 'Stubs array must not be empty';
-            throw new \Exception($msg);
-        }
+
         foreach ($stubs as $field) {
             if (!$field instanceof AssociationStubBase) {
                 $msg = 'Stubs array must only have AssociationStubBase objects';

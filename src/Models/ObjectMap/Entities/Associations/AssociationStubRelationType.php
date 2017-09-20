@@ -15,5 +15,5 @@ class AssociationStubRelationType extends Enum
 {
     const NULL_ONE = 1;
     const ONE = 2;
-    const MANY = 3;
+    const MANY = 4;
 }
