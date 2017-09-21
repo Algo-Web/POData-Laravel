@@ -26,8 +26,8 @@ class QueryProvider extends ServiceProvider
     {
         $this->app->singleton(
             'odataquery', function ($app) {
-            return new LaravelQuery();
-        }
+                return new LaravelQuery();
+            }
         );
     }
 }

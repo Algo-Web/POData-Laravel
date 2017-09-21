@@ -130,7 +130,6 @@ class MetadataProvider extends MetadataBaseProvider
                     $last->getRelationName()
                 );
         }
-
     }
 
     private function implomntProperties(EntityGubbins $unifiedEntity)
@@ -160,7 +159,6 @@ class MetadataProvider extends MetadataBaseProvider
                 $field->getDefaultValue(),
                 $field->getIsNullable());
         }
-
     }
 
     /**
@@ -368,9 +366,9 @@ class MetadataProvider extends MetadataBaseProvider
     /**
      * Resolve possible reverse relation property names.
      *
-     * @param  Model $source
-     * @param  Model $target
-     * @param        $propName
+     * @param Model $source
+     * @param Model $target
+     * @param       $propName
      *
      * @return string|null
      */

@@ -291,7 +291,7 @@ trait MetadataTrait
     }
 
     /**
-     * @param  bool $biDir
+     * @param bool $biDir
      *
      * @return array
      */
@@ -474,8 +474,8 @@ trait MetadataTrait
     }
 
     /**
-     * @param        $foo
-     * @param  mixed $condition
+     * @param       $foo
+     * @param mixed $condition
      *
      * @return array
      */

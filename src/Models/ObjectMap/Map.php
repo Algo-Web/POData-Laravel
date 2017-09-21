@@ -1,7 +1,6 @@
 <?php
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap;
 
-
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 
