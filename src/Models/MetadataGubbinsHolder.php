@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 
 class MetadataGubbinsHolder
@@ -58,7 +59,7 @@ class MetadataGubbinsHolder
             $others = $this->getRelationsByRelationName($className, $relName);
             if (1 === count($others)) {
                 $others = $others[0];
-                $assoc = new Association();
+                $assoc = new AssociationMonomorphic();
                 $first = -1 === $stub->compare($others);
                 $assoc->setFirst($first ? $stub : $others);
                 $assoc->setLast($first ? $others : $stub);

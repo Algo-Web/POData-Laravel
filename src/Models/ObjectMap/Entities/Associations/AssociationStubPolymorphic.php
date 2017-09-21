@@ -51,4 +51,10 @@ class AssociationStubPolymorphic extends AssociationStubBase
 
         return true;
     }
+
+    public function isKnownSide()
+    {
+        assert($this->isOk(), 'Polymorphic stub not OK so known-side determination is meaningless');
+        return null === $this->targType;
+    }
 }

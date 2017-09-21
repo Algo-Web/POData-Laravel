@@ -98,7 +98,7 @@ class MetadataProvider extends MetadataBaseProvider
         $first = $associationUnderHammer->getFirst();
         $last = $associationUnderHammer->getLast();
         $isPoly = $first instanceof AssociationStubPolymorphic;
-        switch ($associationUnderHammer->getAssocationType()) {
+        switch ($associationUnderHammer->getAssociationType()) {
             case AssociationType::NULL_ONE_TO_NULL_ONE():
             case AssociationType::NULL_ONE_TO_ONE():
             case AssociationType::ONE_TO_ONE():

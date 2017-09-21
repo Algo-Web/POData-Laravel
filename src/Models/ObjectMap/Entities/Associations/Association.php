@@ -2,17 +2,12 @@
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
-class Association
+abstract class Association
 {
     /**
      * @var AssociationStubBase
      */
     protected $first;
-
-    /**
-     * @var AssociationStubBase
-     */
-    protected $last;
 
     /**
      * @return AssociationStubBase
@@ -31,45 +26,17 @@ class Association
     }
 
     /**
-     * @return AssociationStubBase
+     * @return AssociationStubBase|AssociationStubBase[]
      */
-    public function getLast()
-    {
-        return $this->last;
-    }
-
-    /**
-     * @param AssociationStubBase $last
-     */
-    public function setLast(AssociationStubBase $last)
-    {
-        $this->last = $last;
-    }
+    abstract public function getLast();
 
     /**
      * @return bool
      */
-    public function isOk()
-    {
-        $first = $this->getFirst();
-        $last = $this->getLast();
-        if (null === $first || !$first->isOk()) {
-            return false;
-        }
-        if (null === $last || !$last->isOk()) {
-            return false;
-        }
-        if (!$first->isCompatible($last)) {
-            return false;
-        }
-        return -1 === $first->compare($last);
-    }
+    abstract public function isOk();
 
     /**
-     * @return \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType
+     * @return AssociationType|AssociationType[]
      */
-    public function getAssocationType()
-    {
-        return new AssociationType($this->first->getMultiplicity()->getValue() | $this->last->getMultiplicity()->getValue());
-    }
+    abstract public function getAssociationType();
 }

@@ -91,6 +91,8 @@ class AssociationStubTest extends TestCase
 
         $this->assertTrue($foo->isCompatible($bar));
         $this->assertTrue($bar->isCompatible($foo));
+        $this->assertFalse($foo->isKnownSide());
+        $this->assertTrue($bar->isKnownSide());
     }
 
     public function testAssociationIncompatibleOnBothOne()
@@ -113,6 +115,8 @@ class AssociationStubTest extends TestCase
 
         $this->assertFalse($foo->isCompatible($bar));
         $this->assertFalse($bar->isCompatible($foo));
+        $this->assertFalse($foo->isKnownSide());
+        $this->assertTrue($bar->isKnownSide());
     }
 
     public function testAssociationPolymorphicWithBothEndsKnown()
@@ -132,6 +136,8 @@ class AssociationStubTest extends TestCase
 
         $this->assertFalse($foo->isCompatible($bar));
         $this->assertFalse($bar->isCompatible($foo));
+        $this->assertTrue($foo->isKnownSide());
+        $this->assertTrue($bar->isKnownSide());
     }
 
     public function testAssociationPolymorphicWithIncompatibleTypes()
