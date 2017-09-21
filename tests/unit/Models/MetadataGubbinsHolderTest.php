@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
@@ -322,5 +323,26 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $result = $foo->getRelationsByRelationName(TestMorphManyToManyTarget::class, 'manyTarget');
         $this->assertEquals(0, count($result));
+    }
+
+    public function testGetRelationsTwoArmedPolymorphicRelation()
+    {
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $model = new TestMorphTarget($metaRaw);
+        $nuModel = new TestMorphManySource($metaRaw);
+        $altModel = new TestMorphManySourceAlternate($metaRaw);
+
+        $foo = new MetadataGubbinsHolder();
+        $foo->addEntity($model->extractGubbins());
+        $foo->addEntity($nuModel->extractGubbins());
+        $foo->addEntity($altModel->extractGubbins());
+
+        $result = $foo->getRelations();
+        $this->assertEquals(1, count($result));
+        $this->assertTrue($result[0] instanceof AssociationPolymorphic, get_class($result[0]));
+        $this->assertEquals(2, count($result[0]->getLast()));
     }
 }

@@ -3,6 +3,8 @@
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use POData\Providers\Metadata\ResourceEntityType;
@@ -189,11 +191,28 @@ class EntityGubbins
      */
     public function addAssociation(Association $association, $isFirst = true)
     {
-        $stub = $isFirst ? $association->getFirst() : $association->getLast();
-        if (!in_array($stub, $this->stubs)) {
-            throw new \InvalidArgumentException('Association cannot be connected to this entity');
+        if ($association instanceof AssociationMonomorphic) {
+            $stub = $isFirst ? $association->getFirst() : $association->getLast();
+            if (!in_array($stub, $this->stubs)) {
+                throw new \InvalidArgumentException('Association cannot be connected to this entity');
+            }
+            $propertyName = $stub->getRelationName();
+        } elseif ($association instanceof AssociationPolymorphic) {
+            if ($isFirst) {
+                $stub = $association->getFirst();
+                if (!in_array($stub, $this->stubs)) {
+                    throw new \InvalidArgumentException('Association cannot be connected to this entity');
+                }
+            } else {
+                $stubs = $association->getLast();
+                $inter = array_intersect($stubs, $this->stubs);
+                if (1 !== count($inter)) {
+                    throw new \InvalidArgumentException('Association cannot be connected to this entity');
+                }
+                $stub = $inter[0];
+            }
+            $propertyName = $stub->getRelationName();
         }
-        $propertyName = $stub->getRelationName();
         $this->associations[$propertyName] = $association;
     }
 

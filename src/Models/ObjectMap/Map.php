@@ -2,6 +2,8 @@
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 
 class Map
@@ -14,7 +16,7 @@ class Map
     /**
      * @var Association[]
      */
-    private $assocations;
+    private $associations;
 
     /**
      * @param EntityGubbins $entity
@@ -49,26 +51,29 @@ class Map
     /**
      * @param Association[] $assocations
      */
-    public function setAssociations(array $assocations)
+    public function setAssociations(array $associations)
     {
-        foreach ($assocations as $assocation) {
-            $this->addAssociation($assocation);
+        foreach ($associations as $association) {
+            $this->addAssociation($association);
         }
     }
 
     /**
-     * @param Association $assocations
+     * @param Association $association
      */
-    public function addAssociation(Association $assocations)
+    public function addAssociation(Association $association)
     {
-        if (!is_array($this->assocations)) {
-            $this->assocations = [];
+        if (!is_array($this->associations)) {
+            $this->associations = [];
         }
-        $firstClass = $this->Entities[$assocations->getFirst()->getBaseType()];
-        $secondClass = $this->Entities[$assocations->getLast()->getBaseType()];
-        $firstClass->addAssociation($assocations);
-        $secondClass->addAssociation($assocations, false);
-        $this->assocations[] = $assocations;
+        if ($association instanceof AssociationMonomorphic) {
+            $this->addAssociationMonomorphic($association);
+        } elseif ($association instanceof AssociationPolymorphic) {
+            $this->addAssociationPolymorphic($association);
+        } else {
+            assert(false, 'Association type not yet handled');
+        }
+        $this->associations[] = $association;
     }
 
     /**
@@ -76,7 +81,7 @@ class Map
      */
     public function getAssociations()
     {
-        return $this->assocations;
+        return $this->associations;
     }
 
     /**
@@ -87,5 +92,24 @@ class Map
         foreach ($this->Entities as $entity) {
             $entity->isOK();
         }
+    }
+
+    /**
+     * @param AssociationMonomorphic $association
+     */
+    private function addAssociationMonomorphic(AssociationMonomorphic $association)
+    {
+        $firstClass = $this->Entities[$association->getFirst()->getBaseType()];
+        $secondClass = $this->Entities[$association->getLast()->getBaseType()];
+        $firstClass->addAssociation($association);
+        $secondClass->addAssociation($association, false);
+    }
+
+    /**
+     * @param AssociationPolymorphic $association
+     */
+    private function addAssociationPolymorphic(AssociationPolymorphic $association)
+    {
+        $firstClass = $this->Entities[$association->getFirst()->getBaseType()];
     }
 }

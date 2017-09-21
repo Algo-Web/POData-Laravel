@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType;
@@ -88,16 +89,19 @@ class MetadataProvider extends MetadataBaseProvider
         $assoc = $objectModel->getAssociations();
         $assoc = null === $assoc ? [] : $assoc;
         foreach ($assoc as $association) {
-            $this->implementAssociations($objectModel, $association);
+            if ($association instanceof AssociationMonomorphic) {
+                $this->implementAssociations($objectModel, $association);
+            } else {
+
+            }
         }
     }
 
-    private function implementAssociations(Map $objectModel, Association $associationUnderHammer)
+    private function implementAssociations(Map $objectModel, AssociationMonomorphic $associationUnderHammer)
     {
         $meta = App::make('metadata');
         $first = $associationUnderHammer->getFirst();
         $last = $associationUnderHammer->getLast();
-        $isPoly = $first instanceof AssociationStubPolymorphic;
         switch ($associationUnderHammer->getAssociationType()) {
             case AssociationType::NULL_ONE_TO_NULL_ONE():
             case AssociationType::NULL_ONE_TO_ONE():
