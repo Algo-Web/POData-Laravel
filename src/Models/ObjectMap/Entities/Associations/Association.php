@@ -46,6 +46,9 @@ class Association
         $this->last = $last;
     }
 
+    /**
+     * @return bool
+     */
     public function isOk()
     {
         $first = $this->getFirst();

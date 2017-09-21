@@ -51,16 +51,25 @@ class EntityField
      */
     private $edmFieldType;
 
+    /**
+     * @return \POData\Providers\Metadata\Type\TypeCode
+     */
     public function getEdmFieldType()
     {
         return $this->edmFieldType;
     }
 
+    /**
+     * @return \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType
+     */
     public function getPrimitiveType()
     {
         return $this->primitiveType;
     }
 
+    /**
+     * @param \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType $primitiveType
+     */
     public function setPrimitiveType(EntityFieldPrimitiveType $primitiveType)
     {
         $this->primitiveType = $primitiveType;

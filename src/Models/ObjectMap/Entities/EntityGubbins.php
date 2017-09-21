@@ -20,12 +20,12 @@ class EntityGubbins
     private $className;
 
     /**
-     * @var array
+     * @var EntityField[]
      */
     private $keyFields;
 
     /**
-     * @var array
+     * @var EntityField[]
      */
     private $fields;
 
@@ -66,11 +66,17 @@ class EntityGubbins
         return $this->isPolymorphicAffected;
     }
 
+    /**
+     * @return ResourceEntityType
+     */
     public function getOdataResourceType()
     {
         return $this->odataResourceType;
     }
 
+    /**
+     * @param ResourceEntityType $odataType
+     */
     public function setOdataResourceType(ResourceEntityType $odataType)
     {
         if ($odataType->isAbstract()) {
@@ -129,7 +135,7 @@ class EntityGubbins
     }
 
     /**
-     * @param array $fields
+     * @param EntityField[] $fields
      */
     public function setFields(array $fields)
     {
@@ -178,6 +184,10 @@ class EntityGubbins
         $this->stubs = $stubs;
     }
 
+    /**
+     * @param Association $association
+     * @param bool        $isFirst
+     */
     public function addAssociation(Association $association, $isFirst = true)
     {
         $stub = $isFirst ? $association->getFirst() : $association->getLast();
@@ -188,6 +198,9 @@ class EntityGubbins
         $this->associations[$propertyName] = $association;
     }
 
+    /**
+     * @return String[]
+     */
     private function getFieldNames()
     {
         $fieldNames = [];
@@ -197,6 +210,9 @@ class EntityGubbins
         return $fieldNames;
     }
 
+    /**
+     * @return String[]
+     */
     private function getAssocationNames()
     {
         if (empty($this->stubs)) {
@@ -209,7 +225,10 @@ class EntityGubbins
         return $assocationNames;
     }
 
-    public function isOK(&$msg)
+    /**
+     * @return bool
+     */
+    public function isOK()
     {
         $fieldNames = $this->getFieldNames();
         $associationNames = $this->getAssocationNames();

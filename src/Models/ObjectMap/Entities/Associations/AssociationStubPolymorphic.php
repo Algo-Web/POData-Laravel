@@ -25,6 +25,11 @@ class AssociationStubPolymorphic extends AssociationStubBase
         $this->morphType = $morphType;
     }
 
+    /**
+     * @param \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase $otherStub
+     *
+     * @return bool
+     */
     public function isCompatible(AssociationStubBase $otherStub)
     {
         if (!parent::isCompatible($otherStub)) {

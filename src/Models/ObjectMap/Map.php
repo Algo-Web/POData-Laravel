@@ -17,6 +17,9 @@ class Map
      */
     private $assocations;
 
+    /**
+     * @param EntityGubbins $entity
+     */
     public function addEntity(EntityGubbins $entity)
     {
         if (!is_array($this->Entities)) {
@@ -25,11 +28,17 @@ class Map
         $this->Entities[$entity->getClassName()] = $entity;
     }
 
+    /**
+     * @return EntityGubbins[]
+     */
     public function getEntities()
     {
         return $this->Entities;
     }
 
+    /**
+     * @param EntityGubbins[] $entities
+     */
     public function setEntities(array $entities)
     {
         $this->Entities = [];
@@ -38,6 +47,9 @@ class Map
         }
     }
 
+    /**
+     * @param Association[] $assocations
+     */
     public function setAssociations(array $assocations)
     {
         foreach ($assocations as $assocation) {
@@ -45,6 +57,9 @@ class Map
         }
     }
 
+    /**
+     * @param Association $assocations
+     */
     public function addAssociation(Association $assocations)
     {
         if (!is_array($this->assocations)) {
@@ -57,15 +72,21 @@ class Map
         $this->assocations[] = $assocations;
     }
 
+    /**
+     * @return Association[]
+     */
     public function getAssociations()
     {
         return $this->assocations;
     }
 
-    public function isOK(&$msg)
+    /**
+     * @return bool
+     */
+    public function isOK()
     {
         foreach ($this->Entities as $entity) {
-            $entity->isOK($msg);
+            $entity->isOK();
         }
     }
 }
