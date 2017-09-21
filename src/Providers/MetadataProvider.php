@@ -276,11 +276,11 @@ class MetadataProvider extends MetadataBaseProvider
     private function processRelationLine($line, $entityTypes, &$meta)
     {
         $principalType = $line['principalType'];
-        $principalMult = $line['principalMult'];
+        $principalMult = $line['dependentMult'];
         $principalProp = $line['principalProp'];
         $principalRSet = $line['principalRSet'];
         $dependentType = $line['dependentType'];
-        $dependentMult = $line['dependentMult'];
+        $dependentMult = $line['principalMult'];
         $dependentProp = $line['dependentProp'];
         $dependentRSet = $line['dependentRSet'];
 
