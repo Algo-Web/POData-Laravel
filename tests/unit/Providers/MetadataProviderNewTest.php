@@ -390,8 +390,14 @@ class MetadataProviderNewTest extends TestCase
             App::instance($className, $testModel);
         }
 
-        $foo = new MetadataProviderDummy(App::make('app'));
-        $foo->setCandidateModels($classen);
+
+        $holder = new MetadataGubbinsHolder();
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen);
+        $foo->shouldReceive('getEntityTypesAndResourceSets')->never();
+        $foo->reset();
+        $foo->boot();
 
         $actual = $foo->getRepairedRoundTripRelations();
 
@@ -413,6 +419,11 @@ class MetadataProviderNewTest extends TestCase
 
     public function testMonomorphicParentOfKnownSidePolymorphicModel()
     {
+        $metaRaw = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
         $expected = [];
         $expected[] = [
             'principalType' => TestMorphTarget::class,
@@ -425,30 +436,29 @@ class MetadataProviderNewTest extends TestCase
             'dependentProp' => 'morphTargets'
         ];
 
-        $holder = new MetadataGubbinsHolder();
-
         $classen = [TestMonomorphicParentOfMorphTarget::class, TestMorphTarget::class];
         shuffle($classen);
 
-        $types = [];
-
         foreach ($classen as $className) {
-            $testModel = m::mock($className)->makePartial();
-            $this->assertTrue($testModel instanceof Model, get_class($testModel));
-            $testModel->shouldReceive('metadata')->andReturn([]);
+            $testModel = new $className($metaRaw, null);
             App::instance($className, $testModel);
-            $type = m::mock(ResourceType::class);
-            $types[$className] = $type;
         }
 
+        $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
+        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        $cache->shouldReceive('forget')->andReturn(null);
+        Cache::swap($cache);
+
+        $holder = new MetadataGubbinsHolder();
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen);
-        $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
-        $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
+        $foo->shouldReceive('getEntityTypesAndResourceSets')->never();
         $foo->reset();
+        $foo->boot();
 
-        $actual = $foo->getRepairedRoundTripRelations();
+        $actual = $foo->calculateRoundTripRelations();
 
         $this->assertEquals(2 * count($expected), count($actual));
         foreach ($expected as $forward) {

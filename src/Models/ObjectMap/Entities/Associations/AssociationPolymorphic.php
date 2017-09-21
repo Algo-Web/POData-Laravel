@@ -2,6 +2,8 @@
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
+use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+
 class AssociationPolymorphic extends Association
 {
     /**
@@ -66,5 +68,55 @@ class AssociationPolymorphic extends Association
     private function isStubOk($stub)
     {
         return (null !== $stub && $stub instanceof AssociationStubPolymorphic && $stub->isOk());
+    }
+
+    /**
+     * return array[]
+     */
+    public function getArrayPayload()
+    {
+        $placeholder = MetadataProvider::POLYMORPHIC;
+
+        $principalType = $this->first->getBaseType();
+        $principalProp = $this->first->getRelationName();
+        $principalRSet = $principalType;
+        $principalMult = $this->multArray[$this->first->getMultiplicity()->getValue()];
+        $numLast = count($this->last);
+
+        $dependentRSet = $placeholder;
+
+        $result = [];
+
+        foreach ($this->last as $last) {
+            $dependentMult = $this->multArray[$last->getMultiplicity()->getValue()];
+            $dependentProp = $last->getRelationName();
+            $dependentType = $last->getBaseType();
+
+            $forward = [
+                'principalType' => $principalType,
+                'principalMult' => $principalMult,
+                'principalProp' => $principalProp,
+                'principalRSet' => $principalRSet,
+                'dependentType' => $dependentType,
+                'dependentMult' => $dependentMult,
+                'dependentProp' => $dependentProp,
+                'dependentRSet' => $dependentRSet
+            ];
+            $reverse = [
+                'principalType' => $dependentType,
+                'principalMult' => $dependentMult,
+                'principalProp' => $dependentProp,
+                'principalRSet' => $dependentRSet,
+                'dependentType' => $principalType,
+                'dependentMult' => $principalMult,
+                'dependentProp' => $principalProp,
+                'dependentRSet' => $principalRSet
+            ];
+            $result[] = $forward;
+            $result[] = $reverse;
+        }
+
+        assert(count($result) == 2 * $numLast);
+        return $result;
     }
 }

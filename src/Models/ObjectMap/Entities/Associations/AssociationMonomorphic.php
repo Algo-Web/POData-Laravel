@@ -50,6 +50,47 @@ class AssociationMonomorphic extends Association
      */
     public function getAssociationType()
     {
-        return new AssociationType($this->first->getMultiplicity()->getValue() | $this->last->getMultiplicity()->getValue());
+        return new AssociationType($this->first->getMultiplicity()->getValue()
+                                   | $this->last->getMultiplicity()->getValue());
+    }
+
+    /**
+     * return array[]
+     */
+    public function getArrayPayload()
+    {
+        $principalType = $this->first->getBaseType();
+        $principalProp = $this->first->getRelationName();
+        $principalRSet = $principalType;
+        $principalMult = $this->multArray[$this->first->getMultiplicity()->getValue()];
+
+        $dependentType = $this->last->getBaseType();
+        $dependentProp = $this->last->getRelationName();
+        $dependentRSet = $dependentType;
+        $dependentMult = $this->multArray[$this->last->getMultiplicity()->getValue()];
+
+        $forward = [
+            'principalType' => $principalType,
+            'principalMult' => $principalMult,
+            'principalProp' => $principalProp,
+            'principalRSet' => $principalType,
+            'dependentType' => $dependentType,
+            'dependentMult' => $dependentMult,
+            'dependentProp' => $dependentProp,
+            'dependentRSet' => $dependentType
+        ];
+        $reverse = [
+            'principalType' => $dependentType,
+            'principalMult' => $dependentMult,
+            'principalProp' => $dependentProp,
+            'principalRSet' => $dependentType,
+            'dependentType' => $principalType,
+            'dependentMult' => $principalMult,
+            'dependentProp' => $principalProp,
+            'dependentRSet' => $principalType
+        ];
+        $payload = [$forward, $reverse];
+
+        return $payload;
     }
 }

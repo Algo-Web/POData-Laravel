@@ -5,6 +5,7 @@ namespace AlgoWeb\PODataLaravel\Providers;
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType;
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema as Schema;
+use POData\Providers\Metadata\ResourceEntityType;
+use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceStreamInfo;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Metadata\Type\TypeCode;
@@ -89,15 +92,16 @@ class MetadataProvider extends MetadataBaseProvider
         $assoc = $objectModel->getAssociations();
         $assoc = null === $assoc ? [] : $assoc;
         foreach ($assoc as $association) {
+            assert($association->isOk());
             if ($association instanceof AssociationMonomorphic) {
-                $this->implementAssociations($objectModel, $association);
-            } else {
-
+                $this->implementAssociationsMonomorphic($objectModel, $association);
+            } elseif ($association instanceof AssociationPolymorphic) {
+                $this->implementAssociationsPolymorphic($objectModel, $association);
             }
         }
     }
 
-    private function implementAssociations(Map $objectModel, AssociationMonomorphic $associationUnderHammer)
+    private function implementAssociationsMonomorphic(Map $objectModel, AssociationMonomorphic $associationUnderHammer)
     {
         $meta = App::make('metadata');
         $first = $associationUnderHammer->getFirst();
@@ -137,6 +141,72 @@ class MetadataProvider extends MetadataBaseProvider
                     $last->getRelationName()
                 );
         }
+    }
+
+    /**
+     * @param Map $objectModel
+     * @param AssociationPolymorphic $association
+     */
+    private function implementAssociationsPolymorphic(Map $objectModel, AssociationPolymorphic $association)
+    {
+        $meta = App::make('metadata');
+        $first = $association->getFirst();
+
+        $polySet = $meta->resolveResourceSet(static::POLYMORPHIC_PLURAL);
+        assert($polySet instanceof ResourceSet);
+
+        $principalType = $objectModel->getEntities()[$first->getBaseType()]->getOdataResourceType();
+        assert($principalType instanceof ResourceEntityType);
+        $principalSet = $principalType->getCustomState();
+        assert($principalSet instanceof ResourceSet);
+        $principalProp = $first->getRelationName();
+        $isPrincipalAdded = null !== $principalType->resolveProperty($principalProp);
+
+        if (!$isPrincipalAdded) {
+            if ($first->getMultiplicity()->getValue() !== AssociationStubRelationType::MANY) {
+                $meta->addResourceReferenceProperty($principalType, $principalProp, $polySet);
+            } else {
+                $meta->addResourceSetReferenceProperty($principalType, $principalProp, $polySet);
+            }
+        }
+
+        $types = $association->getAssociationType();
+        $final = $association->getLast();
+        $numRows = count($types);
+        assert($numRows == count($final));
+
+        for ($i = 0; $i < $numRows; $i++) {
+            $type = $types[$i];
+            $last = $final[$i];
+
+            $dependentType = $objectModel->getEntities()[$last->getBaseType()]->getOdataResourceType();
+            assert($dependentType instanceof ResourceEntityType);
+            $dependentSet = $dependentType->getCustomState();
+            assert($dependentSet instanceof ResourceSet);
+            $dependentProp = $last->getRelationName();
+            $isDependentAdded = null !== $dependentType->resolveProperty($dependentProp);
+
+            switch ($type) {
+                case AssociationType::NULL_ONE_TO_NULL_ONE():
+                case AssociationType::NULL_ONE_TO_ONE():
+                case AssociationType::ONE_TO_ONE():
+                    if (!$isDependentAdded) {
+                        $meta->addResourceReferenceProperty($dependentType, $dependentProp, $principalSet);
+                    }
+                    break;
+                case AssociationType::NULL_ONE_TO_MANY():
+                case AssociationType::ONE_TO_MANY():
+                    if (!$isDependentAdded) {
+                        $meta->addResourceReferenceProperty($dependentType, $dependentProp, $principalSet, true, false);
+                    }
+                    break;
+                case AssociationType::MANY_TO_MANY():
+                    if (!$isDependentAdded) {
+                        $meta->addResourceSetReferenceProperty($dependentType, $dependentProp, $principalSet);
+                    }
+            }
+        }
+
     }
 
     private function implementProperties(EntityGubbins $unifiedEntity)
@@ -261,11 +331,25 @@ class MetadataProvider extends MetadataBaseProvider
         foreach ($modelNames as $name) {
             if (!$this->getRelationHolder()->hasClass($name)) {
                 $model = new $name();
-                $this->getRelationHolder()->addEntity($model->extractGubbins());
+                $gubbinz = $model->extractGubbins();
+                $this->getRelationHolder()->addEntity($gubbinz);
             }
         }
 
-        return $this->getRelationHolder()->getRelations();
+        $rels = $this->getRelationHolder()->getRelations();
+
+        $result = [];
+        foreach ($rels as $payload) {
+            assert($payload instanceof Association);
+            $raw = $payload->getArrayPayload();
+            if (is_array($raw)) {
+                foreach ($raw as $line) {
+                    $result[] = $line;
+                }
+            }
+        }
+
+        return $result;
     }
 
     public function getPolymorphicRelationGroups()

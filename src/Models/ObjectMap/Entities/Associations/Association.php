@@ -4,6 +4,12 @@ namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
 abstract class Association
 {
+    protected $multArray = [
+        AssociationStubRelationType::MANY => '*',
+        AssociationStubRelationType::ONE => '1',
+        AssociationStubRelationType::NULL_ONE => '0..1',
+    ];
+
     /**
      * @var AssociationStubBase
      */
@@ -39,4 +45,9 @@ abstract class Association
      * @return AssociationType|AssociationType[]
      */
     abstract public function getAssociationType();
+
+    /**
+     * @return array[]
+     */
+    abstract public function getArrayPayload();
 }

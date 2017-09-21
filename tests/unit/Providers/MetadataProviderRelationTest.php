@@ -24,6 +24,7 @@ use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphTargetAlternate;
 use AlgoWeb\PODataLaravel\Models\TestMorphTargetChild;
 use AlgoWeb\PODataLaravel\Models\TestPolymorphicDualSource;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
@@ -233,10 +234,11 @@ class MetadataProviderRelationTest extends TestCase
 
     public function testCalcRoundTripFromTwoArmedPolymorphicRelationBothOneToOne()
     {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
 
@@ -246,20 +248,22 @@ class MetadataProviderRelationTest extends TestCase
         $classen = [ TestMorphOneSource::class, TestMorphOneSourceAlternate::class, TestMorphTarget::class];
 
         foreach ($classen as $className) {
-            $testModel = new $className($meta);
+            $testModel = new $className($metaRaw, null);
             App::instance($className, $testModel);
         }
 
         $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
         $cache->shouldReceive('put')->with('metadata', m::any(), 10);
+        $cache->shouldReceive('forget')->andReturn(null);
         Cache::swap($cache);
 
         $holder = new MetadataGubbinsHolder();
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getIsCaching')->andReturn(false);
-        $foo->shouldReceive('getCandidateModels')->andReturn($classen)->once();
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen)->atLeast(1);
+        $foo->boot();
 
         $result = $foo->calculateRoundTripRelations();
         $this->assertEquals(4, count($result));
@@ -268,6 +272,45 @@ class MetadataProviderRelationTest extends TestCase
     public function testCalcRoundTripFromTwoArmedPolymorphicRelationBothOneToMany()
     {
         $meta = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $this->setUpSchemaFacade();
+
+        $simple = new SimpleMetadataProvider('Data', 'Data');
+        App::instance('metadata', $simple);
+
+        $classen = [ TestMorphManySource::class, TestMorphManySourceAlternate::class, TestMorphTarget::class];
+
+        foreach ($classen as $className) {
+            $testModel = new $className($metaRaw, null);
+            App::instance($className, $testModel);
+        }
+
+        $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
+        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        $cache->shouldReceive('forget')->andReturn(null);
+        Cache::swap($cache);
+
+        $holder = new MetadataGubbinsHolder();
+        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
+        $foo->shouldReceive('getIsCaching')->andReturn(false);
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen)->atLeast(1);
+        $foo->reset();
+        $foo->boot();
+
+        $result = $foo->calculateRoundTripRelations();
+        $this->assertEquals(4, count($result));
+    }
+
+    public function testBootFromTwoArmedPolymorphicRelationBothOneToMany()
+    {
+        $meta = [];
+        $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
@@ -285,18 +328,15 @@ class MetadataProviderRelationTest extends TestCase
         }
 
         $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
-        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->never();
+        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        $cache->shouldReceive('forget')->andReturn(null);
         Cache::swap($cache);
 
-        $holder = new MetadataGubbinsHolder();
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
-        $foo->shouldReceive('getIsCaching')->andReturn(false);
-        $foo->shouldReceive('getCandidateModels')->andReturn($classen)->once();
+        $foo = new MetadataProviderDummy(App::make('app'));
+        $foo->setCandidateModels($classen);
 
-        $result = $foo->calculateRoundTripRelations();
-        $this->assertEquals(4, count($result));
+        $foo->boot();
     }
 
     public function testRelationGroupingTwoArmedPolymorphicRelation()
@@ -375,10 +415,10 @@ class MetadataProviderRelationTest extends TestCase
 
     public function testRelationGroupingMonomorphicRelationWithSingleKnownSide()
     {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
 
@@ -388,20 +428,23 @@ class MetadataProviderRelationTest extends TestCase
         $classen = [ TestMonomorphicSource::class, TestMonomorphicTarget::class, TestMorphManyToManyTarget::class];
 
         foreach ($classen as $className) {
-            $testModel = new $className($meta);
+            $testModel = new $className($metaRaw, null);
             App::instance($className, $testModel);
         }
 
         $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
-        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->never();
+        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        $cache->shouldReceive('forget')->andReturn(null);
         Cache::swap($cache);
 
         $holder = new MetadataGubbinsHolder();
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getIsCaching')->andReturn(false);
-        $foo->shouldReceive('getCandidateModels')->andReturn($classen)->once();
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen)->atLeast(1);
+        $foo->reset();
+        $foo->boot();
 
         $expected = [];
         $actual = $foo->getPolymorphicRelationGroups();
@@ -447,6 +490,7 @@ class MetadataProviderRelationTest extends TestCase
     {
         $metaRaw = [];
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
@@ -459,17 +503,20 @@ class MetadataProviderRelationTest extends TestCase
             TestMonomorphicSource::class, TestMonomorphicTarget::class];
 
         foreach ($classen as $className) {
-            $testModel = new $className($metaRaw);
+            $testModel = new $className($metaRaw, null);
             App::instance($className, $testModel);
         }
 
         $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
-        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->never();
+        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        $cache->shouldReceive('forget')->andReturn(null);
         Cache::swap($cache);
 
         $foo = new MetadataProviderDummy(App::make('app'));
+        $foo->reset();
         $foo->setCandidateModels($classen);
+        $foo->boot();
 
         $rels = $foo->calculateRoundTripRelations();
         $expected = $foo->calculateRoundTripRelations();
