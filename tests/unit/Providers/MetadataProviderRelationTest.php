@@ -708,6 +708,7 @@ class MetadataProviderRelationTest extends TestCase
         $metadata = App::make('metadata');
         $targAssoc = 'TestMorphTargetChild_morph_polyMorphicPlaceholder';
         $set = $metadata->resolveAssociationSet($targAssoc);
+        $this->assertTrue(isset($set), 'Association set not retrieved');
         $this->assertTrue($set instanceof ResourceAssociationSet, get_class($set));
         $end1Concrete = $set->getEnd1()->getConcreteType();
         $this->assertTrue($end1Concrete instanceof ResourceEntityType);
@@ -722,6 +723,7 @@ class MetadataProviderRelationTest extends TestCase
 
         $revAssoc = 'TestMorphTarget_childMorph_TestMorphTargetChild';
         $set = $metadata->resolveAssociationSet($revAssoc);
+        $this->assertTrue(isset($set), 'Association set not retrieved');
         $this->assertTrue($set instanceof ResourceAssociationSet, get_class($set));
         $end1Concrete = $set->getEnd1()->getConcreteType();
         $this->assertTrue($end1Concrete instanceof ResourceEntityType);

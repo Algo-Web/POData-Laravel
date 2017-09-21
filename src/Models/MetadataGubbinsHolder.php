@@ -120,9 +120,13 @@ class MetadataGubbinsHolder
 
         foreach ($this->knownSides as $knownType => $knownDeets) {
             foreach (array_keys($knownDeets) as $key) {
+                $lastCandidates = $unknowns[$knownType][$key];
+                if (0 == count($lastCandidates)) {
+                    continue;
+                }
                 $assoc = new AssociationPolymorphic();
                 $assoc->setFirst($this->knownSides[$knownType][$key]);
-                $assoc->setLast($unknowns[$knownType][$key]);
+                $assoc->setLast($lastCandidates);
                 assert($assoc->isOk());
                 $polyAssoc[] = $assoc;
             }
