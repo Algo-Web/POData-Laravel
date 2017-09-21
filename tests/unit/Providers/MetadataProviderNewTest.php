@@ -5,6 +5,7 @@ namespace AlgoWeb\PODataLaravel\Providers;
 use AlgoWeb\ODataMetadata\MetadataManager;
 use AlgoWeb\ODataMetadata\MetadataV3\edm\TEntityTypeType;
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataProviderDummy;
 use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestCastModel;
@@ -106,7 +107,7 @@ class MetadataProviderNewTest extends TestCase
     {
         $app = m::mock(\Illuminate\Contracts\Foundation\Application::class);
         $foo = new MetadataProvider($app);
-        $this->assertTrue($foo->getRelationHolder() instanceof MetadataRelationHolder);
+        $this->assertTrue($foo->getRelationHolder() instanceof MetadataGubbinsHolder);
     }
 
     public function testBootHasMigrationsIsCached()
@@ -162,6 +163,7 @@ class MetadataProviderNewTest extends TestCase
         Cache::swap($cache);
 
         $foo = $this->object;
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen);
         $foo->shouldReceive('getIsCaching')->andReturn(true)->once();
 
         $foo->boot();
@@ -232,6 +234,10 @@ class MetadataProviderNewTest extends TestCase
 
     public function testBootHasMigrationsThreeDifferentRelationTypes()
     {
+        $metaRaw = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
@@ -244,9 +250,7 @@ class MetadataProviderNewTest extends TestCase
         $types = [];
 
         foreach ($classen as $className) {
-            $testModel = m::mock($className)->makePartial();
-            $testModel->shouldReceive('getXmlSchema')->andReturn(null);
-            $testModel->shouldReceive('metadata')->andReturn([]);
+            $testModel = new $className($metaRaw);
             App::instance($className, $testModel);
             $type = m::mock(ResourceEntityType::class);
             $type->shouldReceive('getCustomState')->andReturn(m::mock(ResourceSet::class));
@@ -264,27 +268,7 @@ class MetadataProviderNewTest extends TestCase
         $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
         $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
 
-        $abstract = $this->createAbstractMockType();
-
-        $meta = \Mockery::mock(SimpleMetadataProvider::class);
-        $meta->shouldReceive('addKeyProperty')->andReturnNull()->once();
-        $meta->shouldReceive('addResourceSet')->andReturnNull()->once();
-        $meta->shouldReceive('resolveResourceSet')
-            ->withArgs(['polyMorphicPlaceholders'])->andReturn($placeholder);
-        $meta->shouldReceive('resolveResourceSet')
-            ->withArgs([TestMorphManyToManyTarget::class])->andReturn($morphTarget);
-        $meta->shouldReceive('addEntityType')->andReturn($abstract)->atLeast(1);
-        $meta->shouldReceive('addResourceSetReferenceProperty')
-            ->withAnyArgs()->andReturn(null)->atLeast(1);
-        $meta->shouldReceive('addResourceReferenceSinglePropertyBidirectional')
-            ->withAnyArgs()->andReturn(null)->atLeast(1);
-        $meta->shouldReceive('addResourceReferencePropertyBidirectional')
-            ->withAnyArgs()->andReturn(null)->atLeast(1);
-        $meta->shouldReceive('resolveResourceType')->withArgs(['TestMorphManyToManyTarget'])
-            ->andReturn($types[TestMorphManyToManyTarget::class]);
-        $meta->shouldReceive('resolveResourceType')->withArgs(['TestMorphManyToManySource'])
-            ->andReturn($types[TestMorphManyToManySource::class]);
-
+        $meta = new SimpleMetadataProvider('Data', 'Data');
 
         App::instance('metadata', $meta);
 
@@ -335,12 +319,12 @@ class MetadataProviderNewTest extends TestCase
     {
         $functionName = [get_class($this), 'getterSingleton'];
 
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
-        $testModel = new TestModel($meta, null);
+        $testModel = new TestModel($metaRaw, null);
         App::instance(TestModel::class, $testModel);
 
         $this->setUpSchemaFacade();
@@ -358,9 +342,7 @@ class MetadataProviderNewTest extends TestCase
         $types = [];
         $i = 0;
         foreach ($classen as $className) {
-            $testModel = m::mock($className)->makePartial();
-            //$testModel->shouldReceive('getXmlSchema')->andReturn(null);
-            $testModel->shouldReceive('metadata')->andReturn([]);
+            $testModel = new $className($metaRaw);
             App::instance($className, $testModel);
             $type = m::mock(ResourceType::class);
             $types[$className] = $type;
@@ -383,6 +365,11 @@ class MetadataProviderNewTest extends TestCase
 
     public function testMonomorphicChildOfKnownSidePolymorphicModel()
     {
+        $metaRaw = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
         $expected = [];
         $expected[] = [
             'principalType' => TestMorphTarget::class,
@@ -395,27 +382,16 @@ class MetadataProviderNewTest extends TestCase
             'dependentProp' => 'morphTarget'
         ];
 
-        $holder = new MetadataRelationHolder();
-
         $classen = [TestMonomorphicChildOfMorphTarget::class, TestMorphTarget::class];
-        shuffle($classen);
-
-        $types = [];
+        //shuffle($classen);
 
         foreach ($classen as $className) {
-            $testModel = m::mock($className)->makePartial();
-            $testModel->shouldReceive('metadata')->andReturn([]);
+            $testModel = new $className($metaRaw, null);
             App::instance($className, $testModel);
-            $type = m::mock(ResourceType::class);
-            $types[$className] = $type;
         }
 
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
-        $foo->shouldReceive('getCandidateModels')->andReturn($classen);
-        $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
-        $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
-        $foo->reset();
+        $foo = new MetadataProviderDummy(App::make('app'));
+        $foo->setCandidateModels($classen);
 
         $actual = $foo->getRepairedRoundTripRelations();
 
@@ -449,7 +425,7 @@ class MetadataProviderNewTest extends TestCase
             'dependentProp' => 'morphTargets'
         ];
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
 
         $classen = [TestMonomorphicParentOfMorphTarget::class, TestMorphTarget::class];
         shuffle($classen);

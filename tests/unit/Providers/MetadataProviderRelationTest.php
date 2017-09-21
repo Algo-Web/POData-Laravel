@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\MetadataProviderDummy;
 use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestCase;
@@ -254,7 +255,7 @@ class MetadataProviderRelationTest extends TestCase
         $cache->shouldReceive('put')->with('metadata', m::any(), 10);
         Cache::swap($cache);
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getIsCaching')->andReturn(false);
@@ -288,7 +289,7 @@ class MetadataProviderRelationTest extends TestCase
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
         Cache::swap($cache);
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getIsCaching')->andReturn(false);
@@ -322,7 +323,7 @@ class MetadataProviderRelationTest extends TestCase
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
         Cache::swap($cache);
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getIsCaching')->andReturn(false);
@@ -361,7 +362,7 @@ class MetadataProviderRelationTest extends TestCase
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
         Cache::swap($cache);
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getIsCaching')->andReturn(false);
@@ -396,7 +397,7 @@ class MetadataProviderRelationTest extends TestCase
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
         Cache::swap($cache);
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getIsCaching')->andReturn(false);
@@ -431,7 +432,7 @@ class MetadataProviderRelationTest extends TestCase
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
         Cache::swap($cache);
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getIsCaching')->andReturn(false);
@@ -444,10 +445,10 @@ class MetadataProviderRelationTest extends TestCase
 
     public function testPolymorphicRelationUpdateWithTwoArmedPolymorphicAndSingleMonomorphicRelation()
     {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
 
@@ -458,7 +459,7 @@ class MetadataProviderRelationTest extends TestCase
             TestMonomorphicSource::class, TestMonomorphicTarget::class];
 
         foreach ($classen as $className) {
-            $testModel = new $className($meta);
+            $testModel = new $className($metaRaw);
             App::instance($className, $testModel);
         }
 
@@ -467,11 +468,8 @@ class MetadataProviderRelationTest extends TestCase
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
         Cache::swap($cache);
 
-        $holder = new MetadataRelationHolder();
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
-        $foo->shouldReceive('getIsCaching')->andReturn(false);
-        $foo->shouldReceive('getCandidateModels')->andReturn($classen)->atLeast(1);
+        $foo = new MetadataProviderDummy(App::make('app'));
+        $foo->setCandidateModels($classen);
 
         $rels = $foo->calculateRoundTripRelations();
         $expected = $foo->calculateRoundTripRelations();
@@ -503,7 +501,7 @@ class MetadataProviderRelationTest extends TestCase
         // raw relations are passed through unmodified
         $expected = ['foo', 'bar'];
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('calculateRoundTripRelations')->andReturn($expected);
@@ -545,25 +543,14 @@ class MetadataProviderRelationTest extends TestCase
         $abstract->shouldReceive('setCustomState')->andReturn(null);
         $abstract->shouldReceive('getCustomState')->andReturn($abstractSet);
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen);
         $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
         $foo->shouldReceive('getEntityTypesAndResourceSets')->withAnyArgs()->andReturn([$types, null, null]);
 
-        $meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
-        $meta->shouldReceive('addEntityType')
-            ->with(m::any(), 'polyMorphicPlaceholder', true, null)
-            ->andReturn($abstract);
-        $meta->shouldReceive('addKeyProperty')->andReturnNull()->atLeast(1);
-        $meta->shouldReceive('addPrimitiveProperty')->andReturnNull()->atLeast(1);
-        $meta->shouldReceive('addResourceSetReferencePropertyBidirectional')
-            ->withAnyArgs()->andReturn(null)->atLeast(1);
-        $meta->shouldReceive('addResourceReferenceSinglePropertyBidirectional')
-            ->withAnyArgs()->andReturn(null)->never();
-        $meta->shouldReceive('addResourceReferencePropertyBidirectional')
-            ->withAnyArgs()->andReturn(null)->never();
+        $meta = new SimpleMetadataProvider('Data', 'Data');
 
         App::instance('metadata', $meta);
 

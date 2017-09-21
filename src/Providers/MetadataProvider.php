@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
@@ -62,7 +63,7 @@ class MetadataProvider extends MetadataBaseProvider
         $objectModel->isOK($failMessage);
     }
 
-    private function imploment(Map $objectModel)
+    private function implement(Map $objectModel)
     {
         $meta = App::make('metadata');
         $entities = $objectModel->getEntities();
@@ -71,8 +72,9 @@ class MetadataProvider extends MetadataBaseProvider
             $className = $entity->getClassName();
             $entityName = $entity->getName();
             $EntityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, false, $baseType);
+            assert($EntityType->hasBaseType() === isset($baseType));
             $entity->setOdataResourceType($EntityType);
-            $this->implomntProperties($entity);
+            $this->implementProperties($entity);
             $meta->addResourceSet($entity->getClassName(), $EntityType);
             $meta->oDataEntityMap[$className] = $meta->oDataEntityMap[$entityName];
         }
@@ -86,15 +88,16 @@ class MetadataProvider extends MetadataBaseProvider
         $assoc = $objectModel->getAssociations();
         $assoc = null === $assoc ? [] : $assoc;
         foreach ($assoc as $association) {
-            $this->implomentAssocations($objectModel, $association);
+            $this->implementAssociations($objectModel, $association);
         }
     }
 
-    private function implomentAssocations(Map $objectModel, Association $associationUnderHammer)
+    private function implementAssociations(Map $objectModel, Association $associationUnderHammer)
     {
         $meta = App::make('metadata');
         $first = $associationUnderHammer->getFirst();
         $last = $associationUnderHammer->getLast();
+        $isPoly = $first instanceof AssociationStubPolymorphic;
         switch ($associationUnderHammer->getAssocationType()) {
             case AssociationType::NULL_ONE_TO_NULL_ONE():
             case AssociationType::NULL_ONE_TO_ONE():
@@ -132,7 +135,7 @@ class MetadataProvider extends MetadataBaseProvider
         }
     }
 
-    private function implomntProperties(EntityGubbins $unifiedEntity)
+    private function implementProperties(EntityGubbins $unifiedEntity)
     {
         $meta = App::make('metadata');
         $odataEntity = $unifiedEntity->getOdataResourceType();
@@ -202,7 +205,7 @@ class MetadataProvider extends MetadataBaseProvider
         $objectModel = $this->extract($modelNames);
         $objectModel = $this->unify($objectModel);
         $this->verify($objectModel);
-        $this->imploment($objectModel);
+        $this->implement($objectModel);
         //dd($objectModel);
         $key = 'metadata';
         $this->handlePostBoot($isCaching, $hasCache, $key, $meta);
@@ -216,11 +219,9 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function register()
     {
-        $this->app->singleton(
-            'metadata', function ($app) {
+        $this->app->singleton('metadata', function ($app) {
             return new SimpleMetadataProvider('Data', self::$metaNAMESPACE);
-        }
-        );
+        });
     }
 
     /**
@@ -256,7 +257,7 @@ class MetadataProvider extends MetadataBaseProvider
         foreach ($modelNames as $name) {
             if (!$this->getRelationHolder()->hasClass($name)) {
                 $model = new $name();
-                $this->getRelationHolder()->addModel($model);
+                $this->getRelationHolder()->addEntity($model->extractGubbins());
             }
         }
 
