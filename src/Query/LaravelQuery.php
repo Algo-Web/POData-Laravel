@@ -2,26 +2,20 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
-use \POData\Common\ODataException;
 use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
-use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
-use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use POData\Common\InvalidOperationException;
-use POData\Providers\Expression\MySQLExpressionProvider;
-use POData\Providers\Expression\PHPExpressionProvider;
+use POData\Common\ODataException;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Query\IQueryProvider;
@@ -293,6 +287,7 @@ class LaravelQuery implements IQueryProvider
     }
     /**
      * Delete resource from a resource set.
+     *
      * @param ResourceSet $sourceResourceSet
      * @param object      $sourceEntityInstance
      *
@@ -327,7 +322,7 @@ class LaravelQuery implements IQueryProvider
      * @param object      $sourceEntityInstance The source entity instance
      * @param object      $data                 The New data for the entity instance.
      *
-     * returns object|null returns the newly created model if sucessful or null if model creation failed.
+     *                                          returns object|null returns the newly created model if sucessful or null if model creation failed.
      */
     public function createResourceforResourceSet(
         ResourceSet $resourceSet,
@@ -344,7 +339,8 @@ class LaravelQuery implements IQueryProvider
      * @param $sourceEntityInstance
      * @param $data
      * @param $class
-     * @param  string                    $verb
+     * @param  string $verb
+     *
      * @throws ODataException
      * @throws InvalidOperationException
      * @return array|mixed
@@ -409,8 +405,8 @@ class LaravelQuery implements IQueryProvider
     /**
      * @param ResourceSet $sourceResourceSet
      * @param $data
-     * @param $verb
-     * @param  Model|null                $source
+     * @param             $verb
+     * @param  Model|null $source
      * @throws InvalidOperationException
      * @throws ODataException
      * @return mixed
@@ -507,11 +503,12 @@ class LaravelQuery implements IQueryProvider
 
     /**
      * Create multiple new resources in a resource set.
+     *
      * @param ResourceSet $sourceResourceSet The entity set containing the entity to fetch
      * @param object[]    $data              The new data for the entity instance
      *
      * @return object[] returns the newly created model if successful, or throws an exception if model creation failed
-     * @throw \Exception
+     * @throw  \Exception
      */
     public function createBulkResourceforResourceSet(
         ResourceSet $sourceResourceSet,
@@ -554,7 +551,7 @@ class LaravelQuery implements IQueryProvider
      * @param bool            $shouldUpdate         Should undefined values be updated or reset to default
      *
      * @return object[] the new resource value if it is assignable, or throw exception for null
-     * @throw \Exception
+     * @throw  \Exception
      */
     public function updateBulkResource(
         ResourceSet $sourceResourceSet,
@@ -766,8 +763,8 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * @param ResourceSet $sourceResourceSet
-     * @param array       $data
+     * @param ResourceSet           $sourceResourceSet
+     * @param array                 $data
      * @param $mapping
      * @param $pastVerb
      * @param  KeyDescriptor[]|null $keyDescriptor

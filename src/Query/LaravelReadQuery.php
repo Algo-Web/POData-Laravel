@@ -119,11 +119,13 @@ class LaravelReadQuery
             foreach ($parameters as $name => $line) {
                 $processed[$name] = ['direction' => $line['direction'], 'value' => $line['value']];
                 $sourceEntityInstance = $sourceEntityInstance
-                    ->orWhere(function ($query) use ($processed) {
-                        foreach ($processed as $key => $proc) {
-                            $query->where($key, $proc['direction'], $proc['value']);
+                    ->orWhere(
+                        function ($query) use ($processed) {
+                            foreach ($processed as $key => $proc) {
+                                $query->where($key, $proc['direction'], $proc['value']);
+                            }
                         }
-                    });
+                    );
                 // now we've handled the later-in-order segment for this key, drop it back to equality in prep
                 // for next key - same-in-order for processed keys and later-in-order for next
                 $processed[$name]['direction'] = '=';
@@ -279,6 +281,7 @@ class LaravelReadQuery
 
     /**
      * Common method for getResourceFromRelatedResourceSet() and getResourceFromResourceSet().
+     *
      * @param ResourceSet|null    $resourceSet
      * @param KeyDescriptor|null  $keyDescriptor
      * @param Model|Relation|null $sourceEntityInstance Starting point of query
@@ -408,7 +411,8 @@ class LaravelReadQuery
 
     /**
      * @param $sourceEntityInstance
-     * @param  null|mixed     $checkInstance
+     * @param  null|mixed $checkInstance
+     *
      * @throws ODataException
      */
     private function checkAuth($sourceEntityInstance, $checkInstance = null)
@@ -425,7 +429,7 @@ class LaravelReadQuery
 
     /**
      * @param $sourceEntityInstance
-     * @param  KeyDescriptor|null        $keyDescriptor
+     * @param  KeyDescriptor|null $keyDescriptor
      * @throws InvalidOperationException
      */
     private function processKeyDescriptor(&$sourceEntityInstance, KeyDescriptor $keyDescriptor = null)

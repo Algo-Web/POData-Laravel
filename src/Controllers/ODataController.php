@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Storage;
 use POData\OperationContext\ServiceHost as ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
 use POData\SimpleDataService as DataService;
-use voku\helper\AntiXSS;
 
 class ODataController extends BaseController
 {

@@ -436,12 +436,14 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level bag resource.
      *
-     * @param  QueryResult          &$BagValue     The bag object to be
-     *                                             written
-     * @param  string               $propertyName  The name of the
-     *                                             bag property
-     * @param  ResourceType         &$resourceType Describes the type of
-     *                                             bag object
+     * @param QueryResult  &$BagValue     The bag object to be
+     *                                    written
+     * @param string       $propertyName  The name of the
+     *                                    bag property
+     * @param ResourceType &$resourceType Describes the type of
+     *                                    bag object
+     *
+
      * @return ODataPropertyContent
      */
     public function writeTopLevelBagObject(QueryResult &$BagValue, $propertyName, ResourceType &$resourceType)
@@ -461,10 +463,10 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level primitive value.
      *
-     * @param  QueryResult          &$primitiveValue   The primitive value to be
-     *                                                 written
-     * @param  ResourceProperty     &$resourceProperty Resource property describing the
-     *                                                 primitive property to be written
+     * @param QueryResult      &$primitiveValue   The primitive value to be
+     *                                            written
+     * @param ResourceProperty &$resourceProperty Resource property describing the
+     *                                            primitive property to be written
      * @return ODataPropertyContent
      */
     public function writeTopLevelPrimitive(QueryResult &$primitiveValue, ResourceProperty &$resourceProperty = null)
@@ -732,8 +734,9 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Get next page link from the given entity instance.
      *
-     * @param  mixed          &$lastObject Last object serialized to be
-     *                                     used for generating $skiptoken
+     * @param mixed &$lastObject Last object serialized to be
+     *                           used for generating
+     *                           $skiptoken
      * @throws ODataException
      * @return string         for the link for next page
      */
@@ -950,9 +953,9 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param  ResourceType         $resourceType
-     * @param  object               $result
-     * @param  string|null          $propertyName
+     * @param  ResourceType $resourceType
+     * @param  object       $result
+     * @param  string|null  $propertyName
      * @return ODataPropertyContent
      */
     protected function writeComplexValue(ResourceType &$resourceType, &$result, $propertyName = null)

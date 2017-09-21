@@ -20,7 +20,8 @@ class ModelSerialiser
     /**
      * Serialise needed bits of supplied model, taking fast path where possible.
      *
-     * @param $model
+     * @param  $model
+     *
      * @return mixed
      */
     public function bulkSerialise($model)

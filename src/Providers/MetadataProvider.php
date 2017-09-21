@@ -152,12 +152,14 @@ class MetadataProvider extends MetadataBaseProvider
                 $odataEntity->addNamedStream($streamInfo);
                 continue;
             }
-            $meta->addPrimitiveProperty($odataEntity,
+            $meta->addPrimitiveProperty(
+                $odataEntity,
                 $field->getName(),
                 $field->getEdmFieldType(),
                 $field->getFieldType() == EntityFieldType::PRIMITIVE_BAG(),
                 $field->getDefaultValue(),
-                $field->getIsNullable());
+                $field->getIsNullable()
+            );
         }
     }
 
@@ -214,9 +216,11 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function register()
     {
-        $this->app->singleton('metadata', function ($app) {
+        $this->app->singleton(
+            'metadata', function ($app) {
             return new SimpleMetadataProvider('Data', self::$metaNAMESPACE);
-        });
+        }
+        );
     }
 
     /**
