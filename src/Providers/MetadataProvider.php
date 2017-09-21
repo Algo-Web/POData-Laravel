@@ -3,7 +3,6 @@
 namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
-use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType;
@@ -59,7 +58,8 @@ class MetadataProvider extends MetadataBaseProvider
 
     private function verify(Map $objectModel)
     {
-//dd($objectModel);
+        $failMessage = '';
+        $objectModel->isOK($failMessage);
     }
 
     private function imploment(Map $objectModel)

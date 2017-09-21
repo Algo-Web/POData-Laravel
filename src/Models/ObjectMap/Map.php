@@ -61,4 +61,11 @@ class Map
     {
         return $this->assocations;
     }
+
+    public function isOK(&$msg)
+    {
+        foreach ($this->Entities as $entity) {
+            $entity->isOK($msg);
+        }
+    }
 }

@@ -188,4 +188,35 @@ class EntityGubbins
         $this->associations[$propertyName] = $association;
     }
 
+    private function getFieldNames()
+    {
+        $fieldNames = [];
+        foreach ($this->fields as $field) {
+            $fieldNames[] = $field->getName();
+        }
+        return $fieldNames;
+    }
+
+    private function getAssocationNames()
+    {
+        if (empty($this->stubs)) {
+            return [];
+        }
+        $assocationNames = [];
+        foreach ($this->stubs as $stub) {
+            $assocationNames[] = $stub->getRelationName();
+        }
+        return $assocationNames;
+    }
+
+    public function isOK(&$msg)
+    {
+        $fieldNames = $this->getFieldNames();
+        $associationNames = $this->getAssocationNames();
+        $intersection = array_intersect($fieldNames, $associationNames);
+        if (0 !== count($intersection)) {
+            dd($intersection);
+        }
+    }
+
 }
