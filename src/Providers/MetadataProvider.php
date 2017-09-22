@@ -237,7 +237,7 @@ class MetadataProvider extends MetadataBaseProvider
                 case AssociationType::NULL_ONE_TO_MANY():
                 case AssociationType::ONE_TO_MANY():
                     if (!$isDependentAdded) {
-                        $meta->addResourceReferenceProperty($dependentType, $dependentProp, $principalSet, true, false);
+                        $meta->addResourceSetReferenceProperty($dependentType, $dependentProp, $principalSet);
                     }
                     break;
                 case AssociationType::MANY_TO_MANY():
