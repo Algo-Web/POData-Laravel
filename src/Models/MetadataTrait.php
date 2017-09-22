@@ -15,9 +15,6 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\App as App;
-use POData\Providers\Metadata\ResourceEntityType;
-use POData\Providers\Metadata\ResourceStreamInfo;
 use POData\Providers\Metadata\Type\EdmPrimitiveType;
 
 trait MetadataTrait
@@ -136,106 +133,6 @@ trait MetadataTrait
             return ($name);
         }
         return ($endpoint);
-    }
-
-    /*
-     * Assemble this model's OData metadata as xml schema
-     *
-     * @return ResourceEntityType
-     */
-    public function getXmlSchema()
-    {
-        $raw = $this->metadata();
-        if ([] == $raw) {
-            return null;
-        }
-
-        $metadata = App::make('metadata');
-
-        $isKnown = $this->isKnownPolymorphSide();
-        $isAbstract = false;
-        if ($isKnown) {
-            $baseType = $metadata->resolveResourceType('polyMorphicPlaceholder');
-            assert($baseType instanceof ResourceEntityType);
-            assert($baseType->isAbstract());
-            $isAbstract = true;
-        } else {
-            $baseType = null;
-        }
-
-        $reflec = new \ReflectionClass(get_class($this));
-        $complex = $metadata->addEntityType($reflec, $reflec->getShortName(), false, $baseType);
-        $keyName = $this->getKeyName();
-
-        if (null !== $keyName && !$isAbstract) {
-            $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);
-        }
-        assert(0 < count($complex->getKeyProperties()), get_class($this) . ' has no effective keys');
-
-        foreach ($raw as $key => $secret) {
-            if ($key == $keyName) {
-                continue;
-            }
-            if ($secret['type'] == 'blob') {
-                $complex->setMediaLinkEntry(true);
-                $streamInfo = new ResourceStreamInfo($key);
-                assert($complex->isMediaLinkEntry());
-                $complex->addNamedStream($streamInfo);
-                continue;
-            }
-            $nullable = $secret['nullable'];
-            $default = $secret['default'];
-            // tag as isBag?
-            $metadata->addPrimitiveProperty(
-                $complex,
-                $key,
-                $this->mapping[$secret['type']],
-                false,
-                $default,
-                $nullable
-            );
-        }
-
-        return $complex;
-    }
-
-    /**
-     * @param $entityTypes
-     * @param $resourceSets
-     *
-     * @return array
-     */
-    public function hookUpRelationships($entityTypes, $resourceSets)
-    {
-        assert(is_array($entityTypes) && is_array($resourceSets), 'Both entityTypes and resourceSets must be arrays');
-        $metadata = App::make('metadata');
-        $rel = $this->getRelationshipsFromMethods();
-        $thisClass = get_class($this);
-        $thisInTypes = array_key_exists($thisClass, $entityTypes);
-        $thisInSets = array_key_exists($thisClass, $resourceSets);
-
-        if (!($thisInSets && $thisInTypes)) {
-            return $rel;
-        }
-
-        $resourceType = $entityTypes[$thisClass];
-        // if $r is in $combined keys, then its in keyspaces of both $entityTypes and $resourceSets
-        $combinedKeys = array_intersect(array_keys($entityTypes), array_keys($resourceSets));
-        foreach ($rel['HasOne'] as $n => $r) {
-            $r = trim($r, '\\');
-            if (in_array($r, $combinedKeys)) {
-                $targResourceSet = $resourceSets[$r];
-                $metadata->addResourceReferenceProperty($resourceType, $n, $targResourceSet);
-            }
-        }
-        foreach ($rel['HasMany'] as $n => $r) {
-            $r = trim($r, '\\');
-            if (in_array($r, $combinedKeys)) {
-                $targResourceSet = $resourceSets[$r];
-                $metadata->addResourceSetReferenceProperty($resourceType, $n, $targResourceSet);
-            }
-        }
-        return $rel;
     }
 
     /**

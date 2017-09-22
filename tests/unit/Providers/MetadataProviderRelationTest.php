@@ -4,7 +4,6 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\MetadataProviderDummy;
-use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestCase;
 use AlgoWeb\PODataLaravel\Models\TestCastModel;
 use AlgoWeb\PODataLaravel\Models\TestGetterModel;
@@ -28,7 +27,6 @@ use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphTargetAlternate;
 use AlgoWeb\PODataLaravel\Models\TestMorphTargetChild;
 use AlgoWeb\PODataLaravel\Models\TestPolymorphicDualSource;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
@@ -602,9 +600,7 @@ class MetadataProviderRelationTest extends TestCase
 
         foreach ($classen as $className) {
             $testModel = new $className($metaRaw);
-            $testType = ($testModel->getXmlSchema());
             App::instance($className, $testModel);
-            $types[$className] = $testType;
         }
 
         $abstractSet = m::mock(ResourceSet::class);

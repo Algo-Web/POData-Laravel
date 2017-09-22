@@ -20,7 +20,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -41,7 +40,6 @@ use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
 use POData\UriProcessor\QueryProcessor\ExpressionParser\FilterInfo;
 use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
-use POData\UriProcessor\QueryProcessor\OrderByParser\OrderByInfo;
 use POData\UriProcessor\QueryProcessor\OrderByParser\OrderByPathSegment;
 use POData\UriProcessor\QueryProcessor\OrderByParser\OrderBySubPathSegment;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
@@ -768,10 +766,6 @@ class LaravelQueryTest extends TestCase
 
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
-        $fqModelName = TestModel::class;
-        $instance = $this->generateTestModelWithMetadata();
-        $type = $instance->getXmlSchema();
-        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
 
         $std = m::mock(IType::class);
@@ -840,10 +834,6 @@ class LaravelQueryTest extends TestCase
 
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
-        $fqModelName = TestModel::class;
-        $instance = $this->generateTestModelWithMetadata();
-        $type = $instance->getXmlSchema();
-        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
 
         $std = m::mock(IType::class);
@@ -882,10 +872,6 @@ class LaravelQueryTest extends TestCase
 
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
-        $fqModelName = TestModel::class;
-        $instance = $this->generateTestModelWithMetadata();
-        $type = $instance->getXmlSchema();
-        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
 
         $std = m::mock(IType::class);
@@ -925,10 +911,6 @@ class LaravelQueryTest extends TestCase
 
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
-        $fqModelName = TestModel::class;
-        $instance = $this->generateTestModelWithMetadata();
-        $type = $instance->getXmlSchema();
-        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
@@ -989,10 +971,6 @@ class LaravelQueryTest extends TestCase
 
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
-        $fqModelName = TestModel::class;
-        $instance = $this->generateTestModelWithMetadata();
-        $type = $instance->getXmlSchema();
-        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
 
         $std = m::mock(IType::class);
@@ -1037,10 +1015,6 @@ class LaravelQueryTest extends TestCase
 
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
-        $fqModelName = TestModel::class;
-        $instance = $this->generateTestModelWithMetadata();
-        $type = $instance->getXmlSchema();
-        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
@@ -1081,10 +1055,6 @@ class LaravelQueryTest extends TestCase
 
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
-        $fqModelName = TestModel::class;
-        $instance = $this->generateTestModelWithMetadata();
-        $type = $instance->getXmlSchema();
-        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
@@ -1126,10 +1096,6 @@ class LaravelQueryTest extends TestCase
 
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
-        $fqModelName = TestModel::class;
-        $instance = $this->generateTestModelWithMetadata();
-        $type = $instance->getXmlSchema();
-        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
@@ -1170,10 +1136,6 @@ class LaravelQueryTest extends TestCase
 
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
-        $fqModelName = TestModel::class;
-        $instance = $this->generateTestModelWithMetadata();
-        $type = $instance->getXmlSchema();
-        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
@@ -1204,10 +1166,6 @@ class LaravelQueryTest extends TestCase
 
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
-        $fqModelName = TestModel::class;
-        $instance = $this->generateTestModelWithMetadata();
-        $type = $instance->getXmlSchema();
-        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
@@ -1248,10 +1206,6 @@ class LaravelQueryTest extends TestCase
 
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
-        $fqModelName = TestModel::class;
-        $instance = $this->generateTestModelWithMetadata();
-        $type = $instance->getXmlSchema();
-        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
@@ -1292,10 +1246,6 @@ class LaravelQueryTest extends TestCase
 
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
-        $fqModelName = TestModel::class;
-        $instance = $this->generateTestModelWithMetadata();
-        $type = $instance->getXmlSchema();
-        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         App::instance('metadata', $metaProv);
         App::instance($testName, $mockController);
 
@@ -1336,10 +1286,6 @@ class LaravelQueryTest extends TestCase
 
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
-        $fqModelName = TestModel::class;
-        $instance = $this->generateTestModelWithMetadata();
-        $type = $instance->getXmlSchema();
-        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         $container = m::mock(MetadataControllerContainer::class)->makePartial();
         $container->shouldReceive('getMetadata')->andReturn([])->once();
         App::instance('metadata', $metaProv);
@@ -1380,10 +1326,6 @@ class LaravelQueryTest extends TestCase
 
         $metaProv = new SimpleMetadataProvider('Data', 'Data');
 
-        $fqModelName = TestModel::class;
-        $instance = $this->generateTestModelWithMetadata();
-        $type = $instance->getXmlSchema();
-        $result = $metaProv->addResourceSet(strtolower($fqModelName), $type);
         $container = m::mock(MetadataControllerContainer::class)->makePartial();
         $container->shouldReceive('getMetadata')->andReturn([TestModel::class => ''])->once();
         $container->shouldReceive('getMapping')->withAnyArgs()->andReturn(null)->once();
