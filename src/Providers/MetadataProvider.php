@@ -6,7 +6,6 @@ use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
-use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
@@ -31,6 +30,32 @@ class MetadataProvider extends MetadataBaseProvider
     const POLYMORPHIC = 'polyMorphicPlaceholder';
     const POLYMORPHIC_PLURAL = 'polyMorphicPlaceholders';
 
+    protected static $afterExtract;
+    protected static $afterUnify;
+    protected static $afterVerify;
+    protected static $afterImploment;
+
+    public static function setAfterExtract(Callable $method)
+    {
+        self::$afterExtract = $method;
+    }
+
+    public static function setAfterUnify(Callable $method)
+    {
+        self::$afterUnify = $method;
+    }
+
+    public static function setAfterVerify(Callable $method)
+    {
+        self::$afterVerify = $method;
+    }
+
+    public static function setAfterImploment(Callable $method)
+    {
+        self::$afterImploment = $method;
+    }
+
+
     protected $relationHolder;
 
     public function __construct($app)
@@ -47,6 +72,10 @@ class MetadataProvider extends MetadataBaseProvider
             $modelInstance = App::make($modelName);
             $objectMap->addEntity($modelInstance->extractGubbins());
         }
+        if (null != self::$afterExtract) {
+            $func = self::$afterExtract;
+            $func($objectMap);
+        }
         return $objectMap;
     }
 
@@ -57,7 +86,10 @@ class MetadataProvider extends MetadataBaseProvider
             $mgh->addEntity($entity);
         }
         $ObjectMap->setAssociations($mgh->getRelations());
-        //TODO: sandi, look here.
+        if (null != self::$afterUnify) {
+            $func = self::$afterUnify;
+            $func($ObjectMap);
+        }
         return $ObjectMap;
     }
 
@@ -65,6 +97,10 @@ class MetadataProvider extends MetadataBaseProvider
     {
         $failMessage = '';
         $objectModel->isOK($failMessage);
+        if (null != self::$afterVerify) {
+            $func = self::$afterVerify;
+            $func($objectModel);
+        }
     }
 
     private function implement(Map $objectModel)
@@ -98,6 +134,10 @@ class MetadataProvider extends MetadataBaseProvider
             } elseif ($association instanceof AssociationPolymorphic) {
                 $this->implementAssociationsPolymorphic($objectModel, $association);
             }
+        }
+        if (null != self::$afterImploment) {
+            $func = self::$afterImploment;
+            $func($objectModel);
         }
     }
 
