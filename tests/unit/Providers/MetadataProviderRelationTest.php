@@ -545,14 +545,14 @@ class MetadataProviderRelationTest extends TestCase
 
         $rels = $foo->calculateRoundTripRelations();
         $expected = $foo->calculateRoundTripRelations();
-        $expected[0]['principalRSet'] = 'polyMorphicPlaceholder';
-        $expected[1]['principalRSet'] = 'polyMorphicPlaceholder';
-        $expected[2]['principalRSet'] = 'polyMorphicPlaceholder';
-        $expected[3]['principalRSet'] = 'polyMorphicPlaceholder';
-        $expected[0]['dependentRSet'] = 'polyMorphicPlaceholder';
-        $expected[1]['dependentRSet'] = 'polyMorphicPlaceholder';
-        $expected[2]['dependentRSet'] = 'polyMorphicPlaceholder';
-        $expected[3]['dependentRSet'] = 'polyMorphicPlaceholder';
+        $expected[4]['principalRSet'] = 'polyMorphicPlaceholder';
+        $expected[5]['principalRSet'] = 'polyMorphicPlaceholder';
+        $expected[6]['principalRSet'] = 'polyMorphicPlaceholder';
+        $expected[7]['principalRSet'] = 'polyMorphicPlaceholder';
+        $expected[4]['dependentRSet'] = 'polyMorphicPlaceholder';
+        $expected[5]['dependentRSet'] = 'polyMorphicPlaceholder';
+        $expected[6]['dependentRSet'] = 'polyMorphicPlaceholder';
+        $expected[7]['dependentRSet'] = 'polyMorphicPlaceholder';
 
         // if groups is empty, bail right back out - nothing to do
         // else - need to loop through rels
@@ -655,8 +655,9 @@ class MetadataProviderRelationTest extends TestCase
         $foo->boot();
 
         $metadata = App::make('metadata');
-        $targAssoc = 'TestMorphOneSource_morphTarget_polyMorphicPlaceholder';
+        $targAssoc = 'TestMorphOneSource_morphTarget_TestMorphTarget';
         $set = $metadata->resolveAssociationSet($targAssoc);
+        $this->assertTrue(isset($set));
         $this->assertTrue($set instanceof ResourceAssociationSet, get_class($set));
         $end1Concrete = $set->getEnd1()->getConcreteType();
         $this->assertTrue($end1Concrete instanceof ResourceEntityType);
@@ -696,8 +697,9 @@ class MetadataProviderRelationTest extends TestCase
         $foo->boot();
 
         $metadata = App::make('metadata');
-        $targAssoc = 'TestMorphManySource_morphTarget_polyMorphicPlaceholder';
+        $targAssoc = 'TestMorphManySource_morphTarget_TestMorphTarget';
         $set = $metadata->resolveAssociationSet($targAssoc);
+        $this->assertTrue(isset($set));
         $this->assertTrue($set instanceof ResourceAssociationSet, get_class($set));
         $end1Concrete = $set->getEnd1()->getConcreteType();
         $this->assertTrue($end1Concrete instanceof ResourceEntityType);
@@ -739,6 +741,7 @@ class MetadataProviderRelationTest extends TestCase
         $metadata = App::make('metadata');
         $targAssoc = 'TestMorphManyToManyTarget_manyTarget_polyMorphicPlaceholder';
         $set = $metadata->resolveAssociationSet($targAssoc);
+        $this->assertTrue(isset($set));
         $this->assertTrue($set instanceof ResourceAssociationSet, get_class($set));
         $end1Concrete = $set->getEnd1()->getConcreteType();
         $this->assertTrue($end1Concrete instanceof ResourceEntityType);

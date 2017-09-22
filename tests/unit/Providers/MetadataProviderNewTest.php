@@ -423,7 +423,7 @@ class MetadataProviderNewTest extends TestCase
         $expected = [];
         $expected[] = [
             'principalType' => TestMorphTarget::class,
-            'principalRSet' => 'polyMorphicPlaceholder',
+            'principalRSet' => TestMorphTarget::class,
             'principalMult' => '1',
             'principalProp' => 'monomorphicParent',
             'dependentType' => TestMonomorphicParentOfMorphTarget::class,
@@ -441,7 +441,7 @@ class MetadataProviderNewTest extends TestCase
         }
 
         $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
-        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
         $cache->shouldReceive('forget')->andReturn(null);
         Cache::swap($cache);

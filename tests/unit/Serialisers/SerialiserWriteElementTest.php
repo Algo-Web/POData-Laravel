@@ -701,6 +701,11 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $link2->isExpanded = true;
         $link2->expandedResult = $feed;
 
+        $actual = $ironic->writeTopLevelElement($result);
+        $this->assertEquals(2, count($actual->links));
+        $isFirst = 'manySource' == $actual->links[0]->title;
+        $index = $isFirst ? 0 : 1;
+
         $expected = new ODataEntry();
         $expected->id = 'http://localhost/odata.svc/TestMonomorphicSources(id=1)';
         $expected->title = new ODataTitle('TestMonomorphicSource');
@@ -710,16 +715,15 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $expected->editLink->title = 'TestMonomorphicSource';
         $expected->type = new ODataCategory('TestMonomorphicSource');
         $expected->propertyContent = $propContent;
-        $expected->links = [$link1, $link2];
+        $expected->links = !$isFirst ? [$link1, $link2] : [$link2, $link1];
         $expected->isMediaLinkEntry = false;
         $expected->resourceSetName = 'TestMonomorphicSources';
         $expected->updated = '2017-01-01T00:00:00+00:00';
         $expected->baseURI = 'http://localhost/odata.svc/';
 
-        $actual = $ironic->writeTopLevelElement($result);
         // not too worried about the TestMonomorphicTarget links, so zeroing them out here
-        $actual->links[1]->expandedResult->entries[0]->links = [];
-        $actual->links[1]->expandedResult->entries[1]->links = [];
+        $actual->links[$index]->expandedResult->entries[0]->links = [];
+        $actual->links[$index]->expandedResult->entries[1]->links = [];
         $this->assertEquals($expected, $actual);
     }
 

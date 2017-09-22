@@ -132,7 +132,6 @@ class MetadataGubbinsHolder
             }
         }
         $result = array_merge($monoAssoc, $polyAssoc);
-        shuffle($result);
 
         return $result;
     }
