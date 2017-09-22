@@ -204,12 +204,17 @@ class EntityGubbins
                     throw new \InvalidArgumentException('Association cannot be connected to this entity');
                 }
             } else {
+                $comp = function (AssociationStubBase $a, AssociationStubBase $b) {
+                    return $a->compare($b);
+                };
                 $stubs = $association->getLast();
-                $inter = array_intersect($stubs, $this->stubs);
+                assert(is_array($stubs));
+                assert(is_array($this->stubs));
+                $inter = array_uintersect(array_values($stubs), array_values($this->stubs), $comp);
                 if (1 !== count($inter)) {
                     throw new \InvalidArgumentException('Association cannot be connected to this entity');
                 }
-                $stub = $inter[0];
+                $stub = array_values($inter)[0];
             }
             $propertyName = $stub->getRelationName();
         }

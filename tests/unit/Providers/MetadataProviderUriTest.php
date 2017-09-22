@@ -329,10 +329,11 @@ class MetadataProviderUriTest extends TestCase
             $this->assertArrayHasKey('AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate', $entities);
             $this->assertArrayHasKey('AlgoWeb\PODataLaravel\Models\TestMorphTarget', $entities);
             $morphTarget = $entities['AlgoWeb\PODataLaravel\Models\TestMorphTarget'];
-            $MorphManySourceAlternate = $entities['AlgoWeb\PODataLaravel\Models\TestMorphTarget'];
+            $MorphManySourceAlternate = $entities['AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate'];
             $morphTargetStubs = $morphTarget->getStubs();
+            $this->assertEquals(4, count($morphTargetStubs));
             $MorphManySourceAlternateStubs = $MorphManySourceAlternate->getStubs();
-            dd($objectMap->getEntities()['AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate']);
+            $this->assertEquals(1, count($MorphManySourceAlternateStubs));
         });
         $app = App::make('app');
         $foo = new MetadataProviderDummy($app);

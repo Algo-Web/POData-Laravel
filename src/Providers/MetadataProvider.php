@@ -33,26 +33,26 @@ class MetadataProvider extends MetadataBaseProvider
     protected static $afterExtract;
     protected static $afterUnify;
     protected static $afterVerify;
-    protected static $afterImploment;
+    protected static $afterImplement;
 
-    public static function setAfterExtract(Callable $method)
+    public static function setAfterExtract(callable $method)
     {
         self::$afterExtract = $method;
     }
 
-    public static function setAfterUnify(Callable $method)
+    public static function setAfterUnify(callable $method)
     {
         self::$afterUnify = $method;
     }
 
-    public static function setAfterVerify(Callable $method)
+    public static function setAfterVerify(callable $method)
     {
         self::$afterVerify = $method;
     }
 
-    public static function setAfterImploment(Callable $method)
+    public static function setAfterImplement(callable $method)
     {
-        self::$afterImploment = $method;
+        self::$afterImplement = $method;
     }
 
 
@@ -135,8 +135,8 @@ class MetadataProvider extends MetadataBaseProvider
                 $this->implementAssociationsPolymorphic($objectModel, $association);
             }
         }
-        if (null != self::$afterImploment) {
-            $func = self::$afterImploment;
+        if (null != self::$afterImplement) {
+            $func = self::$afterImplement;
             $func($objectModel);
         }
     }
@@ -494,6 +494,10 @@ class MetadataProvider extends MetadataBaseProvider
     {
         self::$relationCache = null;
         self::$isBooted = false;
+        self::$afterExtract = null;
+        self::$afterUnify = null;
+        self::$afterVerify = null;
+        self::$afterImplement = null;
     }
 
     /**
