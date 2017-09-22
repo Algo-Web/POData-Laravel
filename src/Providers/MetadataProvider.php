@@ -330,7 +330,7 @@ class MetadataProvider extends MetadataBaseProvider
 
         foreach ($modelNames as $name) {
             if (!$this->getRelationHolder()->hasClass($name)) {
-                $model = new $name();
+                $model = App::make($name);
                 $gubbinz = $model->extractGubbins();
                 $this->getRelationHolder()->addEntity($gubbinz);
             }

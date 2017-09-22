@@ -390,13 +390,9 @@ class MetadataProviderNewTest extends TestCase
             App::instance($className, $testModel);
         }
 
-
-        $holder = new MetadataGubbinsHolder();
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getRelationHolder')->andReturn($holder);
-        $foo->shouldReceive('getCandidateModels')->andReturn($classen);
-        $foo->shouldReceive('getEntityTypesAndResourceSets')->never();
+        $foo = new MetadataProviderDummy(App::make('app'));
         $foo->reset();
+        $foo->setCandidateModels($classen);
         $foo->boot();
 
         $actual = $foo->getRepairedRoundTripRelations();

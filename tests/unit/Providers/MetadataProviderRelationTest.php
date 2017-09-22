@@ -6,6 +6,9 @@ use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\MetadataProviderDummy;
 use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
 use AlgoWeb\PODataLaravel\Models\TestCase;
+use AlgoWeb\PODataLaravel\Models\TestCastModel;
+use AlgoWeb\PODataLaravel\Models\TestGetterModel;
+use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicChildOfMorphTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
@@ -16,6 +19,7 @@ use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate;
+use AlgoWeb\PODataLaravel\Models\TestMorphManySourceWithUnexposedTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
@@ -38,6 +42,26 @@ class MetadataProviderRelationTest extends TestCase
 {
     public function testMonomorphicSourceAndTarget()
     {
+        $metaRaw = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $classen = [ TestCastModel::class, TestGetterModel::class, TestModel::class,
+            TestMonomorphicChildOfMorphTarget::class, TestMonomorphicManySource::class, TestMonomorphicTarget::class,
+            TestMonomorphicManyTarget::class, TestMonomorphicOneAndManySource::class,
+            TestMonomorphicOneAndManyTarget::class, TestMonomorphicParentOfMorphTarget::class,
+            TestMonomorphicSource::class, TestMorphOneSource::class, TestMorphManySourceAlternate::class,
+            TestMorphManySource::class, TestMorphManySourceWithUnexposedTarget::class, TestMorphManyToManySource::class,
+            TestMorphManyToManyTarget::class, TestMorphOneSourceAlternate::class, TestMorphTarget::class,
+            TestMorphTargetAlternate::class, TestMorphTargetChild::class, TestPolymorphicDualSource::class];
+
+        foreach ($classen as $className) {
+            $testModel = new $className($metaRaw, null);
+            App::instance($className, $testModel);
+        }
+
         $app = App::make('app');
         $foo = new MetadataProvider($app);
 
@@ -76,7 +100,7 @@ class MetadataProviderRelationTest extends TestCase
         ];
         $expected[] = [
             'principalType' => TestMorphManyToManySource::class,
-            'principalRSet' => TestMorphManyToManySource::class,
+            'principalRSet' => 'polyMorphicPlaceholder',
             'principalMult' => '*',
             'principalProp' => 'manySource',
             'dependentType' => TestMorphManyToManyTarget::class,
@@ -106,7 +130,7 @@ class MetadataProviderRelationTest extends TestCase
         ];
         $expected[] = [
             'principalType' => TestMorphManySource::class,
-            'principalRSet' => TestMorphManySource::class,
+            'principalRSet' => 'polyMorphicPlaceholder',
             'principalMult' => '*',
             'principalProp' => 'morphTarget',
             'dependentType' => TestMorphTarget::class,
@@ -116,7 +140,7 @@ class MetadataProviderRelationTest extends TestCase
         ];
         $expected[] = [
             'principalType' => TestMorphManySourceAlternate::class,
-            'principalRSet' => TestMorphManySourceAlternate::class,
+            'principalRSet' => 'polyMorphicPlaceholder',
             'principalMult' => '*',
             'principalProp' => 'morphTarget',
             'dependentType' => TestMorphTarget::class,
@@ -126,7 +150,7 @@ class MetadataProviderRelationTest extends TestCase
         ];
         $expected[] = [
             'principalType' => TestMorphOneSource::class,
-            'principalRSet' => TestMorphOneSource::class,
+            'principalRSet' => 'polyMorphicPlaceholder',
             'principalMult' => '0..1',
             'principalProp' => 'morphTarget',
             'dependentType' => TestMorphTarget::class,
@@ -136,7 +160,7 @@ class MetadataProviderRelationTest extends TestCase
         ];
         $expected[] = [
             'principalType' => TestMorphOneSourceAlternate::class,
-            'principalRSet' => TestMorphOneSourceAlternate::class,
+            'principalRSet' => 'polyMorphicPlaceholder',
             'principalMult' => '0..1',
             'principalProp' => 'morphTarget',
             'dependentType' => TestMorphTarget::class,
@@ -146,7 +170,7 @@ class MetadataProviderRelationTest extends TestCase
         ];
         $expected[] = [
             'principalType' => TestPolymorphicDualSource::class,
-            'principalRSet' => TestPolymorphicDualSource::class,
+            'principalRSet' => 'polyMorphicPlaceholder',
             'principalMult' => '0..1',
             'principalProp' => 'morphAlternate',
             'dependentType' => TestMorphTargetAlternate::class,
@@ -156,7 +180,7 @@ class MetadataProviderRelationTest extends TestCase
         ];
         $expected[] = [
             'principalType' => TestPolymorphicDualSource::class,
-            'principalRSet' => TestPolymorphicDualSource::class,
+            'principalRSet' => 'polyMorphicPlaceholder',
             'principalMult' => '0..1',
             'principalProp' => 'morphTarget',
             'dependentType' => TestMorphTarget::class,
@@ -171,7 +195,7 @@ class MetadataProviderRelationTest extends TestCase
             'principalMult' => '1',
             'principalProp' => 'morph',
             'dependentType' => TestMorphTarget::class,
-            'dependentRSet' => TestMorphTarget::class,
+            'dependentRSet' => 'polyMorphicPlaceholder',
             'dependentMult' => '0..1',
             'dependentProp' => 'childMorph'
         ];
@@ -200,6 +224,7 @@ class MetadataProviderRelationTest extends TestCase
         $this->assertTrue(is_array($actual), 'Bidirectional relations result not an array');
         $counter = 0;
         $this->assertEquals(2 * count($expected), count($actual));
+
         foreach ($expected as $forward) {
             $this->assertTrue(in_array($forward, $actual), $counter);
             $reverse = $forward;
