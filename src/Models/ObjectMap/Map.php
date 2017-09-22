@@ -111,5 +111,10 @@ class Map
     private function addAssociationPolymorphic(AssociationPolymorphic $association)
     {
         $firstClass = $this->Entities[$association->getFirst()->getBaseType()];
+        $firstClass->addAssociation($association);
+        foreach ($association->getLast() as $last) {
+            $secondClass = $this->Entities[$last->getBaseType()];
+            $secondClass->addAssociation($association, false);
+        }
     }
 }
