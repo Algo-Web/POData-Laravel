@@ -81,15 +81,8 @@ class EntityGubbinsTest extends TestCase
     public function testSetEmptyStubsArray()
     {
         $foo = new EntityGubbins();
-        $expected = 'Stubs array must not be empty';
-        $actual = null;
-
-        try {
-            $foo->setStubs([]);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
+        $foo->setStubs([]);
+        $this->assertEquals(0, count($foo->getStubs()));
     }
 
     public function testSetBadStubsArray()

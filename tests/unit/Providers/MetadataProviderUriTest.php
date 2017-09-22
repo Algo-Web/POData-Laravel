@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataProviderDummy;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use AlgoWeb\PODataLaravel\Models\TestCase;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
@@ -339,11 +340,15 @@ class MetadataProviderUriTest extends TestCase
             $this->assertEquals(1, count($morphTargetAssoc));
             foreach ($morphTargetAssoc as $key => $assoc) {
                 $this->assertTrue($assoc instanceof AssociationPolymorphic);
+                $assocTypes = $assoc->getAssociationType();
+                $this->assertEquals(AssociationType::ONE_TO_MANY, $assocTypes[0]->getValue());
             }
             $morphManyAssoc = $MorphManySourceAlternate->getAssociations();
             $this->assertEquals(1, count($morphManyAssoc));
             foreach ($morphManyAssoc as $key => $assoc) {
                 $this->assertTrue($assoc instanceof AssociationPolymorphic);
+                $assocTypes = $assoc->getAssociationType();
+                $this->assertEquals(AssociationType::ONE_TO_MANY, $assocTypes[0]->getValue());
             }
         });
         $app = App::make('app');

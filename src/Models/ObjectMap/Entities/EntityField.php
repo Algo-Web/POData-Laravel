@@ -191,7 +191,7 @@ class EntityField
     /**
      * @var array
      */
-    private static $primativeToEdmMapping = [
+    private static $primitiveToEdmMapping = [
         EntityFieldPrimitiveType::INTEGER => EdmPrimitiveType::INT32,
         EntityFieldPrimitiveType::STRING => EdmPrimitiveType::STRING,
         EntityFieldPrimitiveType::DATETIME => EdmPrimitiveType::DATETIME,
@@ -210,9 +210,8 @@ class EntityField
     private function PrimitiveTypeToEdmType(EntityFieldPrimitiveType $primitiveType)
     {
         $value = $primitiveType->getValue();
-        return self::$primativeToEdmMapping[$value];
-        return in_array($value, self::$primativeToEdmMapping) ?
-            self::$primativeToEdmMapping[$value] :
+        return in_array($value, self::$primitiveToEdmMapping) ?
+            self::$primitiveToEdmMapping[$value] :
             EdmPrimitiveType::STRING;
     }
 }

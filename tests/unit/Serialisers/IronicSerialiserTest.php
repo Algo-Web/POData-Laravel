@@ -434,7 +434,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $propContent->properties['name']->name = 'name';
         $propContent->properties['alternate_id']->name = 'alternate_id';
         $propContent->properties['name']->typeName = 'Edm.String';
-        $propContent->properties['alternate_id']->typeName = 'Edm.Int32';
+        $propContent->properties['alternate_id']->typeName = 'Edm.String';
         $propContent->properties['name']->value = 'Hammer, M.C.';
 
         $odataLink = new ODataLink();
