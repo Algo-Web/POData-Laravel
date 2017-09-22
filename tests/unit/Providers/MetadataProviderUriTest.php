@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataProviderDummy;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use AlgoWeb\PODataLaravel\Models\TestCase;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
@@ -334,11 +335,21 @@ class MetadataProviderUriTest extends TestCase
             $this->assertEquals(4, count($morphTargetStubs));
             $MorphManySourceAlternateStubs = $MorphManySourceAlternate->getStubs();
             $this->assertEquals(1, count($MorphManySourceAlternateStubs));
+            $morphTargetAssoc = $morphTarget->getAssociations();
+            $this->assertEquals(1, count($morphTargetAssoc));
+            foreach ($morphTargetAssoc as $key => $assoc) {
+                $this->assertTrue($assoc instanceof AssociationPolymorphic);
+            }
+            $morphManyAssoc = $MorphManySourceAlternate->getAssociations();
+            $this->assertEquals(1, count($morphManyAssoc));
+            foreach ($morphManyAssoc as $key => $assoc) {
+                $this->assertTrue($assoc instanceof AssociationPolymorphic);
+            }
         });
         $app = App::make('app');
         $foo = new MetadataProviderDummy($app);
         $foo->setCandidateModels($classen);
-        $foo->boot();
+        $foo->boot(false);
 
         $meta = App::make('metadata');
 

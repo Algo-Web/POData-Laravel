@@ -249,6 +249,14 @@ class EntityGubbins
     }
 
     /**
+     * @return Associations\Association[]
+     */
+    public function getAssociations()
+    {
+        return $this->associations;
+    }
+
+    /**
      * @return bool
      */
     public function isOK()
@@ -257,7 +265,8 @@ class EntityGubbins
         $associationNames = $this->getAssocationNames();
         $intersection = array_intersect($fieldNames, $associationNames);
         if (0 !== count($intersection)) {
-            dd($intersection);
+            return false;
         }
+        return true;
     }
 }
