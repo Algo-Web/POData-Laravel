@@ -14,6 +14,9 @@ class AssociationStubMonomorphic extends AssociationStubBase
         if (!parent::isCompatible($otherStub)) {
             return false;
         }
-        return $this->getForeignField() === $otherStub->getKeyField();
+        return ($this->getTargType() === $otherStub->getBaseType())
+               && ($this->getBaseType() === $otherStub->getTargType())
+               && ($this->getForeignField() === $otherStub->getKeyField())
+               && ($this->getKeyField() === $otherStub->getForeignField());
     }
 }

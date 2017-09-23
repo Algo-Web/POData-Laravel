@@ -67,6 +67,13 @@ class MetadataGubbinsHolder
         $associations = [];
         foreach ($stubs as $relName => $stub) {
             $others = $this->getRelationsByRelationName($className, $relName);
+            if ($stub instanceof AssociationStubMonomorphic) {
+                assert(
+                    1 >= count($others),
+                    'Monomorphic relation stub on '. $className . ' ' . $relName
+                    . ' should point to at most 1 other stub'
+                );
+            }
             if (1 === count($others)) {
                 $others = $others[0];
                 $assoc = new AssociationMonomorphic();
