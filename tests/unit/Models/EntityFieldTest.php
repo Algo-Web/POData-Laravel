@@ -3,7 +3,9 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
+use POData\Providers\Metadata\Type\EdmPrimitiveType;
 
 class EntityFieldTest extends TestCase
 {
@@ -40,5 +42,14 @@ class EntityFieldTest extends TestCase
         $foo->setIsKeyField($expectedName);
         $actualIsKeyField = $foo->getIsKeyField();
         $this->assertEquals($expectedIsKeyField, $actualIsKeyField);
+    }
+
+    public function testSetKnownPrimitiveType()
+    {
+        $type = EntityFieldPrimitiveType::INTEGER();
+        $foo = new EntityField();
+        $foo->setPrimitiveType($type);
+        $result = $foo->getEdmFieldType();
+        $this->assertEquals(EdmPrimitiveType::INT32, $result);
     }
 }

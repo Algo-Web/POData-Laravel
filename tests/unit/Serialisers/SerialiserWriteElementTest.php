@@ -511,7 +511,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $propContent->properties = ['id' => new ODataProperty(), 'name' => new ODataProperty()];
         $propContent->properties['id']->name = 'id';
         $propContent->properties['name']->name = 'name';
-        $propContent->properties['id']->typeName = 'Edm.String';
+        $propContent->properties['id']->typeName = 'Edm.Int32';
         $propContent->properties['name']->typeName = 'Edm.String';
         $propContent->properties['id']->value = '1';
         $propContent->properties['name']->value = 'Name';
@@ -520,14 +520,14 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $link->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/manySource';
         $link->title = 'manySource';
         $link->type = 'application/atom+xml;type=feed';
-        $link->url = 'TestMonomorphicManySources(id=\'1\')/manySource';
+        $link->url = 'TestMonomorphicManySources(id=1)/manySource';
 
         $expected = new ODataEntry();
-        $expected->id = 'http://localhost/odata.svc/TestMonomorphicManySources(id=\'1\')';
+        $expected->id = 'http://localhost/odata.svc/TestMonomorphicManySources(id=1)';
         $expected->title = new ODataTitle('TestMonomorphicManySource');
-        $expected->editLink = 'TestMonomorphicManySources(id=\'1\')';
+        $expected->editLink = 'TestMonomorphicManySources(id=1)';
         $expected->editLink = new ODataLink();
-        $expected->editLink->url = 'TestMonomorphicManySources(id=\'1\')';
+        $expected->editLink->url = 'TestMonomorphicManySources(id=1)';
         $expected->editLink->name = 'edit';
         $expected->editLink->title = 'TestMonomorphicManySource';
         $expected->type = new ODataCategory('TestMonomorphicManySource');
@@ -625,7 +625,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $propContent->properties = ['id' => new ODataProperty(), 'name' => new ODataProperty()];
         $propContent->properties['id']->name = 'id';
         $propContent->properties['name']->name = 'name';
-        $propContent->properties['id']->typeName = 'Edm.String';
+        $propContent->properties['id']->typeName = 'Edm.Int32';
         $propContent->properties['name']->typeName = 'Edm.String';
         $propContent->properties['id']->value = '1';
         $propContent->properties['name']->value = 'Name';
@@ -634,7 +634,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $feed1Content->properties = ['id' => new ODataProperty(), 'name' => new ODataProperty()];
         $feed1Content->properties['id']->name = 'id';
         $feed1Content->properties['name']->name = 'name';
-        $feed1Content->properties['id']->typeName = 'Edm.String';
+        $feed1Content->properties['id']->typeName = 'Edm.Int32';
         $feed1Content->properties['name']->typeName = 'Edm.String';
         $feed1Content->properties['id']->value = '1';
         $feed1Content->properties['name']->value = 'Inspector';
@@ -643,16 +643,16 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $feed2Content->properties = ['id' => new ODataProperty(), 'name' => new ODataProperty()];
         $feed2Content->properties['id']->name = 'id';
         $feed2Content->properties['name']->name = 'name';
-        $feed2Content->properties['id']->typeName = 'Edm.String';
+        $feed2Content->properties['id']->typeName = 'Edm.Int32';
         $feed2Content->properties['name']->typeName = 'Edm.String';
         $feed2Content->properties['id']->value = '2';
         $feed2Content->properties['name']->value = 'Gadget';
 
         $feed1 = new ODataEntry();
-        $feed1->id = 'http://localhost/odata.svc/TestMonomorphicTargets(id=\'1\')';
+        $feed1->id = 'http://localhost/odata.svc/TestMonomorphicTargets(id=1)';
         $feed1->title = new ODataTitle('TestMonomorphicTarget');
         $feed1->editLink = new ODataLink();
-        $feed1->editLink->url = 'TestMonomorphicTargets(id=\'1\')';
+        $feed1->editLink->url = 'TestMonomorphicTargets(id=1)';
         $feed1->editLink->name = 'edit';
         $feed1->editLink->title = 'TestMonomorphicTarget';
         $feed1->type = new ODataCategory('TestMonomorphicTarget');
@@ -662,10 +662,10 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $feed1->updated = '2017-01-01T00:00:00+00:00';
 
         $feed2 = new ODataEntry();
-        $feed2->id = 'http://localhost/odata.svc/TestMonomorphicTargets(id=\'2\')';
+        $feed2->id = 'http://localhost/odata.svc/TestMonomorphicTargets(id=2)';
         $feed2->title = new ODataTitle('TestMonomorphicTarget');
         $feed2->editLink = new ODataLink();
-        $feed2->editLink->url = 'TestMonomorphicTargets(id=\'2\')';
+        $feed2->editLink->url = 'TestMonomorphicTargets(id=2)';
         $feed2->editLink->name = 'edit';
         $feed2->editLink->title = 'TestMonomorphicTarget';
         $feed2->type = new ODataCategory('TestMonomorphicTarget');
@@ -677,10 +677,10 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $feedLink = new ODataLink();
         $feedLink->name = 'self';
         $feedLink->title = 'manySource';
-        $feedLink->url = 'TestMonomorphicSources(id=\'1\')/manySource';
+        $feedLink->url = 'TestMonomorphicSources(id=1)/manySource';
 
         $feed = new ODataFeed();
-        $feed->id = 'http://localhost/odata.svc/TestMonomorphicSources(id=\'1\')/manySource';
+        $feed->id = 'http://localhost/odata.svc/TestMonomorphicSources(id=1)/manySource';
         $feed->title = new ODataTitle('manySource');
         $feed->selfLink = $feedLink;
         $feed->entries = [$feed1, $feed2];
@@ -690,13 +690,13 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $link1->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/oneSource';
         $link1->title = 'oneSource';
         $link1->type = 'application/atom+xml;type=entry';
-        $link1->url = 'TestMonomorphicSources(id=\'1\')/oneSource';
+        $link1->url = 'TestMonomorphicSources(id=1)/oneSource';
 
         $link2 = new ODataLink();
         $link2->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/manySource';
         $link2->title = 'manySource';
         $link2->type = 'application/atom+xml;type=feed';
-        $link2->url = 'TestMonomorphicSources(id=\'1\')/manySource';
+        $link2->url = 'TestMonomorphicSources(id=1)/manySource';
         $link2->isCollection = true;
         $link2->isExpanded = true;
         $link2->expandedResult = $feed;
@@ -707,10 +707,10 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $index = $isFirst ? 0 : 1;
 
         $expected = new ODataEntry();
-        $expected->id = 'http://localhost/odata.svc/TestMonomorphicSources(id=\'1\')';
+        $expected->id = 'http://localhost/odata.svc/TestMonomorphicSources(id=1)';
         $expected->title = new ODataTitle('TestMonomorphicSource');
         $expected->editLink = new ODataLink();
-        $expected->editLink->url = 'TestMonomorphicSources(id=\'1\')';
+        $expected->editLink->url = 'TestMonomorphicSources(id=1)';
         $expected->editLink->name = 'edit';
         $expected->editLink->title = 'TestMonomorphicSource';
         $expected->type = new ODataCategory('TestMonomorphicSource');
