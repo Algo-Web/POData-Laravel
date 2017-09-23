@@ -44,6 +44,11 @@ class Map
     {
         $this->Entities = [];
         foreach ($entities as $entity) {
+            if (!$entity instanceof EntityGubbins) {
+                throw new \InvalidArgumentException('Entities array must contain only EntityGubbins objects');
+            }
+        }
+        foreach ($entities as $entity) {
             $this->Entities[$entity->getClassName()] = $entity;
         }
     }
@@ -71,7 +76,7 @@ class Map
         } elseif ($association instanceof AssociationPolymorphic) {
             $this->addAssociationPolymorphic($association);
         } else {
-            assert(false, 'Association type not yet handled');
+            throw new \InvalidArgumentException('Association type not yet handled');
         }
         $this->associations[] = $association;
     }

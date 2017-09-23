@@ -224,7 +224,7 @@ class EntityGubbins
     /**
      * @return String[]
      */
-    private function getFieldNames()
+    protected function getFieldNames()
     {
         $fieldNames = [];
         foreach ($this->fields as $field) {
@@ -236,7 +236,7 @@ class EntityGubbins
     /**
      * @return String[]
      */
-    private function getAssocationNames()
+    protected function getAssociationNames()
     {
         if (empty($this->stubs)) {
             return [];
@@ -262,7 +262,7 @@ class EntityGubbins
     public function isOK()
     {
         $fieldNames = $this->getFieldNames();
-        $associationNames = $this->getAssocationNames();
+        $associationNames = $this->getAssociationNames();
         $intersection = array_intersect($fieldNames, $associationNames);
         if (0 !== count($intersection)) {
             return false;

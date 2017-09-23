@@ -5,6 +5,8 @@ namespace AlgoWeb\PODataLaravel\Models;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
+use POData\Providers\Metadata\ResourceEntityType;
+use Mockery as m;
 
 class EntityGubbinsTest extends TestCase
 {
@@ -106,5 +108,30 @@ class EntityGubbinsTest extends TestCase
 
         $foo->setStubs([$stub]);
         $this->assertEquals(1, count($foo->getStubs()));
+    }
+
+    public function testSetAbstractODataType()
+    {
+        $foo = new EntityGubbins();
+        $rType = m::mock(ResourceEntityType::class);
+        $rType->shouldReceive('isAbstract')->andReturn(true)->once();
+
+        $expected = 'OData resource entity type must be concrete';
+        $actual = null;
+
+        try {
+            $foo->setOdataResourceType($rType);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testFieldAndAssociationNamesIntersectNotOk()
+    {
+        $foo = m::mock(EntityGubbins::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getFieldNames')->andReturn(['field', 'overlap'])->once();
+        $foo->shouldReceive('getAssociationNames')->andReturn(['overlap', 'relation'])->once();
+        $this->assertFalse($foo->isOk());
     }
 }
