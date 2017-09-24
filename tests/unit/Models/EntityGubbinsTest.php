@@ -2,6 +2,9 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
@@ -133,5 +136,59 @@ class EntityGubbinsTest extends TestCase
         $foo->shouldReceive('getFieldNames')->andReturn(['field', 'overlap'])->once();
         $foo->shouldReceive('getAssociationNames')->andReturn(['overlap', 'relation'])->once();
         $this->assertFalse($foo->isOk());
+    }
+
+    public function testAddDisconnectedEmptyMonomorphicAssociation()
+    {
+        $foo = new EntityGubbins();
+        $assoc = new AssociationMonomorphic();
+
+        $expected = 'Association cannot be connected to this entity';
+        $actual = null;
+
+        try {
+            $foo->addAssociation($assoc);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testAddDisconnectedMonomorphicAssociation()
+    {
+        $foo = new EntityGubbins();
+        $foo->setStubs([]);
+        $assoc = m::mock(AssociationMonomorphic::class);
+        $stub = m::mock(AssociationStubBase::class);
+        $assoc->shouldReceive('getFirst')->andReturn($stub)->once();
+
+        $expected = 'Association cannot be connected to this entity';
+        $actual = null;
+
+        try {
+            $foo->addAssociation($assoc);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testAddDisconnectedPolymorphicAssociation()
+    {
+        $foo = new EntityGubbins();
+        $foo->setStubs([]);
+        $assoc = m::mock(AssociationPolymorphic::class);
+        $stub = m::mock(AssociationStubBase::class);
+        $assoc->shouldReceive('getLast')->andReturn([$stub])->once();
+
+        $expected = 'Association cannot be connected to this entity';
+        $actual = null;
+
+        try {
+            $foo->addAssociation($assoc, false);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 }

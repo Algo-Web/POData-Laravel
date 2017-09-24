@@ -16,6 +16,7 @@ use AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -35,6 +36,13 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 
 class MetadataProviderUriTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+        $foo = m::mock(MetadataProvider::class)->makePartial();
+        $foo->reset();
+    }
+
     public function testUriOfMonomorphicOneToOneRelation()
     {
         $metaRaw = [];
@@ -66,10 +74,17 @@ class MetadataProviderUriTest extends TestCase
             App::instance($className, $testModel);
         }
 
+        MetadataProvider::setAfterExtract(function (Map $objectMap) {
+            $assoc = $objectMap->getAssociations();
+            $this->assertEquals(0, count($assoc));
+            $entities = $objectMap->getEntities();
+            $this->assertEquals(2, count($entities));
+        });
+
         $app = App::make('app');
         $foo = new MetadataProviderDummy($app);
         $foo->setCandidateModels($classen);
-        $foo->boot();
+        $foo->boot(false);
 
         $meta = App::make('metadata');
 
@@ -130,10 +145,17 @@ class MetadataProviderUriTest extends TestCase
             App::instance($className, $testModel);
         }
 
+        MetadataProvider::setAfterUnify(function (Map $objectMap) {
+            $assoc = $objectMap->getAssociations();
+            $this->assertEquals(2, count($assoc));
+            $entities = $objectMap->getEntities();
+            $this->assertEquals(2, count($entities));
+        });
+
         $app = App::make('app');
         $foo = new MetadataProviderDummy($app);
         $foo->setCandidateModels($classen);
-        $foo->boot();
+        $foo->boot(false);
 
         $meta = App::make('metadata');
 
@@ -416,10 +438,17 @@ class MetadataProviderUriTest extends TestCase
             App::instance($className, $testModel);
         }
 
+        MetadataProvider::setAfterImplement(function (Map $objectMap) {
+            $assoc = $objectMap->getAssociations();
+            $this->assertEquals(1, count($assoc));
+            $entities = $objectMap->getEntities();
+            $this->assertEquals(2, count($entities));
+        });
+
         $app = App::make('app');
         $foo = new MetadataProviderDummy($app);
         $foo->setCandidateModels($classen);
-        $foo->boot();
+        $foo->boot(false);
 
         $meta = App::make('metadata');
 
