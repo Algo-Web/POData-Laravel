@@ -1428,6 +1428,48 @@ class LaravelQueryTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testHookSingleModelWithTargModelNull()
+    {
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+        $srcInstance = m::mock(Model::class);
+        $targInstance = null;
+        $navPropName = 'metadata';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial();
+
+        $expected = 'Both source and target must be Eloquent models';
+        $actual = null;
+
+        try {
+            $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
+        } catch (\InvalidArgumentException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testHookSingleModelWithSourceModelNull()
+    {
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+        $srcInstance = null;
+        $targInstance = m::mock(Model::class);
+        $navPropName = 'metadata';
+
+        $foo = m::mock(LaravelQuery::class)->makePartial();
+
+        $expected = 'Both source and target must be Eloquent models';
+        $actual = null;
+
+        try {
+            $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
+        } catch (\InvalidArgumentException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testUnhookSingleModelWithBothModelsNull()
     {
         $source = m::mock(ResourceSet::class);

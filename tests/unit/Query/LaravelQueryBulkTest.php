@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Mockery as m;
+use POData\Common\ODataException;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\Type\Int32;
@@ -384,8 +385,9 @@ class LaravelQueryBulkTest extends TestCase
 
         try {
             $foo->updateBulkResource($source, m::mock(TestModel::class), $keys, $data);
-        } catch (\Exception $e) {
+        } catch (ODataException $e) {
             $actual = $e->getMessage();
+            $this->assertEquals(422, $e->getStatusCode());
         }
         $this->assertEquals($expected, $actual);
     }

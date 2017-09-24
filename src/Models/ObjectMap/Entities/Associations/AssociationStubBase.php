@@ -99,7 +99,6 @@ abstract class AssociationStubBase
 
         $count = ($thisPoly ? 1 : 0) + ($thatPoly ? 1 : 0) + ($thisMono ? 1 : 0) + ($thatMono ? 1 : 0);
         assert(2 == $count);
-
         if ($thisPoly && $thatMono) {
             return false;
         }
