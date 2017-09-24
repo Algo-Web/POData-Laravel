@@ -55,7 +55,7 @@ class AssociationMonomorphic extends Association
     }
 
     /**
-     * return array[]
+     * return array[].
      */
     public function getArrayPayload()
     {

@@ -339,7 +339,7 @@ class LaravelQuery implements IQueryProvider
      * @param $sourceEntityInstance
      * @param $data
      * @param $class
-     * @param  string $verb
+     * @param string $verb
      *
      * @throws ODataException
      * @throws InvalidOperationException
@@ -405,8 +405,8 @@ class LaravelQuery implements IQueryProvider
     /**
      * @param ResourceSet $sourceResourceSet
      * @param $data
-     * @param             $verb
-     * @param  Model|null $source
+     * @param                            $verb
+     * @param  Model|null                $source
      * @throws InvalidOperationException
      * @throws ODataException
      * @return mixed
@@ -763,8 +763,8 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * @param ResourceSet           $sourceResourceSet
-     * @param array                 $data
+     * @param ResourceSet $sourceResourceSet
+     * @param array       $data
      * @param $mapping
      * @param $pastVerb
      * @param  KeyDescriptor[]|null $keyDescriptor

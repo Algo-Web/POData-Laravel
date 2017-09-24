@@ -151,7 +151,7 @@ trait MetadataControllerTrait
     }
 
     /**
-     * @param  string $crudVerb
+     * @param string $crudVerb
      *
      * @throws \Exception
      */

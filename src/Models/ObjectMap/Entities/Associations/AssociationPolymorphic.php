@@ -71,7 +71,7 @@ class AssociationPolymorphic extends Association
     }
 
     /**
-     * return array[]
+     * return array[].
      */
     public function getArrayPayload()
     {

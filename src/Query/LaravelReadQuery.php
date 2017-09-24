@@ -411,7 +411,7 @@ class LaravelReadQuery
 
     /**
      * @param $sourceEntityInstance
-     * @param  null|mixed $checkInstance
+     * @param null|mixed $checkInstance
      *
      * @throws ODataException
      */
@@ -429,7 +429,7 @@ class LaravelReadQuery
 
     /**
      * @param $sourceEntityInstance
-     * @param  KeyDescriptor|null $keyDescriptor
+     * @param  KeyDescriptor|null        $keyDescriptor
      * @throws InvalidOperationException
      */
     private function processKeyDescriptor(&$sourceEntityInstance, KeyDescriptor $keyDescriptor = null)

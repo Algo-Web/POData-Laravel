@@ -349,7 +349,7 @@ class MetadataProviderUriTest extends TestCase
         }
         MetadataProvider::setAfterVerify(function (Map $objectMap) use ($classen) {
             $entities = $objectMap->getEntities();
-            $this->assertEquals(count($classen), count($entities), "The object map contained to many entities");
+            $this->assertEquals(count($classen), count($entities), 'The object map contained to many entities');
             $this->assertArrayHasKey('AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate', $entities);
             $this->assertArrayHasKey('AlgoWeb\PODataLaravel\Models\TestMorphTarget', $entities);
             $morphTarget = $entities['AlgoWeb\PODataLaravel\Models\TestMorphTarget'];

@@ -184,7 +184,7 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * @param Map $objectModel
+     * @param Map                    $objectModel
      * @param AssociationPolymorphic $association
      */
     private function implementAssociationsPolymorphic(Map $objectModel, AssociationPolymorphic $association)
@@ -246,7 +246,6 @@ class MetadataProvider extends MetadataBaseProvider
                     }
             }
         }
-
     }
 
     private function implementProperties(EntityGubbins $unifiedEntity)
@@ -283,6 +282,7 @@ class MetadataProvider extends MetadataBaseProvider
     /**
      * Bootstrap the application services.  Post-boot.
      *
+     * @param  mixed $reset
      * @return void
      */
     public function boot($reset = true)
