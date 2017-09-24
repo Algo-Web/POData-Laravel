@@ -669,7 +669,8 @@ class LaravelQuery implements IQueryProvider
             $otherPropName = $this->getMetadataProvider()
                 ->resolveReverseProperty($sourceEntityInstance, $targetEntityInstance, $navPropName);
             if (null === $otherPropName) {
-                $msg = 'Bad navigation property, ' . $navPropName . ', on source model ' . get_class($sourceEntityInstance);
+                $srcClass = get_class($sourceEntityInstance);
+                $msg = 'Bad navigation property, ' . $navPropName . ', on source model ' . $srcClass;
                 throw new \InvalidArgumentException($msg);
             }
             $this->unhookSingleModel(
@@ -800,7 +801,8 @@ class LaravelQuery implements IQueryProvider
                 throw new ODataException($e->getMessage(), 500);
             }
         } else {
-            throw new ODataException('Target models not successfully ' . $pastVerb, 422);
+            $msg = 'Target models not successfully ' . $pastVerb;
+            throw new ODataException($msg, 422);
         }
     }
 

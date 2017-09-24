@@ -60,10 +60,12 @@ class LaravelReadQuery
         $sourceEntityInstance = null
     ) {
         if (null != $filterInfo && !($filterInfo instanceof FilterInfo)) {
-            throw new InvalidArgumentException('Filter info must be either null or instance of FilterInfo.');
+            $msg = 'Filter info must be either null or instance of FilterInfo.';
+            throw new InvalidArgumentException($msg);
         }
         if (null != $skipToken && !($skipToken instanceof SkipTokenInfo)) {
-            throw new InvalidArgumentException('Skip token must be either null or instance of SkipTokenInfo.');
+            $msg = 'Skip token must be either null or instance of SkipTokenInfo.';
+            throw new InvalidArgumentException($msg);
         }
 
         $eagerLoad = [];
@@ -297,7 +299,8 @@ class LaravelReadQuery
         $sourceEntityInstance = null
     ) {
         if (null == $resourceSet && null == $sourceEntityInstance) {
-            throw new \Exception('Must supply at least one of a resource set and source entity.');
+            $msg = 'Must supply at least one of a resource set and source entity.';
+            throw new \Exception($msg);
         }
 
         $this->checkSourceInstance($sourceEntityInstance);
@@ -402,7 +405,8 @@ class LaravelReadQuery
     protected function checkSourceInstance($source)
     {
         if (!(null == $source || $source instanceof Model || $source instanceof Relation)) {
-            throw new InvalidArgumentException('Source entity instance must be null, a model, or a relation.');
+            $msg = 'Source entity instance must be null, a model, or a relation.';
+            throw new InvalidArgumentException($msg);
         }
     }
 
