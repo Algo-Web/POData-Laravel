@@ -25,7 +25,6 @@ class MetadataProvider extends MetadataBaseProvider
 {
     protected $multConstraints = ['0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
     protected static $metaNAMESPACE = 'Data';
-    protected static $relationCache;
     protected static $isBooted = false;
     const POLYMORPHIC = 'polyMorphicPlaceholder';
     const POLYMORPHIC_PLURAL = 'polyMorphicPlaceholders';
@@ -379,135 +378,8 @@ class MetadataProvider extends MetadataBaseProvider
         return $this->relationHolder;
     }
 
-    public function calculateRoundTripRelations()
-    {
-        $modelNames = $this->getCandidateModels();
-
-        foreach ($modelNames as $name) {
-            if (!$this->getRelationHolder()->hasClass($name)) {
-                $model = App::make($name);
-                $gubbinz = $model->extractGubbins();
-                $this->getRelationHolder()->addEntity($gubbinz);
-            }
-        }
-
-        $rels = $this->getRelationHolder()->getRelations();
-
-        $result = [];
-        foreach ($rels as $payload) {
-            assert($payload instanceof Association);
-            $raw = $payload->getArrayPayload();
-            if (is_array($raw)) {
-                foreach ($raw as $line) {
-                    $result[] = $line;
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    public function getPolymorphicRelationGroups()
-    {
-        $modelNames = $this->getCandidateModels();
-
-        $knownSide = [];
-        $unknownSide = [];
-
-        $hooks = [];
-        // fish out list of polymorphic-affected models for further processing
-        foreach ($modelNames as $name) {
-            $model = new $name();
-            $isPoly = false;
-            if ($model->isKnownPolymorphSide()) {
-                $knownSide[$name] = [];
-                $isPoly = true;
-            }
-            if ($model->isUnknownPolymorphSide()) {
-                $unknownSide[$name] = [];
-                $isPoly = true;
-            }
-            if (false === $isPoly) {
-                continue;
-            }
-
-            $rels = $model->getRelationships();
-            // it doesn't matter if a model has no relationships here, that lack will simply be skipped over
-            // during hookup processing
-            $hooks[$name] = $rels;
-        }
-        // ensure we've only loaded up polymorphic-affected models
-        $knownKeys = array_keys($knownSide);
-        $unknownKeys = array_keys($unknownSide);
-        $dualKeys = array_intersect($knownKeys, $unknownKeys);
-        assert(count($hooks) == (count($unknownKeys) + count($knownKeys) - count($dualKeys)));
-        // if either list is empty, bail out - there's nothing to do
-        if (0 === count($knownSide) || 0 === count($unknownSide)) {
-            return [];
-        }
-
-        // commence primary ignition
-
-        foreach ($unknownKeys as $key) {
-            assert(isset($hooks[$key]));
-            $hook = $hooks[$key];
-            foreach ($hook as $barb) {
-                foreach ($barb as $knownType => $propData) {
-                    $propName = array_keys($propData)[0];
-                    if (in_array($knownType, $knownKeys)) {
-                        if (!isset($knownSide[$knownType][$key])) {
-                            $knownSide[$knownType][$key] = [];
-                        }
-                        assert(isset($knownSide[$knownType][$key]));
-                        $knownSide[$knownType][$key][] = $propData[$propName]['property'];
-                    }
-                }
-            }
-        }
-
-        return $knownSide;
-    }
-
-    /**
-     * Get round-trip relations after inserting polymorphic-powered placeholders.
-     *
-     * @return array
-     */
-    public function getRepairedRoundTripRelations()
-    {
-        if (!isset(self::$relationCache)) {
-            $rels = $this->calculateRoundTripRelations();
-            $groups = $this->getPolymorphicRelationGroups();
-
-            if (0 === count($groups)) {
-                self::$relationCache = $rels;
-                return $rels;
-            }
-
-            $placeholder = static::POLYMORPHIC;
-
-            $groupKeys = array_keys($groups);
-
-            // we have at least one polymorphic relation, need to dig it out
-            $numRels = count($rels);
-            for ($i = 0; $i < $numRels; $i++) {
-                $relation = $rels[$i];
-                $principalType = $relation['principalType'];
-                $dependentType = $relation['dependentType'];
-                $principalPoly = in_array($principalType, $groupKeys);
-                $dependentPoly = in_array($dependentType, $groupKeys);
-                $rels[$i]['principalRSet'] = $principalPoly ? $placeholder : $principalType;
-                $rels[$i]['dependentRSet'] = $dependentPoly ? $placeholder : $dependentType;
-            }
-            self::$relationCache = $rels;
-        }
-        return self::$relationCache;
-    }
-
-
     public function reset()
     {
-        self::$relationCache = null;
         self::$isBooted = false;
         self::$afterExtract = null;
         self::$afterUnify = null;
@@ -552,5 +424,6 @@ class MetadataProvider extends MetadataBaseProvider
                 return $stub->getRelationName();
             }
         }
+        return null;
     }
 }

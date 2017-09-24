@@ -153,7 +153,7 @@ class MetadataGubbinsHolder
      */
     protected function checkClassExists($className)
     {
-        if (!array_key_exists($className, $this->relations)) {
+        if (!$this->hasClass($className)) {
             $msg = $className . ' does not exist in holder';
             throw new \InvalidArgumentException($msg);
         }

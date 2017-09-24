@@ -45,9 +45,4 @@ abstract class Association
      * @return AssociationType|AssociationType[]
      */
     abstract public function getAssociationType();
-
-    /**
-     * @return array[]
-     */
-    abstract public function getArrayPayload();
 }
