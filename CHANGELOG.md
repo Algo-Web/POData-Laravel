@@ -1,5 +1,8 @@
 Unreleased
 ----------
+
+0.3.0 (2017-09-24)
+------------------
    * Remix relation calculation and add stronger consistency checks
    * Fix bugs in base type generation
    * Fix bugs in relation calculation
