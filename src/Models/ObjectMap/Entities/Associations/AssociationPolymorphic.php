@@ -12,7 +12,7 @@ class AssociationPolymorphic extends Association
     protected $last = [];
 
     /**
-     * @return AssociationStubBase|AssociationStubBase[]
+     * @return AssociationStubBase[]
      */
     public function getLast()
     {

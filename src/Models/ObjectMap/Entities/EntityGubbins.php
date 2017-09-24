@@ -204,8 +204,8 @@ class EntityGubbins
                     throw new \InvalidArgumentException('Association cannot be connected to this entity');
                 }
             } else {
-                $comp = function (AssociationStubBase $a, AssociationStubBase $b) {
-                    return $a->compare($b);
+                $comp = function (AssociationStubBase $one, AssociationStubBase $two) {
+                    return $one->compare($two);
                 };
                 $stubs = $association->getLast();
                 assert(is_array($stubs));
@@ -218,6 +218,7 @@ class EntityGubbins
             }
             $propertyName = $stub->getRelationName();
         }
+        assert(isset($propertyName));
         $this->associations[$propertyName] = $association;
     }
 
@@ -264,9 +265,6 @@ class EntityGubbins
         $fieldNames = $this->getFieldNames();
         $associationNames = $this->getAssociationNames();
         $intersection = array_intersect($fieldNames, $associationNames);
-        if (0 !== count($intersection)) {
-            return false;
-        }
-        return true;
+        return 0 === count($intersection);
     }
 }

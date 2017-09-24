@@ -11,7 +11,7 @@ class Map
     /**
      * @var EntityGubbins[]
      */
-    private $Entities;
+    private $entities;
 
     /**
      * @var Association[]
@@ -23,10 +23,10 @@ class Map
      */
     public function addEntity(EntityGubbins $entity)
     {
-        if (!is_array($this->Entities)) {
-            $this->Entities = [];
+        if (!is_array($this->entities)) {
+            $this->entities = [];
         }
-        $this->Entities[$entity->getClassName()] = $entity;
+        $this->entities[$entity->getClassName()] = $entity;
     }
 
     /**
@@ -34,7 +34,7 @@ class Map
      */
     public function getEntities()
     {
-        return $this->Entities;
+        return $this->entities;
     }
 
     /**
@@ -42,19 +42,19 @@ class Map
      */
     public function setEntities(array $entities)
     {
-        $this->Entities = [];
+        $this->entities = [];
         foreach ($entities as $entity) {
             if (!$entity instanceof EntityGubbins) {
                 throw new \InvalidArgumentException('Entities array must contain only EntityGubbins objects');
             }
         }
         foreach ($entities as $entity) {
-            $this->Entities[$entity->getClassName()] = $entity;
+            $this->entities[$entity->getClassName()] = $entity;
         }
     }
 
     /**
-     * @param Association[] $assocations
+     * @param Association[] $associations
      */
     public function setAssociations(array $associations)
     {
@@ -94,9 +94,12 @@ class Map
      */
     public function isOK()
     {
-        foreach ($this->Entities as $entity) {
-            $entity->isOK();
+        foreach ($this->entities as $entity) {
+            if (!$entity->isOK()) {
+                return false;
+            }
         }
+        return true;
     }
 
     /**
@@ -104,8 +107,8 @@ class Map
      */
     private function addAssociationMonomorphic(AssociationMonomorphic $association)
     {
-        $firstClass = $this->Entities[$association->getFirst()->getBaseType()];
-        $secondClass = $this->Entities[$association->getLast()->getBaseType()];
+        $firstClass = $this->entities[$association->getFirst()->getBaseType()];
+        $secondClass = $this->entities[$association->getLast()->getBaseType()];
         $firstClass->addAssociation($association);
         $secondClass->addAssociation($association, false);
     }
@@ -115,10 +118,10 @@ class Map
      */
     private function addAssociationPolymorphic(AssociationPolymorphic $association)
     {
-        $firstClass = $this->Entities[$association->getFirst()->getBaseType()];
+        $firstClass = $this->entities[$association->getFirst()->getBaseType()];
         $firstClass->addAssociation($association);
         foreach ($association->getLast() as $last) {
-            $secondClass = $this->Entities[$last->getBaseType()];
+            $secondClass = $this->entities[$last->getBaseType()];
             $secondClass->addAssociation($association, false);
         }
     }
