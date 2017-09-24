@@ -68,7 +68,7 @@ trait MetadataControllerTrait
         }
 
         if (!method_exists($this, $result)) {
-            $msg ='Metadata target for CRUD verb ' . $crudVerb . ' on model ' . $modelName . ' does not exist';
+            $msg = 'Metadata target for CRUD verb ' . $crudVerb . ' on model ' . $modelName . ' does not exist';
             throw new \Exception($msg);
         }
 
