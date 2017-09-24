@@ -144,8 +144,8 @@ class LaravelReadQuery
         $nullFilter = true;
         $isvalid = null;
         if (isset($filterInfo)) {
-            $method = 'return '.$filterInfo->getExpressionAsString().';';
-            $clln = '$'.$resourceSet->getResourceType()->getName();
+            $method = 'return ' . $filterInfo->getExpressionAsString() . ';';
+            $clln = '$' . $resourceSet->getResourceType()->getName();
             $isvalid = create_function($clln, $method);
             $nullFilter = false;
         }
@@ -173,7 +173,7 @@ class LaravelReadQuery
                     // so we can't bail out early
                     $rawCount += $results->count();
                     // now bolt on filtrate to accumulating result set if we haven't accumulated enough bitz
-                    if ($rawTop > $resultSet->count() + $skip) {
+                    if ($rawTop > $resultSet->count()+$skip) {
                         $resultSet = collect(array_merge($resultSet->all(), $results->all()));
                         $sliceAmount = min($skip, $resultSet->count());
                         $resultSet = $resultSet->slice($sliceAmount);
@@ -211,7 +211,7 @@ class LaravelReadQuery
         if (QueryType::COUNT() == $queryType || QueryType::ENTITIES_WITH_COUNT() == $queryType) {
             $result->count = $resultCount;
         }
-        $hazMore = $bulkSetCount > $skip + count($resultSet);
+        $hazMore = $bulkSetCount > $skip+count($resultSet);
         $result->hasMore = $hazMore;
         return $result;
     }
@@ -371,7 +371,7 @@ class LaravelReadQuery
     ) {
         $propertyName = $targetProperty->getName();
         if (!method_exists($sourceEntityInstance, $propertyName)) {
-            $msg = 'Relation method, '.$propertyName.', does not exist on supplied entity.';
+            $msg = 'Relation method, ' . $propertyName . ', does not exist on supplied entity.';
             throw new InvalidArgumentException($msg);
         }
         // take key descriptor and turn it into where clause here, rather than in getResource call

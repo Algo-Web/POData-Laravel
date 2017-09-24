@@ -18,7 +18,7 @@ class MetadataGubbinsHolder
     {
         $className = $entity->getClassName();
         if (array_key_exists($className, $this->relations)) {
-            $msg = $className.' already added';
+            $msg = $className . ' already added';
             throw new \InvalidArgumentException($msg);
         }
         $this->relations[$className] = $entity;
@@ -70,7 +70,7 @@ class MetadataGubbinsHolder
             if ($stub instanceof AssociationStubMonomorphic) {
                 assert(
                     1 >= count($others),
-                    'Monomorphic relation stub on '. $className . ' ' . $relName
+                    'Monomorphic relation stub on ' . $className . ' ' . $relName
                     . ' should point to at most 1 other stub'
                 );
             }

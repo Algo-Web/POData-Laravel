@@ -23,7 +23,7 @@ use POData\Providers\Metadata\Type\TypeCode;
 
 class MetadataProvider extends MetadataBaseProvider
 {
-    protected $multConstraints = [ '0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
+    protected $multConstraints = ['0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
     protected static $metaNAMESPACE = 'Data';
     protected static $relationCache;
     protected static $isBooted = false;
@@ -120,7 +120,7 @@ class MetadataProvider extends MetadataBaseProvider
         }
         $metaCount = count($meta->oDataEntityMap);
         $entityCount = count($entities);
-        assert($metaCount == 2 * $entityCount + 1);
+        assert($metaCount == 2 * $entityCount+1);
 
         if (null === $objectModel->getAssociations()) {
             return;
@@ -427,7 +427,7 @@ class MetadataProvider extends MetadataBaseProvider
         $knownKeys = array_keys($knownSide);
         $unknownKeys = array_keys($unknownSide);
         $dualKeys = array_intersect($knownKeys, $unknownKeys);
-        assert(count($hooks) == (count($unknownKeys) + count($knownKeys) - count($dualKeys)));
+        assert(count($hooks) == (count($unknownKeys)+count($knownKeys)-count($dualKeys)));
         // if either list is empty, bail out - there's nothing to do
         if (0 === count($knownSide) || 0 === count($unknownSide)) {
             return [];

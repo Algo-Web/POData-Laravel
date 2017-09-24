@@ -354,12 +354,12 @@ class LaravelQuery implements IQueryProvider
         $map = $raw->getMetadata();
 
         if (!array_key_exists($class, $map)) {
-            throw new \POData\Common\InvalidOperationException('Controller mapping missing for class '.$class.'.');
+            throw new \POData\Common\InvalidOperationException('Controller mapping missing for class ' . $class . '.');
         }
         $goal = $raw->getMapping($class, $verb);
         if (null == $goal) {
             throw new \POData\Common\InvalidOperationException(
-                'Controller mapping missing for '.$verb.' verb on class '.$class.'.'
+                'Controller mapping missing for ' . $verb . ' verb on class ' . $class . '.'
             );
         }
 
@@ -433,7 +433,7 @@ class LaravelQuery implements IQueryProvider
                 throw new ODataException($e->getMessage(), 500);
             }
         }
-        throw new ODataException('Target model not successfully '.$lastWord, 422);
+        throw new ODataException('Target model not successfully ' . $lastWord, 422);
     }
 
     /**
@@ -476,7 +476,7 @@ class LaravelQuery implements IQueryProvider
         }
         $outData = $result->getData();
         if (is_object($outData)) {
-            $outData = (array)$outData;
+            $outData = (array) $outData;
         }
 
         if (!is_array($outData)) {
@@ -669,7 +669,7 @@ class LaravelQuery implements IQueryProvider
             $otherPropName = $this->getMetadataProvider()
                 ->resolveReverseProperty($sourceEntityInstance, $targetEntityInstance, $navPropName);
             if (null === $otherPropName) {
-                $msg = 'Bad navigation property, '.$navPropName.', on source model '.get_class($sourceEntityInstance);
+                $msg = 'Bad navigation property, ' . $navPropName . ', on source model ' . get_class($sourceEntityInstance);
                 throw new \InvalidArgumentException($msg);
             }
             $this->unhookSingleModel(
@@ -703,7 +703,7 @@ class LaravelQuery implements IQueryProvider
         }
         $targType = $relation->getRelated();
         if (!$targetEntityInstance instanceof $targType) {
-            $msg = 'Target instance must be of type compatible with relation declared in method '.$navPropName;
+            $msg = 'Target instance must be of type compatible with relation declared in method ' . $navPropName;
             throw new \InvalidArgumentException($msg);
         }
         return $relation;
@@ -743,7 +743,7 @@ class LaravelQuery implements IQueryProvider
                 $var = new $varType();
                 if ($spec['isRequest']) {
                     $var->setMethod($isCreate ? 'POST' : 'PUT');
-                    $bulkData = [ 'data' => $data];
+                    $bulkData = ['data' => $data];
                     if (null !== $keyDescriptors) {
                         $keys = [];
                         foreach ($keyDescriptors as $desc) {

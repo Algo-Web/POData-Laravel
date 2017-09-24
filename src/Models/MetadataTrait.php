@@ -115,7 +115,7 @@ trait MetadataTrait
 
         if (!isset($endpoint)) {
             $bitter = get_class();
-            $name = substr($bitter, strrpos($bitter, '\\') + 1);
+            $name = substr($bitter, strrpos($bitter, '\\')+1);
             return ($name);
         }
         return ($endpoint);
@@ -199,7 +199,7 @@ trait MetadataTrait
                         $reflection = new \ReflectionMethod($model, $method);
 
                         $file = new \SplFileObject($reflection->getFileName());
-                        $file->seek($reflection->getStartLine() - 1);
+                        $file->seek($reflection->getStartLine()-1);
                         $code = '';
                         while ($file->key() < $reflection->getEndLine()) {
                             $code .= $file->current();
@@ -212,21 +212,21 @@ trait MetadataTrait
                             'Function definition must have keyword \'function\''
                         );
                         $begin = strpos($code, 'function(');
-                        $code = substr($code, $begin, strrpos($code, '}') - $begin + 1);
-                        $lastCode = $code[strlen($code) - 1];
+                        $code = substr($code, $begin, strrpos($code, '}')-$begin+1);
+                        $lastCode = $code[strlen($code)-1];
                         assert('}' == $lastCode, 'Final character of function definition must be closing brace');
                         foreach ([
-                                     'hasMany',
-                                     'hasManyThrough',
-                                     'belongsToMany',
-                                     'hasOne',
-                                     'belongsTo',
-                                     'morphOne',
-                                     'morphTo',
-                                     'morphMany',
-                                     'morphToMany',
-                                     'morphedByMany'
-                                 ] as $relation) {
+                                        'hasMany',
+                                        'hasManyThrough',
+                                        'belongsToMany',
+                                        'hasOne',
+                                        'belongsTo',
+                                        'morphOne',
+                                        'morphTo',
+                                        'morphMany',
+                                        'morphToMany',
+                                        'morphedByMany'
+                                    ] as $relation) {
                             $search = '$this->' . $relation . '(';
                             if ($pos = stripos($code, $search)) {
                                 //Resolve the relation's model to a Relation object.
@@ -485,10 +485,10 @@ trait MetadataTrait
 
             $keyRaw = $isBelong ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
             $keySegments = explode('.', $keyRaw);
-            $keyName = $keySegments[count($keySegments) - 1];
+            $keyName = $keySegments[count($keySegments)-1];
             $localRaw = $isBelong ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
             $localSegments = explode('.', $localRaw);
-            $localName = $localSegments[count($localSegments) - 1];
+            $localName = $localSegments[count($localSegments)-1];
             $first = $keyName;
             $last = $localName;
             $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
@@ -514,10 +514,10 @@ trait MetadataTrait
 
             $keyName = $isBelong ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
             $keySegments = explode('.', $keyName);
-            $keyName = $keySegments[count($keySegments) - 1];
+            $keyName = $keySegments[count($keySegments)-1];
             $localRaw = $isBelong ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
             $localSegments = explode('.', $localRaw);
-            $localName = $localSegments[count($localSegments) - 1];
+            $localName = $localSegments[count($localSegments)-1];
             $first = $isBelong ? $localName : $keyName;
             $last = $isBelong ? $keyName : $localName;
             $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
@@ -541,10 +541,10 @@ trait MetadataTrait
 
             $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
             $keySegments = explode('.', $keyRaw);
-            $keyName = $keySegments[count($keySegments) - 1];
+            $keyName = $keySegments[count($keySegments)-1];
             $localRaw = $isMany ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
             $localSegments = explode('.', $localRaw);
-            $localName = $localSegments[count($localSegments) - 1];
+            $localName = $localSegments[count($localSegments)-1];
             $first = $isMany ? $keyName : $localName;
             $last = $isMany ? $localName : $keyName;
             $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, 'unknown');
@@ -567,10 +567,10 @@ trait MetadataTrait
 
             $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
             $keySegments = explode('.', $keyRaw);
-            $keyName = $keySegments[count($keySegments) - 1];
+            $keyName = $keySegments[count($keySegments)-1];
             $localRaw = $isMany ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
             $localSegments = explode('.', $localRaw);
-            $localName = $localSegments[count($localSegments) - 1];
+            $localName = $localSegments[count($localSegments)-1];
 
             $first = $keyName;
             $last = (isset($localName) && '' != $localName) ? $localName : $foo->getRelated()->getKeyName();

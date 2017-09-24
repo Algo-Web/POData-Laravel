@@ -40,7 +40,7 @@ trait MetadataControllerTrait
         assert(0 < count($this->mapping), 'Mapping array must not be empty');
 
         if (!array_key_exists($modelName, $this->mapping)) {
-            throw new \Exception('Metadata mapping for model '.$modelName.' not defined');
+            throw new \Exception('Metadata mapping for model ' . $modelName . ' not defined');
         }
 
         $this->checkCrudVerbDefined($crudVerb);
@@ -48,7 +48,7 @@ trait MetadataControllerTrait
 
         $lookup = $this->mapping[$modelName];
         if (!is_array($lookup)) {
-            throw new \Exception('Metadata mapping for model '.$modelName.' not an array');
+            throw new \Exception('Metadata mapping for model ' . $modelName . ' not an array');
         }
 
         if (!array_key_exists($crudVerb, $lookup)) {
@@ -56,16 +56,16 @@ trait MetadataControllerTrait
                 // optional crud verbs don't have to be defined - so we can return null
                 return null;
             }
-            throw new \Exception('Metadata mapping for CRUD verb '.$crudVerb.' on model '.$modelName.' not defined');
+            throw new \Exception('Metadata mapping for CRUD verb ' . $crudVerb . ' on model ' . $modelName . ' not defined');
         }
         $result = $lookup[$crudVerb];
         if (!isset($result)) {
-            throw new \Exception('Metadata mapping for CRUD verb '.$crudVerb.' on model '.$modelName.' null');
+            throw new \Exception('Metadata mapping for CRUD verb ' . $crudVerb . ' on model ' . $modelName . ' null');
         }
 
         if (!method_exists($this, $result)) {
             throw new \Exception(
-                'Metadata target for CRUD verb '.$crudVerb.' on model '.$modelName.' does not exist'
+                'Metadata target for CRUD verb ' . $crudVerb . ' on model ' . $modelName . ' does not exist'
             );
         }
 
@@ -87,17 +87,17 @@ trait MetadataControllerTrait
         // check that mapping array is well formed and sane, rather than waiting to stab us with a spatula
         foreach ($this->mapping as $key => $map) {
             if (!is_array($map)) {
-                throw new \Exception('Metadata mapping for model '.$key.' not an array');
+                throw new \Exception('Metadata mapping for model ' . $key . ' not an array');
             }
             foreach ($map as $verb => $method) {
                 $this->checkCrudVerbDefined($verb);
                 if (!isset($method)) {
-                    throw new \Exception('Metadata mapping for CRUD verb '.$verb.' on model '.$key.' null');
+                    throw new \Exception('Metadata mapping for CRUD verb ' . $verb . ' on model ' . $key . ' null');
                 }
 
                 if (!method_exists($this, $method)) {
                     throw new \Exception(
-                        'Metadata target for CRUD verb '.$verb.' on model '.$key.' does not exist'
+                        'Metadata target for CRUD verb ' . $verb . ' on model ' . $key . ' does not exist'
                     );
                 }
                 $parmArray = $this->getParameterNames($method);

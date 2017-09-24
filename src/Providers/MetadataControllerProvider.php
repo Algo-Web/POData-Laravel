@@ -61,7 +61,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
                     }
                     assert(
                         !$alreadyKey,
-                        'Mapping already defined for model '.$key.' and CRUD verb '.$barrel
+                        'Mapping already defined for model ' . $key . ' and CRUD verb ' . $barrel
                     );
                     $metamix[$key][$barrel] = $roll;
                 }

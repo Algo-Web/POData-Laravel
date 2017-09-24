@@ -211,7 +211,6 @@ class EntityField
     {
         $value = $primitiveType->getValue();
         return array_key_exists($value, self::$primitiveToEdmMapping) ?
-            self::$primitiveToEdmMapping[$value] :
-            EdmPrimitiveType::STRING;
+            self::$primitiveToEdmMapping[$value] : EdmPrimitiveType::STRING;
     }
 }

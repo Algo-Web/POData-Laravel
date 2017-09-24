@@ -51,7 +51,7 @@ class AssociationMonomorphic extends Association
     public function getAssociationType()
     {
         return new AssociationType($this->first->getMultiplicity()->getValue()
-                                   | $this->last->getMultiplicity()->getValue());
+                                    | $this->last->getMultiplicity()->getValue());
     }
 
     /**

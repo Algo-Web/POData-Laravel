@@ -54,7 +54,7 @@ class LaravelExpressionProvider implements IExpressionProvider
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_ENDSWITH] = function ($params) {
             return '(strcmp(substr('.$params[0].', strlen('.$params[0].') - strlen('.$params[1].')), '
-                   .$params[1].') === 0)';
+                    .$params[1].') === 0)';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_INDEXOF] = function ($params) {
             return 'strpos('.$params[0].', '.$params[1].')';
@@ -155,7 +155,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function setResourceType(ResourceType $resourceType)
     {
-        $this->iteratorName = '$'.$resourceType->getName();
+        $this->iteratorName = '$' . $resourceType->getName();
         $this->resourceType = $resourceType;
     }
     /**
@@ -280,11 +280,11 @@ class LaravelExpressionProvider implements IExpressionProvider
         $parent = $expression;
         $variable = null;
         do {
-            $variable = $parent->getResourceProperty()->getName().self::MEMBER_ACCESS.$variable;
+            $variable = $parent->getResourceProperty()->getName() . self::MEMBER_ACCESS . $variable;
             $parent = $parent->getParent();
         } while ($parent != null);
         $variable = rtrim($variable, self::MEMBER_ACCESS);
-        $variable = $this->getIteratorName().self::MEMBER_ACCESS.$variable;
+        $variable = $this->getIteratorName() . self::MEMBER_ACCESS . $variable;
         return $variable;
     }
     /**
@@ -316,7 +316,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     private function prepareBinaryExpression($operator, $left, $right)
     {
-        return self::OPEN_BRACKET.$left.' '.$operator.' '.$right.self::CLOSE_BRACKET;
+        return self::OPEN_BRACKET . $left . ' ' . $operator . ' ' . $right . self::CLOSE_BRACKET;
     }
     /**
      * To format unary expression.
@@ -328,6 +328,6 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     private function prepareUnaryExpression($operator, $child)
     {
-        return $operator.self::OPEN_BRACKET.$child.self::CLOSE_BRACKET;
+        return $operator . self::OPEN_BRACKET . $child . self::CLOSE_BRACKET;
     }
 }
