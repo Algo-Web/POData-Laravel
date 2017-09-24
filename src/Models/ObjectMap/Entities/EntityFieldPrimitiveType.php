@@ -9,7 +9,6 @@ use MyCLabs\Enum\Enum;
  *
  * @method static EntityFieldPrimitiveType TARRAY()
  * @method static EntityFieldPrimitiveType SIMPLE_ARRAY()
- * @method static EntityFieldPrimitiveType PRIMITIVE_BAG()
  * @method static EntityFieldPrimitiveType JSON_ARRAY()
  * @method static EntityFieldPrimitiveType JSON()
  * @method static EntityFieldPrimitiveType BIGINT()

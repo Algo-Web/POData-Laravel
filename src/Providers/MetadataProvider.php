@@ -30,6 +30,19 @@ class MetadataProvider extends MetadataBaseProvider
     const POLYMORPHIC = 'polyMorphicPlaceholder';
     const POLYMORPHIC_PLURAL = 'polyMorphicPlaceholders';
 
+    /**
+     * @var Map The completed object map set at post Implement;
+     */
+    private $completedObjectMap;
+
+    /**
+     * @return \AlgoWeb\PODataLaravel\Models\ObjectMap\Map
+     */
+    public function getObjectMap()
+    {
+        return $this->completedObjectMap;
+    }
+
     protected static $afterExtract;
     protected static $afterUnify;
     protected static $afterVerify;
@@ -120,7 +133,7 @@ class MetadataProvider extends MetadataBaseProvider
         }
         $metaCount = count($meta->oDataEntityMap);
         $entityCount = count($entities);
-        assert($metaCount == 2 * $entityCount+1);
+        assert($metaCount == 2 * $entityCount + 1);
 
         if (null === $objectModel->getAssociations()) {
             return;
@@ -283,6 +296,7 @@ class MetadataProvider extends MetadataBaseProvider
      * Bootstrap the application services.  Post-boot.
      *
      * @param  mixed $reset
+     *
      * @return void
      */
     public function boot($reset = true)
@@ -322,7 +336,7 @@ class MetadataProvider extends MetadataBaseProvider
         $objectModel = $this->unify($objectModel);
         $this->verify($objectModel);
         $this->implement($objectModel);
-        //dd($objectModel);
+        $this->completedObjectMap = $objectModel;
         $key = 'metadata';
         $this->handlePostBoot($isCaching, $hasCache, $key, $meta);
         self::$isBooted = true;
@@ -427,7 +441,7 @@ class MetadataProvider extends MetadataBaseProvider
         $knownKeys = array_keys($knownSide);
         $unknownKeys = array_keys($unknownSide);
         $dualKeys = array_intersect($knownKeys, $unknownKeys);
-        assert(count($hooks) == (count($unknownKeys)+count($knownKeys)-count($dualKeys)));
+        assert(count($hooks) == (count($unknownKeys) + count($knownKeys) - count($dualKeys)));
         // if either list is empty, bail out - there's nothing to do
         if (0 === count($knownSide) || 0 === count($unknownSide)) {
             return [];
@@ -513,24 +527,21 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function resolveReverseProperty(Model $source, Model $target, $propName)
     {
-        assert(is_string($propName), 'Property name must be string');
-        $relations = $this->getRepairedRoundTripRelations();
+        $association = $this
+            ->getObjectMap()
+            ->getEntities()[get_class($source)]
+            ->getAssociations()[$propName];
+        $lasts = $association->getLast();
 
-        $sourceName = get_class($source);
-        $targName = get_class($target);
-
-        $filter = function ($segment) use ($sourceName, $targName, $propName) {
-            $match = $sourceName == $segment['principalType'];
-            $match &= $targName == $segment['dependentType'];
-            $match &= $propName == $segment['principalProp'];
-
-            return $match;
-        };
-
-        // array_filter does not reset keys - we have to do it ourselves
-        $trim = array_values(array_filter($relations, $filter));
-        $result = 0 === count($trim) ? null : $trim[0]['dependentProp'];
-
-        return $result;
+        $stubs = [];
+        $stubs[] = $association->getFirst();
+        if (!is_array($lasts)) {
+            $stubs[] = $lasts;
+        }
+        foreach ($stubs as $stub) {
+            if ($stub->getBaseType() == get_class($target)) {
+                return $stub->getRelationName();
+            }
+        }
     }
 }
