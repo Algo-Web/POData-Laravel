@@ -322,7 +322,7 @@ class LaravelQuery implements IQueryProvider
     /**
      * @param ResourceSet $resourceSet          The entity set containing the entity to fetch
      * @param object      $sourceEntityInstance The source entity instance
-     * @param object      $data                 The New data for the entity instance.
+     * @param object      $data                 the New data for the entity instance
      *
      * @returns object|null                     returns the newly created model if successful,
      *                                          or null if model creation failed.
