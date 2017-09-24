@@ -206,6 +206,24 @@ class MetadataProviderReverseTest extends TestCase
         $this->assertNull($leftForward);
     }
 
+    public function testMetadataResolveReversePropertyMappingNotPresent()
+    {
+        $foo = m::mock(MetadataProvider::class)->makePartial();
+        $foo->shouldReceive('getObjectMap->resolveEntity')->andReturn(null)->once();
+
+        $expected = 'Source model not defined';
+        $actual = null;
+
+        $left = new TestMorphManySource([]);
+
+        try {
+            $foo->resolveReverseProperty($left, $left, 'property');
+        } catch (\InvalidArgumentException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
     private function setUpSchemaFacade()
     {
         $schema = Schema::getFacadeRoot();

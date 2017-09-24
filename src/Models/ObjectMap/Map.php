@@ -37,6 +37,11 @@ class Map
         return $this->entities;
     }
 
+    public function resolveEntity($entityClassName)
+    {
+        return array_key_exists($entityClassName, $this->entities) ? $this->entities[$entityClassName] : null;
+    }
+
     /**
      * @param EntityGubbins[] $entities
      */

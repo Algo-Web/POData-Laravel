@@ -257,6 +257,12 @@ class EntityGubbins
         return $this->associations;
     }
 
+    public function resolveAssociation($relName)
+    {
+        $this->associations = is_array($this->associations) ? $this->associations : [];
+        return array_key_exists($relName, $this->associations) ? $this->associations[$relName] : null;
+    }
+
     /**
      * @return bool
      */

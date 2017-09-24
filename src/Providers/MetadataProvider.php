@@ -527,18 +527,28 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function resolveReverseProperty(Model $source, Model $target, $propName)
     {
-        $association = $this
-            ->getObjectMap()
-            ->getEntities()[get_class($source)]
-            ->getAssociations()[$propName];
-        $lasts = $association->getLast();
-
-        $stubs = [];
-        $stubs[] = $association->getFirst();
-        if (!is_array($lasts)) {
-            $stubs[] = $lasts;
+        assert(is_string($propName), 'Property name must be string');
+        $entity = $this->getObjectMap()->resolveEntity(get_class($source));
+        if (null === $entity) {
+            $msg = 'Source model not defined';
+            throw new \InvalidArgumentException($msg);
         }
-        foreach ($stubs as $stub) {
+        $association = $entity->resolveAssociation($propName);
+        if (null === $association) {
+            return null;
+        }
+        $isFirst = $propName === $association->getFirst()->getRelationName();
+        if (!$isFirst) {
+            return $association->getFirst()->getRelationName();
+        }
+
+        if ($association instanceof AssociationMonomorphic) {
+            return $association->getLast()->getRelationName();
+        }
+        assert($association instanceof AssociationPolymorphic);
+
+        $lasts = $association->getLast();
+        foreach ($lasts as $stub) {
             if ($stub->getBaseType() == get_class($target)) {
                 return $stub->getRelationName();
             }
