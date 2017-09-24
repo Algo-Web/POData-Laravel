@@ -2,13 +2,11 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
-use AlgoWeb\PODataLaravel\Controllers\MetadataControllerTrait;
-use AlgoWeb\PODataLaravel\Controllers\TestController;
-use Illuminate\Routing\Controller;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Cache;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
+use AlgoWeb\PODataLaravel\Controllers\MetadataControllerTrait;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 
 class MetadataControllerProvider extends MetadataBaseProvider
 {
@@ -63,7 +61,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
                     }
                     assert(
                         !$alreadyKey,
-                        'Mapping already defined for model '.$key.' and CRUD verb '.$barrel
+                        'Mapping already defined for model ' . $key . ' and CRUD verb ' . $barrel
                     );
                     $metamix[$key][$barrel] = $roll;
                 }
@@ -83,15 +81,18 @@ class MetadataControllerProvider extends MetadataBaseProvider
      */
     public function register()
     {
-        $this->app->singleton('metadataControllers', function ($app) {
-            return new MetadataControllerContainer();
-        });
+        $this->app->singleton(
+            'metadataControllers',
+            function ($app) {
+                return new MetadataControllerContainer();
+            }
+        );
     }
 
     /**
      * @param $classes
-     * @return array
      * @throws \Exception
+     * @return array
      */
     protected function getCandidateControllers($classes)
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models;
+namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
 class AssociationStubPolymorphic extends AssociationStubBase
 {
@@ -25,6 +25,11 @@ class AssociationStubPolymorphic extends AssociationStubBase
         $this->morphType = $morphType;
     }
 
+    /**
+     * @param \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase $otherStub
+     *
+     * @return bool
+     */
     public function isCompatible(AssociationStubBase $otherStub)
     {
         if (!parent::isCompatible($otherStub)) {
@@ -45,5 +50,11 @@ class AssociationStubPolymorphic extends AssociationStubBase
         }
 
         return true;
+    }
+
+    public function isKnownSide()
+    {
+        assert($this->isOk(), 'Polymorphic stub not OK so known-side determination is meaningless');
+        return null === $this->targType;
     }
 }

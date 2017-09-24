@@ -2,7 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
-use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
@@ -422,7 +422,7 @@ class IronicSerialiserTest extends SerialiserTestBase
             App::instance($className, $testModel);
         }
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
@@ -522,9 +522,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     *
-     */
+    
     public function testSerialiseKnownSideWithNoResourceMatch()
     {
         $known = Carbon::create(2017, 1, 1, 0, 0, 0, 'UTC');
@@ -601,9 +599,9 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $op = new IlluminateOperationContext($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -664,9 +662,9 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $op = new IlluminateOperationContext($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);

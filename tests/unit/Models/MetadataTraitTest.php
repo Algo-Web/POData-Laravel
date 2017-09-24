@@ -2,18 +2,11 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
-use AlgoWeb\PODataLaravel\Models\TestMorphManySourceWithUnexposedTarget;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\App;
-use Illuminate\Database\Connection;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use Illuminate\Database\Connection;
+use Illuminate\Support\Facades\App;
 use Mockery as m;
-use POData\Providers\Metadata\ResourceEntityType;
-use POData\Providers\Metadata\ResourceSet;
-use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
-use POData\Providers\Metadata\Type\StringType;
 
 /**
  * Generated Test Class.
@@ -148,7 +141,7 @@ class MetadataTraitTest extends TestCase
         $expected['added_at'] = ['type' => 'integer', 'nullable' => false, 'fillable' => true, 'default' => null];
         $expected['weight'] = ['type' => 'integer', 'nullable' => false, 'fillable' => true, 'default' => null];
         $expected['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $expected['WeightCode'] = ['type' => 'text', 'nullable' => true, 'fillable' => false, 'default' => ""];
+        $expected['WeightCode'] = ['type' => 'text', 'nullable' => true, 'fillable' => false, 'default' => ''];
 
         $intType = \Mockery::mock(\Doctrine\DBAL\Types\IntegerType::class);
         $intType->shouldReceive('getName')->andReturn('integer');
@@ -282,192 +275,7 @@ class MetadataTraitTest extends TestCase
         $this->assertEquals(0, count($expResDiff) + count($resExpDiff)); // if all keys are common, arrays are equal
     }
 
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getXmlSchema
-     * @todo   Implement testGetXmlSchema().
-     */
-    public function testGetXmlSchema()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
 
-    public function testGetXmlSchemaBlobAndOthers()
-    {
-        $expectedTypes = [];
-        $expectedTypes['integer'] = 'POData\\Providers\\Metadata\\Type\\Int32';
-        $expectedTypes['string'] = 'POData\\Providers\\Metadata\\Type\\StringType';
-
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-
-        $foo = new TestModel($meta);
-
-        $result = $foo->getXmlSchema();
-        $this->assertEquals('TestModel', $result->getName());
-
-        $props = $result->getPropertiesDeclaredOnThisType();
-        $this->assertEquals(2, count($props));
-        foreach ($props as $key => $val) {
-            $this->assertTrue(array_key_exists($key, $meta));
-            $targType = get_class($val->getInstanceType());
-            $refType = $meta[$key]['type'];
-            $this->assertEquals($expectedTypes[$refType], $targType);
-        }
-
-        $streams = $result->getNamedStreamsDeclaredOnThisType();
-        $this->assertEquals(1, count($streams));
-        foreach ($streams as $key => $val) {
-            $this->assertTrue(array_key_exists($key, $meta));
-            $this->assertEquals('blob', $meta[$key]['type']);
-        }
-    }
-
-    public function testGetXmlSchemaOnEmptyMetadata()
-    {
-        $meta = [];
-
-        $foo = new TestModel($meta);
-
-        $result = $foo->getXmlSchema();
-        $this->assertNull($result);
-    }
-
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::hookUpRelationships
-     */
-    public function testHookUpRelationshipsBadInputFormat()
-    {
-        $meta = [];
-
-        $foo = new TestModel($meta);
-        $types = 'types';
-        $sets = 'sets';
-
-        $expected = 'assert(): Both entityTypes and resourceSets must be arrays failed';
-        $actual = null;
-
-        try {
-            $result = $foo->hookUpRelationships($types, $sets);
-        } catch (\ErrorException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testHookUpRelationshipsOneInputNotArray()
-    {
-        $foo = m::mock(TestModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getRelationshipsFromMethods')->andReturn([])->never();
-
-        $types = [];
-        $sets = 'scoobie oobie doobie oobie doobie melodie';
-
-        $expected = 'assert(): Both entityTypes and resourceSets must be arrays failed';
-        $actual = null;
-
-        try {
-            $result = $foo->hookUpRelationships($types, $sets);
-        } catch (\ErrorException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-        try {
-            $result = $foo->hookUpRelationships($sets, $types);
-        } catch (\ErrorException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testHookUpRelationshipsBothEmptyArrays()
-    {
-        $foo = m::mock(TestModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getRelationshipsFromMethods')->andReturn([])->once();
-
-        $types = [];
-        $sets = [];
-
-        $result = $foo->hookUpRelationships($types, $sets);
-        $this->assertTrue(is_array($result));
-        $this->assertEquals(0, count($result));
-    }
-
-    public function testHookUpRelationshipsExistsInOnlyOneArray()
-    {
-        $foo = m::mock(TestModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getRelationshipsFromMethods')->andReturn([])->twice();
-
-        $types = [get_class($foo) => 'bar'];
-        $sets = [];
-
-        $result = $foo->hookUpRelationships($types, $sets);
-        $this->assertTrue(is_array($result));
-        $this->assertEquals(0, count($result));
-
-        $result = $foo->hookUpRelationships($sets, $types);
-        $this->assertTrue(is_array($result));
-        $this->assertEquals(0, count($result));
-    }
-
-    public function testHookUpRelationshipsHasOnlyHasOneRelations()
-    {
-        $meta = m::mock(SimpleMetadataProvider::class);
-        $meta->shouldReceive('addResourceReferenceProperty')->withAnyArgs()->andReturnNull()->once();
-        $meta->shouldReceive('addResourceSetReferenceProperty')->withAnyArgs()->andReturnNull()->never();
-
-        $foo = m::mock(TestModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $fooName = get_class($foo);
-        $barName = TestMorphTarget::class;
-
-        $rel = [];
-        $rel['HasOne'] = ['b' => $barName];
-        $rel['HasMany'] = [];
-        $foo->shouldReceive('getRelationshipsFromMethods')->andReturn($rel)->once();
-
-        $type1 = m::mock(ResourceEntityType::class);
-        $type2 = m::mock(ResourceEntityType::class);
-        $set1 = m::mock(ResourceSet::class);
-        $set2 = m::mock(ResourceSet::class);
-        $types = [$fooName => $type1, $barName => $type2];
-        $sets = [$fooName => $set1, $barName => $set2];
-
-        $result = $foo->hookUpRelationships($types, $sets);
-        $this->assertTrue(is_array($result));
-        $this->assertEquals(2, count($result));
-    }
-
-    public function testHookUpRelationshipsHasOnlyHasManyRelations()
-    {
-        $meta = m::mock(SimpleMetadataProvider::class);
-        $meta->shouldReceive('addResourceReferenceProperty')->withAnyArgs()->andReturnNull()->never();
-        $meta->shouldReceive('addResourceSetReferenceProperty')->withAnyArgs()->andReturnNull()->once();
-
-        $foo = m::mock(TestModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $fooName = get_class($foo);
-        $barName = TestMorphTarget::class;
-
-        $rel = [];
-        $rel['HasMany'] = ['b' => $barName];
-        $rel['HasOne'] = [];
-        $foo->shouldReceive('getRelationshipsFromMethods')->andReturn($rel)->once();
-
-        $type1 = m::mock(ResourceEntityType::class);
-        $type2 = m::mock(ResourceEntityType::class);
-        $set1 = m::mock(ResourceSet::class);
-        $set2 = m::mock(ResourceSet::class);
-        $types = [$fooName => $type1, $barName => $type2];
-        $sets = [$fooName => $set1, $barName => $set2];
-
-        $result = $foo->hookUpRelationships($types, $sets);
-        $this->assertTrue(is_array($result));
-        $this->assertEquals(2, count($result));
-    }
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
@@ -550,7 +358,7 @@ class MetadataTraitTest extends TestCase
     {
         $foo = new TestModel();
 
-        $expected = 'testmodel';
+        $expected = 'TestModel';
         $actual = $foo->getEndpointName();
         $this->assertEquals($expected, $actual);
     }
@@ -558,7 +366,7 @@ class MetadataTraitTest extends TestCase
     public function testGetEndpointSpecifiedName()
     {
         $foo = new TestModel(null, 'EndPoint');
-        $expected = 'endpoint';
+        $expected = 'EndPoint';
         $actual = $foo->getEndpointName();
         $this->assertEquals($expected, $actual);
     }
@@ -595,7 +403,7 @@ class MetadataTraitTest extends TestCase
         $foo = new TestMonomorphicSource();
         $relations = [new \DateTime()];
 
-        $expected = "Object of class DateTime could not be converted to string";
+        $expected = 'Object of class DateTime could not be converted to string';
         $actual = null;
 
         try {
@@ -611,7 +419,7 @@ class MetadataTraitTest extends TestCase
         $foo = new TestMonomorphicSource();
         $relations = [[]];
 
-        $expected = "Array to string conversion";
+        $expected = 'Array to string conversion';
         $actual = null;
 
         try {
@@ -622,44 +430,10 @@ class MetadataTraitTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testGetXmlSchemaOnUnknownSideOfPolymorphic()
-    {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-
-        $entity = m::mock(ResourceEntityType::class);
-        $entity->shouldReceive('isAbstract')->withAnyArgs()->andReturn(false)->never();
-
-        $iType = new StringType();
-        $base = m::mock(ResourceEntityType::class)->makePartial();
-        $base->shouldReceive('getInstanceType')->andReturn($iType);
-        $base->shouldReceive('getName')->andReturn(TestMorphOneSource::class);
-        $base->shouldReceive('getFullName')->andReturn(TestMorphOneSource::class);
-        $base->shouldReceive('addProperty')->andReturn(null)->times(2);
-        $base->shouldReceive('setMediaLinkEntry')->andReturn(null)->times(1);
-        $base->shouldReceive('isMediaLinkEntry')->andReturn(true)->once();
-        $base->shouldReceive('addNamedStream')->andReturn(null)->times(1);
-        $base->shouldReceive('getKeyProperties')->andReturn(['a'])->times(1);
-
-        $metaProv = m::mock(SimpleMetadataProvider::class)->makePartial();
-        $metaProv->shouldReceive('resolveResourceType')->andReturn($entity)->never();
-        $metaProv->shouldReceive('addEntityType')->andReturn($base);
-
-
-        //$foo = new TestMorphOneSource($meta);
-        $foo = m::mock(TestMorphOneSource::class)->makePartial();
-        $foo->shouldReceive('metadata')->andReturn($meta);
-        $foo->shouldReceive('isUnknownPolymorphSide')->andReturn(true)->never();
-        $foo->shouldReceive('isKnownPolymorphSide')->andReturn(false)->once();
-
-        $result = $foo->getXmlSchema();
-        $this->assertEquals(TestMorphOneSource::class, $result->getName());
-    }
-
     /**
      * @dataProvider knownSideProvider
+     * @param mixed $modelName
+     * @param mixed $expected
      */
     public function testCheckKnownSide($modelName, $expected)
     {
@@ -695,6 +469,8 @@ class MetadataTraitTest extends TestCase
 
     /**
      * @dataProvider unknownSideProvider
+     * @param mixed $modelName
+     * @param mixed $expected
      */
     public function testCheckUnknownSide($modelName, $expected)
     {

@@ -2,6 +2,15 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
+use Mockery as m;
+use POData\Providers\Metadata\ResourceEntityType;
+
 class EntityGubbinsTest extends TestCase
 {
     public function testSimpleGettersAndSetters()
@@ -77,15 +86,8 @@ class EntityGubbinsTest extends TestCase
     public function testSetEmptyStubsArray()
     {
         $foo = new EntityGubbins();
-        $expected = 'Stubs array must not be empty';
-        $actual = null;
-
-        try {
-            $foo->setStubs([]);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
+        $foo->setStubs([]);
+        $this->assertEquals(0, count($foo->getStubs()));
     }
 
     public function testSetBadStubsArray()
@@ -109,5 +111,84 @@ class EntityGubbinsTest extends TestCase
 
         $foo->setStubs([$stub]);
         $this->assertEquals(1, count($foo->getStubs()));
+    }
+
+    public function testSetAbstractODataType()
+    {
+        $foo = new EntityGubbins();
+        $rType = m::mock(ResourceEntityType::class);
+        $rType->shouldReceive('isAbstract')->andReturn(true)->once();
+
+        $expected = 'OData resource entity type must be concrete';
+        $actual = null;
+
+        try {
+            $foo->setOdataResourceType($rType);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testFieldAndAssociationNamesIntersectNotOk()
+    {
+        $foo = m::mock(EntityGubbins::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getFieldNames')->andReturn(['field', 'overlap'])->once();
+        $foo->shouldReceive('getAssociationNames')->andReturn(['overlap', 'relation'])->once();
+        $this->assertFalse($foo->isOk());
+    }
+
+    public function testAddDisconnectedEmptyMonomorphicAssociation()
+    {
+        $foo = new EntityGubbins();
+        $assoc = new AssociationMonomorphic();
+
+        $expected = 'Association cannot be connected to this entity';
+        $actual = null;
+
+        try {
+            $foo->addAssociation($assoc);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testAddDisconnectedMonomorphicAssociation()
+    {
+        $foo = new EntityGubbins();
+        $foo->setStubs([]);
+        $assoc = m::mock(AssociationMonomorphic::class);
+        $stub = m::mock(AssociationStubBase::class);
+        $assoc->shouldReceive('getFirst')->andReturn($stub)->once();
+
+        $expected = 'Association cannot be connected to this entity';
+        $actual = null;
+
+        try {
+            $foo->addAssociation($assoc);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testAddDisconnectedPolymorphicAssociation()
+    {
+        $foo = new EntityGubbins();
+        $foo->setStubs([]);
+        $assoc = m::mock(AssociationPolymorphic::class);
+        $stub = m::mock(AssociationStubBase::class);
+        $assoc->shouldReceive('getLast')->andReturn([$stub])->once();
+
+        $expected = 'Association cannot be connected to this entity';
+        $actual = null;
+
+        try {
+            $foo->addAssociation($assoc, false);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 }

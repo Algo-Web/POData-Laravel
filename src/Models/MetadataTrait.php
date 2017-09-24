@@ -1,17 +1,21 @@
 <?php
 namespace AlgoWeb\PODataLaravel\Models;
 
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Support\Facades\App as App;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use POData\Providers\Metadata\ResourceEntityType;
-use POData\Providers\Metadata\ResourceStreamInfo;
 use POData\Providers\Metadata\Type\EdmPrimitiveType;
-use Illuminate\Database\Eloquent\Model;
 
 trait MetadataTrait
 {
@@ -20,20 +24,6 @@ trait MetadataTrait
     protected static $methodPrimary = [];
     protected static $methodAlternate = [];
     protected $loadEagerRelations = [];
-
-    /*
-     * Array to record mapping between doctrine types and OData types
-     */
-    protected $mapping = [
-        'integer' => EdmPrimitiveType::INT32,
-        'string' => EdmPrimitiveType::STRING,
-        'datetime' => EdmPrimitiveType::DATETIME,
-        'float' => EdmPrimitiveType::SINGLE,
-        'decimal' => EdmPrimitiveType::DECIMAL,
-        'text' => EdmPrimitiveType::STRING,
-        'boolean' => EdmPrimitiveType::BOOLEAN,
-        'blob' => 'stream'
-    ];
 
     /*
      * Retrieve and assemble this model's metadata for OData packaging
@@ -126,112 +116,13 @@ trait MetadataTrait
         if (!isset($endpoint)) {
             $bitter = get_class();
             $name = substr($bitter, strrpos($bitter, '\\')+1);
-            return strtolower($name);
+            return ($name);
         }
-        return strtolower($endpoint);
-    }
-
-    /*
-     * Assemble this model's OData metadata as xml schema
-     *
-     * @return ResourceEntityType
-     */
-    public function getXmlSchema()
-    {
-        $raw = $this->metadata();
-        if ([] == $raw) {
-            return null;
-        }
-
-        $metadata = App::make('metadata');
-
-        $isKnown = $this->isKnownPolymorphSide();
-        $isAbstract = false;
-        if ($isKnown) {
-            $baseType = $metadata->resolveResourceType('polyMorphicPlaceholder');
-            assert($baseType instanceof ResourceEntityType);
-            assert($baseType->isAbstract());
-            $isAbstract = true;
-        } else {
-            $baseType = null;
-        }
-
-        $reflec = new \ReflectionClass(get_class($this));
-        $complex = $metadata->addEntityType($reflec, $reflec->getShortName(), false, $baseType);
-        $keyName = $this->getKeyName();
-
-        if (null !== $keyName && !$isAbstract) {
-            $metadata->addKeyProperty($complex, $keyName, $this->mapping[$raw[$keyName]['type']]);
-        }
-        assert(0 < count($complex->getKeyProperties()), get_class($this) . ' has no effective keys');
-
-        foreach ($raw as $key => $secret) {
-            if ($key == $keyName) {
-                continue;
-            }
-            if ($secret['type'] == 'blob') {
-                $complex->setMediaLinkEntry(true);
-                $streamInfo = new ResourceStreamInfo($key);
-                assert($complex->isMediaLinkEntry());
-                $complex->addNamedStream($streamInfo);
-                continue;
-            }
-            $nullable = $secret['nullable'];
-            $default = $secret['default'];
-            // tag as isBag?
-            $metadata->addPrimitiveProperty(
-                $complex,
-                $key,
-                $this->mapping[$secret['type']],
-                false,
-                $default,
-                $nullable
-            );
-        }
-
-        return $complex;
+        return ($endpoint);
     }
 
     /**
-     * @param $entityTypes
-     * @param $resourceSets
-     * @return array
-     */
-    public function hookUpRelationships($entityTypes, $resourceSets)
-    {
-        assert(is_array($entityTypes) && is_array($resourceSets), 'Both entityTypes and resourceSets must be arrays');
-        $metadata = App::make('metadata');
-        $rel = $this->getRelationshipsFromMethods();
-        $thisClass = get_class($this);
-        $thisInTypes = array_key_exists($thisClass, $entityTypes);
-        $thisInSets = array_key_exists($thisClass, $resourceSets);
-
-        if (!($thisInSets && $thisInTypes)) {
-            return $rel;
-        }
-
-        $resourceType = $entityTypes[$thisClass];
-        // if $r is in $combined keys, then its in keyspaces of both $entityTypes and $resourceSets
-        $combinedKeys = array_intersect(array_keys($entityTypes), array_keys($resourceSets));
-        foreach ($rel['HasOne'] as $n => $r) {
-            $r = trim($r, '\\');
-            if (in_array($r, $combinedKeys)) {
-                $targResourceSet = $resourceSets[$r];
-                $metadata->addResourceReferenceProperty($resourceType, $n, $targResourceSet);
-            }
-        }
-        foreach ($rel['HasMany'] as $n => $r) {
-            $r = trim($r, '\\');
-            if (in_array($r, $combinedKeys)) {
-                $targResourceSet = $resourceSets[$r];
-                $metadata->addResourceSetReferenceProperty($resourceType, $n, $targResourceSet);
-            }
-        }
-        return $rel;
-    }
-
-    /**
-     * Get model's relationships
+     * Get model's relationships.
      *
      * @return array
      */
@@ -284,6 +175,7 @@ trait MetadataTrait
 
     /**
      * @param bool $biDir
+     *
      * @return array
      */
     protected function getRelationshipsFromMethods($biDir = false)
@@ -307,7 +199,7 @@ trait MetadataTrait
                         $reflection = new \ReflectionMethod($model, $method);
 
                         $file = new \SplFileObject($reflection->getFileName());
-                        $file->seek($reflection->getStartLine() - 1);
+                        $file->seek($reflection->getStartLine()-1);
                         $code = '';
                         while ($file->key() < $reflection->getEndLine()) {
                             $code .= $file->current();
@@ -320,21 +212,21 @@ trait MetadataTrait
                             'Function definition must have keyword \'function\''
                         );
                         $begin = strpos($code, 'function(');
-                        $code = substr($code, $begin, strrpos($code, '}') - $begin + 1);
-                        $lastCode = $code[strlen($code) - 1];
+                        $code = substr($code, $begin, strrpos($code, '}')-$begin+1);
+                        $lastCode = $code[strlen($code)-1];
                         assert('}' == $lastCode, 'Final character of function definition must be closing brace');
                         foreach ([
-                                     'hasMany',
-                                     'hasManyThrough',
-                                     'belongsToMany',
-                                     'hasOne',
-                                     'belongsTo',
-                                     'morphOne',
-                                     'morphTo',
-                                     'morphMany',
-                                     'morphToMany',
-                                     'morphedByMany'
-                                 ] as $relation) {
+                                        'hasMany',
+                                        'hasManyThrough',
+                                        'belongsToMany',
+                                        'hasOne',
+                                        'belongsTo',
+                                        'morphOne',
+                                        'morphTo',
+                                        'morphMany',
+                                        'morphToMany',
+                                        'morphedByMany'
+                                    ] as $relation) {
                             $search = '$this->' . $relation . '(';
                             if ($pos = stripos($code, $search)) {
                                 //Resolve the relation's model to a Relation object.
@@ -439,7 +331,7 @@ trait MetadataTrait
     abstract public function getFillable();
 
     /**
-     * Dig up all defined getters on the model
+     * Dig up all defined getters on the model.
      *
      * @return array
      */
@@ -465,7 +357,9 @@ trait MetadataTrait
     }
 
     /**
-     * @param $foo
+     * @param       $foo
+     * @param mixed $condition
+     *
      * @return array
      */
     private function polyglotKeyMethodNames($foo, $condition = false)
@@ -489,7 +383,10 @@ trait MetadataTrait
                         break;
                     }
                 }
-                assert(in_array($fkMethodName, $methodList), 'Selected method, '.$fkMethodName.', not in method list');
+                assert(
+                    in_array($fkMethodName, $methodList),
+                    'Selected method, ' . $fkMethodName . ', not in method list'
+                );
                 $rkMethodName = 'getQualifiedRelatedPivotKeyName';
                 foreach ($rkList as $option) {
                     if (in_array($option, $methodList)) {
@@ -497,7 +394,10 @@ trait MetadataTrait
                         break;
                     }
                 }
-                assert(in_array($rkMethodName, $methodList), 'Selected method, '.$rkMethodName.', not in method list');
+                assert(
+                    in_array($rkMethodName, $methodList),
+                    'Selected method, ' . $rkMethodName . ', not in method list'
+                );
                 $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
                 static::$methodPrimary[get_class($foo)] = $line;
             }
@@ -520,13 +420,19 @@ trait MetadataTrait
             } else {
                 $methodList = get_class_methods(get_class($foo));
                 $fkCombo = array_values(array_intersect($fkList, $methodList));
-                assert(1 <= count($fkCombo), 'Expected at least 1 element in foreign-key list, got '.count($fkCombo));
+                assert(1 <= count($fkCombo), 'Expected at least 1 element in foreign-key list, got ' . count($fkCombo));
                 $fkMethodName = $fkCombo[0];
-                assert(in_array($fkMethodName, $methodList), 'Selected method, '.$fkMethodName.', not in method list');
+                assert(
+                    in_array($fkMethodName, $methodList),
+                    'Selected method, ' . $fkMethodName . ', not in method list'
+                );
                 $rkCombo = array_values(array_intersect($rkList, $methodList));
-                assert(1 <= count($rkCombo), 'Expected at least 1 element in related-key list, got '.count($rkCombo));
+                assert(1 <= count($rkCombo), 'Expected at least 1 element in related-key list, got ' . count($rkCombo));
                 $rkMethodName = $rkCombo[0];
-                assert(in_array($rkMethodName, $methodList), 'Selected method, '.$rkMethodName.', not in method list');
+                assert(
+                    in_array($rkMethodName, $methodList),
+                    'Selected method, ' . $rkMethodName . ', not in method list'
+                );
                 $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
                 static::$methodAlternate[get_class($foo)] = $line;
             }
@@ -535,13 +441,14 @@ trait MetadataTrait
     }
 
     /**
-     * @param $hooks
-     * @param $first
-     * @param $property
-     * @param $last
-     * @param $mult
-     * @param $targ
+     * @param             $hooks
+     * @param             $first
+     * @param             $property
+     * @param             $last
+     * @param             $mult
+     * @param             $targ
      * @param string|null $targ
+     * @param null|mixed  $type
      */
     private function addRelationsHook(&$hooks, $first, $property, $last, $mult, $targ, $type = null)
     {
@@ -578,10 +485,10 @@ trait MetadataTrait
 
             $keyRaw = $isBelong ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
             $keySegments = explode('.', $keyRaw);
-            $keyName = $keySegments[count($keySegments) - 1];
+            $keyName = $keySegments[count($keySegments)-1];
             $localRaw = $isBelong ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
             $localSegments = explode('.', $localRaw);
-            $localName = $localSegments[count($localSegments) - 1];
+            $localName = $localSegments[count($localSegments)-1];
             $first = $keyName;
             $last = $localName;
             $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
@@ -607,10 +514,10 @@ trait MetadataTrait
 
             $keyName = $isBelong ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
             $keySegments = explode('.', $keyName);
-            $keyName = $keySegments[count($keySegments) - 1];
+            $keyName = $keySegments[count($keySegments)-1];
             $localRaw = $isBelong ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
             $localSegments = explode('.', $localRaw);
-            $localName = $localSegments[count($localSegments) - 1];
+            $localName = $localSegments[count($localSegments)-1];
             $first = $isBelong ? $localName : $keyName;
             $last = $isBelong ? $keyName : $localName;
             $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
@@ -634,10 +541,10 @@ trait MetadataTrait
 
             $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
             $keySegments = explode('.', $keyRaw);
-            $keyName = $keySegments[count($keySegments) - 1];
+            $keyName = $keySegments[count($keySegments)-1];
             $localRaw = $isMany ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
             $localSegments = explode('.', $localRaw);
-            $localName = $localSegments[count($localSegments) - 1];
+            $localName = $localSegments[count($localSegments)-1];
             $first = $isMany ? $keyName : $localName;
             $last = $isMany ? $localName : $keyName;
             $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, 'unknown');
@@ -660,10 +567,10 @@ trait MetadataTrait
 
             $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
             $keySegments = explode('.', $keyRaw);
-            $keyName = $keySegments[count($keySegments) - 1];
+            $keyName = $keySegments[count($keySegments)-1];
             $localRaw = $isMany ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
             $localSegments = explode('.', $localRaw);
-            $localName = $localSegments[count($localSegments) - 1];
+            $localName = $localSegments[count($localSegments)-1];
 
             $first = $keyName;
             $last = (isset($localName) && '' != $localName) ? $localName : $foo->getRelated()->getKeyName();
@@ -672,7 +579,7 @@ trait MetadataTrait
     }
 
     /**
-     * SUpplemental function to retrieve cast array for Laravel versions that do not supply hasCasts
+     * SUpplemental function to retrieve cast array for Laravel versions that do not supply hasCasts.
      *
      * @return array
      */
@@ -682,7 +589,7 @@ trait MetadataTrait
     }
 
     /**
-     * Return list of relations to be eager-loaded by Laravel query provider
+     * Return list of relations to be eager-loaded by Laravel query provider.
      *
      * @return array
      */
@@ -693,7 +600,7 @@ trait MetadataTrait
     }
 
     /**
-     * Set list of relations to be eager-loaded
+     * Set list of relations to be eager-loaded.
      *
      * @param array $relations
      */
@@ -727,7 +634,7 @@ trait MetadataTrait
     }
 
     /**
-     * Extract entity gubbins detail for later downstream use
+     * Extract entity gubbins detail for later downstream use.
      *
      * @return EntityGubbins
      */
@@ -754,6 +661,7 @@ trait MetadataTrait
             $nuField->setDefaultValue($field['default']);
             $nuField->setIsKeyField($this->getKeyName() == $name);
             $nuField->setFieldType(EntityFieldType::PRIMITIVE());
+            $nuField->setPrimitiveType(new EntityFieldPrimitiveType($field['type']));
             $entityFields[$name] = $nuField;
         }
         $gubbins->setFields($entityFields);
@@ -779,7 +687,6 @@ trait MetadataTrait
                 }
             }
         }
-
         $gubbins->setStubs($stubs);
 
         return $gubbins;

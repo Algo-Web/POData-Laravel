@@ -2,7 +2,8 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
-use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
@@ -16,7 +17,6 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
-use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use POData\ObjectModel\ObjectModelSerializer;
 use POData\ObjectModel\ODataPropertyContent;
 use POData\OperationContext\ServiceHost;
@@ -46,9 +46,9 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $classen = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -102,9 +102,9 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $classen = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -160,9 +160,9 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -222,9 +222,9 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -293,9 +293,9 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $classen = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);

@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Concerns\BuildsQueries;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
@@ -16,6 +17,9 @@ class TestCastModel extends Model
     }
 
     protected $metaArray;
+    protected $connect;
+    protected $grammar;
+    protected $processor;
 
     protected $casts = ['is_bool' => 'boolean'];
 
@@ -27,6 +31,12 @@ class TestCastModel extends Model
         if (isset($endpoint)) {
             $this->endpoint = $endpoint;
         }
+        $this->processor = \Mockery::mock(\Illuminate\Database\Query\Processors\Processor::class)->makePartial();
+        $this->grammar = \Mockery::mock(\Illuminate\Database\Query\Grammars\Grammar::class)->makePartial();
+        $connect = \Mockery::mock(Connection::class)->makePartial();
+        $connect->shouldReceive('getQueryGrammar')->andReturn($this->grammar);
+        $connect->shouldReceive('getPostProcessor')->andReturn($this->processor);
+        $this->connect = $connect;
         parent::__construct();
     }
 

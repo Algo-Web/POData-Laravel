@@ -1,5 +1,6 @@
 Unreleased
 ----------
+   * Remix relation calculation and add stronger consistency checks
    * Fix bugs in base type generation
    * Fix bugs in relation calculation
    * Add dry-run config option
@@ -7,7 +8,7 @@ Unreleased
    * Implement relation hookup/disconnect
    * Add config switch to bypass authentication
    * Simulate polymorphic relations a la OData v3
-   * Turned Scrutinizer analysis up to 11
+   * Turn Scrutinizer analysis up to 11
    * Implement Laravel-specialised object model serialiser
    * Get skipToken handling working
    * Add capability to use Laravel's passport authentication (if available)

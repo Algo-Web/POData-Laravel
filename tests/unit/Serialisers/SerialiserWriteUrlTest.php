@@ -2,7 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
-use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
@@ -35,7 +35,7 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $classen = [TestModel::class];
         $metaProv = $this->setupMockMetadataProvider($classen);
@@ -80,7 +80,7 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $classen = [TestModel::class];
         $metaProv = $this->setupMockMetadataProvider($classen);
@@ -130,7 +130,7 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
-        $host->setServiceUri("/odata.svc/");
+        $host->setServiceUri('/odata.svc/');
 
         $classen = [TestModel::class];
         $metaProv = $this->setupMockMetadataProvider($classen);
@@ -171,7 +171,7 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
      */
     private function setupMockMetadataProvider($classen)
     {
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);

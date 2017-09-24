@@ -2,11 +2,11 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestCastModel;
 use AlgoWeb\PODataLaravel\Models\TestGetterModel;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use Mockery as m;
-use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 
 class ModelSerialiserTest extends TestCase
 {
@@ -78,7 +78,7 @@ class ModelSerialiserTest extends TestCase
         $bar = new TestGetterModel($meta, null);
         $bar->id = 1;
         $bar->name = 'model';
-        $bar->created_at = new \DateTime("2015-11-10 09:08:07");
+        $bar->created_at = new \DateTime('2015-11-10 09:08:07');
 
         $foo = new ModelSerialiser();
 

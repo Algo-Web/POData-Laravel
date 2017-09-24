@@ -3,6 +3,9 @@
 namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataProviderDummy;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use AlgoWeb\PODataLaravel\Models\TestCase;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
@@ -13,7 +16,7 @@ use AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
 use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
-use AlgoWeb\PODataLaravel\Models\TestMorphTargetChild;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -24,7 +27,6 @@ use POData\Common\Version;
 use POData\Configuration\EntitySetRights;
 use POData\Configuration\IServiceConfiguration;
 use POData\IService;
-use POData\OperationContext\IOperationContext;
 use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext;
 use POData\Providers\ProvidersWrapper;
@@ -34,6 +36,13 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 
 class MetadataProviderUriTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+        $foo = m::mock(MetadataProvider::class)->makePartial();
+        $foo->reset();
+    }
+
     public function testUriOfMonomorphicOneToOneRelation()
     {
         $metaRaw = [];
@@ -65,10 +74,17 @@ class MetadataProviderUriTest extends TestCase
             App::instance($className, $testModel);
         }
 
+        MetadataProvider::setAfterExtract(function (Map $objectMap) {
+            $assoc = $objectMap->getAssociations();
+            $this->assertEquals(0, count($assoc));
+            $entities = $objectMap->getEntities();
+            $this->assertEquals(2, count($entities));
+        });
+
         $app = App::make('app');
         $foo = new MetadataProviderDummy($app);
         $foo->setCandidateModels($classen);
-        $foo->boot();
+        $foo->boot(false);
 
         $meta = App::make('metadata');
 
@@ -129,10 +145,17 @@ class MetadataProviderUriTest extends TestCase
             App::instance($className, $testModel);
         }
 
+        MetadataProvider::setAfterUnify(function (Map $objectMap) {
+            $assoc = $objectMap->getAssociations();
+            $this->assertEquals(2, count($assoc));
+            $entities = $objectMap->getEntities();
+            $this->assertEquals(2, count($entities));
+        });
+
         $app = App::make('app');
         $foo = new MetadataProviderDummy($app);
         $foo->setCandidateModels($classen);
-        $foo->boot();
+        $foo->boot(false);
 
         $meta = App::make('metadata');
 
@@ -296,6 +319,7 @@ class MetadataProviderUriTest extends TestCase
     {
         $metaRaw = [];
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
@@ -323,11 +347,36 @@ class MetadataProviderUriTest extends TestCase
             $testModel = new $className($metaRaw);
             App::instance($className, $testModel);
         }
-
+        MetadataProvider::setAfterVerify(function (Map $objectMap) use ($classen) {
+            $entities = $objectMap->getEntities();
+            $this->assertEquals(count($classen), count($entities), 'The object map contained to many entities');
+            $this->assertArrayHasKey('AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate', $entities);
+            $this->assertArrayHasKey('AlgoWeb\PODataLaravel\Models\TestMorphTarget', $entities);
+            $morphTarget = $entities['AlgoWeb\PODataLaravel\Models\TestMorphTarget'];
+            $MorphManySourceAlternate = $entities['AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate'];
+            $morphTargetStubs = $morphTarget->getStubs();
+            $this->assertEquals(4, count($morphTargetStubs));
+            $MorphManySourceAlternateStubs = $MorphManySourceAlternate->getStubs();
+            $this->assertEquals(1, count($MorphManySourceAlternateStubs));
+            $morphTargetAssoc = $morphTarget->getAssociations();
+            $this->assertEquals(1, count($morphTargetAssoc));
+            foreach ($morphTargetAssoc as $key => $assoc) {
+                $this->assertTrue($assoc instanceof AssociationPolymorphic);
+                $assocTypes = $assoc->getAssociationType();
+                $this->assertEquals(AssociationType::ONE_TO_MANY, $assocTypes[0]->getValue());
+            }
+            $morphManyAssoc = $MorphManySourceAlternate->getAssociations();
+            $this->assertEquals(1, count($morphManyAssoc));
+            foreach ($morphManyAssoc as $key => $assoc) {
+                $this->assertTrue($assoc instanceof AssociationPolymorphic);
+                $assocTypes = $assoc->getAssociationType();
+                $this->assertEquals(AssociationType::ONE_TO_MANY, $assocTypes[0]->getValue());
+            }
+        });
         $app = App::make('app');
         $foo = new MetadataProviderDummy($app);
         $foo->setCandidateModels($classen);
-        $foo->boot();
+        $foo->boot(false);
 
         $meta = App::make('metadata');
 
@@ -389,10 +438,17 @@ class MetadataProviderUriTest extends TestCase
             App::instance($className, $testModel);
         }
 
+        MetadataProvider::setAfterImplement(function (Map $objectMap) {
+            $assoc = $objectMap->getAssociations();
+            $this->assertEquals(1, count($assoc));
+            $entities = $objectMap->getEntities();
+            $this->assertEquals(2, count($entities));
+        });
+
         $app = App::make('app');
         $foo = new MetadataProviderDummy($app);
         $foo->setCandidateModels($classen);
-        $foo->boot();
+        $foo->boot(false);
 
         $meta = App::make('metadata');
 

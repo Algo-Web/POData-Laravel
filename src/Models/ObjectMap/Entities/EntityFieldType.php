@@ -1,11 +1,11 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models;
+namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities;
 
 use MyCLabs\Enum\Enum;
 
 /**
- * Class EntityFieldType
+ * Class EntityFieldType.
  *
  * @method static EntityFieldType PRIMITIVE()
  * @method static EntityFieldType PRIMITIVE_BAG()

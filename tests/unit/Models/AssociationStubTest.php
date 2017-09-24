@@ -2,6 +2,9 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
 use Mockery as m;
 
 class AssociationStubTest extends TestCase
@@ -33,6 +36,28 @@ class AssociationStubTest extends TestCase
         $this->assertFalse($foo->isOk());
         $foo->setForeignField(123);
         $this->assertFalse($foo->isOk());
+    }
+
+    public function testMonomorphicAssociationIsIncompatibleNotOk()
+    {
+        $foo = m::mock(AssociationStubMonomorphic::class);
+        $foo->shouldReceive('isOk')->andReturn(false)->once();
+        $foo->shouldReceive('isCompatible')->passthru()->once();
+        $other = m::mock(AssociationStubMonomorphic::class);
+        $other->shouldReceive('isOk')->andReturn(false)->never();
+
+        $this->assertFalse($foo->isCompatible($other));
+    }
+
+    public function testPolymorphicAssociationIsIncompatibleNotOk()
+    {
+        $foo = m::mock(AssociationStubPolymorphic::class);
+        $foo->shouldReceive('isOk')->andReturn(true)->once();
+        $foo->shouldReceive('isCompatible')->passthru()->once();
+        $other = m::mock(AssociationStubPolymorphic::class);
+        $other->shouldReceive('isOk')->andReturn(false)->once();
+
+        $this->assertFalse($foo->isCompatible($other));
     }
 
     public function testPolymorphicAssociationIsOkBadForeignField()
@@ -89,6 +114,8 @@ class AssociationStubTest extends TestCase
 
         $this->assertTrue($foo->isCompatible($bar));
         $this->assertTrue($bar->isCompatible($foo));
+        $this->assertFalse($foo->isKnownSide());
+        $this->assertTrue($bar->isKnownSide());
     }
 
     public function testAssociationIncompatibleOnBothOne()
@@ -111,6 +138,8 @@ class AssociationStubTest extends TestCase
 
         $this->assertFalse($foo->isCompatible($bar));
         $this->assertFalse($bar->isCompatible($foo));
+        $this->assertFalse($foo->isKnownSide());
+        $this->assertTrue($bar->isKnownSide());
     }
 
     public function testAssociationPolymorphicWithBothEndsKnown()
@@ -130,6 +159,8 @@ class AssociationStubTest extends TestCase
 
         $this->assertFalse($foo->isCompatible($bar));
         $this->assertFalse($bar->isCompatible($foo));
+        $this->assertTrue($foo->isKnownSide());
+        $this->assertTrue($bar->isKnownSide());
     }
 
     public function testAssociationPolymorphicWithIncompatibleTypes()

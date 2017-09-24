@@ -1,34 +1,14 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models;
+namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
-class Association
+class AssociationMonomorphic extends Association
 {
-    /**
-     * @var AssociationStubBase
-     */
-    protected $first;
 
     /**
      * @var AssociationStubBase
      */
     protected $last;
-
-    /**
-     * @return AssociationStubBase
-     */
-    public function getFirst()
-    {
-        return $this->first;
-    }
-
-    /**
-     * @param AssociationStubBase $first
-     */
-    public function setFirst(AssociationStubBase $first)
-    {
-        $this->first = $first;
-    }
 
     /**
      * @return AssociationStubBase
@@ -46,6 +26,9 @@ class Association
         $this->last = $last;
     }
 
+    /**
+     * @return bool
+     */
     public function isOk()
     {
         $first = $this->getFirst();
@@ -60,5 +43,14 @@ class Association
             return false;
         }
         return -1 === $first->compare($last);
+    }
+
+    /**
+     * @return \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType
+     */
+    public function getAssociationType()
+    {
+        return new AssociationType($this->first->getMultiplicity()->getValue()
+                                    | $this->last->getMultiplicity()->getValue());
     }
 }

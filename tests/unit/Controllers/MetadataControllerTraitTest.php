@@ -2,14 +2,14 @@
 
 namespace AlgoWeb\PODataLaravel\Controllers;
 
-use AlgoWeb\PODataLaravel\Requests\TestRequest;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\App;
-use Illuminate\Database\Connection;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestModel as TestModel;
+use AlgoWeb\PODataLaravel\Requests\TestRequest;
+use Illuminate\Database\Connection;
 use Illuminate\Http\Request as Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class MetadataControllerTraitTest extends TestCase
 {

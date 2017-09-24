@@ -1,6 +1,6 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models;
+namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
 abstract class AssociationStubBase
 {
@@ -10,14 +10,14 @@ abstract class AssociationStubBase
     protected $multiplicity;
 
     /**
-     * Foreign key field of this end of relation
+     * Foreign key field of this end of relation.
      *
      * @var string
      */
     protected $keyField;
 
     /**
-     * Foreign key field of other end of relation
+     * Foreign key field of other end of relation.
      *
      * @var string
      */
@@ -30,12 +30,14 @@ abstract class AssociationStubBase
 
     /**
      * Target type this relation points to, if known.  Is null for known-side polymorphic relations.
+     *
      * @var string
      */
     protected $targType;
 
     /**
-     * Base type this relation is attached to
+     * Base type this relation is attached to.
+     *
      * @var string
      */
     protected $baseType;
@@ -95,9 +97,8 @@ abstract class AssociationStubBase
         $thisMono = $this instanceof AssociationStubMonomorphic;
         $thatMono = $otherStub instanceof AssociationStubMonomorphic;
 
-        $count = ($thisPoly ? 1 : 0) + ($thatPoly ? 1 : 0) + ($thisMono ? 1 : 0) + ($thatMono ? 1 : 0);
+        $count = ($thisPoly ? 1 : 0)+($thatPoly ? 1 : 0)+($thisMono ? 1 : 0)+($thatMono ? 1 : 0);
         assert(2 == $count);
-
         if ($thisPoly && $thatMono) {
             return false;
         }
@@ -198,11 +199,11 @@ abstract class AssociationStubBase
     }
 
     /**
-     * Supply a canonical sort ordering to determine order in associations
+     * Supply a canonical sort ordering to determine order in associations.
      *
      * @param AssociationStubBase $other
      *
-     * @return integer
+     * @return int
      */
     public function compare(AssociationStubBase $other)
     {

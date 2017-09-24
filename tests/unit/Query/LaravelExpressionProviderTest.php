@@ -4,10 +4,10 @@ namespace AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider as LaravelExpressionProvider;
-use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\ExpressionType;
-use POData\Providers\Metadata\ResourceType;
-use POData\UriProcessor\QueryProcessor\FunctionDescription;
 use POData\Common\ODataConstants;
+use POData\Providers\Metadata\ResourceType;
+use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\ExpressionType;
+use POData\UriProcessor\QueryProcessor\FunctionDescription;
 
 /**
  * Generated Test Class.
@@ -357,6 +357,9 @@ class LaravelExpressionProviderTest extends TestCase
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider::onConstantExpression
      * @dataProvider onConstantExpressionProvider
+     * @param mixed $type
+     * @param mixed $value
+     * @param mixed $expected
      */
     public function testOnConstantExpression($type, $value, $expected)
     {
@@ -367,14 +370,14 @@ class LaravelExpressionProviderTest extends TestCase
     public function onConstantExpressionProvider()
     {
         return [
-            [new \POData\Providers\Metadata\Type\Null1, null, "NULL"],
-            [new \POData\Providers\Metadata\Type\Boolean , true, "true"],
-            [new \POData\Providers\Metadata\Type\Boolean , false, "false"],
+            [new \POData\Providers\Metadata\Type\Null1, null, 'NULL'],
+            [new \POData\Providers\Metadata\Type\Boolean , true, 'true'],
+            [new \POData\Providers\Metadata\Type\Boolean , false, 'false'],
             [new \POData\Providers\Metadata\Type\Byte, 254, 254],
             [new \POData\Providers\Metadata\Type\Int16, 32767, 32767],
             [new \POData\Providers\Metadata\Type\Int32, 2147483647, 2147483647],
             [new \POData\Providers\Metadata\Type\Int64, 9223372036854775807, 9223372036854775807],
-            [new \POData\Providers\Metadata\Type\StringType, "the mighty string", "the mighty string"],
+            [new \POData\Providers\Metadata\Type\StringType, 'the mighty string', 'the mighty string'],
 
         ];
     }
@@ -399,8 +402,8 @@ class LaravelExpressionProviderTest extends TestCase
         $topLevelPropertyAccess->shouldReceive('getParent')->andReturn($SecondLevelPropertyAccess);
         $topLevelPropertyAccess->shouldReceive('getResourceProperty')->andReturn($topLevelResourceProperty);
         $SecondLevelPropertyAccess->shouldReceive('getResourceProperty')->andReturn($secondLevelResourceProperty);
-        $topLevelResourceProperty->shouldReceive('getName')->andReturn("TopPropertyAccessor");
-        $secondLevelResourceProperty->shouldReceive('getName')->andReturn("SecondPropertyAccessor");
+        $topLevelResourceProperty->shouldReceive('getName')->andReturn('TopPropertyAccessor');
+        $secondLevelResourceProperty->shouldReceive('getName')->andReturn('SecondPropertyAccessor');
 
 
         $foo = new LaravelExpressionProvider();
@@ -408,7 +411,7 @@ class LaravelExpressionProviderTest extends TestCase
         $refProperty = $fooRef->getProperty('iteratorName');
         $refProperty->setAccessible(true);
         $refProperty->setValue($foo, 'testIterator');
-        $expected = "testIterator->SecondPropertyAccessor->TopPropertyAccessor";
+        $expected = 'testIterator->SecondPropertyAccessor->TopPropertyAccessor';
         $result = $foo->onPropertyAccessExpression($topLevelPropertyAccess);
         $this->assertEquals($expected, $result);
     }
@@ -463,7 +466,7 @@ class LaravelExpressionProviderTest extends TestCase
 
         $func = new FunctionDescription(ODataConstants::STRFUN_COMPARE, null, null);
 
-        $expected = "strcmp(foo, bar)";
+        $expected = 'strcmp(foo, bar)';
         $result = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
         $this->assertEquals($expected, $result);
     }
@@ -474,7 +477,7 @@ class LaravelExpressionProviderTest extends TestCase
 
         $func = new FunctionDescription(ODataConstants::STRFUN_ENDSWITH, null, null);
 
-        $expected = "(strcmp(substr(foo, strlen(foo) - strlen(bar)), bar) === 0)";
+        $expected = '(strcmp(substr(foo, strlen(foo) - strlen(bar)), bar) === 0)';
         $result = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
         $this->assertEquals($expected, $result);
     }
@@ -485,7 +488,7 @@ class LaravelExpressionProviderTest extends TestCase
 
         $func = new FunctionDescription(ODataConstants::STRFUN_INDEXOF, null, null);
 
-        $expected = "strpos(foo, bar)";
+        $expected = 'strpos(foo, bar)';
         $result = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
         $this->assertEquals($expected, $result);
     }
@@ -550,7 +553,7 @@ class LaravelExpressionProviderTest extends TestCase
 
         $func = new FunctionDescription(ODataConstants::STRFUN_SUBSTRING, null, null);
 
-        $expected = "substr(foo, 2)";
+        $expected = 'substr(foo, 2)';
         $result = $foo->onFunctionCallExpression($func, [ 'foo', 2]);
         $this->assertEquals($expected, $result);
     }
@@ -561,7 +564,7 @@ class LaravelExpressionProviderTest extends TestCase
 
         $func = new FunctionDescription(ODataConstants::STRFUN_SUBSTRING, null, null);
 
-        $expected = "substr(foo, 2, 3)";
+        $expected = 'substr(foo, 2, 3)';
         $result = $foo->onFunctionCallExpression($func, [ 'foo', 2, 3]);
         $this->assertEquals($expected, $result);
     }

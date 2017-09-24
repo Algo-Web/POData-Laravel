@@ -2,13 +2,16 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase;
 use Mockery as m;
 
 class AssociationTest extends TestCase
 {
     public function testNotOkNewCreation()
     {
-        $foo = new Association();
+        $foo = new AssociationMonomorphic();
         $this->assertFalse($foo->isOk());
     }
 
@@ -17,7 +20,7 @@ class AssociationTest extends TestCase
         $one = m::mock(AssociationStubBase::class);
         $one->shouldReceive('isOk')->andReturn(false);
 
-        $foo = new Association();
+        $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
         $this->assertFalse($foo->isOk());
     }
@@ -27,7 +30,7 @@ class AssociationTest extends TestCase
         $one = m::mock(AssociationStubBase::class);
         $one->shouldReceive('isOk')->andReturn(true);
 
-        $foo = new Association();
+        $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
         $this->assertFalse($foo->isOk());
     }
@@ -39,7 +42,7 @@ class AssociationTest extends TestCase
         $two = m::mock(AssociationStubBase::class);
         $two->shouldReceive('isOk')->andReturn(false);
 
-        $foo = new Association();
+        $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
         $foo->setLast($two);
         $this->assertFalse($foo->isOk());
@@ -53,7 +56,7 @@ class AssociationTest extends TestCase
         $two = m::mock(AssociationStubBase::class);
         $two->shouldReceive('isOk')->andReturn(true);
 
-        $foo = new Association();
+        $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
         $foo->setLast($two);
         $this->assertFalse($foo->isOk());
@@ -68,7 +71,7 @@ class AssociationTest extends TestCase
         $two = m::mock(AssociationStubBase::class);
         $two->shouldReceive('isOk')->andReturn(true);
 
-        $foo = new Association();
+        $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
         $foo->setLast($two);
         $this->assertFalse($foo->isOk());
@@ -83,7 +86,7 @@ class AssociationTest extends TestCase
         $two = m::mock(AssociationStubBase::class);
         $two->shouldReceive('isOk')->andReturn(true);
 
-        $foo = new Association();
+        $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
         $foo->setLast($two);
         $this->assertTrue($foo->isOk());
@@ -110,10 +113,10 @@ class AssociationTest extends TestCase
             $foo->getRelationsByRelationName(TestMonomorphicTarget::class, 'manyTarget')
         ];
 
-        $assoc1 = new Association();
+        $assoc1 = new AssociationMonomorphic();
         $assoc1->setLast($srcStubs[0][0]);
         $assoc1->setFirst($dstStubs[0][0]);
-        $assoc2 = new Association();
+        $assoc2 = new AssociationMonomorphic();
         $assoc2->setLast($srcStubs[1][0]);
         $assoc2->setFirst($dstStubs[1][0]);
 
@@ -158,10 +161,10 @@ class AssociationTest extends TestCase
             $foo->getRelationsByRelationName(TestMonomorphicTarget::class, 'manyTarget')
         ];
 
-        $assoc1 = new Association();
+        $assoc1 = new AssociationMonomorphic();
         $assoc1->setLast($srcStubs[0][0]);
         $assoc1->setFirst($dstStubs[0][0]);
-        $assoc2 = new Association();
+        $assoc2 = new AssociationMonomorphic();
         $assoc2->setLast($srcStubs[1][0]);
         $assoc2->setFirst($dstStubs[1][0]);
 

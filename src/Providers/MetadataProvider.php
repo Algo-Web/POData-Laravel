@@ -2,46 +2,302 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
-use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
-use POData\Providers\Metadata\IMetadataProvider;
+use Illuminate\Support\Facades\Schema as Schema;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
-use POData\Providers\Metadata\ResourceType;
+use POData\Providers\Metadata\ResourceStreamInfo;
 use POData\Providers\Metadata\SimpleMetadataProvider;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema as Schema;
 use POData\Providers\Metadata\Type\TypeCode;
-use POData\Providers\ProvidersWrapper;
 
 class MetadataProvider extends MetadataBaseProvider
 {
-    protected $multConstraints = [ '0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
+    protected $multConstraints = ['0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
     protected static $metaNAMESPACE = 'Data';
-    protected static $relationCache;
     protected static $isBooted = false;
     const POLYMORPHIC = 'polyMorphicPlaceholder';
     const POLYMORPHIC_PLURAL = 'polyMorphicPlaceholders';
+
+    /**
+     * @var Map The completed object map set at post Implement;
+     */
+    private $completedObjectMap;
+
+    /**
+     * @return \AlgoWeb\PODataLaravel\Models\ObjectMap\Map
+     */
+    public function getObjectMap()
+    {
+        return $this->completedObjectMap;
+    }
+
+    protected static $afterExtract;
+    protected static $afterUnify;
+    protected static $afterVerify;
+    protected static $afterImplement;
+
+    public static function setAfterExtract(callable $method)
+    {
+        self::$afterExtract = $method;
+    }
+
+    public static function setAfterUnify(callable $method)
+    {
+        self::$afterUnify = $method;
+    }
+
+    public static function setAfterVerify(callable $method)
+    {
+        self::$afterVerify = $method;
+    }
+
+    public static function setAfterImplement(callable $method)
+    {
+        self::$afterImplement = $method;
+    }
+
 
     protected $relationHolder;
 
     public function __construct($app)
     {
         parent::__construct($app);
-        $this->relationHolder = new MetadataRelationHolder();
+        $this->relationHolder = new MetadataGubbinsHolder();
         self::$isBooted = false;
+    }
+
+    private function extract(array $modelNames)
+    {
+        $objectMap = new Map();
+        foreach ($modelNames as $modelName) {
+            $modelInstance = App::make($modelName);
+            $objectMap->addEntity($modelInstance->extractGubbins());
+        }
+        if (null != self::$afterExtract) {
+            $func = self::$afterExtract;
+            $func($objectMap);
+        }
+        return $objectMap;
+    }
+
+    private function unify(Map $objectMap)
+    {
+        $mgh = $this->getRelationHolder();
+        foreach ($objectMap->getEntities() as $entity) {
+            $mgh->addEntity($entity);
+        }
+        $objectMap->setAssociations($mgh->getRelations());
+        if (null != self::$afterUnify) {
+            $func = self::$afterUnify;
+            $func($objectMap);
+        }
+        return $objectMap;
+    }
+
+    private function verify(Map $objectModel)
+    {
+        $objectModel->isOK();
+        if (null != self::$afterVerify) {
+            $func = self::$afterVerify;
+            $func($objectModel);
+        }
+    }
+
+    private function implement(Map $objectModel)
+    {
+        $meta = App::make('metadata');
+        $entities = $objectModel->getEntities();
+        foreach ($entities as $entity) {
+            $baseType = $entity->isPolymorphicAffected() ? $meta->resolveResourceType('polyMorphicPlaceholder') : null;
+            $className = $entity->getClassName();
+            $entityName = $entity->getName();
+            $entityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, false, $baseType);
+            assert($entityType->hasBaseType() === isset($baseType));
+            $entity->setOdataResourceType($entityType);
+            $this->implementProperties($entity);
+            $meta->addResourceSet($entity->getClassName(), $entityType);
+            $meta->oDataEntityMap[$className] = $meta->oDataEntityMap[$entityName];
+        }
+        $metaCount = count($meta->oDataEntityMap);
+        $entityCount = count($entities);
+        assert($metaCount == 2 * $entityCount + 1);
+
+        if (null === $objectModel->getAssociations()) {
+            return;
+        }
+        $assoc = $objectModel->getAssociations();
+        $assoc = null === $assoc ? [] : $assoc;
+        foreach ($assoc as $association) {
+            assert($association->isOk());
+            if ($association instanceof AssociationMonomorphic) {
+                $this->implementAssociationsMonomorphic($objectModel, $association);
+            } elseif ($association instanceof AssociationPolymorphic) {
+                $this->implementAssociationsPolymorphic($objectModel, $association);
+            }
+        }
+        if (null != self::$afterImplement) {
+            $func = self::$afterImplement;
+            $func($objectModel);
+        }
+    }
+
+    private function implementAssociationsMonomorphic(Map $objectModel, AssociationMonomorphic $associationUnderHammer)
+    {
+        $meta = App::make('metadata');
+        $first = $associationUnderHammer->getFirst();
+        $last = $associationUnderHammer->getLast();
+        switch ($associationUnderHammer->getAssociationType()) {
+            case AssociationType::NULL_ONE_TO_NULL_ONE():
+            case AssociationType::NULL_ONE_TO_ONE():
+            case AssociationType::ONE_TO_ONE():
+                $meta->addResourceReferenceSinglePropertyBidirectional(
+                    $objectModel->getEntities()[$first->getBaseType()]->getOdataResourceType(),
+                    $objectModel->getEntities()[$last->getBaseType()]->getOdataResourceType(),
+                    $first->getRelationName(),
+                    $last->getRelationName()
+                );
+                break;
+            case AssociationType::NULL_ONE_TO_MANY():
+            case AssociationType::ONE_TO_MANY():
+                if ($first->getMultiplicity()->getValue() == AssociationStubRelationType::MANY) {
+                    $oneSide = $last;
+                    $manySide = $first;
+                } else {
+                    $oneSide = $first;
+                    $manySide = $last;
+                }
+                $meta->addResourceReferencePropertyBidirectional(
+                    $objectModel->getEntities()[$oneSide->getBaseType()]->getOdataResourceType(),
+                    $objectModel->getEntities()[$manySide->getBaseType()]->getOdataResourceType(),
+                    $oneSide->getRelationName(),
+                    $manySide->getRelationName()
+                );
+                break;
+            case AssociationType::MANY_TO_MANY():
+                $meta->addResourceSetReferencePropertyBidirectional(
+                    $objectModel->getEntities()[$first->getBaseType()]->getOdataResourceType(),
+                    $objectModel->getEntities()[$last->getBaseType()]->getOdataResourceType(),
+                    $first->getRelationName(),
+                    $last->getRelationName()
+                );
+        }
+    }
+
+    /**
+     * @param Map                    $objectModel
+     * @param AssociationPolymorphic $association
+     */
+    private function implementAssociationsPolymorphic(Map $objectModel, AssociationPolymorphic $association)
+    {
+        $meta = App::make('metadata');
+        $first = $association->getFirst();
+
+        $polySet = $meta->resolveResourceSet(static::POLYMORPHIC_PLURAL);
+        assert($polySet instanceof ResourceSet);
+
+        $principalType = $objectModel->getEntities()[$first->getBaseType()]->getOdataResourceType();
+        assert($principalType instanceof ResourceEntityType);
+        $principalSet = $principalType->getCustomState();
+        assert($principalSet instanceof ResourceSet);
+        $principalProp = $first->getRelationName();
+        $isPrincipalAdded = null !== $principalType->resolveProperty($principalProp);
+
+        if (!$isPrincipalAdded) {
+            if ($first->getMultiplicity()->getValue() !== AssociationStubRelationType::MANY) {
+                $meta->addResourceReferenceProperty($principalType, $principalProp, $polySet);
+            } else {
+                $meta->addResourceSetReferenceProperty($principalType, $principalProp, $polySet);
+            }
+        }
+
+        $types = $association->getAssociationType();
+        $final = $association->getLast();
+        $numRows = count($types);
+        assert($numRows == count($final));
+
+        for ($i = 0; $i < $numRows; $i++) {
+            $type = $types[$i];
+            $last = $final[$i];
+
+            $dependentType = $objectModel->getEntities()[$last->getBaseType()]->getOdataResourceType();
+            assert($dependentType instanceof ResourceEntityType);
+            $dependentSet = $dependentType->getCustomState();
+            assert($dependentSet instanceof ResourceSet);
+            $dependentProp = $last->getRelationName();
+            $isDependentAdded = null !== $dependentType->resolveProperty($dependentProp);
+
+            switch ($type) {
+                case AssociationType::NULL_ONE_TO_NULL_ONE():
+                case AssociationType::NULL_ONE_TO_ONE():
+                case AssociationType::ONE_TO_ONE():
+                    if (!$isDependentAdded) {
+                        $meta->addResourceReferenceProperty($dependentType, $dependentProp, $principalSet);
+                    }
+                    break;
+                case AssociationType::NULL_ONE_TO_MANY():
+                case AssociationType::ONE_TO_MANY():
+                    if (!$isDependentAdded) {
+                        $meta->addResourceSetReferenceProperty($dependentType, $dependentProp, $principalSet);
+                    }
+                    break;
+                case AssociationType::MANY_TO_MANY():
+                    if (!$isDependentAdded) {
+                        $meta->addResourceSetReferenceProperty($dependentType, $dependentProp, $principalSet);
+                    }
+            }
+        }
+    }
+
+    private function implementProperties(EntityGubbins $unifiedEntity)
+    {
+        $meta = App::make('metadata');
+        $odataEntity = $unifiedEntity->getOdataResourceType();
+        if (!$unifiedEntity->isPolymorphicAffected()) {
+            foreach ($unifiedEntity->getKeyFields() as $keyField) {
+                $meta->addKeyProperty($odataEntity, $keyField->getName(), $keyField->getEdmFieldType());
+            }
+        }
+        foreach ($unifiedEntity->getFields() as $field) {
+            if (in_array($field, $unifiedEntity->getKeyFields())) {
+                continue;
+            }
+            if ($field->getPrimitiveType() == 'blob') {
+                $odataEntity->setMediaLinkEntry(true);
+                $streamInfo = new ResourceStreamInfo($field->getName());
+                assert($odataEntity->isMediaLinkEntry());
+                $odataEntity->addNamedStream($streamInfo);
+                continue;
+            }
+            $meta->addPrimitiveProperty(
+                $odataEntity,
+                $field->getName(),
+                $field->getEdmFieldType(),
+                $field->getFieldType() == EntityFieldType::PRIMITIVE_BAG(),
+                $field->getDefaultValue(),
+                $field->getIsNullable()
+            );
+        }
     }
 
     /**
      * Bootstrap the application services.  Post-boot.
      *
+     * @param mixed $reset
+     *
      * @return void
      */
-    public function boot()
+    public function boot($reset = true)
     {
         self::$metaNAMESPACE = env('ODataMetaNamespace', 'Data');
         // If we aren't migrated, there's no DB tables to pull metadata _from_, so bail out early
@@ -63,7 +319,9 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
         $meta = App::make('metadata');
-        $this->reset();
+        if (false !== $reset) {
+            $this->reset();
+        }
 
         $stdRef = new \ReflectionClass(Model::class);
         $abstract = $meta->addEntityType($stdRef, static::POLYMORPHIC, true, null);
@@ -72,19 +330,11 @@ class MetadataProvider extends MetadataBaseProvider
         $meta->addResourceSet(static::POLYMORPHIC, $abstract);
 
         $modelNames = $this->getCandidateModels();
-
-        list($entityTypes) = $this->getEntityTypesAndResourceSets($meta, $modelNames);
-        $entityTypes[static::POLYMORPHIC] = $abstract;
-
-        // need to lift EntityTypes, adjust for polymorphic-affected relations, etc
-        $biDirect = $this->getRepairedRoundTripRelations();
-
-        // now that endpoints are hooked up, tackle the relationships
-        // if we'd tried earlier, we'd be guaranteed to try to hook a relation up to null, which would be bad
-        foreach ($biDirect as $line) {
-            $this->processRelationLine($line, $entityTypes, $meta);
-        }
-
+        $objectModel = $this->extract($modelNames);
+        $objectModel = $this->unify($objectModel);
+        $this->verify($objectModel);
+        $this->implement($objectModel);
+        $this->completedObjectMap = $objectModel;
         $key = 'metadata';
         $this->handlePostBoot($isCaching, $hasCache, $key, $meta);
         self::$isBooted = true;
@@ -121,378 +371,59 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * @param $meta
-     * @param $ends
-     * @return array[]
-     */
-    protected function getEntityTypesAndResourceSets($meta, $ends)
-    {
-        assert($meta instanceof IMetadataProvider, get_class($meta));
-        $entityTypes = [];
-        $resourceSets = [];
-        $begins = [];
-        $numEnds = count($ends);
-
-        for ($i = 0; $i < $numEnds; $i++) {
-            $bitter = $ends[$i];
-            $fqModelName = $bitter;
-
-            $instance = App::make($fqModelName);
-            $name = strtolower($instance->getEndpointName());
-            $metaSchema = $instance->getXmlSchema();
-
-            // if for whatever reason we don't get an XML schema, move on to next entry and drop current one from
-            // further processing
-            if (null == $metaSchema) {
-                continue;
-            }
-            $entityTypes[$fqModelName] = $metaSchema;
-            $resourceSets[$fqModelName] = $meta->addResourceSet($name, $metaSchema);
-            $begins[] = $bitter;
-        }
-
-        return [$entityTypes, $resourceSets, $begins];
-    }
-
-    /**
-     * @return MetadataRelationHolder
+     * @return MetadataGubbinsHolder
      */
     public function getRelationHolder()
     {
         return $this->relationHolder;
     }
 
-    public function calculateRoundTripRelations()
-    {
-        $modelNames = $this->getCandidateModels();
-
-        foreach ($modelNames as $name) {
-            if (!$this->getRelationHolder()->hasClass($name)) {
-                $model = new $name();
-                $this->getRelationHolder()->addModel($model);
-            }
-        }
-
-        return $this->getRelationHolder()->getRelations();
-    }
-
-    public function getPolymorphicRelationGroups()
-    {
-        $modelNames = $this->getCandidateModels();
-
-        $knownSide = [];
-        $unknownSide = [];
-
-        $hooks = [];
-        // fish out list of polymorphic-affected models for further processing
-        foreach ($modelNames as $name) {
-            $model = new $name();
-            $isPoly = false;
-            if ($model->isKnownPolymorphSide()) {
-                $knownSide[$name] = [];
-                $isPoly = true;
-            }
-            if ($model->isUnknownPolymorphSide()) {
-                $unknownSide[$name] = [];
-                $isPoly = true;
-            }
-            if (false === $isPoly) {
-                continue;
-            }
-
-            $rels = $model->getRelationships();
-            // it doesn't matter if a model has no relationships here, that lack will simply be skipped over
-            // during hookup processing
-            $hooks[$name] = $rels;
-        }
-        // ensure we've only loaded up polymorphic-affected models
-        $knownKeys = array_keys($knownSide);
-        $unknownKeys = array_keys($unknownSide);
-        $dualKeys = array_intersect($knownKeys, $unknownKeys);
-        assert(count($hooks) == (count($unknownKeys) + count($knownKeys) - count($dualKeys)));
-        // if either list is empty, bail out - there's nothing to do
-        if (0 === count($knownSide) || 0 === count($unknownSide)) {
-            return [];
-        }
-
-        // commence primary ignition
-
-        foreach ($unknownKeys as $key) {
-            assert(isset($hooks[$key]));
-            $hook = $hooks[$key];
-            foreach ($hook as $barb) {
-                foreach ($barb as $knownType => $propData) {
-                    $propName = array_keys($propData)[0];
-                    if (in_array($knownType, $knownKeys)) {
-                        if (!isset($knownSide[$knownType][$key])) {
-                            $knownSide[$knownType][$key] = [];
-                        }
-                        assert(isset($knownSide[$knownType][$key]));
-                        $knownSide[$knownType][$key][] = $propData[$propName]['property'];
-                    }
-                }
-            }
-        }
-
-        return $knownSide;
-    }
-
-    /**
-     * Get round-trip relations after inserting polymorphic-powered placeholders
-     *
-     * @return array
-     */
-    public function getRepairedRoundTripRelations()
-    {
-        if (!isset(self::$relationCache)) {
-            $rels = $this->calculateRoundTripRelations();
-            $groups = $this->getPolymorphicRelationGroups();
-
-            if (0 === count($groups)) {
-                self::$relationCache = $rels;
-                return $rels;
-            }
-
-            $placeholder = static::POLYMORPHIC;
-
-            $groupKeys = array_keys($groups);
-
-            // we have at least one polymorphic relation, need to dig it out
-            $numRels = count($rels);
-            for ($i = 0; $i < $numRels; $i++) {
-                $relation = $rels[$i];
-                $principalType = $relation['principalType'];
-                $dependentType = $relation['dependentType'];
-                $principalPoly = in_array($principalType, $groupKeys);
-                $dependentPoly = in_array($dependentType, $groupKeys);
-                $rels[$i]['principalRSet'] = $principalPoly ? $placeholder : $principalType;
-                $rels[$i]['dependentRSet'] = $dependentPoly ? $placeholder : $dependentType;
-            }
-            self::$relationCache = $rels;
-        }
-        return self::$relationCache;
-    }
-
-    private function processRelationLine($line, $entityTypes, &$meta)
-    {
-        $principalType = $line['principalType'];
-        $principalMult = $line['principalMult'];
-        $principalProp = $line['principalProp'];
-        $principalRSet = $line['principalRSet'];
-        $dependentType = $line['dependentType'];
-        $dependentMult = $line['dependentMult'];
-        $dependentProp = $line['dependentProp'];
-        $dependentRSet = $line['dependentRSet'];
-
-        if (!isset($entityTypes[$principalType]) || !isset($entityTypes[$dependentType])) {
-            return;
-        }
-        $principal = $entityTypes[$principalType];
-        $dependent = $entityTypes[$dependentType];
-        $isPoly = static::POLYMORPHIC == $principalRSet || static::POLYMORPHIC == $dependentRSet;
-
-        if ($isPoly) {
-            $this->attachReferencePolymorphic(
-                $meta,
-                $principalMult,
-                $dependentMult,
-                $principal,
-                $dependent,
-                $principalProp,
-                $dependentProp,
-                $principalRSet,
-                $dependentRSet,
-                $principalType,
-                $dependentType
-            );
-            return null;
-        }
-        $this->attachReferenceNonPolymorphic(
-            $meta,
-            $principalMult,
-            $dependentMult,
-            $principal,
-            $dependent,
-            $principalProp,
-            $dependentProp
-        );
-        return null;
-    }
-
-    /**
-     * @param $meta
-     * @param $principalMult
-     * @param $dependentMult
-     * @param $principal
-     * @param $dependent
-     * @param $principalProp
-     * @param $dependentProp
-     */
-    private function attachReferenceNonPolymorphic(
-        &$meta,
-        $principalMult,
-        $dependentMult,
-        $principal,
-        $dependent,
-        $principalProp,
-        $dependentProp
-    ) {
-        //many-to-many
-        if ('*' == $principalMult && '*' == $dependentMult) {
-            $meta->addResourceSetReferencePropertyBidirectional(
-                $principal,
-                $dependent,
-                $principalProp,
-                $dependentProp
-            );
-            return;
-        }
-        //one-to-one
-        if ('0..1' == $principalMult || '0..1' == $dependentMult) {
-            assert($principalMult != $dependentMult, 'Cannot have both ends with 0..1 multiplicity');
-            $meta->addResourceReferenceSinglePropertyBidirectional(
-                $principal,
-                $dependent,
-                $principalProp,
-                $dependentProp
-            );
-            return;
-        }
-        assert($principalMult != $dependentMult, 'Cannot have both ends same multiplicity for 1:N relation');
-        //principal-one-to-dependent-many
-        if ('1' == $principalMult) {
-            $meta->addResourceReferencePropertyBidirectional(
-                $principal,
-                $dependent,
-                $principalProp,
-                $dependentProp
-            );
-            return;
-        }
-        //dependent-one-to-principal-many
-        $meta->addResourceReferencePropertyBidirectional(
-            $dependent,
-            $principal,
-            $dependentProp,
-            $principalProp
-        );
-        return;
-    }
-
-    /**
-     * @param $meta
-     * @param $principalMult
-     * @param $dependentMult
-     * @param $principal
-     * @param $dependent
-     * @param $principalProp
-     * @param $dependentProp
-     */
-    private function attachReferencePolymorphic(
-        &$meta,
-        $principalMult,
-        $dependentMult,
-        $principal,
-        $dependent,
-        $principalProp,
-        $dependentProp,
-        $principalRSet,
-        $dependentRSet,
-        $principalType,
-        $dependentType
-    ) {
-        $prinPoly = static::POLYMORPHIC == $principalRSet;
-        $depPoly = static::POLYMORPHIC == $dependentRSet;
-        $principalSet = (!$prinPoly) ? $principal->getCustomState()
-            : $meta->resolveResourceSet(static::POLYMORPHIC_PLURAL);
-        $dependentSet = (!$depPoly) ? $dependent->getCustomState()
-            : $meta->resolveResourceSet(static::POLYMORPHIC_PLURAL);
-        assert($principalSet instanceof ResourceSet, $principalRSet);
-        assert($dependentSet instanceof ResourceSet, $dependentRSet);
-
-        $isPrincipalAdded = null !== $principal->resolveProperty($principalProp);
-        $isDependentAdded = null !== $dependent->resolveProperty($dependentProp);
-        $prinMany = '*' == $principalMult;
-        $depMany = '*' == $dependentMult;
-
-        $prinConcrete = null;
-        $depConcrete = null;
-        if ($prinPoly) {
-            $prinBitz = explode('\\', $principalType);
-            $prinConcrete = $meta->resolveResourceType($prinBitz[count($prinBitz)-1]);
-            assert(static::POLYMORPHIC !== $prinConcrete->getName());
-        }
-        if ($depPoly) {
-            $depBitz = explode('\\', $dependentType);
-            $depConcrete = $meta->resolveResourceType($depBitz[count($depBitz)-1]);
-            assert(static::POLYMORPHIC !== $depConcrete->getName());
-        }
-
-        if (!$isPrincipalAdded) {
-            if ('*' == $principalMult || $depMany) {
-                $meta->addResourceSetReferenceProperty($principal, $principalProp, $dependentSet, $depConcrete);
-            } else {
-                $meta->addResourceReferenceProperty(
-                    $principal,
-                    $principalProp,
-                    $dependentSet,
-                    $prinPoly,
-                    $depMany,
-                    $depConcrete
-                );
-            }
-        }
-        if (!$isDependentAdded) {
-            if ('*' == $dependentMult || $prinMany) {
-                $meta->addResourceSetReferenceProperty($dependent, $dependentProp, $principalSet, $prinConcrete);
-            } else {
-                $meta->addResourceReferenceProperty(
-                    $dependent,
-                    $dependentProp,
-                    $principalSet,
-                    $depPoly,
-                    $prinMany,
-                    $prinConcrete
-                );
-            }
-        }
-        return;
-    }
-
     public function reset()
     {
-        self::$relationCache = null;
         self::$isBooted = false;
+        self::$afterExtract = null;
+        self::$afterUnify = null;
+        self::$afterVerify = null;
+        self::$afterImplement = null;
     }
 
     /**
-     * Resolve possible reverse relation property names
+     * Resolve possible reverse relation property names.
      *
      * @param Model $source
      * @param Model $target
-     * @param $propName
+     * @param       $propName
+     *
      * @return string|null
      */
     public function resolveReverseProperty(Model $source, Model $target, $propName)
     {
         assert(is_string($propName), 'Property name must be string');
-        $relations = $this->getRepairedRoundTripRelations();
+        $entity = $this->getObjectMap()->resolveEntity(get_class($source));
+        if (null === $entity) {
+            $msg = 'Source model not defined';
+            throw new \InvalidArgumentException($msg);
+        }
+        $association = $entity->resolveAssociation($propName);
+        if (null === $association) {
+            return null;
+        }
+        $isFirst = $propName === $association->getFirst()->getRelationName();
+        if (!$isFirst) {
+            return $association->getFirst()->getRelationName();
+        }
 
-        $sourceName = get_class($source);
-        $targName = get_class($target);
+        if ($association instanceof AssociationMonomorphic) {
+            return $association->getLast()->getRelationName();
+        }
+        assert($association instanceof AssociationPolymorphic);
 
-        $filter = function ($segment) use ($sourceName, $targName, $propName) {
-            $match = $sourceName == $segment['principalType'];
-            $match &= $targName == $segment['dependentType'];
-            $match &= $propName == $segment['principalProp'];
-
-            return $match;
-        };
-
-        // array_filter does not reset keys - we have to do it ourselves
-        $trim = array_values(array_filter($relations, $filter));
-        $result = 0 === count($trim) ? null : $trim[0]['dependentProp'];
-
-        return $result;
+        $lasts = $association->getLast();
+        foreach ($lasts as $stub) {
+            if ($stub->getBaseType() == get_class($target)) {
+                return $stub->getRelationName();
+            }
+        }
+        return null;
     }
 }

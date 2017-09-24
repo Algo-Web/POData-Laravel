@@ -2,8 +2,8 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
-use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Database\Connection as Connection;
+use Illuminate\Database\Eloquent\Model as Model;
 use Mockery\Mockery;
 
 class TestMonomorphicOneAndManySource extends Model
@@ -69,5 +69,13 @@ class TestMonomorphicOneAndManySource extends Model
     public function manyTarget()
     {
         return $this->hasMany(TestMonomorphicOneAndManyTarget::class, 'many_id');
+    }
+
+    public function metadata()
+    {
+        if (isset($this->metaArray)) {
+            return $this->metaArray;
+        }
+        return $this->traitmetadata();
     }
 }

@@ -2,7 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
-use AlgoWeb\PODataLaravel\Models\MetadataRelationHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\TestCase;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
@@ -32,7 +32,7 @@ class MetadataProviderReverseTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $holder = new MetadataRelationHolder();
+        $holder = new MetadataGubbinsHolder();
         $this->metadataProvider = m::mock(MetadataProvider::class)
             ->makePartial()->shouldAllowMockingProtectedMethods();
         $this->metadataProvider->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -204,6 +204,24 @@ class MetadataProviderReverseTest extends TestCase
 
         $leftForward = $foo->resolveReverseProperty($left, $base, 'property');
         $this->assertNull($leftForward);
+    }
+
+    public function testMetadataResolveReversePropertyMappingNotPresent()
+    {
+        $foo = m::mock(MetadataProvider::class)->makePartial();
+        $foo->shouldReceive('getObjectMap->resolveEntity')->andReturn(null)->once();
+
+        $expected = 'Source model not defined';
+        $actual = null;
+
+        $left = new TestMorphManySource([]);
+
+        try {
+            $foo->resolveReverseProperty($left, $left, 'property');
+        } catch (\InvalidArgumentException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 
     private function setUpSchemaFacade()
