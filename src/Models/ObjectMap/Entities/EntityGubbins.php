@@ -257,6 +257,10 @@ class EntityGubbins
         return $this->associations;
     }
 
+    /**
+     * @param $relName
+     * @return Association|null
+     */
     public function resolveAssociation($relName)
     {
         $this->associations = is_array($this->associations) ? $this->associations : [];

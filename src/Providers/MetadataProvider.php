@@ -92,24 +92,23 @@ class MetadataProvider extends MetadataBaseProvider
         return $objectMap;
     }
 
-    private function unify(Map $ObjectMap)
+    private function unify(Map $objectMap)
     {
         $mgh = $this->getRelationHolder();
-        foreach ($ObjectMap->getEntities() as $entity) {
+        foreach ($objectMap->getEntities() as $entity) {
             $mgh->addEntity($entity);
         }
-        $ObjectMap->setAssociations($mgh->getRelations());
+        $objectMap->setAssociations($mgh->getRelations());
         if (null != self::$afterUnify) {
             $func = self::$afterUnify;
-            $func($ObjectMap);
+            $func($objectMap);
         }
-        return $ObjectMap;
+        return $objectMap;
     }
 
     private function verify(Map $objectModel)
     {
-        $failMessage = '';
-        $objectModel->isOK($failMessage);
+        $objectModel->isOK();
         if (null != self::$afterVerify) {
             $func = self::$afterVerify;
             $func($objectModel);
@@ -124,11 +123,11 @@ class MetadataProvider extends MetadataBaseProvider
             $baseType = $entity->isPolymorphicAffected() ? $meta->resolveResourceType('polyMorphicPlaceholder') : null;
             $className = $entity->getClassName();
             $entityName = $entity->getName();
-            $EntityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, false, $baseType);
-            assert($EntityType->hasBaseType() === isset($baseType));
-            $entity->setOdataResourceType($EntityType);
+            $entityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, false, $baseType);
+            assert($entityType->hasBaseType() === isset($baseType));
+            $entity->setOdataResourceType($entityType);
             $this->implementProperties($entity);
-            $meta->addResourceSet($entity->getClassName(), $EntityType);
+            $meta->addResourceSet($entity->getClassName(), $entityType);
             $meta->oDataEntityMap[$className] = $meta->oDataEntityMap[$entityName];
         }
         $metaCount = count($meta->oDataEntityMap);
