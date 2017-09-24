@@ -26,20 +26,6 @@ trait MetadataTrait
     protected $loadEagerRelations = [];
 
     /*
-     * Array to record mapping between doctrine types and OData types
-     */
-    protected $mapping = [
-        'integer' => EdmPrimitiveType::INT32,
-        'string' => EdmPrimitiveType::STRING,
-        'datetime' => EdmPrimitiveType::DATETIME,
-        'float' => EdmPrimitiveType::SINGLE,
-        'decimal' => EdmPrimitiveType::DECIMAL,
-        'text' => EdmPrimitiveType::STRING,
-        'boolean' => EdmPrimitiveType::BOOLEAN,
-        'blob' => 'stream'
-    ];
-
-    /*
      * Retrieve and assemble this model's metadata for OData packaging
      */
     public function metadata()
