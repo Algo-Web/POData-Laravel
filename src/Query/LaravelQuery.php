@@ -109,10 +109,12 @@ class LaravelQuery implements IQueryProvider
      * IE: http://host/EntitySet
      *  http://host/EntitySet?$skip=10&$top=5&filter=Prop gt Value.
      *
-     * @param QueryType                $queryType            Is this is a query for a count, entities, or entities-with-count
+     * @param QueryType                $queryType            Is this is a query for a count, entities,
+     *                                                       or entities-with-count?
      * @param ResourceSet              $resourceSet          The entity set containing the entities to fetch
-     * @param FilterInfo|null          $filterInfo           The $filter parameter of the OData query.  NULL if none specified
-     * @param null|InternalOrderByInfo $orderBy              sorted order if we want to get the data in some specific order
+     * @param FilterInfo|null          $filterInfo           The $filter parameter of the OData query.  NULL if absent
+     * @param null|InternalOrderByInfo $orderBy              sorted order if we want to get the data in some
+     *                                                       specific order
      * @param int|null                 $top                  number of records which need to be retrieved
      * @param int|null                 $skip                 number of records which need to be skipped
      * @param SkipTokenInfo|null       $skipToken            value indicating what records to skip
@@ -240,7 +242,7 @@ class LaravelQuery implements IQueryProvider
      *
      * @param ResourceSet      $sourceResourceSet    The entity set containing the source entity
      * @param object           $sourceEntityInstance the source entity instance
-     * @param ResourceSet      $targetResourceSet    The entity set containing the entity pointed to by the navigation property
+     * @param ResourceSet      $targetResourceSet    The entity set containing the entity pointed to by the nav property
      * @param ResourceProperty $targetProperty       The navigation property to fetch
      *
      * @return object|null The related resource if found else null
@@ -322,7 +324,8 @@ class LaravelQuery implements IQueryProvider
      * @param object      $sourceEntityInstance The source entity instance
      * @param object      $data                 The New data for the entity instance.
      *
-     *                                          returns object|null returns the newly created model if sucessful or null if model creation failed.
+     * @returns object|null                     returns the newly created model if successful,
+     *                                          or null if model creation failed.
      */
     public function createResourceforResourceSet(
         ResourceSet $resourceSet,

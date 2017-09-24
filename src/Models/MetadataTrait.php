@@ -397,7 +397,10 @@ trait MetadataTrait
                         break;
                     }
                 }
-                assert(in_array($fkMethodName, $methodList), 'Selected method, ' . $fkMethodName . ', not in method list');
+                assert(
+                    in_array($fkMethodName, $methodList),
+                    'Selected method, ' . $fkMethodName . ', not in method list'
+                );
                 $rkMethodName = 'getQualifiedRelatedPivotKeyName';
                 foreach ($rkList as $option) {
                     if (in_array($option, $methodList)) {
@@ -405,7 +408,10 @@ trait MetadataTrait
                         break;
                     }
                 }
-                assert(in_array($rkMethodName, $methodList), 'Selected method, ' . $rkMethodName . ', not in method list');
+                assert(
+                    in_array($rkMethodName, $methodList),
+                    'Selected method, ' . $rkMethodName . ', not in method list'
+                );
                 $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
                 static::$methodPrimary[get_class($foo)] = $line;
             }
@@ -430,11 +436,17 @@ trait MetadataTrait
                 $fkCombo = array_values(array_intersect($fkList, $methodList));
                 assert(1 <= count($fkCombo), 'Expected at least 1 element in foreign-key list, got ' . count($fkCombo));
                 $fkMethodName = $fkCombo[0];
-                assert(in_array($fkMethodName, $methodList), 'Selected method, ' . $fkMethodName . ', not in method list');
+                assert(
+                    in_array($fkMethodName, $methodList),
+                    'Selected method, ' . $fkMethodName . ', not in method list'
+                );
                 $rkCombo = array_values(array_intersect($rkList, $methodList));
                 assert(1 <= count($rkCombo), 'Expected at least 1 element in related-key list, got ' . count($rkCombo));
                 $rkMethodName = $rkCombo[0];
-                assert(in_array($rkMethodName, $methodList), 'Selected method, ' . $rkMethodName . ', not in method list');
+                assert(
+                    in_array($rkMethodName, $methodList),
+                    'Selected method, ' . $rkMethodName . ', not in method list'
+                );
                 $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
                 static::$methodAlternate[get_class($foo)] = $line;
             }
@@ -690,7 +702,6 @@ trait MetadataTrait
             }
         }
         $gubbins->setStubs($stubs);
-
 
         return $gubbins;
     }
