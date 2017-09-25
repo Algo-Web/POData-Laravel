@@ -4,12 +4,14 @@ namespace AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestModel;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
 use Illuminate\Database\Query\Builder;
 use Mockery as m;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\Type\Int32;
 use POData\Providers\Metadata\Type\StringType;
 use POData\Providers\Query\QueryType;
+use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
 use POData\UriProcessor\QueryProcessor\OrderByParser\OrderByPathSegment;
 use POData\UriProcessor\QueryProcessor\OrderByParser\OrderBySubPathSegment;
 use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
@@ -145,6 +147,50 @@ class LaravelReadQueryTest extends TestCase
         $expected = null;
         $actual = $foo->getResource($rSet, null, [], $source);
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testNonTrivialOrderByOnModel()
+    {
+        $rawModel = $this->generateTestModelWithMetadata();
+        $rawMeta = $rawModel->metadata();
+
+        $rSet = m::mock(ResourceSet::class);
+
+        $builder = m::mock(Builder::class)->makePartial();
+        $builder->shouldReceive('orderBy')->andReturn($builder)->times(1);
+        $builder->shouldReceive('count')->andReturn(0)->atLeast(1);
+        $builder->shouldReceive('skip')->andReturn($builder)->atLeast(1);
+        $builder->shouldReceive('take')->andReturn($builder)->atLeast(1);
+        $builder->shouldReceive('with')->andReturn($builder)->atLeast(1);
+        $builder->shouldReceive('get')->andReturn(collect([]))->atLeast(1);
+
+        $model = m::mock(TestModel::class)->makePartial();
+        $model->shouldReceive('metadata')->andReturn($rawMeta);
+        $model->shouldReceive('orderBy')->andReturn($builder)->times(1);
+
+
+        $firstSeg = m::mock(OrderBySubPathSegment::class);
+        $firstSeg->shouldReceive('getName')->andReturn('name');
+
+        $subSeg = m::mock(OrderBySubPathSegment::class);
+        $subSeg->shouldReceive('getName')->andReturn('PrimaryKey');
+
+        $orderSeg = m::mock(OrderByPathSegment::class);
+        $orderSeg->shouldReceive('getSubPathSegments')->andReturn([$firstSeg, $subSeg]);
+        $orderSeg->shouldReceive('isAscending')->andReturn(false)->atLeast(1);
+
+        $orderBy = m::mock(InternalOrderByInfo::class)->makePartial();
+        $orderBy->shouldReceive('getOrderByInfo->getOrderByPathSegments')->andReturn([$orderSeg]);
+
+        $foo = m::mock(LaravelReadQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
+
+        $expected = null;
+        $type = QueryType::ENTITIES_WITH_COUNT();
+        $actual = $foo->getResourceSet($type, $rSet, null, $orderBy, null, null, null, $model);
+        $this->assertFalse($actual->hasMore);
+        $this->assertEquals(0, $actual->count);
+        $this->assertEquals(0, count($actual->results));
     }
 
     /**

@@ -96,7 +96,7 @@ class LaravelReadQuery
             foreach ($orderBy->getOrderByInfo()->getOrderByPathSegments() as $order) {
                 foreach ($order->getSubPathSegments() as $subOrder) {
                     $subName = $subOrder->getName();
-                    $subName = (self::PK == $subName) ? $sourceEntityInstance->getKeyName() : $subName;
+                    $subName = (self::PK == $subName) ? $keyName : $subName;
                     $sourceEntityInstance = $sourceEntityInstance->orderBy(
                         $subName,
                         $order->isAscending() ? 'asc' : 'desc'
