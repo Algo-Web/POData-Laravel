@@ -162,6 +162,7 @@ class IronicSerialiser implements IObjectSerialiser
         $topOfStack = $this->lightStack[$stackCount-1];
         $payloadClass = get_class($entryObject->results);
         $resourceType = $this->getService()->getProvidersWrapper()->resolveResourceType($topOfStack['type']);
+
         // need gubbinz to unpack an abstract resource type
         if ($resourceType->isAbstract()) {
             $derived = $this->getMetadata()->getDerivedTypes($resourceType);
@@ -843,7 +844,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @param $nonRelProp
      * @return ODataPropertyContent
      */
-    private function writePrimitiveProperties($entryObject, $nonRelProp)
+    private function writePrimitiveProperties(Model $entryObject, $nonRelProp)
     {
         $propertyContent = new ODataPropertyContent();
         $cereal = $this->getModelSerialiser()->bulkSerialise($entryObject);
