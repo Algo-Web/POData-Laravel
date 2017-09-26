@@ -8,6 +8,7 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
+use AlgoWeb\PODataLaravel\Query\LaravelReadQuery;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -690,5 +691,14 @@ trait MetadataTrait
         $gubbins->setStubs($stubs);
 
         return $gubbins;
+    }
+
+    public function synthLiteralPK()
+    {
+        if (!$this->isKnownPolymorphSide()) {
+            return;
+        }
+        $fieldName = LaravelReadQuery::PK;
+        $this->$fieldName = $this->getKey();
     }
 }
