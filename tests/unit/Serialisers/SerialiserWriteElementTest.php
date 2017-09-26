@@ -829,6 +829,8 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $source = new TestMonomorphicParentOfMorphTarget($metadata);
         $target = new TestMorphTarget($metadata);
 
+        $relMethods = $source->getRelationshipsFromMethods();
+
         App::instance(TestMonomorphicParentOfMorphTarget::class, $source);
         App::instance(TestMorphTarget::class, $target);
 
@@ -884,6 +886,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $model = m::mock(TestMonomorphicParentOfMorphTarget::class)->makePartial()
             ->shouldAllowMockingProtectedMethods();
         $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->shouldReceive('getRelationshipsFromMethods')->andReturn($relMethods);
         $model->id = 1;
         $model->name = 'Name';
         $model->shouldReceive('getAttribute')->withArgs(['morphTargets'])->andReturn(collect([$targ1, $targ2]));

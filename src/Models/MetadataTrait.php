@@ -8,6 +8,7 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
+use AlgoWeb\PODataLaravel\Query\LaravelReadQuery;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Mockery\Mock;
 use POData\Providers\Metadata\Type\EdmPrimitiveType;
 
 trait MetadataTrait
@@ -194,11 +196,14 @@ trait MetadataTrait
             if (!empty($methods)) {
                 foreach ($methods as $method) {
                     if (!method_exists('Illuminate\Database\Eloquent\Model', $method)
+                        && !method_exists(Mock::class, $method)
+                        && !method_exists(MetadataTrait::class, $method)
                     ) {
                         //Use reflection to inspect the code, based on Illuminate/Support/SerializableClosure.php
                         $reflection = new \ReflectionMethod($model, $method);
+                        $fileName = $reflection->getFileName();
 
-                        $file = new \SplFileObject($reflection->getFileName());
+                        $file = new \SplFileObject($fileName);
                         $file->seek($reflection->getStartLine()-1);
                         $code = '';
                         while ($file->key() < $reflection->getEndLine()) {
@@ -690,5 +695,14 @@ trait MetadataTrait
         $gubbins->setStubs($stubs);
 
         return $gubbins;
+    }
+
+    public function synthLiteralPK()
+    {
+        if (!$this->isKnownPolymorphSide()) {
+            return;
+        }
+        $fieldName = LaravelReadQuery::PK;
+        $this->$fieldName = $this->getKey();
     }
 }

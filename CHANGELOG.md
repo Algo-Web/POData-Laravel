@@ -1,5 +1,6 @@
 Unreleased
 ----------
+   * Fix bug that omitted PrimaryKey property serialisation
    * Fix orderBy handling, whether via model, relation or query builder
 
 0.3.0 (2017-09-24)

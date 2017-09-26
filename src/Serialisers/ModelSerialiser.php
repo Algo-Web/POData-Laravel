@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use AlgoWeb\PODataLaravel\Query\LaravelReadQuery;
 use Illuminate\Database\Eloquent\Model;
 
 class ModelSerialiser
@@ -32,6 +33,7 @@ class ModelSerialiser
         if (!isset(self::$metadataCache[$class])) {
             self::$metadataCache[$class] = $model->metadata();
         }
+        $model->synthLiteralPK();
         $meta = self::$metadataCache[$class];
         $keys = array_keys($meta);
         // dig up getter list - we only care about the mutators that end up in metadata
@@ -47,7 +49,8 @@ class ModelSerialiser
             self::$mutatorCache[$class] = $getterz;
         }
         $getterz = self::$mutatorCache[$class];
-        $result = array_intersect_key($model->getAttributes(), $meta);
+        $modelAttrib = $model->getAttributes();
+        $result = array_intersect_key($modelAttrib, $meta);
         foreach ($keys as $key) {
             if (!isset($result[$key])) {
                 $result[$key] = null;
@@ -55,6 +58,9 @@ class ModelSerialiser
         }
         foreach ($getterz as $getter) {
             $result[$getter] = $model->$getter;
+        }
+        if (isset($modelAttrib[LaravelReadQuery::PK])) {
+            $result[LaravelReadQuery::PK] = $modelAttrib[LaravelReadQuery::PK];
         }
 
         return $result;

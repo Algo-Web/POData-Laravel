@@ -429,12 +429,19 @@ class IronicSerialiserTest extends SerialiserTestBase
         $metaProv->boot();
 
         $propContent = new ODataPropertyContent();
-        $propContent->properties = ['name' => new ODataProperty(), 'alternate_id' => new ODataProperty()];
+        $propContent->properties = [
+            'name' => new ODataProperty(),
+            'alternate_id' => new ODataProperty(),
+            'PrimaryKey' => new ODataProperty()
+        ];
         $propContent->properties['name']->name = 'name';
         $propContent->properties['alternate_id']->name = 'alternate_id';
+        $propContent->properties['PrimaryKey']->name = 'PrimaryKey';
         $propContent->properties['name']->typeName = 'Edm.String';
         $propContent->properties['alternate_id']->typeName = 'Edm.Int32';
+        $propContent->properties['PrimaryKey']->typeName = 'Edm.String';
         $propContent->properties['name']->value = 'Hammer, M.C.';
+        $propContent->properties['PrimaryKey']->value = '42';
 
         $odataLink = new ODataLink();
         $odataLink->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph';
@@ -478,7 +485,6 @@ class IronicSerialiserTest extends SerialiserTestBase
         $model = new TestMorphTarget($meta);
         $model->id = 42;
         $model->name = 'Hammer, M.C.';
-        $model->PrimaryKey = 42;
         $this->assertTrue($model->isKnownPolymorphSide());
         $this->assertTrue($model->isUnknownPolymorphSide());
 
