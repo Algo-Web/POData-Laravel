@@ -117,6 +117,7 @@ class LaravelReadQuery
             for ($i = 0; $i < $numValues; $i++) {
                 $relation = $segments[$i]->isAscending() ? '>' : '<';
                 $name = $segments[$i]->getSubPathSegments()[0]->getName();
+                $name = (self::PK == $name) ? $keyName : $name;
                 $parameters[$name] = ['direction' => $relation, 'value' => trim($values[$i][0], '\'')];
             }
 
