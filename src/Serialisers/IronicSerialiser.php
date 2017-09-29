@@ -53,6 +53,11 @@ class IronicSerialiser implements IObjectSerialiser
     private $propertiesCache = [];
 
     /**
+     * @var RootProjectionNode
+     */
+    private $rootNode = null;
+
+    /**
      * The service implementation.
      *
      * @var IService
@@ -657,7 +662,10 @@ class IronicSerialiser implements IObjectSerialiser
      */
     protected function getCurrentExpandedProjectionNode()
     {
-        $expandedProjectionNode = $this->getRequest()->getRootProjectionNode();
+        if (null === $this->rootNode) {
+            $this->rootNode = $this->getRequest()->getRootProjectionNode();
+        }
+        $expandedProjectionNode = $this->rootNode;
         if (null === $expandedProjectionNode) {
             return null;
         } else {
@@ -834,16 +842,23 @@ class IronicSerialiser implements IObjectSerialiser
      */
     private function primitiveToString(IType & $type, $primitiveValue)
     {
-        if ($type instanceof Boolean) {
-            $stringValue = (true === $primitiveValue) ? 'true' : 'false';
-        } elseif ($type instanceof Binary) {
-            $stringValue = base64_encode($primitiveValue);
-        } elseif ($type instanceof DateTime && $primitiveValue instanceof \DateTime) {
-            $stringValue = $primitiveValue->format(\DateTime::ATOM);
-        } elseif ($type instanceof StringType) {
-            $stringValue = utf8_encode($primitiveValue);
-        } else {
-            $stringValue = strval($primitiveValue);
+        // kludge to enable switching on type of $type without getting tripped up by mocks as we would with get_class
+        // switch (true) means we unconditionally enter, and then lean on case statements to match given block
+        switch (true) {
+            case $type instanceof StringType:
+                $stringValue = utf8_encode($primitiveValue);
+                break;
+            case $type instanceof Boolean:
+                $stringValue = (true === $primitiveValue) ? 'true' : 'false';
+                break;
+            case $type instanceof Binary:
+                $stringValue = base64_encode($primitiveValue);
+                break;
+            case $type instanceof DateTime && $primitiveValue instanceof \DateTime:
+                $stringValue = $primitiveValue->format(\DateTime::ATOM);
+                break;
+            default:
+                $stringValue = strval($primitiveValue);
         }
 
         return $stringValue;
