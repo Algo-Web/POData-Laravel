@@ -46,7 +46,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      * @var ResourceType
      */
     private $resourceType;
-    
+
     public function __construct()
     {
         $this->functionDescriptionParsers[ODataConstants::STRFUN_COMPARE] = function ($params) {
@@ -54,7 +54,7 @@ class LaravelExpressionProvider implements IExpressionProvider
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_ENDSWITH] = function ($params) {
             return '(strcmp(substr(' . $params[0] . ', strlen(' . $params[0] . ') - strlen(' . $params[1] . ')), '
-                    .$params[1] . ') === 0)';
+                   .$params[1] . ') === 0)';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_INDEXOF] = function ($params) {
             return 'strpos(' . $params[0] . ', ' . $params[1] . ')';
@@ -169,6 +169,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onLogicalExpression($expressionType, $left, $right)
     {
+        $expressionType = $this->unpackExpressionType($expressionType);
         switch ($expressionType) {
             case ExpressionType::AND_LOGICAL:
                 return $this->prepareBinaryExpression(self::LOGICAL_AND, $left, $right);
@@ -189,6 +190,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onArithmeticExpression($expressionType, $left, $right)
     {
+        $expressionType = $this->unpackExpressionType($expressionType);
         switch ($expressionType) {
             case ExpressionType::MULTIPLY:
                 return $this->prepareBinaryExpression(self::MULTIPLY, $left, $right);
@@ -215,6 +217,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onRelationalExpression($expressionType, $left, $right)
     {
+        $expressionType = $this->unpackExpressionType($expressionType);
         switch ($expressionType) {
             case ExpressionType::GREATERTHAN:
                 return $this->prepareBinaryExpression(self::GREATER_THAN, $left, $right);
@@ -242,6 +245,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onUnaryExpression($expressionType, $child)
     {
+        $expressionType = $this->unpackExpressionType($expressionType);
         switch ($expressionType) {
             case ExpressionType::NEGATE:
                 return $this->prepareUnaryExpression(self::NEGATE, $child);
@@ -329,5 +333,18 @@ class LaravelExpressionProvider implements IExpressionProvider
     private function prepareUnaryExpression($operator, $child)
     {
         return $operator . self::OPEN_BRACKET . $child . self::CLOSE_BRACKET;
+    }
+
+    /**
+     * @param $expressionType
+     * @return mixed
+     */
+    private function unpackExpressionType($expressionType)
+    {
+        if ($expressionType instanceof ExpressionType) {
+            $expressionType = $expressionType->getValue();
+            return $expressionType;
+        }
+        return $expressionType;
     }
 }
