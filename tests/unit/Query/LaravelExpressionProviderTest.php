@@ -66,18 +66,6 @@ class LaravelExpressionProviderTest extends TestCase
         $this->assertEquals('dangerZone', $remix->getName());
     }
 
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider::onLogicalExpression
-     * @todo   Implement testOnLogicalExpression().
-     */
-    public function testOnLogicalExpression()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
     public function testOnLogicalExpressionNullArguments()
     {
         $foo = new LaravelExpressionProvider();
@@ -116,16 +104,16 @@ class LaravelExpressionProviderTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider::onArithmeticExpression
-     * @todo   Implement testOnArithmeticExpression().
-     */
-    public function testOnArithmeticExpression()
+    public function testOnLogicalExpressionLogicalOrPacked()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $foo = new LaravelExpressionProvider();
+        $left = 'x < 4';
+        $right = 'y > 2';
+        $type = ExpressionType::OR_LOGICAL();
+        $expected = '(x < 4 || y > 2)';
+
+        $result = $foo->onLogicalExpression($type, $left, $right);
+        $this->assertEquals($expected, $result);
     }
 
     public function testOnArithmeticExpressionNullArguments()
@@ -200,19 +188,6 @@ class LaravelExpressionProviderTest extends TestCase
 
         $result = $foo->onArithmeticExpression($type, $left, $right);
         $this->assertEquals($expected, $result);
-    }
-
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider::onRelationalExpression
-     * @todo   Implement testOnRelationalExpression().
-     */
-    public function testOnRelationalExpression()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
     }
 
     public function testOnRelationalExpressionNullArguments()
@@ -299,18 +274,6 @@ class LaravelExpressionProviderTest extends TestCase
 
         $result = $foo->onRelationalExpression($type, $left, $right);
         $this->assertEquals($expected, $result);
-    }
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider::onUnaryExpression
-     * @todo   Implement testOnUnaryExpression().
-     */
-    public function testOnUnaryExpression()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
     }
 
     public function testOnUnaryExpressionNullArguments()
@@ -414,19 +377,6 @@ class LaravelExpressionProviderTest extends TestCase
         $expected = 'testIterator->SecondPropertyAccessor->TopPropertyAccessor';
         $result = $foo->onPropertyAccessExpression($topLevelPropertyAccess);
         $this->assertEquals($expected, $result);
-    }
-
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider::onFunctionCallExpression
-     * @todo   Implement testOnFunctionCallExpression().
-     */
-    public function testOnFunctionCallExpression()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
     }
 
     public function testOnFunctionCallExpressionNullArguments()
