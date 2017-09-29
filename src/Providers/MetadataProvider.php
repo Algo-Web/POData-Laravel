@@ -265,12 +265,15 @@ class MetadataProvider extends MetadataBaseProvider
         $odataEntity = $unifiedEntity->getOdataResourceType();
         $keyFields = $unifiedEntity->getKeyFields();
         $fields = $unifiedEntity->getFields();
-        foreach ($keyFields as $keyField) {
-            $meta->addKeyProperty($odataEntity, $keyField->getName(), $keyField->getEdmFieldType());
+        $affected = $unifiedEntity->isPolymorphicAffected();
+        if (!$affected) {
+            foreach ($keyFields as $keyField) {
+                $meta->addKeyProperty($odataEntity, $keyField->getName(), $keyField->getEdmFieldType());
+            }
         }
 
         foreach ($fields as $field) {
-            if (in_array($field, $keyFields)) {
+            if (in_array($field, $keyFields) && !$affected) {
                 continue;
             }
             if ($field->getPrimitiveType() == 'blob') {
