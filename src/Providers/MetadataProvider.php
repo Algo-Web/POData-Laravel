@@ -263,12 +263,14 @@ class MetadataProvider extends MetadataBaseProvider
     {
         $meta = App::make('metadata');
         $odataEntity = $unifiedEntity->getOdataResourceType();
-        foreach ($unifiedEntity->getKeyFields() as $keyField) {
+        $keyFields = $unifiedEntity->getKeyFields();
+        $fields = $unifiedEntity->getFields();
+        foreach ($keyFields as $keyField) {
             $meta->addKeyProperty($odataEntity, $keyField->getName(), $keyField->getEdmFieldType());
         }
 
-        foreach ($unifiedEntity->getFields() as $field) {
-            if (in_array($field, $unifiedEntity->getKeyFields())) {
+        foreach ($fields as $field) {
+            if (in_array($field, $keyFields)) {
                 continue;
             }
             if ($field->getPrimitiveType() == 'blob') {
