@@ -263,11 +263,10 @@ class MetadataProvider extends MetadataBaseProvider
     {
         $meta = App::make('metadata');
         $odataEntity = $unifiedEntity->getOdataResourceType();
-        if (!$unifiedEntity->isPolymorphicAffected()) {
-            foreach ($unifiedEntity->getKeyFields() as $keyField) {
-                $meta->addKeyProperty($odataEntity, $keyField->getName(), $keyField->getEdmFieldType());
-            }
+        foreach ($unifiedEntity->getKeyFields() as $keyField) {
+            $meta->addKeyProperty($odataEntity, $keyField->getName(), $keyField->getEdmFieldType());
         }
+
         foreach ($unifiedEntity->getFields() as $field) {
             if (in_array($field, $unifiedEntity->getKeyFields())) {
                 continue;

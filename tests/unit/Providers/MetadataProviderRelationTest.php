@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 use POData\Providers\Metadata\ResourceAssociationSet;
 use POData\Providers\Metadata\ResourceEntityType;
+use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 
@@ -78,6 +79,27 @@ class MetadataProviderRelationTest extends TestCase
         $foo->setCandidateModels($classen);
 
         $foo->boot();
+        // now verify that actual-PK field shows up alongside literal-PK field for unknown-side models
+        $source = $simple->resolveResourceType('TestMorphManySource');
+        $this->assertNotNull($source);
+        $this->assertTrue($source instanceof ResourceEntityType, get_class($source));
+        $literalPK = $source->resolveProperty('PrimaryKey');
+        $this->assertNotNull($literalPK);
+        $this->assertTrue($literalPK instanceof ResourceProperty, get_class($literalPK));
+        $actualPK = $source->resolveProperty('id');
+        $this->assertNotNull($actualPK);
+        $this->assertTrue($actualPK instanceof ResourceProperty, get_class($actualPK));
+        unset($source, $literalPK, $actualPK);
+
+        $source = $simple->resolveResourceType('TestMorphManySourceAlternate');
+        $this->assertNotNull($source);
+        $this->assertTrue($source instanceof ResourceEntityType, get_class($source));
+        $literalPK = $source->resolveProperty('PrimaryKey');
+        $this->assertNotNull($literalPK);
+        $this->assertTrue($literalPK instanceof ResourceProperty, get_class($literalPK));
+        $actualPK = $source->resolveProperty('alternate_id');
+        $this->assertNotNull($actualPK);
+        $this->assertTrue($actualPK instanceof ResourceProperty, get_class($actualPK));
     }
 
     public function testMonomorphicManyToManyRelation()

@@ -795,7 +795,8 @@ class LaravelQuery implements IQueryProvider
 
         if ($success) {
             try {
-                $result = $class::findMany($payload['id'])->toArray()[0];
+                // return array of Model objects underlying collection returned by findMany
+                $result = $class::findMany($payload['id'])->flatten()->all();
                 return $result;
             } catch (\Exception $e) {
                 throw new ODataException($e->getMessage(), 500);

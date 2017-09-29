@@ -432,16 +432,20 @@ class IronicSerialiserTest extends SerialiserTestBase
         $propContent->properties = [
             'name' => new ODataProperty(),
             'alternate_id' => new ODataProperty(),
-            'PrimaryKey' => new ODataProperty()
+            'PrimaryKey' => new ODataProperty(),
+            'id' => new ODataProperty()
         ];
         $propContent->properties['name']->name = 'name';
         $propContent->properties['alternate_id']->name = 'alternate_id';
         $propContent->properties['PrimaryKey']->name = 'PrimaryKey';
+        $propContent->properties['id']->name = 'id';
         $propContent->properties['name']->typeName = 'Edm.String';
         $propContent->properties['alternate_id']->typeName = 'Edm.Int32';
         $propContent->properties['PrimaryKey']->typeName = 'Edm.String';
+        $propContent->properties['id']->typeName = 'Edm.Int32';
         $propContent->properties['name']->value = 'Hammer, M.C.';
         $propContent->properties['PrimaryKey']->value = '42';
+        $propContent->properties['id']->value = '42';
 
         $odataLink = new ODataLink();
         $odataLink->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph';
