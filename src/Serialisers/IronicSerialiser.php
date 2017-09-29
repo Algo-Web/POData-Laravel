@@ -50,6 +50,8 @@ class IronicSerialiser implements IObjectSerialiser
 {
     const PK = 'PrimaryKey';
 
+    private $propertiesCache = [];
+
     /**
      * The service implementation.
      *
@@ -189,16 +191,24 @@ class IronicSerialiser implements IObjectSerialiser
             'Object being serialised not instance of expected class, ' . $targClass . ', is actually ' . $payloadClass
         );
 
-        $rawProp = $resourceType->getAllProperties();
-        $relProp = [];
-        $nonRelProp = [];
-        foreach ($rawProp as $prop) {
-            if ($prop->getResourceType() instanceof ResourceEntityType) {
-                $relProp[] = $prop;
-            } else {
-                $nonRelProp[$prop->getName()] = $prop;
+        if (!array_key_exists($targClass, $this->propertiesCache)) {
+            $rawProp = $resourceType->getAllProperties();
+            $relProp = [];
+            $nonRelProp = [];
+            foreach ($rawProp as $prop) {
+                $propType = $prop->getResourceType();
+                if ($propType instanceof ResourceEntityType) {
+                    $relProp[] = $prop;
+                } else {
+                    $nonRelProp[$prop->getName()] = ['prop' => $prop, 'type' => $propType->getInstanceType()];
+                }
             }
+            $this->propertiesCache[$targClass] = ['rel' => $relProp, 'nonRel' => $nonRelProp];
         }
+        unset($relProp);
+        unset($nonRelProp);
+        $relProp = $this->propertiesCache[$targClass]['rel'];
+        $nonRelProp = $this->propertiesCache[$targClass]['nonRel'];
 
         $resourceSet = $resourceType->getCustomState();
         assert($resourceSet instanceof ResourceSet);
@@ -771,10 +781,10 @@ class IronicSerialiser implements IObjectSerialiser
     {
         $queryParameterString = null;
         foreach ([ODataConstants::HTTPQUERY_STRING_FILTER,
-                        ODataConstants::HTTPQUERY_STRING_EXPAND,
-                        ODataConstants::HTTPQUERY_STRING_ORDERBY,
-                        ODataConstants::HTTPQUERY_STRING_INLINECOUNT,
-                        ODataConstants::HTTPQUERY_STRING_SELECT, ] as $queryOption) {
+                     ODataConstants::HTTPQUERY_STRING_EXPAND,
+                     ODataConstants::HTTPQUERY_STRING_ORDERBY,
+                     ODataConstants::HTTPQUERY_STRING_INLINECOUNT,
+                     ODataConstants::HTTPQUERY_STRING_SELECT, ] as $queryOption) {
             $value = $this->getService()->getHost()->getQueryStringItem($queryOption);
             if (null !== $value) {
                 if (null !== $queryParameterString) {
@@ -853,11 +863,11 @@ class IronicSerialiser implements IObjectSerialiser
                 continue;
             }
             $corn = strval($corn);
-            $rType = $nonRelProp[$corn]->getResourceType()->getInstanceType();
+            $rType = $nonRelProp[$corn]['type'];
             $subProp = new ODataProperty();
             $subProp->name = $corn;
             $subProp->value = isset($flake) ? $this->primitiveToString($rType, $flake) : null;
-            $subProp->typeName = $nonRelProp[$corn]->getResourceType()->getFullName();
+            $subProp->typeName = $nonRelProp[$corn]['prop']->getResourceType()->getFullName();
             $propertyContent->properties[$corn] = $subProp;
         }
         return $propertyContent;
