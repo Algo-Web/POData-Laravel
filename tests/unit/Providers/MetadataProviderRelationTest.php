@@ -37,6 +37,7 @@ use Mockery as m;
 use POData\Providers\Metadata\ResourceAssociationSet;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceProperty;
+use POData\Providers\Metadata\ResourcePropertyKind;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 
@@ -86,9 +87,11 @@ class MetadataProviderRelationTest extends TestCase
         $literalPK = $source->resolveProperty('PrimaryKey');
         $this->assertNotNull($literalPK);
         $this->assertTrue($literalPK instanceof ResourceProperty, get_class($literalPK));
+        $this->assertTrue($literalPK->isKindOf(ResourcePropertyKind::KEY));
         $actualPK = $source->resolveProperty('id');
         $this->assertNotNull($actualPK);
         $this->assertTrue($actualPK instanceof ResourceProperty, get_class($actualPK));
+        $this->assertFalse($actualPK->isKindOf(ResourcePropertyKind::KEY));
         unset($source, $literalPK, $actualPK);
 
         $source = $simple->resolveResourceType('TestMorphManySourceAlternate');
@@ -97,9 +100,11 @@ class MetadataProviderRelationTest extends TestCase
         $literalPK = $source->resolveProperty('PrimaryKey');
         $this->assertNotNull($literalPK);
         $this->assertTrue($literalPK instanceof ResourceProperty, get_class($literalPK));
+        $this->assertTrue($literalPK->isKindOf(ResourcePropertyKind::KEY));
         $actualPK = $source->resolveProperty('alternate_id');
         $this->assertNotNull($actualPK);
         $this->assertTrue($actualPK instanceof ResourceProperty, get_class($actualPK));
+        $this->assertFalse($actualPK->isKindOf(ResourcePropertyKind::KEY));
     }
 
     public function testMonomorphicManyToManyRelation()
