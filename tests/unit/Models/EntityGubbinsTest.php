@@ -111,6 +111,9 @@ class EntityGubbinsTest extends TestCase
 
         $foo->setStubs([$stub]);
         $this->assertEquals(1, count($foo->getStubs()));
+        $this->assertFalse($foo->isPolymorphicAffected());
+        // and to check caching
+        $this->assertFalse($foo->isPolymorphicAffected());
     }
 
     public function testSetAbstractODataType()
