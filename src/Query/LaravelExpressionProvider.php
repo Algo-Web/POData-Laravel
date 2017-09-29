@@ -169,8 +169,8 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onLogicalExpression($expressionType, $left, $right)
     {
-        $expressionType = $this->unpackExpressionType($expressionType);
-        switch ($expressionType) {
+        $type = $this->unpackExpressionType($expressionType);
+        switch ($type) {
             case ExpressionType::AND_LOGICAL:
                 return $this->prepareBinaryExpression(self::LOGICAL_AND, $left, $right);
             case ExpressionType::OR_LOGICAL:
@@ -190,8 +190,8 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onArithmeticExpression($expressionType, $left, $right)
     {
-        $expressionType = $this->unpackExpressionType($expressionType);
-        switch ($expressionType) {
+        $type = $this->unpackExpressionType($expressionType);
+        switch ($type) {
             case ExpressionType::MULTIPLY:
                 return $this->prepareBinaryExpression(self::MULTIPLY, $left, $right);
             case ExpressionType::DIVIDE:
@@ -217,8 +217,8 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onRelationalExpression($expressionType, $left, $right)
     {
-        $expressionType = $this->unpackExpressionType($expressionType);
-        switch ($expressionType) {
+        $type = $this->unpackExpressionType($expressionType);
+        switch ($type) {
             case ExpressionType::GREATERTHAN:
                 return $this->prepareBinaryExpression(self::GREATER_THAN, $left, $right);
             case ExpressionType::GREATERTHAN_OR_EQUAL:
@@ -245,8 +245,8 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onUnaryExpression($expressionType, $child)
     {
-        $expressionType = $this->unpackExpressionType($expressionType);
-        switch ($expressionType) {
+        $type = $this->unpackExpressionType($expressionType);
+        switch ($type) {
             case ExpressionType::NEGATE:
                 return $this->prepareUnaryExpression(self::NEGATE, $child);
             case ExpressionType::NOT_LOGICAL:
@@ -342,9 +342,10 @@ class LaravelExpressionProvider implements IExpressionProvider
     private function unpackExpressionType($expressionType)
     {
         if ($expressionType instanceof ExpressionType) {
-            $expressionType = $expressionType->getValue();
-            return $expressionType;
+            $type = $expressionType->getValue();
+        } else {
+            $type = $expressionType;
         }
-        return $expressionType;
+        return $type;
     }
 }
