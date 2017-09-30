@@ -5,8 +5,10 @@ namespace AlgoWeb\PODataLaravel\Query;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder;
 use Mockery as m;
+use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\Type\Int32;
 use POData\Providers\Metadata\Type\StringType;
@@ -147,6 +149,25 @@ class LaravelReadQueryTest extends TestCase
         $expected = null;
         $actual = $foo->getResource($rSet, null, [], $source);
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetRelatedResourceReferenceWhenItIsntThere()
+    {
+        $rSet = m::mock(ResourceSet::class);
+        $targProp = m::mock(ResourceProperty::class);
+        $targProp->shouldReceive('getName')->andReturn('oneSource')->once();
+
+        $foo = m::mock(LaravelReadQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
+
+        $rel = m::mock(HasOne::class)->makePartial();
+        $rel->shouldReceive('getResults')->andReturn(null)->once();
+
+        $entity = m::mock(TestMonomorphicSource::class)->makePartial();
+        $entity->shouldReceive('oneSource')->andReturn($rel)->once();
+
+        $result = $foo->getRelatedResourceReference($rSet, $entity, $rSet, $targProp);
+        $this->assertNull($result);
     }
 
     public function testNonTrivialOrderByOnModel()

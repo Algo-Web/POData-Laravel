@@ -350,6 +350,10 @@ class LaravelReadQuery
 
         $propertyName = $targetProperty->getName();
         $result = $sourceEntityInstance->$propertyName;
+        if (null === $result) {
+            return null;
+        }
+        assert($result instanceof Model, get_class($result));
         $result->PrimaryKey = $result->getKey();
         return $result;
     }
