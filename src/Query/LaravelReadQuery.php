@@ -323,12 +323,13 @@ class LaravelReadQuery
         }
 
         $this->checkAuth($sourceEntityInstance);
+        $modelLoad = $sourceEntityInstance->getEagerLoad();
 
         $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
         foreach ($whereCondition as $fieldName => $fieldValue) {
             $sourceEntityInstance = $sourceEntityInstance->where($fieldName, $fieldValue);
         }
-        $modelLoad = $sourceEntityInstance->getEagerLoad();
+
         $rawLoad = array_values(array_unique(array_merge($rawLoad, $modelLoad)));
         $sourceEntityInstance = $sourceEntityInstance->get();
         $sourceCount = $sourceEntityInstance->count();
