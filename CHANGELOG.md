@@ -1,5 +1,7 @@
 Unreleased
 ----------
+   * Eager-load explicitly-expanded properties during GET queries
+   * Memoise repeated calculations to speed up big GET queries
    * Fix bug that omitted PrimaryKey property serialisation
    * Fix orderBy handling, whether via model, relation or query builder
 
