@@ -70,13 +70,7 @@ class LaravelReadQuery
             throw new InvalidArgumentException($msg);
         }
 
-        $load = (null === $eagerLoad) ? [] : $eagerLoad;
-        $rawLoad = [];
-        foreach ($load as $line) {
-            assert(is_string($line), 'Eager-load elements must be non-empty strings');
-            $remixLine = str_replace('/', '.', $line);
-            $rawLoad[] = $remixLine;
-        }
+        $rawLoad = $this->processEagerLoadList($eagerLoad);
         $modelLoad = [];
 
         $this->checkSourceInstance($sourceEntityInstance);
@@ -302,9 +296,9 @@ class LaravelReadQuery
      *
      * @param ResourceSet|null    $resourceSet
      * @param KeyDescriptor|null  $keyDescriptor
-     * @param Model|Relation|null $sourceEntity  Instance Starting point of query
+     * @param Model|Relation|null $sourceEntityInstance Starting point of query
      * $param array               $whereCondition
-     * @param string[]|null       $eagerLoad     array of relations to eager load
+     * @param string[]|null       $eagerLoad            array of relations to eager load
      *
      * @return Model|null
      */
@@ -321,6 +315,7 @@ class LaravelReadQuery
         }
 
         $this->checkSourceInstance($sourceEntityInstance);
+        $rawLoad = $this->processEagerLoadList($eagerLoad);
 
         if (null == $sourceEntityInstance) {
             assert(null != $resourceSet);
@@ -333,6 +328,8 @@ class LaravelReadQuery
         foreach ($whereCondition as $fieldName => $fieldValue) {
             $sourceEntityInstance = $sourceEntityInstance->where($fieldName, $fieldValue);
         }
+        $modelLoad = $sourceEntityInstance->getEagerLoad();
+        $rawLoad = array_values(array_unique(array_merge($rawLoad, $modelLoad)));
         $sourceEntityInstance = $sourceEntityInstance->get();
         $sourceCount = $sourceEntityInstance->count();
         if (0 == $sourceCount) {
@@ -468,5 +465,21 @@ class LaravelReadQuery
                 $sourceEntityInstance = $sourceEntityInstance->where($key, $trimValue);
             }
         }
+    }
+
+    /**
+     * @param string[]|null $eagerLoad
+     * @return array
+     */
+    private function processEagerLoadList(array $eagerLoad = null)
+    {
+        $load = (null === $eagerLoad) ? [] : $eagerLoad;
+        $rawLoad = [];
+        foreach ($load as $line) {
+            assert(is_string($line), 'Eager-load elements must be non-empty strings');
+            $remixLine = str_replace('/', '.', $line);
+            $rawLoad[] = $remixLine;
+        }
+        return $rawLoad;
     }
 }
