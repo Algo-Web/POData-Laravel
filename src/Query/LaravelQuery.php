@@ -118,6 +118,7 @@ class LaravelQuery implements IQueryProvider
      * @param int|null                 $top                  number of records which need to be retrieved
      * @param int|null                 $skip                 number of records which need to be skipped
      * @param SkipTokenInfo|null       $skipToken            value indicating what records to skip
+     * @param string[]|null            $eagerLoad            array of relations to eager load
      * @param Model|Relation|null      $sourceEntityInstance Starting point of query
      *
      * @return QueryResult
@@ -130,6 +131,7 @@ class LaravelQuery implements IQueryProvider
         $top = null,
         $skip = null,
         $skipToken = null,
+        array $eagerLoad = null,
         $sourceEntityInstance = null
     ) {
         $source = $this->unpackSourceEntity($sourceEntityInstance);
@@ -141,6 +143,7 @@ class LaravelQuery implements IQueryProvider
             $top,
             $skip,
             $skipToken,
+            $eagerLoad,
             $source
         );
     }
@@ -151,14 +154,16 @@ class LaravelQuery implements IQueryProvider
      *
      * @param ResourceSet        $resourceSet   The entity set containing the entity to fetch
      * @param KeyDescriptor|null $keyDescriptor The key identifying the entity to fetch
+     * @param string[]|null      $eagerLoad     array of relations to eager load
      *
      * @return Model|null Returns entity instance if found else null
      */
     public function getResourceFromResourceSet(
         ResourceSet $resourceSet,
-        KeyDescriptor $keyDescriptor = null
+        KeyDescriptor $keyDescriptor = null,
+        array $eagerLoad = null
     ) {
-        return $this->getReader()->getResourceFromResourceSet($resourceSet, $keyDescriptor);
+        return $this->getReader()->getResourceFromResourceSet($resourceSet, $keyDescriptor, $eagerLoad);
     }
 
     /**

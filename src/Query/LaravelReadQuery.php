@@ -45,6 +45,7 @@ class LaravelReadQuery
      * @param int|null                 $top                  number of records which need to be retrieved
      * @param int|null                 $skip                 number of records which need to be skipped
      * @param SkipTokenInfo|null       $skipToken            value indicating what records to skip
+     * @param string[]|null            $eagerLoad            array of relations to eager load
      * @param Model|Relation|null      $sourceEntityInstance Starting point of query
      *
      * @return QueryResult
@@ -57,6 +58,7 @@ class LaravelReadQuery
         $top = null,
         $skip = null,
         $skipToken = null,
+        array $eagerLoad = null,
         $sourceEntityInstance = null
     ) {
         if (null != $filterInfo && !($filterInfo instanceof FilterInfo)) {
@@ -68,7 +70,8 @@ class LaravelReadQuery
             throw new InvalidArgumentException($msg);
         }
 
-        $eagerLoad = [];
+        $rawLoad = $this->processEagerLoadList($eagerLoad);
+        $modelLoad = [];
 
         $this->checkSourceInstance($sourceEntityInstance);
         if (null == $sourceEntityInstance) {
@@ -77,13 +80,14 @@ class LaravelReadQuery
 
         $keyName = null;
         if ($sourceEntityInstance instanceof Model) {
-            $eagerLoad = $sourceEntityInstance->getEagerLoad();
+            $modelLoad = $sourceEntityInstance->getEagerLoad();
             $keyName = $sourceEntityInstance->getKeyName();
         } elseif ($sourceEntityInstance instanceof Relation) {
-            $eagerLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
+            $modelLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
             $keyName = $sourceEntityInstance->getRelated()->getKeyName();
         }
         assert(isset($keyName));
+        $rawLoad = array_values(array_unique(array_merge($rawLoad, $modelLoad)));
 
         $checkInstance = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : null;
         $this->checkAuth($sourceEntityInstance, $checkInstance);
@@ -158,7 +162,7 @@ class LaravelReadQuery
 
         if ($nullFilter) {
             // default no-filter case, palm processing off to database engine - is a lot faster
-            $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($eagerLoad)->get();
+            $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($rawLoad)->get();
             $resultCount = $bulkSetCount;
         } elseif ($bigSet) {
             assert(isset($isvalid), 'Filter closure not set');
@@ -192,7 +196,7 @@ class LaravelReadQuery
             if ($sourceEntityInstance instanceof Model) {
                 $sourceEntityInstance = $sourceEntityInstance->getQuery();
             }
-            $resultSet = $sourceEntityInstance->with($eagerLoad)->get();
+            $resultSet = $sourceEntityInstance->with($rawLoad)->get();
             $resultSet = $resultSet->filter($isvalid);
             $resultCount = $resultSet->count();
 
@@ -262,6 +266,7 @@ class LaravelReadQuery
             $top,
             $skip,
             $skipToken,
+            null,
             $results
         );
     }
@@ -273,14 +278,16 @@ class LaravelReadQuery
      *
      * @param ResourceSet        $resourceSet   The entity set containing the entity to fetch
      * @param KeyDescriptor|null $keyDescriptor The key identifying the entity to fetch
+     * @param string[]|null      $eagerLoad     array of relations to eager load
      *
      * @return Model|null Returns entity instance if found else null
      */
     public function getResourceFromResourceSet(
         ResourceSet $resourceSet,
-        KeyDescriptor $keyDescriptor = null
+        KeyDescriptor $keyDescriptor = null,
+        array $eagerLoad = null
     ) {
-        return $this->getResource($resourceSet, $keyDescriptor);
+        return $this->getResource($resourceSet, $keyDescriptor, [], $eagerLoad);
     }
 
 
@@ -290,6 +297,8 @@ class LaravelReadQuery
      * @param ResourceSet|null    $resourceSet
      * @param KeyDescriptor|null  $keyDescriptor
      * @param Model|Relation|null $sourceEntityInstance Starting point of query
+     * $param array               $whereCondition
+     * @param string[]|null       $eagerLoad            array of relations to eager load
      *
      * @return Model|null
      */
@@ -297,6 +306,7 @@ class LaravelReadQuery
         ResourceSet $resourceSet = null,
         KeyDescriptor $keyDescriptor = null,
         array $whereCondition = [],
+        array $eagerLoad = null,
         $sourceEntityInstance = null
     ) {
         if (null == $resourceSet && null == $sourceEntityInstance) {
@@ -305,6 +315,7 @@ class LaravelReadQuery
         }
 
         $this->checkSourceInstance($sourceEntityInstance);
+        $rawLoad = $this->processEagerLoadList($eagerLoad);
 
         if (null == $sourceEntityInstance) {
             assert(null != $resourceSet);
@@ -317,6 +328,8 @@ class LaravelReadQuery
         foreach ($whereCondition as $fieldName => $fieldValue) {
             $sourceEntityInstance = $sourceEntityInstance->where($fieldName, $fieldValue);
         }
+        $modelLoad = $sourceEntityInstance->getEagerLoad();
+        $rawLoad = array_values(array_unique(array_merge($rawLoad, $modelLoad)));
         $sourceEntityInstance = $sourceEntityInstance->get();
         $sourceCount = $sourceEntityInstance->count();
         if (0 == $sourceCount) {
@@ -385,7 +398,7 @@ class LaravelReadQuery
         // take key descriptor and turn it into where clause here, rather than in getResource call
         $sourceEntityInstance = $sourceEntityInstance->$propertyName();
         $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
-        $result = $this->getResource(null, null, [], $sourceEntityInstance);
+        $result = $this->getResource(null, null, [], [], $sourceEntityInstance);
         assert(
             $result instanceof Model || null == $result,
             'GetResourceFromRelatedResourceSet must return an entity or null'
@@ -452,5 +465,21 @@ class LaravelReadQuery
                 $sourceEntityInstance = $sourceEntityInstance->where($key, $trimValue);
             }
         }
+    }
+
+    /**
+     * @param string[]|null $eagerLoad
+     * @return array
+     */
+    private function processEagerLoadList(array $eagerLoad = null)
+    {
+        $load = (null === $eagerLoad) ? [] : $eagerLoad;
+        $rawLoad = [];
+        foreach ($load as $line) {
+            assert(is_string($line), 'Eager-load elements must be non-empty strings');
+            $remixLine = str_replace('/', '.', $line);
+            $rawLoad[] = $remixLine;
+        }
+        return $rawLoad;
     }
 }

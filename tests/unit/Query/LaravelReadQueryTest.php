@@ -39,6 +39,26 @@ class LaravelReadQueryTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testBadEagerLoad()
+    {
+        $expected = 'assert(): Eager-load elements must be non-empty strings failed';
+        $actual = null;
+
+        $query = m::mock(QueryType::class);
+        $resource = m::mock(ResourceSet::class);
+        $skipToken = null;
+        $eagerLoad = ['start/the/dance', new \DateTime()];
+
+        $foo = new LaravelReadQuery();
+
+        try {
+            $foo->getResourceSet($query, $resource, null, null, null, null, $skipToken, $eagerLoad);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testSkipTokenWithSegmentValueCountMismatch()
     {
         $expected = 'assert():';
@@ -57,7 +77,7 @@ class LaravelReadQueryTest extends TestCase
         $foo = new LaravelReadQuery();
 
         try {
-            $foo->getResourceSet($query, $resource, null, null, null, null, $skipToken, $source);
+            $foo->getResourceSet($query, $resource, null, null, null, null, $skipToken, null, $source);
         } catch (\Exception $e) {
             $actual = $e->getMessage();
         }
@@ -93,7 +113,7 @@ class LaravelReadQueryTest extends TestCase
 
         $foo = new LaravelReadQuery();
 
-        $result = $foo->getResourceSet($query, $resource, null, null, null, null, $skipToken, $source);
+        $result = $foo->getResourceSet($query, $resource, null, null, null, null, $skipToken, null, $source);
         $this->assertTrue(is_array($result->results));
         $this->assertEquals(0, count($result->results));
         $this->assertEquals(0, $result->count);
@@ -130,7 +150,7 @@ class LaravelReadQueryTest extends TestCase
 
         $foo = new LaravelReadQuery();
 
-        $result = $foo->getResourceSet($query, $resource, null, null, null, null, $skipToken, $source);
+        $result = $foo->getResourceSet($query, $resource, null, null, null, null, $skipToken, null, $source);
         $this->assertTrue(is_array($result->results));
         $this->assertEquals(0, count($result->results));
         $this->assertEquals(0, $result->count);
@@ -147,7 +167,7 @@ class LaravelReadQueryTest extends TestCase
         $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
 
         $expected = null;
-        $actual = $foo->getResource($rSet, null, [], $source);
+        $actual = $foo->getResource($rSet, null, [], null, $source);
         $this->assertEquals($expected, $actual);
     }
 
@@ -208,7 +228,7 @@ class LaravelReadQueryTest extends TestCase
 
         $expected = null;
         $type = QueryType::ENTITIES_WITH_COUNT();
-        $actual = $foo->getResourceSet($type, $rSet, null, $orderBy, null, null, null, $model);
+        $actual = $foo->getResourceSet($type, $rSet, null, $orderBy, null, null, null, null, $model);
         $this->assertFalse($actual->hasMore);
         $this->assertEquals(0, $actual->count);
         $this->assertEquals(0, count($actual->results));
