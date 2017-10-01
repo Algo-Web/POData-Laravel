@@ -39,6 +39,26 @@ class LaravelReadQueryTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testBadEagerLoad()
+    {
+        $expected = 'assert(): Eager-load elements must be non-empty strings failed';
+        $actual = null;
+
+        $query = m::mock(QueryType::class);
+        $resource = m::mock(ResourceSet::class);
+        $skipToken = null;
+        $eagerLoad = ['start/the/dance', new \DateTime()];
+
+        $foo = new LaravelReadQuery();
+
+        try {
+            $foo->getResourceSet($query, $resource, null, null, null, null, $skipToken, $eagerLoad);
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testSkipTokenWithSegmentValueCountMismatch()
     {
         $expected = 'assert():';

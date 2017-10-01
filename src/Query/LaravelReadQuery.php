@@ -70,7 +70,14 @@ class LaravelReadQuery
             throw new InvalidArgumentException($msg);
         }
 
-        $eagerLoad = [];
+        $load = (null === $eagerLoad) ? [] : $eagerLoad;
+        $rawLoad = [];
+        foreach ($load as $line) {
+            assert(is_string($line), 'Eager-load elements must be non-empty strings');
+            $remixLine = str_replace('/', '.', $line);
+            $rawLoad[] = $remixLine;
+        }
+        $modelLoad = [];
 
         $this->checkSourceInstance($sourceEntityInstance);
         if (null == $sourceEntityInstance) {
@@ -79,13 +86,14 @@ class LaravelReadQuery
 
         $keyName = null;
         if ($sourceEntityInstance instanceof Model) {
-            $eagerLoad = $sourceEntityInstance->getEagerLoad();
+            $modelLoad = $sourceEntityInstance->getEagerLoad();
             $keyName = $sourceEntityInstance->getKeyName();
         } elseif ($sourceEntityInstance instanceof Relation) {
-            $eagerLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
+            $modelLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
             $keyName = $sourceEntityInstance->getRelated()->getKeyName();
         }
         assert(isset($keyName));
+        $rawLoad = array_values(array_unique(array_merge($rawLoad, $modelLoad)));
 
         $checkInstance = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : null;
         $this->checkAuth($sourceEntityInstance, $checkInstance);
@@ -160,7 +168,7 @@ class LaravelReadQuery
 
         if ($nullFilter) {
             // default no-filter case, palm processing off to database engine - is a lot faster
-            $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($eagerLoad)->get();
+            $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($rawLoad)->get();
             $resultCount = $bulkSetCount;
         } elseif ($bigSet) {
             assert(isset($isvalid), 'Filter closure not set');
@@ -194,7 +202,7 @@ class LaravelReadQuery
             if ($sourceEntityInstance instanceof Model) {
                 $sourceEntityInstance = $sourceEntityInstance->getQuery();
             }
-            $resultSet = $sourceEntityInstance->with($eagerLoad)->get();
+            $resultSet = $sourceEntityInstance->with($rawLoad)->get();
             $resultSet = $resultSet->filter($isvalid);
             $resultCount = $resultSet->count();
 
