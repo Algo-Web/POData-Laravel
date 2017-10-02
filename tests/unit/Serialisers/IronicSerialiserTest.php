@@ -344,7 +344,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $request->shouldReceive('getTopCount')->andReturn(200)->once();
 
         $internalInfo = m::mock(InternalOrderByInfo::class)->makePartial();
-        $internalInfo->shouldReceive('buildSkipTokenValue')->andReturn('200');
+        $internalInfo->shouldReceive('buildSkipTokenValue')->andReturn('\'200\'');
         $internalInfo->shouldReceive('getOrderByPathSegments')->andReturn(['a'])->once();
 
         $node = m::mock(ExpandedProjectionNode::class)->makePartial();
