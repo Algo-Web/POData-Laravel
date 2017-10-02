@@ -83,9 +83,11 @@ class ODataControllerTest extends TestCase
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Controllers\ODataController::index
+     * @covers \AlgoWeb\PODataLaravel\Controllers\ODataController::getAppPageSize
      */
     public function testIndexCallToBaseService()
     {
+        $this->object->shouldReceive('getAppPageSize')->passthru()->once();
         $request = m::mock(Request::class)->makePartial();
         $request->shouldReceive('getMethod')->andReturn('GET');
         $request->shouldReceive('getQueryString')->andReturn('');
@@ -122,6 +124,7 @@ class ODataControllerTest extends TestCase
 
         $root = 'GET;-;15:17:00;';
         $this->object->shouldReceive('isDumping')->andReturn(true);
+        $this->object->shouldReceive('getAppPageSize')->andReturn(100);
 
         $db = DB::getFacadeRoot();
         $db->shouldReceive('beginTransaction')->andReturn(null)->once();
