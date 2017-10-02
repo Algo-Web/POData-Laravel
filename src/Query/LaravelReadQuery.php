@@ -323,7 +323,12 @@ class LaravelReadQuery
         }
 
         $this->checkAuth($sourceEntityInstance);
-        $modelLoad = $sourceEntityInstance->getEagerLoad();
+        if ($sourceEntityInstance instanceof Model) {
+            $modelLoad = $sourceEntityInstance->getEagerLoad();
+        } elseif ($sourceEntityInstance instanceof Relation) {
+            $modelLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
+        }
+        assert(isset($modelLoad));
 
         $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
         foreach ($whereCondition as $fieldName => $fieldValue) {

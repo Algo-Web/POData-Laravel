@@ -39,6 +39,10 @@ class ODataController extends BaseController
             $service = new DataService($query, $meta, $host);
             $cereal = new IronicSerialiser($service, null);
             $service = new DataService($query, $meta, $host, $cereal);
+            $pageSize = $this->getAppPageSize();
+            if (null !== $pageSize) {
+                $service->maxPageSize = intval($pageSize);
+            }
             $service->handleRequest();
 
             $odataResponse = $context->outgoingResponse();
@@ -107,5 +111,13 @@ class ODataController extends BaseController
     {
         $configDump = env('APP_DRY_RUN', false);
         return true === $configDump;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getAppPageSize()
+    {
+        return env('APP_PAGE_SIZE', null);
     }
 }

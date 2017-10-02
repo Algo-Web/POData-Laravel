@@ -5,6 +5,7 @@ namespace AlgoWeb\PODataLaravel\Query;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder;
 use Mockery as m;
@@ -168,6 +169,26 @@ class LaravelReadQueryTest extends TestCase
 
         $expected = null;
         $actual = $foo->getResource($rSet, null, [], null, $source);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetResourceFromRelation()
+    {
+        $rSet = m::mock(ResourceSet::class);
+
+        $model = m::mock(TestMonomorphicTarget::class)->makePartial();
+
+        $rel = m::mock(HasOne::class);
+        $rel->shouldReceive('getRelated')->andReturn($model)->atLeast(1);
+        $rel->shouldReceive('get')->andReturn(collect([]));
+        $rel->shouldReceive('getEagerLoad')
+            ->andThrow(new \Exception('Relation objects do not have getEagerLoad'))->never();
+
+        $foo = m::mock(LaravelReadQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
+
+        $expected = null;
+        $actual = $foo->getResource($rSet, null, [], null, $rel);
         $this->assertEquals($expected, $actual);
     }
 

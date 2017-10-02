@@ -771,6 +771,7 @@ class IronicSerialiser implements IObjectSerialiser
         $skipToken = $internalOrderByInfo->buildSkipTokenValue($lastObject);
         assert(null !== $skipToken, '!is_null($skipToken)');
         $token = (1 < $numSegments) ? '$skiptoken=' : '$skip=';
+        $skipToken = (1 < $numSegments) ? $skipToken : intval(trim($skipToken, '\''));
         $skipToken = '?' . $queryParameterString . $token . $skipToken;
 
         return $skipToken;
