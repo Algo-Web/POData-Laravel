@@ -82,7 +82,9 @@ class MetadataProvider extends MetadataBaseProvider
         $objectMap = new Map();
         foreach ($modelNames as $modelName) {
             $modelInstance = App::make($modelName);
-            $objectMap->addEntity($modelInstance->extractGubbins());
+            if (Schema::hasTable($modelInstance->getTable())) {
+                $objectMap->addEntity($modelInstance->extractGubbins());
+            }
         }
         if (null != self::$afterExtract) {
             $func = self::$afterExtract;
