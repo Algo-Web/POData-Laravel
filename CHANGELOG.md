@@ -1,5 +1,6 @@
 Unreleased
 ----------
+   * Fix bug that stopped migration attempts
    * Eager-load explicitly-expanded properties during GET queries
    * Memoise repeated calculations to speed up big GET queries
    * Fix bug that omitted PrimaryKey property serialisation

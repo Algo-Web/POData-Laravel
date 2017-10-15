@@ -447,6 +447,50 @@ class MetadataProviderNewTest extends TestCase
         $this->assertEquals(null, Cache::get($key));
     }
 
+    public function testEmptyGubbinsNotUnderArtisan()
+    {
+        $expected = 'Fields array must not be empty';
+        $actual = null;
+        $meta = [];
+
+        $testModel = new TestModel($meta, null);
+        $testModel->name = 'Commence Primary Ignition';
+
+        App::instance(TestModel::class, $testModel);
+        $classen = [TestModel::class];
+        $this->setUpSchemaFacade();
+
+        $foo = $this->object;
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen);
+
+        try {
+            $foo->boot();
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testEmptyGubbinsUnderArtisan()
+    {
+        $meta = [];
+
+        $testModel = new TestModel($meta, null);
+        $testModel->name = 'Commence Primary Ignition';
+        $testModel->setArtisan(true);
+
+        App::instance(TestModel::class, $testModel);
+        $classen = [TestModel::class];
+        $this->setUpSchemaFacade();
+
+        $foo = $this->object;
+        $foo->shouldReceive('getCandidateModels')->andReturn($classen);
+        $foo->shouldReceive('isRunningInArtisan')->andReturn(true);
+        $foo->boot();
+        $map = $foo->getObjectMap();
+        $this->assertEquals(0, count($map->getEntities()));
+    }
+
     private function setUpSchemaFacade()
     {
         $schema = Schema::getFacadeRoot();

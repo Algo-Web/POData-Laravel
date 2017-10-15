@@ -11,7 +11,7 @@ class Map
     /**
      * @var EntityGubbins[]
      */
-    private $entities;
+    private $entities = [];
 
     /**
      * @var Association[]
@@ -23,9 +23,6 @@ class Map
      */
     public function addEntity(EntityGubbins $entity)
     {
-        if (!is_array($this->entities)) {
-            $this->entities = [];
-        }
         $this->entities[$entity->getClassName()] = $entity;
     }
 
