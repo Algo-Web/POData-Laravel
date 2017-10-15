@@ -82,7 +82,12 @@ class MetadataProvider extends MetadataBaseProvider
         $objectMap = new Map();
         foreach ($modelNames as $modelName) {
             $modelInstance = App::make($modelName);
-            $objectMap->addEntity($modelInstance->extractGubbins());
+            $gubbins = $modelInstance->extractGubbins();
+            $isEmpty = 0 === count($gubbins->getFields());
+            $inArtisan = $this->isRunningInArtisan();
+            if (!($isEmpty && $inArtisan)) {
+                $objectMap->addEntity($gubbins);
+            }
         }
         if (null != self::$afterExtract) {
             $func = self::$afterExtract;
@@ -429,5 +434,10 @@ class MetadataProvider extends MetadataBaseProvider
             }
         }
         return null;
+    }
+
+    public function isRunningInArtisan()
+    {
+        return App::runningInConsole() && !App::runningUnitTests();
     }
 }

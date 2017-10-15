@@ -15,12 +15,14 @@ class TestModel extends Model
     use MetadataTrait {
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
         // not bury ourselves under a stack overflow and segfault
+        isRunningInArtisan as isArtisan;
     }
 
     protected $metaArray;
     protected $connect;
     protected $grammar;
     protected $processor;
+    protected $isArtisan;
 
     public function __construct(array $meta = null, $endpoint = null)
     {
@@ -91,6 +93,15 @@ class TestModel extends Model
         }
     }
 
+
+    public function setArtisan($value)
+    {
+        if (null === $value) {
+            $this->isArtisan = null;
+        }
+        $this->isArtisan = boolval($value);
+    }
+
     public function metadata()
     {
         if (isset($this->metaArray)) {
@@ -147,5 +158,13 @@ class TestModel extends Model
         if (empty($this->query->orders) && empty($this->query->unionOrders)) {
             $this->orderBy($this->model->getQualifiedKeyName(), 'asc');
         }
+    }
+
+    public function isRunningInArtisan()
+    {
+        if (null !== $this->isArtisan) {
+            return $this->isArtisan;
+        }
+        return $this->isArtisan();
     }
 }

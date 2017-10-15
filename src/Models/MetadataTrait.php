@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\App;
 use Mockery\Mock;
 use POData\Providers\Metadata\Type\EdmPrimitiveType;
 
@@ -669,7 +670,10 @@ trait MetadataTrait
             $nuField->setPrimitiveType(new EntityFieldPrimitiveType($field['type']));
             $entityFields[$name] = $nuField;
         }
-        $gubbins->setFields($entityFields);
+        $isEmpty = (0 === count($entityFields));
+        if (!($isEmpty && $this->isRunningInArtisan())) {
+            $gubbins->setFields($entityFields);
+        }
 
         $rawRels = $this->getRelationships();
         $stubs = [];
@@ -704,5 +708,10 @@ trait MetadataTrait
         }
         $fieldName = LaravelReadQuery::PK;
         $this->$fieldName = $this->getKey();
+    }
+
+    public function isRunningInArtisan()
+    {
+        return App::runningInConsole() && !App::runningUnitTests();
     }
 }

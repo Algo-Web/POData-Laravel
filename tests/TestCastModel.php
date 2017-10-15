@@ -22,6 +22,7 @@ class TestCastModel extends Model
     protected $processor;
 
     protected $casts = ['is_bool' => 'boolean'];
+    protected $isArtisan = null;
 
     public function __construct(array $meta = null, $endpoint = null)
     {
