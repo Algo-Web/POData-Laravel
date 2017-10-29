@@ -132,9 +132,7 @@ class ODataControllerTest extends TestCase
         $db->shouldReceive('rollBack')->andReturn(null)->never();
 
         $storage = Storage::getFacadeRoot();
-        $storage->shouldReceive('put')->with($root.'request', m::any())->andReturnNull()->once();
-        $storage->shouldReceive('put')->with($root.'metadata', m::any())->andReturnNull()->once();
-        $storage->shouldReceive('put')->with($root.'response', m::any())->andReturnNull()->once();
+        $storage->shouldReceive('put')->withAnyArgs()->andReturnNull()->times(3);
 
         $request = m::mock(Request::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $request->shouldReceive('getMethod')->andReturn('GET');
@@ -150,7 +148,7 @@ class ODataControllerTest extends TestCase
 </service>
 ';
 
-        $result =  $this->object->index($request);
+        $result = $this->object->index($request);
         $this->assertEquals(200, $result->getStatusCode());
         $actual = $result->getContent();
         //$this->assertEquals($expected, $actual);
