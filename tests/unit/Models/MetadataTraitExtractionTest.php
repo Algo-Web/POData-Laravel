@@ -71,4 +71,48 @@ class MetadataTraitExtractionTest extends TestCase
             $this->assertTrue(in_array($stub->getRelationName(), $relations));
         }
     }
+
+    public function testCollidingPrimitivePropertyNames()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['Name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $foo = new TestModel($meta, null);
+        $foo->name = 'Commence Primary Ignition';
+
+        $expected = "Property names must be unique, without regard to case";
+        $actual = null;
+
+        try {
+            $result = $foo->extractGubbins();
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testPropertyAndRelationNameCollision()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['MORPHTARGET'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $foo = new TestMorphOneSource($meta, null);
+        $foo->name = 'Commence Primary Ignition';
+
+        $expected = "Property names must be unique, without regard to case";
+        $actual = null;
+
+        try {
+            $result = $foo->extractGubbins();
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
 }

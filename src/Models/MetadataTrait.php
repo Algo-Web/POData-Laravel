@@ -656,9 +656,16 @@ trait MetadataTrait
         $gubbins->setName($this->getEndpointName());
         $gubbins->setClassName(get_class($this));
 
+        $lowerNames = [];
+
         $fields = $this->metadata();
         $entityFields = [];
         foreach ($fields as $name => $field) {
+            if (in_array(strtolower($name), $lowerNames)) {
+                $msg = 'Property names must be unique, without regard to case';
+                throw new \Exception($msg);
+            }
+            $lowerNames[] = strtolower($name);
             $nuField = new EntityField();
             $nuField->setName($name);
             $nuField->setIsNullable($field['nullable']);
@@ -680,6 +687,11 @@ trait MetadataTrait
         foreach ($rawRels as $key => $rel) {
             foreach ($rel as $rawName => $deets) {
                 foreach ($deets as $relName => $relGubbins) {
+                    if (in_array(strtolower($relName), $lowerNames)) {
+                        $msg = 'Property names must be unique, without regard to case';
+                        throw new \Exception($msg);
+                    }
+                    $lowerNames[] = strtolower($relName);
                     $gubbinsType = $relGubbins['type'];
                     $property = $relGubbins['property'];
                     $isPoly = isset($gubbinsType);
