@@ -54,6 +54,7 @@ trait MetadataTrait
         $rawFoo = $connect->getDoctrineSchemaManager()->listTableColumns($table);
         $foo = [];
         $getters = $this->collectGetters();
+        $getters = array_intersect($getters, $mask);
 
         foreach ($rawFoo as $key => $val) {
             // Work around glitch in Doctrine when reading from MariaDB which added ` characters to root key value

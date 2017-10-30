@@ -1,5 +1,7 @@
 Unreleased
 ----------
+   * Respect hidden/visible getters in metadata processing
+   * Require property names to be case-insensitive unique
    * Fix bug that stopped migration attempts
    * Eager-load explicitly-expanded properties during GET queries
    * Memoise repeated calculations to speed up big GET queries
