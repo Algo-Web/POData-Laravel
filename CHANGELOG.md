@@ -1,5 +1,6 @@
 Unreleased
 ----------
+   * Cache table field list lookups
    * Respect hidden/visible getters in metadata processing
    * Require property names to be case-insensitive unique
    * Fix bug that stopped migration attempts
