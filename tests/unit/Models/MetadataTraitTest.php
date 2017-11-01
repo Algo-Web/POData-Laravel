@@ -170,6 +170,7 @@ class MetadataTraitTest extends TestCase
         $foo = \Mockery::mock(TestGetterModel::class)->makePartial();
         $foo->shouldReceive('getweightAttribute')->andReturn(null);
         $foo->shouldReceive('getConnection')->andReturn($connect);
+        $foo->reset();
         $result = $foo->metadata();
         $this->assertEquals(count($expected), count($result));
         foreach ($expected as $key => $val) {
@@ -381,6 +382,7 @@ class MetadataTraitTest extends TestCase
 
         $foo = \Mockery::mock(TestGetterModel::class)->makePartial();
         $foo->shouldReceive('getConnection->getSchemaBuilder')->andReturn($mockBuilder);
+        $foo->reset();
 
         $result = $foo->metadataMask();
         $this->assertEquals(count($expected), count($result));

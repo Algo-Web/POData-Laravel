@@ -169,5 +169,7 @@ class MetadataTraitExtractionTest extends TestCase
 
         $actual = $foo->metadata();
         $this->assertEquals($expected, $actual);
+        $final = $foo->metadata();
+        $this->assertEquals($expected, $final);
     }
 }
