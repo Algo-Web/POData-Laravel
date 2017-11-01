@@ -17,8 +17,6 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
-use Mockery\Mock;
-use POData\Providers\Metadata\Type\EdmPrimitiveType;
 
 trait MetadataTrait
 {
@@ -27,6 +25,9 @@ trait MetadataTrait
     protected static $methodPrimary = [];
     protected static $methodAlternate = [];
     protected $loadEagerRelations = [];
+    protected static $tableColumns = [];
+    protected static $tableColumnsDoctrine = [];
+    protected static $tableData = [];
 
     /*
      * Retrieve and assemble this model's metadata for OData packaging
@@ -44,14 +45,17 @@ trait MetadataTrait
         if (!$builder->hasTable($table)) {
             return [];
         }
+        if (0 !== count(self::$tableData)) {
+            return self::$tableData;
+        }
 
-        $columns = $builder->getColumnListing($table);
+        $columns = $this->getTableColumns();
         $mask = $this->metadataMask();
         $columns = array_intersect($columns, $mask);
 
         $tableData = [];
 
-        $rawFoo = $connect->getDoctrineSchemaManager()->listTableColumns($table);
+        $rawFoo = $this->getTableDoctrineColumns();
         $foo = [];
         $getters = $this->collectGetters();
         $getters = array_intersect($getters, $mask);
@@ -85,6 +89,7 @@ trait MetadataTrait
             $tableData[$get] = ['type' => 'text', 'nullable' => true, 'fillable' => false, 'default' => $default];
         }
 
+        self::$tableData = $tableData;
         return $tableData;
     }
 
@@ -156,8 +161,7 @@ trait MetadataTrait
         // Adapted from http://stackoverflow.com/a/33514981
         // $columns = $this->getFillable();
         // Another option is to get all columns for the table like so:
-        $builder = $this->getConnection()->getSchemaBuilder();
-        $columns = $builder->getColumnListing($this->getTable());
+        $columns = $this->getTableColumns();
         // but it's safer to just get the fillable fields
 
         $attributes = $this->getAttributes();
@@ -223,17 +227,17 @@ trait MetadataTrait
                         $lastCode = $code[strlen($code)-1];
                         assert('}' == $lastCode, 'Final character of function definition must be closing brace');
                         foreach ([
-                                        'hasMany',
-                                        'hasManyThrough',
-                                        'belongsToMany',
-                                        'hasOne',
-                                        'belongsTo',
-                                        'morphOne',
-                                        'morphTo',
-                                        'morphMany',
-                                        'morphToMany',
-                                        'morphedByMany'
-                                    ] as $relation) {
+                                     'hasMany',
+                                     'hasManyThrough',
+                                     'belongsToMany',
+                                     'hasOne',
+                                     'belongsTo',
+                                     'morphOne',
+                                     'morphTo',
+                                     'morphMany',
+                                     'morphToMany',
+                                     'morphedByMany'
+                                 ] as $relation) {
                             $search = '$this->' . $relation . '(';
                             if ($pos = stripos($code, $search)) {
                                 //Resolve the relation's model to a Relation object.
@@ -726,5 +730,37 @@ trait MetadataTrait
     public function isRunningInArtisan()
     {
         return App::runningInConsole() && !App::runningUnitTests();
+    }
+
+    protected function getTableColumns()
+    {
+        if (0 === count(self::$tableColumns)) {
+            $table = $this->getTable();
+            $connect = $this->getConnection();
+            $builder = $connect->getSchemaBuilder();
+            $columns = $builder->getColumnListing($table);
+
+            self::$tableColumns = $columns;
+        }
+        return self::$tableColumns;
+    }
+
+    protected function getTableDoctrineColumns()
+    {
+        if (0 === count(self::$tableColumnsDoctrine)) {
+            $table = $this->getTable();
+            $connect = $this->getConnection();
+            $columns = $connect->getDoctrineSchemaManager()->listTableColumns($table);
+
+            self::$tableColumnsDoctrine = $columns;
+        }
+        return self::$tableColumnsDoctrine;
+    }
+
+    public function reset()
+    {
+        self::$tableData = [];
+        self::$tableColumnsDoctrine = [];
+        self::$tableColumns = [];
     }
 }
