@@ -448,10 +448,10 @@ class IronicSerialiserTest extends SerialiserTestBase
         $propContent->properties['id']->value = '42';
 
         $odataLink = new ODataLink();
-        $odataLink->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph';
-        $odataLink->title = 'morph';
+        $odataLink->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph_TestMorphOneSource';
+        $odataLink->title = 'morph_TestMorphOneSource';
         $odataLink->type = 'application/atom+xml;type=entry';
-        $odataLink->url = 'TestMorphTargets(PrimaryKey=\'42\')/morph';
+        $odataLink->url = 'TestMorphTargets(PrimaryKey=\'42\')/morph_TestMorphOneSource';
 
         $mediaLink1 = new ODataMediaLink(
             'photo',
