@@ -367,12 +367,15 @@ class LaravelReadQuery
         $this->checkAuth($sourceEntityInstance);
 
         $propertyName = $targetProperty->getName();
+        $propertyName = $this->getLaravelRelationName($propertyName);
         $result = $sourceEntityInstance->$propertyName;
         if (null === $result) {
             return null;
         }
         assert($result instanceof Model, get_class($result));
-        $result->PrimaryKey = $result->getKey();
+        if($targetProperty->getResourceType()->getInstanceType()->getName() != get_class($result)){
+            return null;
+        }
         return $result;
     }
 
