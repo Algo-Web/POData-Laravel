@@ -84,27 +84,19 @@ class MetadataProviderRelationTest extends TestCase
         $source = $simple->resolveResourceType('TestMorphManySource');
         $this->assertNotNull($source);
         $this->assertTrue($source instanceof ResourceEntityType, get_class($source));
-        $literalPK = $source->resolveProperty('PrimaryKey');
-        $this->assertNotNull($literalPK);
-        $this->assertTrue($literalPK instanceof ResourceProperty, get_class($literalPK));
-        $this->assertTrue($literalPK->isKindOf(ResourcePropertyKind::KEY));
         $actualPK = $source->resolveProperty('id');
         $this->assertNotNull($actualPK);
         $this->assertTrue($actualPK instanceof ResourceProperty, get_class($actualPK));
-        $this->assertFalse($actualPK->isKindOf(ResourcePropertyKind::KEY));
+        $this->assertTrue($actualPK->isKindOf(ResourcePropertyKind::KEY));
         unset($source, $literalPK, $actualPK);
 
         $source = $simple->resolveResourceType('TestMorphManySourceAlternate');
         $this->assertNotNull($source);
         $this->assertTrue($source instanceof ResourceEntityType, get_class($source));
-        $literalPK = $source->resolveProperty('PrimaryKey');
-        $this->assertNotNull($literalPK);
-        $this->assertTrue($literalPK instanceof ResourceProperty, get_class($literalPK));
-        $this->assertTrue($literalPK->isKindOf(ResourcePropertyKind::KEY));
         $actualPK = $source->resolveProperty('alternate_id');
         $this->assertNotNull($actualPK);
         $this->assertTrue($actualPK instanceof ResourceProperty, get_class($actualPK));
-        $this->assertFalse($actualPK->isKindOf(ResourcePropertyKind::KEY));
+        $this->assertTrue($actualPK->isKindOf(ResourcePropertyKind::KEY));
     }
 
     public function testMonomorphicManyToManyRelation()
