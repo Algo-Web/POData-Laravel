@@ -124,7 +124,7 @@ class MetadataProvider extends MetadataBaseProvider
         $meta = App::make('metadata');
         $entities = $objectModel->getEntities();
         foreach ($entities as $entity) {
-            $baseType = $entity->isPolymorphicAffected() ? $meta->resolveResourceType('polyMorphicPlaceholder') : null;
+            $baseType = null;
             $className = $entity->getClassName();
             $entityName = $entity->getName();
             $entityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, false, $baseType);
