@@ -453,6 +453,12 @@ class IronicSerialiserTest extends SerialiserTestBase
         $odataLink->type = 'application/atom+xml;type=entry';
         $odataLink->url = 'TestMorphTargets(PrimaryKey=\'42\')/morph_TestMorphOneSource';
 
+        $odataLink1 = new ODataLink();
+        $odataLink1->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph_TestMorphOneSourceAlternate';
+        $odataLink1->title = 'morph_TestMorphOneSourceAlternate';
+        $odataLink1->type = 'application/atom+xml;type=entry';
+        $odataLink1->url = 'TestMorphTargets(PrimaryKey=\'42\')/morph_TestMorphOneSourceAlternate';
+
         $mediaLink1 = new ODataMediaLink(
             'photo',
             'stream',
@@ -479,6 +485,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $expected->type = new ODataCategory('TestMorphTarget');
         $expected->propertyContent = $propContent;
         $expected->links[] = $odataLink;
+        $expected->links[] = $odataLink1;
         $expected->mediaLink = $mediaLink;
         $expected->mediaLinks[] = $mediaLink1;
         $expected->isMediaLinkEntry = true;
