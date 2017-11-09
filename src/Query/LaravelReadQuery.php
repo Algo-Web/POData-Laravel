@@ -69,7 +69,6 @@ class LaravelReadQuery
             $msg = 'Skip token must be either null or instance of SkipTokenInfo.';
             throw new InvalidArgumentException($msg);
         }
-
         $rawLoad = $this->processEagerLoadList($eagerLoad);
         $modelLoad = [];
 
@@ -483,9 +482,24 @@ class LaravelReadQuery
         $rawLoad = [];
         foreach ($load as $line) {
             assert(is_string($line), 'Eager-load elements must be non-empty strings');
-            $remixLine = str_replace('/', '.', $line);
+            $lineParts = explode("/",$line);
+            $numberOfParts = count($lineParts);
+            for($i = 0; $i<$numberOfParts;$i++){
+                $lineParts[$i] = $this->getLaravelRelationName($lineParts[$i]);
+            }
+            $remixLine = implode(".",$lineParts);
             $rawLoad[] = $remixLine;
         }
         return $rawLoad;
     }
+
+    private function getLaravelRelationName($odataProperty){
+        $laravelProperty = $odataProperty;
+        $pos = strrpos($laravelProperty, "_");
+        if($pos !== false){
+            $laravelProperty = substr($laravelProperty,0,$pos);
+        }
+        return $laravelProperty;
+    }
+
 }
