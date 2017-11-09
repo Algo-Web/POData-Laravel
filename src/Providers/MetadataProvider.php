@@ -136,7 +136,8 @@ class MetadataProvider extends MetadataBaseProvider
         }
         $metaCount = count($meta->oDataEntityMap);
         $entityCount = count($entities);
-        assert($metaCount == 2 * $entityCount + 1);
+        $expected = 2 * $entityCount;
+        assert($metaCount == $expected, 'Expected ' . $expected . ' items, actually got '.$metaCount);
 
         if (null === $objectModel->getAssociations()) {
             return;

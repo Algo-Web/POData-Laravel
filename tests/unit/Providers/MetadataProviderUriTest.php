@@ -263,14 +263,14 @@ class MetadataProviderUriTest extends TestCase
         $cacheStore = Cache::getFacadeRoot();
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
 
-        $reqUrlString = 'http://localhost/odata.svc/TestMorphOneSources(PrimaryKey=1)/morphTarget';
+        $reqUrlString = 'http://localhost/odata.svc/TestMorphOneSources(id=1)/morphTarget';
 
         $baseUrl = new Url('http://localhost/odata.svc');
         $reqUrl = new Url($reqUrlString);
 
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')
-            ->andReturn('/odata.svc/TestMorphOneSources(PrimaryKey=1)/manySource');
+            ->andReturn('/odata.svc/TestMorphOneSources(id=1)/manySource');
         $request->shouldReceive('fullUrl')
             ->andReturn($reqUrlString);
         $request->initialize();
@@ -329,14 +329,14 @@ class MetadataProviderUriTest extends TestCase
         $cacheStore = Cache::getFacadeRoot();
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
 
-        $reqUrlString = 'http://localhost/odata.svc/TestMorphManySourceAlternates(PrimaryKey=1)/morphTarget';
+        $reqUrlString = 'http://localhost/odata.svc/TestMorphManySourceAlternates(alternate_id=1)/morphTarget';
 
         $baseUrl = new Url('http://localhost/odata.svc');
         $reqUrl = new Url($reqUrlString);
 
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')
-            ->andReturn('/odata.svc/TestMorphManySourceAlternates(PrimaryKey=1)/manySource');
+            ->andReturn('/odata.svc/TestMorphManySourceAlternates(id=1)/manySource');
         $request->shouldReceive('fullUrl')
             ->andReturn($reqUrlString);
         $request->initialize();
@@ -419,14 +419,14 @@ class MetadataProviderUriTest extends TestCase
         $cacheStore = Cache::getFacadeRoot();
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
 
-        $reqUrlString = 'http://localhost/odata.svc/TestMorphManyToManySources(PrimaryKey=1)/manySource';
+        $reqUrlString = 'http://localhost/odata.svc/TestMorphManyToManySources(id=1)/manySource';
 
         $baseUrl = new Url('http://localhost/odata.svc');
         $reqUrl = new Url($reqUrlString);
 
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')
-            ->andReturn('/odata.svc/TestMorphManyToManySources(PrimaryKey=1)/manySource');
+            ->andReturn('/odata.svc/TestMorphManyToManySources(id=1)/manySource');
         $request->shouldReceive('fullUrl')
             ->andReturn($reqUrlString);
         $request->initialize();

@@ -123,9 +123,9 @@ class MetadataProviderReverseTest extends TestCase
         $this->assertEquals('morph_TestMorphManySource', $leftForward);
         $rightForward = $foo->resolveReverseProperty($right, $base, 'morphTarget');
         $this->assertEquals('morph_TestMorphManySourceAlternate', $rightForward);
-        $backLeft = $foo->resolveReverseProperty($base, $left, 'morph');
+        $backLeft = $foo->resolveReverseProperty($base, $left, 'morph_TestMorphManySource');
         $this->assertEquals('morphTarget', $backLeft);
-        $backRight = $foo->resolveReverseProperty($base, $right, 'morph');
+        $backRight = $foo->resolveReverseProperty($base, $right, 'morph_TestMorphManySourceAlternate');
         $this->assertEquals('morphTarget', $backRight);
     }
 

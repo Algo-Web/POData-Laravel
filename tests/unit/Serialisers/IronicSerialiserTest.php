@@ -432,32 +432,28 @@ class IronicSerialiserTest extends SerialiserTestBase
         $propContent->properties = [
             'name' => new ODataProperty(),
             'alternate_id' => new ODataProperty(),
-            'PrimaryKey' => new ODataProperty(),
             'id' => new ODataProperty()
         ];
         $propContent->properties['name']->name = 'name';
         $propContent->properties['alternate_id']->name = 'alternate_id';
-        $propContent->properties['PrimaryKey']->name = 'PrimaryKey';
         $propContent->properties['id']->name = 'id';
         $propContent->properties['name']->typeName = 'Edm.String';
         $propContent->properties['alternate_id']->typeName = 'Edm.Int32';
-        $propContent->properties['PrimaryKey']->typeName = 'Edm.String';
         $propContent->properties['id']->typeName = 'Edm.Int32';
         $propContent->properties['name']->value = 'Hammer, M.C.';
-        $propContent->properties['PrimaryKey']->value = '42';
         $propContent->properties['id']->value = '42';
 
         $odataLink = new ODataLink();
         $odataLink->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph_TestMorphOneSource';
         $odataLink->title = 'morph_TestMorphOneSource';
         $odataLink->type = 'application/atom+xml;type=entry';
-        $odataLink->url = 'TestMorphTargets(PrimaryKey=\'42\')/morph_TestMorphOneSource';
+        $odataLink->url = 'TestMorphTargets(id=42)/morph_TestMorphOneSource';
 
         $odataLink1 = new ODataLink();
         $odataLink1->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph_TestMorphOneSourceAlternate';
         $odataLink1->title = 'morph_TestMorphOneSourceAlternate';
         $odataLink1->type = 'application/atom+xml;type=entry';
-        $odataLink1->url = 'TestMorphTargets(PrimaryKey=\'42\')/morph_TestMorphOneSourceAlternate';
+        $odataLink1->url = 'TestMorphTargets(id=42)/morph_TestMorphOneSourceAlternate';
 
         $mediaLink1 = new ODataMediaLink(
             'photo',
@@ -469,17 +465,17 @@ class IronicSerialiserTest extends SerialiserTestBase
         $mediaLink = new ODataMediaLink(
             'TestMorphTarget',
             '/$value',
-            'TestMorphTargets(PrimaryKey=\'42\')/$value',
+            'TestMorphTargets(id=42)/$value',
             '*/*',
             'eTag',
             'edit-media'
         );
 
         $expected = new ODataEntry();
-        $expected->id = 'http://localhost/odata.svc/TestMorphTargets(PrimaryKey=\'42\')';
+        $expected->id = 'http://localhost/odata.svc/TestMorphTargets(id=42)';
         $expected->title = new ODataTitle('TestMorphTarget');
         $expected->editLink = new ODataLink();
-        $expected->editLink->url = 'TestMorphTargets(PrimaryKey=\'42\')';
+        $expected->editLink->url = 'TestMorphTargets(id=42)';
         $expected->editLink->name = 'edit';
         $expected->editLink->title = 'TestMorphTarget';
         $expected->type = new ODataCategory('TestMorphTarget');
@@ -505,7 +501,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $service = new Url('http://localhost/odata.svc');
         $request = new Url('http://localhost/odata.svc/TestMorphTargets(42)');
 
-        $targType = $simple->resolveResourceType('polyMorphicPlaceholder');
+        $targType = $simple->resolveResourceType('TestMorphTarget');
 
         $request = m::mock(RequestDescription::class)->makePartial();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMorphTargets(42)');
