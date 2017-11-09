@@ -364,14 +364,14 @@ class MetadataProviderUriTest extends TestCase
             foreach ($morphTargetAssoc as $key => $assoc) {
                 $this->assertTrue($assoc instanceof AssociationMonomorphic );
                 $assocTypes = $assoc->getAssociationType();
-                $this->assertEquals(AssociationType::ONE_TO_MANY, $assocTypes[0]->getValue());
+                $this->assertEquals(AssociationType::ONE_TO_MANY, $assocTypes->getValue());
             }
             $morphManyAssoc = $MorphManySourceAlternate->getAssociations();
             $this->assertEquals(1, count($morphManyAssoc));
             foreach ($morphManyAssoc as $key => $assoc) {
                 $this->assertTrue($assoc instanceof AssociationPolymorphic);
                 $assocTypes = $assoc->getAssociationType();
-                $this->assertEquals(AssociationType::ONE_TO_MANY, $assocTypes[0]->getValue());
+                $this->assertEquals(AssociationType::ONE_TO_MANY, $assocTypes->getValue());
             }
         });
         $app = App::make('app');
