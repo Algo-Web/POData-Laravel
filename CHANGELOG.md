@@ -1,5 +1,10 @@
 Unreleased
 ----------
+
+0.3.1 (2017-11-09)
+------------------
+   * Fix mispointed composer.json dependency for POData
+        Thank you to kodermax@gmail.com for reporting this
    * Cache table field list lookups
    * Respect hidden/visible getters in metadata processing
    * Require property names to be case-insensitive unique
