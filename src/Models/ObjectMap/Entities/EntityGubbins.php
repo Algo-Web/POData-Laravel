@@ -6,6 +6,7 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use POData\Providers\Metadata\ResourceEntityType;
 
@@ -193,7 +194,7 @@ class EntityGubbins
     {
         if ($association instanceof AssociationMonomorphic) {
             $stub = $isFirst ? $association->getFirst() : $association->getLast();
-            if (null === $stub || (!in_array($stub, $this->stubs) && $stub instanceof AssociationStubMonomorphic )) {
+            if (null === $stub || (!in_array($stub, $this->stubs) && !($stub instanceof AssociationStubPolymorphic) )) {
                 throw new \InvalidArgumentException('Association cannot be connected to this entity');
             }
             $propertyName = $stub->getRelationName();
