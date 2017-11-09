@@ -332,12 +332,6 @@ class MetadataProvider extends MetadataBaseProvider
             $this->reset();
         }
 
-        $stdRef = new \ReflectionClass(Model::class);
-        $abstract = $meta->addEntityType($stdRef, static::POLYMORPHIC, true, null);
-        $meta->addKeyProperty($abstract, 'PrimaryKey', TypeCode::STRING);
-
-        $meta->addResourceSet(static::POLYMORPHIC, $abstract);
-
         $modelNames = $this->getCandidateModels();
         $objectModel = $this->extract($modelNames);
         $objectModel = $this->unify($objectModel);
