@@ -131,15 +131,21 @@ class MetadataGubbinsHolder
                 if (0 == count($lastCandidates)) {
                     continue;
                 }
-                $assoc = new AssociationPolymorphic();
-                $assoc->setFirst($this->knownSides[$knownType][$key]);
-                $assoc->setLast($lastCandidates);
-                assert($assoc->isOk());
-                $polyAssoc[] = $assoc;
+                foreach($lastCandidates as $lc){
+                    $stub = clone $this->knownSides[$knownType][$key];
+                    $isMulti = ($stub->getMultiplicity()->getValue() == \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType::MANY);
+                    $RelPolyTypeName = str_plural(substr($lc->getBaseType(),strrpos($lc->getBaseType(),"\\")+1),$isMulti?2:1);
+                    $stub->setRelationName($stub->getRelationName() . "_" . $RelPolyTypeName);
+                    $assoc = new AssociationMonomorphic();
+                    $first = -1 === $stub->compare($lc);
+                    $assoc->setFirst($first ? $stub : $lc);
+                    $assoc->setLast($first ? $lc : $stub);
+                    assert($assoc->isOk());
+                    $polyAssoc[] = $assoc;
+                }
             }
         }
         $result = array_merge($monoAssoc, $polyAssoc);
-
         return $result;
     }
 
