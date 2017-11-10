@@ -4,7 +4,6 @@ namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
-use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
@@ -198,27 +197,7 @@ class EntityGubbins
                 throw new \InvalidArgumentException('Association cannot be connected to this entity');
             }
             $propertyName = $stub->getRelationName();
-        } elseif ($association instanceof AssociationPolymorphic) {
-            if ($isFirst) {
-                $stub = $association->getFirst();
-                if (!in_array($stub, $this->stubs)) {
-                    throw new \InvalidArgumentException('Association cannot be connected to this entity');
-                }
-            } else {
-                $comp = function (AssociationStubBase $one, AssociationStubBase $two) {
-                    return $one->compare($two);
-                };
-                $stubs = $association->getLast();
-                assert(is_array($stubs));
-                assert(is_array($this->stubs));
-                $inter = array_uintersect(array_values($stubs), array_values($this->stubs), $comp);
-                if (1 !== count($inter)) {
-                    throw new \InvalidArgumentException('Association cannot be connected to this entity');
-                }
-                $stub = array_values($inter)[0];
-            }
-            $propertyName = $stub->getRelationName();
-        }
+        } 
         assert(isset($propertyName));
         $this->associations[$propertyName] = $association;
     }
