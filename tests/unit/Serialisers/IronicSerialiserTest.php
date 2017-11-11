@@ -743,4 +743,101 @@ class IronicSerialiserTest extends SerialiserTestBase
         $this->assertNull($ironicResult->entries[1]->links[1]->expandedResult);
         $this->assertTrue($ironicResult->entries[2]->links[1]->expandedResult instanceof ODataFeed);
     }
+
+    public function testGetConcreteTypeFromAbstractTypeWhereAbstractHasNoDerivedTypes()
+    {
+        $abstractType = m::mock(ResourceEntityType::class)->makePartial();
+        $abstractType->shouldReceive('isAbstract')->andReturn(true)->atLeast(1);
+
+        $payloadClass = 'payloadClass';
+
+        $metadata = m::mock(SimpleMetadataProvider::class)->MakePartial();
+        $metadata->shouldReceive('getDerivedTypes')->withArgs([$abstractType])->andReturn([])->once();
+        App::instance('metadata', $metadata);
+
+        $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
+
+        $expected = 'assert(): assert(0 < count($derived)) failed';
+        $actual = null;
+
+        try {
+            $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
+        } catch (\ErrorException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetConcreteTypeFromAbstractTypeWhereAbstractHasOnlyAbstractDerivedTypes()
+    {
+        $abstractType = m::mock(ResourceEntityType::class)->makePartial();
+        $abstractType->shouldReceive('isAbstract')->andReturn(true)->atLeast(1);
+
+        $payloadClass = 'payloadClass';
+
+        $metadata = m::mock(SimpleMetadataProvider::class)->makePartial();
+        $metadata->shouldReceive('getDerivedTypes')->withArgs([$abstractType])->andReturn([$abstractType])->once();
+        App::instance('metadata', $metadata);
+
+        $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
+
+        $expected = 'assert(): Concrete resource type not selected for payload payloadClass failed';
+        $actual = null;
+
+        try {
+            $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
+        } catch (\ErrorException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetConcreteTypeFromAbstractTypeWhereAbstractHasOnlyConcreteDerivedTypesNoPayloadClass()
+    {
+        $abstractType = m::mock(ResourceEntityType::class)->makePartial();
+        $abstractType->shouldReceive('isAbstract')->andReturn(true)->atLeast(1);
+
+        $concreteType = m::mock(ResourceEntityType::class)->makePartial();
+        $concreteType->shouldReceive('isAbstract')->andReturn(false)->atLeast(1);
+        $concreteType->shouldReceive('getInstanceType->getName')->andReturn('concreteClass');
+
+        $payloadClass = 'payloadClass';
+
+        $metadata = m::mock(SimpleMetadataProvider::class)->makePartial();
+        $metadata->shouldReceive('getDerivedTypes')->withArgs([$abstractType])->andReturn([$concreteType])->once();
+        App::instance('metadata', $metadata);
+
+        $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
+
+        $expected = 'assert(): Concrete resource type not selected for payload payloadClass failed';
+        $actual = null;
+
+        try {
+            $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
+        } catch (\ErrorException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetConcreteTypeFromAbstractTypeWhereAbstractHasOnlyConcreteDerivedTypesWithPayloadClass()
+    {
+        $abstractType = m::mock(ResourceEntityType::class)->makePartial();
+        $abstractType->shouldReceive('isAbstract')->andReturn(true)->atLeast(1);
+
+        $concreteType = m::mock(ResourceEntityType::class)->makePartial();
+        $concreteType->shouldReceive('isAbstract')->andReturn(false)->atLeast(1);
+        $concreteType->shouldReceive('getInstanceType->getName')->andReturn('payloadClass');
+
+        $payloadClass = 'payloadClass';
+
+        $metadata = m::mock(SimpleMetadataProvider::class)->makePartial();
+        $metadata->shouldReceive('getDerivedTypes')->withArgs([$abstractType])->andReturn([$concreteType])->once();
+        App::instance('metadata', $metadata);
+
+        $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
+
+        $result = $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
+        $this->assertEquals($result, $concreteType);
+    }
 }

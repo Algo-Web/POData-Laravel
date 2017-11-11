@@ -2,6 +2,8 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use POData\Providers\Metadata\ResourceEntityType;
+
 class IronicSerialiserDummy extends IronicSerialiser
 {
     protected $expand = [];
@@ -43,5 +45,10 @@ class IronicSerialiserDummy extends IronicSerialiser
     public function setPropertyExpansion($propName, $toExpand = true)
     {
         $this->expand[$propName] = boolval($toExpand);
+    }
+    
+    public function getConcreteTypeFromAbstractType(ResourceEntityType $resourceType, $payloadClass)
+    {
+        return parent::getConcreteTypeFromAbstractType($resourceType, $payloadClass);
     }
 }
