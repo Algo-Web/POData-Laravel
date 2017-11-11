@@ -134,9 +134,9 @@ class MetadataGubbinsHolder
                 foreach ($lastCandidates as $lc) {
                     $stub = clone $this->knownSides[$knownType][$key];
                     $isMulti = ($stub->getMultiplicity()->getValue() == AssociationStubRelationType::MANY);
-                    $relPolyTypeName = substr($lc->getBaseType(),strrpos($lc->getBaseType(),"\\")+1);
+                    $relPolyTypeName = substr($lc->getBaseType(),strrpos($lc->getBaseType(),'\\')+1);
                     $relPolyTypeName = str_plural($relPolyTypeName, $isMulti?2:1);
-                    $stub->setRelationName($stub->getRelationName() . "_" . $relPolyTypeName);
+                    $stub->setRelationName($stub->getRelationName() . '_' . $relPolyTypeName);
                     $assoc = new AssociationMonomorphic();
                     $first = -1 === $stub->compare($lc);
                     $assoc->setFirst($first ? $stub : $lc);
