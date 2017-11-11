@@ -44,29 +44,6 @@ class EntityGubbins
      * @var ResourceEntityType
      */
     private $odataResourceType;
-    /**
-     * @var bool|null
-     */
-    private $isPolymorphicAffected = null;
-
-    //TODO: move the checking part of this to the set stubs method.
-    public function isPolymorphicAffected()
-    {
-        if (null !== $this->isPolymorphicAffected) {
-            return $this->isPolymorphicAffected;
-        }
-        $this->isPolymorphicAffected = false;
-        foreach ($this->stubs as $stub) {
-            if (!$stub instanceof AssociationStubPolymorphic) {
-                continue;
-            }
-            if (null !== $stub->getTargType()) {
-                $this->isPolymorphicAffected = true;
-                break;
-            }
-        }
-        return $this->isPolymorphicAffected;
-    }
 
     /**
      * @return ResourceEntityType
