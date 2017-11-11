@@ -90,7 +90,7 @@ class MetadataTraitExtractionTest extends TestCase
         $foo = new TestModel($meta, null);
         $foo->name = 'Commence Primary Ignition';
 
-        $expected = "Property names must be unique, without regard to case";
+        $expected = 'Property names must be unique, without regard to case';
         $actual = null;
 
         try {
@@ -112,7 +112,7 @@ class MetadataTraitExtractionTest extends TestCase
         $foo = new TestMorphOneSource($meta, null);
         $foo->name = 'Commence Primary Ignition';
 
-        $expected = "Property names must be unique, without regard to case";
+        $expected = 'Property names must be unique, without regard to case';
         $actual = null;
 
         try {
