@@ -6,6 +6,7 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 
 class MetadataGubbinsHolder
@@ -132,9 +133,10 @@ class MetadataGubbinsHolder
                 }
                 foreach ($lastCandidates as $lc) {
                     $stub = clone $this->knownSides[$knownType][$key];
-                    $isMulti = ($stub->getMultiplicity()->getValue() == \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType::MANY);
-                    $RelPolyTypeName = str_plural(substr($lc->getBaseType(), strrpos($lc->getBaseType(), '\\')+1), $isMulti?2:1);
-                    $stub->setRelationName($stub->getRelationName() . '_' . $RelPolyTypeName);
+                    $isMulti = ($stub->getMultiplicity()->getValue() == AssociationStubRelationType::MANY);
+                    $relPolyTypeName = substr($lc->getBaseType(),strrpos($lc->getBaseType(),"\\")+1);
+                    $relPolyTypeName = str_plural($relPolyTypeName, $isMulti?2:1);
+                    $stub->setRelationName($stub->getRelationName() . "_" . $relPolyTypeName);
                     $assoc = new AssociationMonomorphic();
                     $first = -1 === $stub->compare($lc);
                     $assoc->setFirst($first ? $stub : $lc);
