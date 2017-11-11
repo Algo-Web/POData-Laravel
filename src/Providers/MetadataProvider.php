@@ -5,7 +5,6 @@ namespace AlgoWeb\PODataLaravel\Providers;
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
-use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
@@ -124,7 +123,7 @@ class MetadataProvider extends MetadataBaseProvider
         $meta = App::make('metadata');
         $entities = $objectModel->getEntities();
         foreach ($entities as $entity) {
-            $baseType = $entity->isPolymorphicAffected() ? $meta->resolveResourceType('polyMorphicPlaceholder') : null;
+            $baseType = null;
             $className = $entity->getClassName();
             $entityName = $entity->getName();
             $entityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, false, $baseType);
@@ -136,7 +135,8 @@ class MetadataProvider extends MetadataBaseProvider
         }
         $metaCount = count($meta->oDataEntityMap);
         $entityCount = count($entities);
-        assert($metaCount == 2 * $entityCount + 1);
+        $expected = 2 * $entityCount;
+        assert($metaCount == $expected, 'Expected ' . $expected . ' items, actually got '.$metaCount);
 
         if (null === $objectModel->getAssociations()) {
             return;
@@ -145,11 +145,7 @@ class MetadataProvider extends MetadataBaseProvider
         $assoc = null === $assoc ? [] : $assoc;
         foreach ($assoc as $association) {
             assert($association->isOk());
-            if ($association instanceof AssociationMonomorphic) {
-                $this->implementAssociationsMonomorphic($objectModel, $association);
-            } elseif ($association instanceof AssociationPolymorphic) {
-                $this->implementAssociationsPolymorphic($objectModel, $association);
-            }
+            $this->implementAssociationsMonomorphic($objectModel, $association);
         }
         if (null != self::$afterImplement) {
             $func = self::$afterImplement;
@@ -199,86 +195,18 @@ class MetadataProvider extends MetadataBaseProvider
         }
     }
 
-    /**
-     * @param Map                    $objectModel
-     * @param AssociationPolymorphic $association
-     */
-    private function implementAssociationsPolymorphic(Map $objectModel, AssociationPolymorphic $association)
-    {
-        $meta = App::make('metadata');
-        $first = $association->getFirst();
-
-        $polySet = $meta->resolveResourceSet(static::POLYMORPHIC_PLURAL);
-        assert($polySet instanceof ResourceSet);
-
-        $principalType = $objectModel->getEntities()[$first->getBaseType()]->getOdataResourceType();
-        assert($principalType instanceof ResourceEntityType);
-        $principalSet = $principalType->getCustomState();
-        assert($principalSet instanceof ResourceSet);
-        $principalProp = $first->getRelationName();
-        $isPrincipalAdded = null !== $principalType->resolveProperty($principalProp);
-
-        if (!$isPrincipalAdded) {
-            if ($first->getMultiplicity()->getValue() !== AssociationStubRelationType::MANY) {
-                $meta->addResourceReferenceProperty($principalType, $principalProp, $polySet);
-            } else {
-                $meta->addResourceSetReferenceProperty($principalType, $principalProp, $polySet);
-            }
-        }
-
-        $types = $association->getAssociationType();
-        $final = $association->getLast();
-        $numRows = count($types);
-        assert($numRows == count($final));
-
-        for ($i = 0; $i < $numRows; $i++) {
-            $type = $types[$i];
-            $last = $final[$i];
-
-            $dependentType = $objectModel->getEntities()[$last->getBaseType()]->getOdataResourceType();
-            assert($dependentType instanceof ResourceEntityType);
-            $dependentSet = $dependentType->getCustomState();
-            assert($dependentSet instanceof ResourceSet);
-            $dependentProp = $last->getRelationName();
-            $isDependentAdded = null !== $dependentType->resolveProperty($dependentProp);
-
-            switch ($type) {
-                case AssociationType::NULL_ONE_TO_NULL_ONE():
-                case AssociationType::NULL_ONE_TO_ONE():
-                case AssociationType::ONE_TO_ONE():
-                    if (!$isDependentAdded) {
-                        $meta->addResourceReferenceProperty($dependentType, $dependentProp, $principalSet);
-                    }
-                    break;
-                case AssociationType::NULL_ONE_TO_MANY():
-                case AssociationType::ONE_TO_MANY():
-                    if (!$isDependentAdded) {
-                        $meta->addResourceSetReferenceProperty($dependentType, $dependentProp, $principalSet);
-                    }
-                    break;
-                case AssociationType::MANY_TO_MANY():
-                    if (!$isDependentAdded) {
-                        $meta->addResourceSetReferenceProperty($dependentType, $dependentProp, $principalSet);
-                    }
-            }
-        }
-    }
-
     private function implementProperties(EntityGubbins $unifiedEntity)
     {
         $meta = App::make('metadata');
         $odataEntity = $unifiedEntity->getOdataResourceType();
         $keyFields = $unifiedEntity->getKeyFields();
         $fields = $unifiedEntity->getFields();
-        $affected = $unifiedEntity->isPolymorphicAffected();
-        if (!$affected) {
-            foreach ($keyFields as $keyField) {
-                $meta->addKeyProperty($odataEntity, $keyField->getName(), $keyField->getEdmFieldType());
-            }
+        foreach ($keyFields as $keyField) {
+            $meta->addKeyProperty($odataEntity, $keyField->getName(), $keyField->getEdmFieldType());
         }
 
         foreach ($fields as $field) {
-            if (in_array($field, $keyFields) && !$affected) {
+            if (in_array($field, $keyFields)) {
                 continue;
             }
             if ($field->getPrimitiveType() == 'blob') {
@@ -331,12 +259,6 @@ class MetadataProvider extends MetadataBaseProvider
         if (false !== $reset) {
             $this->reset();
         }
-
-        $stdRef = new \ReflectionClass(Model::class);
-        $abstract = $meta->addEntityType($stdRef, static::POLYMORPHIC, true, null);
-        $meta->addKeyProperty($abstract, 'PrimaryKey', TypeCode::STRING);
-
-        $meta->addResourceSet(static::POLYMORPHIC, $abstract);
 
         $modelNames = $this->getCandidateModels();
         $objectModel = $this->extract($modelNames);
@@ -400,12 +322,11 @@ class MetadataProvider extends MetadataBaseProvider
      * Resolve possible reverse relation property names.
      *
      * @param Model $source
-     * @param Model $target
-     * @param       $propName
-     *
-     * @return string|null
+     * @param $propName
+     * @return null|string
+     * @internal param Model $target
      */
-    public function resolveReverseProperty(Model $source, Model $target, $propName)
+    public function resolveReverseProperty(Model $source, $propName)
     {
         assert(is_string($propName), 'Property name must be string');
         $entity = $this->getObjectMap()->resolveEntity(get_class($source));
@@ -422,18 +343,8 @@ class MetadataProvider extends MetadataBaseProvider
             return $association->getFirst()->getRelationName();
         }
 
-        if ($association instanceof AssociationMonomorphic) {
-            return $association->getLast()->getRelationName();
-        }
-        assert($association instanceof AssociationPolymorphic);
-
-        $lasts = $association->getLast();
-        foreach ($lasts as $stub) {
-            if ($stub->getBaseType() == get_class($target)) {
-                return $stub->getRelationName();
-            }
-        }
-        return null;
+        assert($association instanceof AssociationMonomorphic);
+        return $association->getLast()->getRelationName();
     }
 
     public function isRunningInArtisan()

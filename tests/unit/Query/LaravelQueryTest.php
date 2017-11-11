@@ -731,6 +731,7 @@ class LaravelQueryTest extends TestCase
         $sourceEntity->shouldReceive('orderBy')->andReturnSelf();
         $sourceEntity->shouldReceive('getAttribute')->withArgs(['morphTarget'])->andReturnSelf()->once();
         $sourceEntity->shouldReceive('get')->andReturn(collect(['a']))->once();
+        $property->shouldReceive('getResourceType->getInstanceType->getName')->andReturn(get_class($sourceEntity));
 
         $foo = new LaravelQuery();
 
@@ -750,10 +751,49 @@ class LaravelQueryTest extends TestCase
         $targ = m::mock(ResourceSet::class);
         $property = m::mock(ResourceProperty::class);
         $property->shouldReceive('getName')->andReturn('name');
+        $property->shouldReceive('getResourceType->getInstanceType->getName')->andReturn(TestModel::class);
 
         $foo = new LaravelQuery();
         $result = $foo->getRelatedResourceReference($source, $model, $targ, $property);
         $this->assertEquals($model->name, $result);
+    }
+
+    public function testGetRelatedResourceReferenceWithInValidGubbins()
+    {
+        $mod1 = new TestModel();
+        $mod1->name = 'Hammer, MC';
+
+        $model = new TestModel();
+        $model->name = $mod1;
+
+        $source = m::mock(ResourceSet::class);
+        $targ = m::mock(ResourceSet::class);
+        $property = m::mock(ResourceProperty::class);
+        $property->shouldReceive('getName')->andReturn('name');
+        $property->shouldReceive('getResourceType->getInstanceType->getName')->andReturn('name');
+
+        $foo = new LaravelQuery();
+        $result = $foo->getRelatedResourceReference($source, $model, $targ, $property);
+        $this->assertEquals(null, $result);
+    }
+
+    public function testGetRelatedResourceReferenceWithExpandedPropertyName()
+    {
+        $mod1 = new TestModel();
+        $mod1->name = 'Hammer, MC';
+
+        $model = new TestModel();
+        $model->name = $mod1;
+
+        $source = m::mock(ResourceSet::class);
+        $targ = m::mock(ResourceSet::class);
+        $property = m::mock(ResourceProperty::class);
+        $property->shouldReceive('getName')->andReturn('noname_unpack')->once();
+        $property->shouldReceive('getResourceType->getInstanceType->getName')->andReturn('name')->never();
+
+        $foo = new LaravelQuery();
+        $result = $foo->getRelatedResourceReference($source, $model, $targ, $property);
+        $this->assertEquals(null, $result);
     }
 
     public function testAttemptUpdate()

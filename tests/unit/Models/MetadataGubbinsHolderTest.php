@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
@@ -341,8 +342,8 @@ class MetadataGubbinsHolderTest extends TestCase
         $foo->addEntity($altModel->extractGubbins());
 
         $result = $foo->getRelations();
-        $this->assertEquals(1, count($result));
-        $this->assertTrue($result[0] instanceof AssociationPolymorphic, get_class($result[0]));
-        $this->assertEquals(2, count($result[0]->getLast()));
+        $this->assertEquals(2, count($result));
+        $this->assertTrue($result[0] instanceof AssociationMonomorphic, get_class($result[0]));
+        $this->assertEquals(1, count($result[0]->getLast()));
     }
 }

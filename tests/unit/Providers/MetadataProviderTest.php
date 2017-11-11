@@ -184,7 +184,7 @@ class MetadataProviderTest extends TestCase
 
         $resources = $meta->getResourceSets();
         $this->assertTrue(is_array($resources));
-        $this->assertEquals(2, count($resources));
+        $this->assertEquals(1, count($resources));
         $this->assertTrue($resources[0] instanceof ResourceSet);
         $this->assertEquals('TestModels', $resources[0]->getName());
     }
@@ -215,7 +215,7 @@ class MetadataProviderTest extends TestCase
 
         $resources = $meta->getResourceSets();
         $this->assertTrue(is_array($resources));
-        $this->assertEquals(2, count($resources));
+        $this->assertEquals(1, count($resources));
     }
 
     public function testBootHasMigrationsThreeDifferentRelationTypes()

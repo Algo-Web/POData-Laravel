@@ -3,7 +3,6 @@ namespace AlgoWeb\PODataLaravel\Models\ObjectMap;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
-use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 
 class Map
@@ -75,8 +74,6 @@ class Map
         }
         if ($association instanceof AssociationMonomorphic) {
             $this->addAssociationMonomorphic($association);
-        } elseif ($association instanceof AssociationPolymorphic) {
-            $this->addAssociationPolymorphic($association);
         } else {
             throw new \InvalidArgumentException('Association type not yet handled');
         }
@@ -113,18 +110,5 @@ class Map
         $secondClass = $this->entities[$association->getLast()->getBaseType()];
         $firstClass->addAssociation($association);
         $secondClass->addAssociation($association, false);
-    }
-
-    /**
-     * @param AssociationPolymorphic $association
-     */
-    private function addAssociationPolymorphic(AssociationPolymorphic $association)
-    {
-        $firstClass = $this->entities[$association->getFirst()->getBaseType()];
-        $firstClass->addAssociation($association);
-        foreach ($association->getLast() as $last) {
-            $secondClass = $this->entities[$last->getBaseType()];
-            $secondClass->addAssociation($association, false);
-        }
     }
 }

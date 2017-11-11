@@ -69,7 +69,6 @@ class LaravelReadQuery
             $msg = 'Skip token must be either null or instance of SkipTokenInfo.';
             throw new InvalidArgumentException($msg);
         }
-
         $rawLoad = $this->processEagerLoadList($eagerLoad);
         $modelLoad = [];
 
@@ -297,7 +296,7 @@ class LaravelReadQuery
      * @param ResourceSet|null    $resourceSet
      * @param KeyDescriptor|null  $keyDescriptor
      * @param Model|Relation|null $sourceEntityInstance Starting point of query
-     * $param array               $whereCondition
+     *                                                  $param array               $whereCondition
      * @param string[]|null       $eagerLoad            array of relations to eager load
      *
      * @return Model|null
@@ -368,12 +367,15 @@ class LaravelReadQuery
         $this->checkAuth($sourceEntityInstance);
 
         $propertyName = $targetProperty->getName();
+        $propertyName = $this->getLaravelRelationName($propertyName);
         $result = $sourceEntityInstance->$propertyName;
         if (null === $result) {
             return null;
         }
         assert($result instanceof Model, get_class($result));
-        $result->PrimaryKey = $result->getKey();
+        if ($targetProperty->getResourceType()->getInstanceType()->getName() != get_class($result)) {
+            return null;
+        }
         return $result;
     }
 
@@ -474,7 +476,7 @@ class LaravelReadQuery
     }
 
     /**
-     * @param string[]|null $eagerLoad
+     * @param  string[]|null $eagerLoad
      * @return array
      */
     private function processEagerLoadList(array $eagerLoad = null)
@@ -483,9 +485,28 @@ class LaravelReadQuery
         $rawLoad = [];
         foreach ($load as $line) {
             assert(is_string($line), 'Eager-load elements must be non-empty strings');
-            $remixLine = str_replace('/', '.', $line);
+            $lineParts = explode('/', $line);
+            $numberOfParts = count($lineParts);
+            for ($i = 0; $i<$numberOfParts; $i++) {
+                $lineParts[$i] = $this->getLaravelRelationName($lineParts[$i]);
+            }
+            $remixLine = implode('.', $lineParts);
             $rawLoad[] = $remixLine;
         }
         return $rawLoad;
+    }
+
+    /**
+     * @param  string $odataProperty
+     * @return string
+     */
+    private function getLaravelRelationName($odataProperty)
+    {
+        $laravelProperty = $odataProperty;
+        $pos = strrpos($laravelProperty, '_');
+        if ($pos !== false) {
+            $laravelProperty = substr($laravelProperty, 0, $pos);
+        }
+        return $laravelProperty;
     }
 }

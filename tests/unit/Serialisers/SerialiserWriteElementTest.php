@@ -778,7 +778,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $ironic = new IronicSerialiserDummy($service, $processor->getRequest());
         $ironic->setLightStack($stack);
         $ironic->setPropertyExpansion('morphTarget');
-        $ironic->setPropertyExpansion('morph', false);
+        $ironic->setPropertyExpansion('morph_TestMorphManySource', false);
 
         $targ1 = new TestMorphTarget($metadata);
         $targ1->id = 1;

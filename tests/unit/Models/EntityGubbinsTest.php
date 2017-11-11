@@ -104,18 +104,6 @@ class EntityGubbinsTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testSetGoodStubsArray()
-    {
-        $foo = new EntityGubbins();
-        $stub = new AssociationStubPolymorphic();
-
-        $foo->setStubs([$stub]);
-        $this->assertEquals(1, count($foo->getStubs()));
-        $this->assertFalse($foo->isPolymorphicAffected());
-        // and to check caching
-        $this->assertFalse($foo->isPolymorphicAffected());
-    }
-
     public function testSetAbstractODataType()
     {
         $foo = new EntityGubbins();
@@ -170,25 +158,6 @@ class EntityGubbinsTest extends TestCase
 
         try {
             $foo->addAssociation($assoc);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testAddDisconnectedPolymorphicAssociation()
-    {
-        $foo = new EntityGubbins();
-        $foo->setStubs([]);
-        $assoc = m::mock(AssociationPolymorphic::class);
-        $stub = m::mock(AssociationStubBase::class);
-        $assoc->shouldReceive('getLast')->andReturn([$stub])->once();
-
-        $expected = 'Association cannot be connected to this entity';
-        $actual = null;
-
-        try {
-            $foo->addAssociation($assoc, false);
         } catch (\Exception $e) {
             $actual = $e->getMessage();
         }

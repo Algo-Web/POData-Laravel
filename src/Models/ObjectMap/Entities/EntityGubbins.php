@@ -4,8 +4,8 @@ namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
-use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use POData\Providers\Metadata\ResourceEntityType;
 
@@ -44,29 +44,6 @@ class EntityGubbins
      * @var ResourceEntityType
      */
     private $odataResourceType;
-    /**
-     * @var bool|null
-     */
-    private $isPolymorphicAffected = null;
-
-    //TODO: move the checking part of this to the set stubs method.
-    public function isPolymorphicAffected()
-    {
-        if (null !== $this->isPolymorphicAffected) {
-            return $this->isPolymorphicAffected;
-        }
-        $this->isPolymorphicAffected = false;
-        foreach ($this->stubs as $stub) {
-            if (!$stub instanceof AssociationStubPolymorphic) {
-                continue;
-            }
-            if (null !== $stub->getTargType()) {
-                $this->isPolymorphicAffected = true;
-                break;
-            }
-        }
-        return $this->isPolymorphicAffected;
-    }
 
     /**
      * @return ResourceEntityType
@@ -193,28 +170,8 @@ class EntityGubbins
     {
         if ($association instanceof AssociationMonomorphic) {
             $stub = $isFirst ? $association->getFirst() : $association->getLast();
-            if (null === $stub || !in_array($stub, $this->stubs)) {
+            if (null === $stub || (!in_array($stub, $this->stubs) && !($stub instanceof AssociationStubPolymorphic))) {
                 throw new \InvalidArgumentException('Association cannot be connected to this entity');
-            }
-            $propertyName = $stub->getRelationName();
-        } elseif ($association instanceof AssociationPolymorphic) {
-            if ($isFirst) {
-                $stub = $association->getFirst();
-                if (!in_array($stub, $this->stubs)) {
-                    throw new \InvalidArgumentException('Association cannot be connected to this entity');
-                }
-            } else {
-                $comp = function (AssociationStubBase $one, AssociationStubBase $two) {
-                    return $one->compare($two);
-                };
-                $stubs = $association->getLast();
-                assert(is_array($stubs));
-                assert(is_array($this->stubs));
-                $inter = array_uintersect(array_values($stubs), array_values($this->stubs), $comp);
-                if (1 !== count($inter)) {
-                    throw new \InvalidArgumentException('Association cannot be connected to this entity');
-                }
-                $stub = array_values($inter)[0];
             }
             $propertyName = $stub->getRelationName();
         }

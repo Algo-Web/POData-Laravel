@@ -432,26 +432,28 @@ class IronicSerialiserTest extends SerialiserTestBase
         $propContent->properties = [
             'name' => new ODataProperty(),
             'alternate_id' => new ODataProperty(),
-            'PrimaryKey' => new ODataProperty(),
             'id' => new ODataProperty()
         ];
         $propContent->properties['name']->name = 'name';
         $propContent->properties['alternate_id']->name = 'alternate_id';
-        $propContent->properties['PrimaryKey']->name = 'PrimaryKey';
         $propContent->properties['id']->name = 'id';
         $propContent->properties['name']->typeName = 'Edm.String';
         $propContent->properties['alternate_id']->typeName = 'Edm.Int32';
-        $propContent->properties['PrimaryKey']->typeName = 'Edm.String';
         $propContent->properties['id']->typeName = 'Edm.Int32';
         $propContent->properties['name']->value = 'Hammer, M.C.';
-        $propContent->properties['PrimaryKey']->value = '42';
         $propContent->properties['id']->value = '42';
 
         $odataLink = new ODataLink();
-        $odataLink->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph';
-        $odataLink->title = 'morph';
+        $odataLink->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph_TestMorphOneSource';
+        $odataLink->title = 'morph_TestMorphOneSource';
         $odataLink->type = 'application/atom+xml;type=entry';
-        $odataLink->url = 'TestMorphTargets(PrimaryKey=\'42\')/morph';
+        $odataLink->url = 'TestMorphTargets(id=42)/morph_TestMorphOneSource';
+
+        $odataLink1 = new ODataLink();
+        $odataLink1->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph_TestMorphOneSourceAlternate';
+        $odataLink1->title = 'morph_TestMorphOneSourceAlternate';
+        $odataLink1->type = 'application/atom+xml;type=entry';
+        $odataLink1->url = 'TestMorphTargets(id=42)/morph_TestMorphOneSourceAlternate';
 
         $mediaLink1 = new ODataMediaLink(
             'photo',
@@ -463,22 +465,23 @@ class IronicSerialiserTest extends SerialiserTestBase
         $mediaLink = new ODataMediaLink(
             'TestMorphTarget',
             '/$value',
-            'TestMorphTargets(PrimaryKey=\'42\')/$value',
+            'TestMorphTargets(id=42)/$value',
             '*/*',
             'eTag',
             'edit-media'
         );
 
         $expected = new ODataEntry();
-        $expected->id = 'http://localhost/odata.svc/TestMorphTargets(PrimaryKey=\'42\')';
+        $expected->id = 'http://localhost/odata.svc/TestMorphTargets(id=42)';
         $expected->title = new ODataTitle('TestMorphTarget');
         $expected->editLink = new ODataLink();
-        $expected->editLink->url = 'TestMorphTargets(PrimaryKey=\'42\')';
+        $expected->editLink->url = 'TestMorphTargets(id=42)';
         $expected->editLink->name = 'edit';
         $expected->editLink->title = 'TestMorphTarget';
         $expected->type = new ODataCategory('TestMorphTarget');
         $expected->propertyContent = $propContent;
         $expected->links[] = $odataLink;
+        $expected->links[] = $odataLink1;
         $expected->mediaLink = $mediaLink;
         $expected->mediaLinks[] = $mediaLink1;
         $expected->isMediaLinkEntry = true;
@@ -498,7 +501,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $service = new Url('http://localhost/odata.svc');
         $request = new Url('http://localhost/odata.svc/TestMorphTargets(42)');
 
-        $targType = $simple->resolveResourceType('polyMorphicPlaceholder');
+        $targType = $simple->resolveResourceType('TestMorphTarget');
 
         $request = m::mock(RequestDescription::class)->makePartial();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMorphTargets(42)');
@@ -546,12 +549,16 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $model = new TestMorphTarget($meta);
 
-        $payload = new QueryResult();
-        $payload->results = $model;
-        
         $concType = m::mock(ResourceEntityType::class)->makePartial();
         $concType->shouldReceive('isAbstract')->andReturn(false)->atLeast(1);
         $concType->shouldReceive('getInstanceType->getName')->andReturn('EatSleepMoshRepeat');
+
+        $simple = m::mock(SimpleMetadataProvider::class)->makePartial();
+        $simple->shouldReceive('getDerivedTypes')->andReturn([$concType]);
+        App::instance('metadata', $simple);
+
+        $payload = new QueryResult();
+        $payload->results = $model;
 
         $targType = m::mock(ResourceEntityType::class)->makePartial();
         $targType->shouldReceive('isAbstract')->andReturn(true)->atLeast(1);
@@ -563,7 +570,6 @@ class IronicSerialiserTest extends SerialiserTestBase
         $foo = m::mock(IronicSerialiser::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getRequest')->andReturn($request);
         $foo->shouldReceive('getService->getProvidersWrapper->resolveResourceType')->andReturn($targType);
-        $foo->shouldReceive('getMetadata->getDerivedTypes')->andReturn([$concType]);
 
         $expected = 'assert(): Concrete resource type not selected for payload'.
                     ' AlgoWeb\PODataLaravel\Models\TestMorphTarget failed';
@@ -736,5 +742,102 @@ class IronicSerialiserTest extends SerialiserTestBase
         $this->assertTrue($ironicResult->entries[0]->links[1]->expandedResult instanceof ODataFeed);
         $this->assertNull($ironicResult->entries[1]->links[1]->expandedResult);
         $this->assertTrue($ironicResult->entries[2]->links[1]->expandedResult instanceof ODataFeed);
+    }
+
+    public function testGetConcreteTypeFromAbstractTypeWhereAbstractHasNoDerivedTypes()
+    {
+        $abstractType = m::mock(ResourceEntityType::class)->makePartial();
+        $abstractType->shouldReceive('isAbstract')->andReturn(true)->atLeast(1);
+
+        $payloadClass = 'payloadClass';
+
+        $metadata = m::mock(SimpleMetadataProvider::class)->MakePartial();
+        $metadata->shouldReceive('getDerivedTypes')->withArgs([$abstractType])->andReturn([])->once();
+        App::instance('metadata', $metadata);
+
+        $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
+
+        $expected = 'assert(): Supplied abstract type must have at least one derived type failed';
+        $actual = null;
+
+        try {
+            $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
+        } catch (\ErrorException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetConcreteTypeFromAbstractTypeWhereAbstractHasOnlyAbstractDerivedTypes()
+    {
+        $abstractType = m::mock(ResourceEntityType::class)->makePartial();
+        $abstractType->shouldReceive('isAbstract')->andReturn(true)->atLeast(1);
+
+        $payloadClass = 'payloadClass';
+
+        $metadata = m::mock(SimpleMetadataProvider::class)->makePartial();
+        $metadata->shouldReceive('getDerivedTypes')->withArgs([$abstractType])->andReturn([$abstractType])->once();
+        App::instance('metadata', $metadata);
+
+        $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
+
+        $expected = 'assert(): Concrete resource type not selected for payload payloadClass failed';
+        $actual = null;
+
+        try {
+            $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
+        } catch (\ErrorException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetConcreteTypeFromAbstractTypeWhereAbstractHasOnlyConcreteDerivedTypesNoPayloadClass()
+    {
+        $abstractType = m::mock(ResourceEntityType::class)->makePartial();
+        $abstractType->shouldReceive('isAbstract')->andReturn(true)->atLeast(1);
+
+        $concreteType = m::mock(ResourceEntityType::class)->makePartial();
+        $concreteType->shouldReceive('isAbstract')->andReturn(false)->atLeast(1);
+        $concreteType->shouldReceive('getInstanceType->getName')->andReturn('concreteClass');
+
+        $payloadClass = 'payloadClass';
+
+        $metadata = m::mock(SimpleMetadataProvider::class)->makePartial();
+        $metadata->shouldReceive('getDerivedTypes')->withArgs([$abstractType])->andReturn([$concreteType])->once();
+        App::instance('metadata', $metadata);
+
+        $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
+
+        $expected = 'assert(): Concrete resource type not selected for payload payloadClass failed';
+        $actual = null;
+
+        try {
+            $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
+        } catch (\ErrorException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetConcreteTypeFromAbstractTypeWhereAbstractHasOnlyConcreteDerivedTypesWithPayloadClass()
+    {
+        $abstractType = m::mock(ResourceEntityType::class)->makePartial();
+        $abstractType->shouldReceive('isAbstract')->andReturn(true)->atLeast(1);
+
+        $concreteType = m::mock(ResourceEntityType::class)->makePartial();
+        $concreteType->shouldReceive('isAbstract')->andReturn(false)->atLeast(1);
+        $concreteType->shouldReceive('getInstanceType->getName')->andReturn('payloadClass');
+
+        $payloadClass = 'payloadClass';
+
+        $metadata = m::mock(SimpleMetadataProvider::class)->makePartial();
+        $metadata->shouldReceive('getDerivedTypes')->withArgs([$abstractType])->andReturn([$concreteType])->once();
+        App::instance('metadata', $metadata);
+
+        $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
+
+        $result = $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
+        $this->assertEquals($result, $concreteType);
     }
 }

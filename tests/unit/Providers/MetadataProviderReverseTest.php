@@ -73,13 +73,13 @@ class MetadataProviderReverseTest extends TestCase
         $source = new TestMonomorphicSource($meta);
         $targ = new TestMonomorphicTarget($meta);
 
-        $forwardOne = $foo->resolveReverseProperty($source, $targ, 'oneSource');
+        $forwardOne = $foo->resolveReverseProperty($source, 'oneSource');
         $this->assertEquals('oneTarget', $forwardOne);
-        $forwardMany = $foo->resolveReverseProperty($source, $targ, 'manySource');
+        $forwardMany = $foo->resolveReverseProperty($source, 'manySource');
         $this->assertEquals('manyTarget', $forwardMany);
-        $revOne = $foo->resolveReverseProperty($targ, $source, 'oneTarget');
+        $revOne = $foo->resolveReverseProperty($targ, 'oneTarget');
         $this->assertEquals('oneSource', $revOne);
-        $revMany = $foo->resolveReverseProperty($targ, $source, 'manyTarget');
+        $revMany = $foo->resolveReverseProperty($targ, 'manyTarget');
         $this->assertEquals('manySource', $revMany);
     }
 
@@ -119,13 +119,13 @@ class MetadataProviderReverseTest extends TestCase
         $right = new TestMorphManySourceAlternate($meta);
         $base = new TestMorphTarget($meta);
 
-        $leftForward = $foo->resolveReverseProperty($left, $base, 'morphTarget');
-        $this->assertEquals('morph', $leftForward);
-        $rightForward = $foo->resolveReverseProperty($right, $base, 'morphTarget');
-        $this->assertEquals('morph', $rightForward);
-        $backLeft = $foo->resolveReverseProperty($base, $left, 'morph');
+        $leftForward = $foo->resolveReverseProperty($left, 'morphTarget');
+        $this->assertEquals('morph_TestMorphManySource', $leftForward);
+        $rightForward = $foo->resolveReverseProperty($right, 'morphTarget');
+        $this->assertEquals('morph_TestMorphManySourceAlternate', $rightForward);
+        $backLeft = $foo->resolveReverseProperty($base, 'morph_TestMorphManySource');
         $this->assertEquals('morphTarget', $backLeft);
-        $backRight = $foo->resolveReverseProperty($base, $right, 'morph');
+        $backRight = $foo->resolveReverseProperty($base, 'morph_TestMorphManySourceAlternate');
         $this->assertEquals('morphTarget', $backRight);
     }
 
@@ -162,7 +162,7 @@ class MetadataProviderReverseTest extends TestCase
 
         $left = new TestMorphManySource($meta);
 
-        $result = $foo->resolveReverseProperty($left, $left, 'property');
+        $result = $foo->resolveReverseProperty($left, 'property');
         $this->assertNull($result);
     }
 
@@ -202,7 +202,7 @@ class MetadataProviderReverseTest extends TestCase
         $right = new TestMorphManySourceAlternate($meta);
         $base = new TestMorphTarget($meta);
 
-        $leftForward = $foo->resolveReverseProperty($left, $base, 'property');
+        $leftForward = $foo->resolveReverseProperty($left, 'property');
         $this->assertNull($leftForward);
     }
 
@@ -217,7 +217,7 @@ class MetadataProviderReverseTest extends TestCase
         $left = new TestMorphManySource([]);
 
         try {
-            $foo->resolveReverseProperty($left, $left, 'property');
+            $foo->resolveReverseProperty($left, 'property');
         } catch (\InvalidArgumentException $e) {
             $actual = $e->getMessage();
         }

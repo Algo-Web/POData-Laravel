@@ -171,22 +171,7 @@ class IronicSerialiser implements IObjectSerialiser
         $resourceType = $this->getService()->getProvidersWrapper()->resolveResourceType($topOfStack['type']);
 
         // need gubbinz to unpack an abstract resource type
-        if ($resourceType->isAbstract()) {
-            $derived = $this->getMetadata()->getDerivedTypes($resourceType);
-            assert(0 < count($derived));
-            foreach ($derived as $rawType) {
-                if (!$rawType->isAbstract()) {
-                    $name = $rawType->getInstanceType()->getName();
-                    if ($payloadClass == $name) {
-                        $resourceType = $rawType;
-                        break;
-                    }
-                }
-            }
-            // despite all set up, checking, etc, if we haven't picked a concrete resource type,
-            // wheels have fallen off, so blow up
-            assert(!$resourceType->isAbstract(), 'Concrete resource type not selected for payload ' . $payloadClass);
-        }
+        $resourceType = $this->getConcreteTypeFromAbstractType($resourceType, $payloadClass);
 
         // make sure we're barking up right tree
         assert($resourceType instanceof ResourceEntityType, get_class($resourceType));
@@ -1066,5 +1051,26 @@ class IronicSerialiser implements IObjectSerialiser
     public function getModelSerialiser()
     {
         return $this->modelSerialiser;
+    }
+
+    protected function getConcreteTypeFromAbstractType(ResourceEntityType $resourceType, $payloadClass)
+    {
+        if ($resourceType->isAbstract()) {
+            $derived = $this->getMetadata()->getDerivedTypes($resourceType);
+            assert(0 < count($derived), 'Supplied abstract type must have at least one derived type');
+            foreach ($derived as $rawType) {
+                if (!$rawType->isAbstract()) {
+                    $name = $rawType->getInstanceType()->getName();
+                    if ($payloadClass == $name) {
+                        $resourceType = $rawType;
+                        break;
+                    }
+                }
+            }
+        }
+        // despite all set up, checking, etc, if we haven't picked a concrete resource type,
+        // wheels have fallen off, so blow up
+        assert(!$resourceType->isAbstract(), 'Concrete resource type not selected for payload ' . $payloadClass);
+        return $resourceType;
     }
 }

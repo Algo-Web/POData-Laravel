@@ -84,27 +84,19 @@ class MetadataProviderRelationTest extends TestCase
         $source = $simple->resolveResourceType('TestMorphManySource');
         $this->assertNotNull($source);
         $this->assertTrue($source instanceof ResourceEntityType, get_class($source));
-        $literalPK = $source->resolveProperty('PrimaryKey');
-        $this->assertNotNull($literalPK);
-        $this->assertTrue($literalPK instanceof ResourceProperty, get_class($literalPK));
-        $this->assertTrue($literalPK->isKindOf(ResourcePropertyKind::KEY));
         $actualPK = $source->resolveProperty('id');
         $this->assertNotNull($actualPK);
         $this->assertTrue($actualPK instanceof ResourceProperty, get_class($actualPK));
-        $this->assertFalse($actualPK->isKindOf(ResourcePropertyKind::KEY));
+        $this->assertTrue($actualPK->isKindOf(ResourcePropertyKind::KEY));
         unset($source, $literalPK, $actualPK);
 
         $source = $simple->resolveResourceType('TestMorphManySourceAlternate');
         $this->assertNotNull($source);
         $this->assertTrue($source instanceof ResourceEntityType, get_class($source));
-        $literalPK = $source->resolveProperty('PrimaryKey');
-        $this->assertNotNull($literalPK);
-        $this->assertTrue($literalPK instanceof ResourceProperty, get_class($literalPK));
-        $this->assertTrue($literalPK->isKindOf(ResourcePropertyKind::KEY));
         $actualPK = $source->resolveProperty('alternate_id');
         $this->assertNotNull($actualPK);
         $this->assertTrue($actualPK instanceof ResourceProperty, get_class($actualPK));
-        $this->assertFalse($actualPK->isKindOf(ResourcePropertyKind::KEY));
+        $this->assertTrue($actualPK->isKindOf(ResourcePropertyKind::KEY));
     }
 
     public function testMonomorphicManyToManyRelation()
@@ -353,26 +345,6 @@ class MetadataProviderRelationTest extends TestCase
         $this->assertTrue(false !== strpos($xml, $rel2));
         $this->assertTrue(false !== strpos($xml, $type1));
         $this->assertTrue(false !== strpos($xml, $type2));
-    }
-
-    public function testResolveReversePropertyNoMatchOnPolymorphic()
-    {
-        $first = m::mock(AssociationStubPolymorphic::class)->makePartial();
-        $first->shouldReceive('getRelationName')->andReturn('property');
-
-        $last = m::mock(AssociationStubPolymorphic::class)->makePartial();
-
-        $assoc = m::mock(AssociationPolymorphic::class)->makePartial();
-        $assoc->shouldReceive('getFirst')->andReturn($first)->atLeast(1);
-        $assoc->shouldReceive('getFirst')->andReturn([$last])->atLeast(1);
-        $gubbins = m::mock(EntityGubbins::class);
-        $gubbins->shouldReceive('resolveAssociation')->andReturn($assoc)->once();
-        $foo = m::mock(MetadataProvider::class)->makePartial();
-        $foo->shouldReceive('getObjectMap->resolveEntity')->andReturn($gubbins)->once();
-
-        $left = new TestMorphManySource([]);
-
-        $this->assertNull($foo->resolveReverseProperty($left, $left, 'property'));
     }
 
     private function setUpSchemaFacade()
