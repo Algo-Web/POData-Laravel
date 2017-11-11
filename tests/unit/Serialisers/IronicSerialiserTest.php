@@ -757,7 +757,7 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
 
-        $expected = 'assert(): assert(0 < count($derived)) failed';
+        $expected = 'assert(): Supplied abstract type must have at least one derived type failed';
         $actual = null;
 
         try {

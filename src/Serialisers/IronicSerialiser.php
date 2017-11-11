@@ -1057,7 +1057,7 @@ class IronicSerialiser implements IObjectSerialiser
     {
         if ($resourceType->isAbstract()) {
             $derived = $this->getMetadata()->getDerivedTypes($resourceType);
-            assert(0 < count($derived));
+            assert(0 < count($derived), 'Supplied abstract type must have at least one derived type');
             foreach ($derived as $rawType) {
                 if (!$rawType->isAbstract()) {
                     $name = $rawType->getInstanceType()->getName();
