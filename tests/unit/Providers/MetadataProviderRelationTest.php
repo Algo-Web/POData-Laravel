@@ -347,26 +347,6 @@ class MetadataProviderRelationTest extends TestCase
         $this->assertTrue(false !== strpos($xml, $type2));
     }
 
-    public function testResolveReversePropertyNoMatchOnPolymorphic()
-    {
-        $first = m::mock(AssociationStubPolymorphic::class)->makePartial();
-        $first->shouldReceive('getRelationName')->andReturn('property');
-
-        $last = m::mock(AssociationStubPolymorphic::class)->makePartial();
-
-        $assoc = m::mock(AssociationPolymorphic::class)->makePartial();
-        $assoc->shouldReceive('getFirst')->andReturn($first)->atLeast(1);
-        $assoc->shouldReceive('getFirst')->andReturn([$last])->atLeast(1);
-        $gubbins = m::mock(EntityGubbins::class);
-        $gubbins->shouldReceive('resolveAssociation')->andReturn($assoc)->once();
-        $foo = m::mock(MetadataProvider::class)->makePartial();
-        $foo->shouldReceive('getObjectMap->resolveEntity')->andReturn($gubbins)->once();
-
-        $left = new TestMorphManySource([]);
-
-        $this->assertNull($foo->resolveReverseProperty($left, $left, 'property'));
-    }
-
     private function setUpSchemaFacade()
     {
         $schema = Schema::getFacadeRoot();

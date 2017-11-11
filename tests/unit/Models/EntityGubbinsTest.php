@@ -175,23 +175,4 @@ class EntityGubbinsTest extends TestCase
         }
         $this->assertEquals($expected, $actual);
     }
-
-    public function testAddDisconnectedPolymorphicAssociation()
-    {
-        $foo = new EntityGubbins();
-        $foo->setStubs([]);
-        $assoc = m::mock(AssociationPolymorphic::class);
-        $stub = m::mock(AssociationStubBase::class);
-        $assoc->shouldReceive('getLast')->andReturn([$stub])->once();
-
-        $expected = 'Association cannot be connected to this entity';
-        $actual = null;
-
-        try {
-            $foo->addAssociation($assoc, false);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
 }

@@ -672,7 +672,7 @@ class LaravelQuery implements IQueryProvider
             // dig up inverse property name, so we can pass it to unhookSingleModel with source and target elements
             // swapped
             $otherPropName = $this->getMetadataProvider()
-                ->resolveReverseProperty($sourceEntityInstance, $targetEntityInstance, $navPropName);
+                ->resolveReverseProperty($sourceEntityInstance, $navPropName);
             if (null === $otherPropName) {
                 $srcClass = get_class($sourceEntityInstance);
                 $msg = 'Bad navigation property, ' . $navPropName . ', on source model ' . $srcClass;

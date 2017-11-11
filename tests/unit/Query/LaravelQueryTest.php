@@ -731,6 +731,7 @@ class LaravelQueryTest extends TestCase
         $sourceEntity->shouldReceive('orderBy')->andReturnSelf();
         $sourceEntity->shouldReceive('getAttribute')->withArgs(['morphTarget'])->andReturnSelf()->once();
         $sourceEntity->shouldReceive('get')->andReturn(collect(['a']))->once();
+        $property->shouldReceive('getResourceType->getInstanceType->getName')->andReturn(get_class($sourceEntity));
 
         $foo = new LaravelQuery();
 
@@ -750,6 +751,7 @@ class LaravelQueryTest extends TestCase
         $targ = m::mock(ResourceSet::class);
         $property = m::mock(ResourceProperty::class);
         $property->shouldReceive('getName')->andReturn('name');
+        $property->shouldReceive('getResourceType->getInstanceType->getName')->andReturn(TestModel::class);
 
         $foo = new LaravelQuery();
         $result = $foo->getRelatedResourceReference($source, $model, $targ, $property);
