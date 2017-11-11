@@ -549,12 +549,16 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $model = new TestMorphTarget($meta);
 
-        $payload = new QueryResult();
-        $payload->results = $model;
-        
         $concType = m::mock(ResourceEntityType::class)->makePartial();
         $concType->shouldReceive('isAbstract')->andReturn(false)->atLeast(1);
         $concType->shouldReceive('getInstanceType->getName')->andReturn('EatSleepMoshRepeat');
+
+        $simple = m::mock(SimpleMetadataProvider::class)->makePartial();
+        $simple->shouldReceive('getDerivedTypes')->andReturn([$concType]);
+        App::instance('metadata', $simple);
+
+        $payload = new QueryResult();
+        $payload->results = $model;
 
         $targType = m::mock(ResourceEntityType::class)->makePartial();
         $targType->shouldReceive('isAbstract')->andReturn(true)->atLeast(1);
@@ -566,7 +570,6 @@ class IronicSerialiserTest extends SerialiserTestBase
         $foo = m::mock(IronicSerialiser::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getRequest')->andReturn($request);
         $foo->shouldReceive('getService->getProvidersWrapper->resolveResourceType')->andReturn($targType);
-        $foo->shouldReceive('getMetadata->getDerivedTypes')->andReturn([$concType]);
 
         $expected = 'assert(): Concrete resource type not selected for payload'.
                     ' AlgoWeb\PODataLaravel\Models\TestMorphTarget failed';
