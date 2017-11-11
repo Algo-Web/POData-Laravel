@@ -104,18 +104,6 @@ class EntityGubbinsTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testSetGoodStubsArray()
-    {
-        $foo = new EntityGubbins();
-        $stub = new AssociationStubPolymorphic();
-
-        $foo->setStubs([$stub]);
-        $this->assertEquals(1, count($foo->getStubs()));
-        $this->assertFalse($foo->isPolymorphicAffected());
-        // and to check caching
-        $this->assertFalse($foo->isPolymorphicAffected());
-    }
-
     public function testSetAbstractODataType()
     {
         $foo = new EntityGubbins();

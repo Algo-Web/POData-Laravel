@@ -487,7 +487,7 @@ class LaravelReadQuery
             assert(is_string($line), 'Eager-load elements must be non-empty strings');
             $lineParts = explode('/', $line);
             $numberOfParts = count($lineParts);
-            for ($i = 0; $i<$numberOfParts;$i++) {
+            for ($i = 0; $i<$numberOfParts; $i++) {
                 $lineParts[$i] = $this->getLaravelRelationName($lineParts[$i]);
             }
             $remixLine = implode('.', $lineParts);
