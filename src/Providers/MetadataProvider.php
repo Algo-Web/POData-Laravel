@@ -322,12 +322,11 @@ class MetadataProvider extends MetadataBaseProvider
      * Resolve possible reverse relation property names.
      *
      * @param Model $source
-     * @param Model $target
-     * @param       $propName
-     *
-     * @return string|null
+     * @param $propName
+     * @return null|string
+     * @internal param Model $target
      */
-    public function resolveReverseProperty(Model $source, Model $target, $propName)
+    public function resolveReverseProperty(Model $source, $propName)
     {
         assert(is_string($propName), 'Property name must be string');
         $entity = $this->getObjectMap()->resolveEntity(get_class($source));
