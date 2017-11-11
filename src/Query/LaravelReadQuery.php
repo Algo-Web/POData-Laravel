@@ -496,8 +496,11 @@ class LaravelReadQuery
         return $rawLoad;
     }
 
-    private function getLaravelRelationName($odataProperty)
-    {
+    /**
+     * @param string $odataProperty
+     * @return string
+     */
+    private function getLaravelRelationName($odataProperty){
         $laravelProperty = $odataProperty;
         $pos = strrpos($laravelProperty, '_');
         if ($pos !== false) {
