@@ -192,11 +192,16 @@ class EntityField
      * @var array
      */
     private static $primitiveToEdmMapping = [
+        EntityFieldPrimitiveType::BINARY => EdmPrimitiveType::BINARY,
+        EntityFieldPrimitiveType::BIGINT => EdmPrimitiveType::INT64,
         EntityFieldPrimitiveType::INTEGER => EdmPrimitiveType::INT32,
         EntityFieldPrimitiveType::STRING => EdmPrimitiveType::STRING,
+        EntityFieldPrimitiveType::DATE => EdmPrimitiveType::DATETIME,
         EntityFieldPrimitiveType::DATETIME => EdmPrimitiveType::DATETIME,
+        EntityFieldPrimitiveType::DATETIMETZ => EdmPrimitiveType::DATETIME,
         EntityFieldPrimitiveType::FLOAT => EdmPrimitiveType::SINGLE,
         EntityFieldPrimitiveType::DECIMAL => EdmPrimitiveType::DECIMAL,
+        EntityFieldPrimitiveType::TEXT => EdmPrimitiveType::STRING,
         EntityFieldPrimitiveType::STRING => EdmPrimitiveType::STRING,
         EntityFieldPrimitiveType::BOOLEAN => EdmPrimitiveType::BOOLEAN,
         EntityFieldPrimitiveType::BLOB => 'stream'
