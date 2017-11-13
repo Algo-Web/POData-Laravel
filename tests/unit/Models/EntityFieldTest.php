@@ -52,4 +52,49 @@ class EntityFieldTest extends TestCase
         $result = $foo->getEdmFieldType();
         $this->assertEquals(EdmPrimitiveType::INT32, $result);
     }
+
+    public function testSetDatePrimitiveType()
+    {
+        $type = EntityFieldPrimitiveType::DATE();
+        $foo = new EntityField();
+        $foo->setPrimitiveType($type);
+        $result = $foo->getEdmFieldType();
+        $this->assertEquals(EdmPrimitiveType::DATETIME, $result);
+    }
+
+    public function testSetDateTimeTzPrimitiveType()
+    {
+        $type = EntityFieldPrimitiveType::DATETIMETZ();
+        $foo = new EntityField();
+        $foo->setPrimitiveType($type);
+        $result = $foo->getEdmFieldType();
+        $this->assertEquals(EdmPrimitiveType::DATETIME, $result);
+    }
+
+    public function testSetBigIntPrimitiveType()
+    {
+        $type = EntityFieldPrimitiveType::BIGINT();
+        $foo = new EntityField();
+        $foo->setPrimitiveType($type);
+        $result = $foo->getEdmFieldType();
+        $this->assertEquals(EdmPrimitiveType::INT64, $result);
+    }
+
+    public function testSetBinaryPrimitiveType()
+    {
+        $type = EntityFieldPrimitiveType::BINARY();
+        $foo = new EntityField();
+        $foo->setPrimitiveType($type);
+        $result = $foo->getEdmFieldType();
+        $this->assertEquals(EdmPrimitiveType::BINARY, $result);
+    }
+
+    public function testSetTextPrimitiveType()
+    {
+        $type = EntityFieldPrimitiveType::TEXT();
+        $foo = new EntityField();
+        $foo->setPrimitiveType($type);
+        $result = $foo->getEdmFieldType();
+        $this->assertEquals(EdmPrimitiveType::STRING, $result);
+    }
 }
