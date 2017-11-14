@@ -116,7 +116,7 @@ class MetadataProvider extends MetadataBaseProvider
             $func = self::$afterVerify;
             $func($objectModel);
         }
-dd($objectModel);
+        dd($objectModel);
     }
 
     private function implement(Map $objectModel)
@@ -295,7 +295,7 @@ dd($objectModel);
         foreach ($classes as $name) {
             if (\Illuminate\Support\Str::startsWith($name, $startName)) {
                 if (in_array('AlgoWeb\\PODataLaravel\\Models\\MetadataTrait', class_uses($name)) &&
-                is_subclass_of($name,'\\Illuminate\\Database\\Eloquent\\Model')) {
+                is_subclass_of($name, '\\Illuminate\\Database\\Eloquent\\Model')) {
                     $ends[] = $name;
                 }
             }
