@@ -116,7 +116,6 @@ class MetadataProvider extends MetadataBaseProvider
             $func = self::$afterVerify;
             $func($objectModel);
         }
-        dd($objectModel);
     }
 
     private function implement(Map $objectModel)
