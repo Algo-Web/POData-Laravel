@@ -159,6 +159,7 @@ class MetadataTraitExtractionTest extends TestCase
         $connect->shouldReceive('getDoctrineSchemaManager')->andReturn($manager)->atLeast(1);
 
         $foo = m::mock(TestGetterModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getCasts')->passthru();
         $foo->shouldReceive('getConnection')->andReturn($connect);
         // exclude the WeightCode getter from results
         $foo->shouldReceive('getHidden')->andReturn(['WeightCode']);

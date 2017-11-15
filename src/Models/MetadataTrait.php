@@ -60,7 +60,7 @@ trait MetadataTrait
         $foo = [];
         $getters = $this->collectGetters();
         $getters = array_intersect($getters, $mask);
-        $casts = $this->getCasts();
+        $casts = $this->retrieveCasts();
 
         foreach ($rawFoo as $key => $val) {
             // Work around glitch in Doctrine when reading from MariaDB which added ` characters to root key value
@@ -606,6 +606,9 @@ trait MetadataTrait
      */
     public function retrieveCasts()
     {
+        if (method_exists($this, 'getCasts')) {
+            return $this->getCasts();
+        }
         return $this->casts;
     }
 
