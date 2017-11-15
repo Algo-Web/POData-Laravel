@@ -1,5 +1,8 @@
 Unreleased
 ----------
+
+0.3.2 (2017-11-15)
+------------------
    * Hook Eloquent model $cast array to metadata generation
    * Only load concrete, trait-using models when processing metadata
    * Unconditionally convert default primitive property values to strings
