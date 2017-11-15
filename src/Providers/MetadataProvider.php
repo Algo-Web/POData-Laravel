@@ -10,6 +10,7 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -80,7 +81,12 @@ class MetadataProvider extends MetadataBaseProvider
     {
         $objectMap = new Map();
         foreach ($modelNames as $modelName) {
-            $modelInstance = App::make($modelName);
+            try {
+                $modelInstance = App::make($modelName);
+            } catch (BindingResolutionException $e) {
+                // if we can't instantiate modelName for whatever reason, move on
+                continue;
+            }
             $gubbins = $modelInstance->extractGubbins();
             $isEmpty = 0 === count($gubbins->getFields());
             $inArtisan = $this->isRunningInArtisan();

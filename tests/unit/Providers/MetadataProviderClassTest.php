@@ -10,6 +10,7 @@ use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestCastModel;
 use AlgoWeb\PODataLaravel\Models\TestGetterModel;
 use AlgoWeb\PODataLaravel\Models\TestModel;
+use AlgoWeb\PODataLaravel\Models\TestModelAbstract;
 use AlgoWeb\PODataLaravel\Models\TestModelTrait;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicChildOfMorphTarget;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
