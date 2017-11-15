@@ -28,6 +28,7 @@ trait MetadataTrait
     protected static $tableColumns = [];
     protected static $tableColumnsDoctrine = [];
     protected static $tableData = [];
+    protected static $dontCastTypes = ['object', 'array', 'collection', 'int'];
 
     /*
      * Retrieve and assemble this model's metadata for OData packaging
@@ -59,6 +60,7 @@ trait MetadataTrait
         $foo = [];
         $getters = $this->collectGetters();
         $getters = array_intersect($getters, $mask);
+        $casts = $this->retrieveCasts();
 
         foreach ($rawFoo as $key => $val) {
             // Work around glitch in Doctrine when reading from MariaDB which added ` characters to root key value
@@ -87,6 +89,14 @@ trait MetadataTrait
             }
             $default = $this->$get;
             $tableData[$get] = ['type' => 'text', 'nullable' => true, 'fillable' => false, 'default' => $default];
+        }
+
+        // now, after everything's gathered up, apply Eloquent model's $cast array
+        foreach ($casts as $key => $type) {
+            $type = strtolower($type);
+            if (array_key_exists($key, $tableData) && !in_array($type, self::$dontCastTypes)) {
+                $tableData[$key]['type'] = $type;
+            }
         }
 
         self::$tableData = $tableData;
@@ -596,6 +606,9 @@ trait MetadataTrait
      */
     public function retrieveCasts()
     {
+        if (method_exists($this, 'getCasts')) {
+            return $this->getCasts();
+        }
         return $this->casts;
     }
 
