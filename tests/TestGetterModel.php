@@ -65,4 +65,9 @@ class TestGetterModel extends Model
     {
         return $this->attributes['weight'] * 10;
     }
+
+    public function setCasts(array $casts)
+    {
+        $this->casts = $casts;
+    }
 }
