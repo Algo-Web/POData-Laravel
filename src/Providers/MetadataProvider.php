@@ -10,6 +10,7 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -80,7 +81,12 @@ class MetadataProvider extends MetadataBaseProvider
     {
         $objectMap = new Map();
         foreach ($modelNames as $modelName) {
-            $modelInstance = App::make($modelName);
+            try {
+                $modelInstance = App::make($modelName);
+            } catch (BindingResolutionException $e) {
+                // if we can't instantiate modelName for whatever reason, move on
+                continue;
+            }
             $gubbins = $modelInstance->extractGubbins();
             $isEmpty = 0 === count($gubbins->getFields());
             $inArtisan = $this->isRunningInArtisan();
@@ -293,7 +299,8 @@ class MetadataProvider extends MetadataBaseProvider
         $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : 'App';
         foreach ($classes as $name) {
             if (\Illuminate\Support\Str::startsWith($name, $startName)) {
-                if (in_array('AlgoWeb\\PODataLaravel\\Models\\MetadataTrait', class_uses($name))) {
+                if (in_array('AlgoWeb\\PODataLaravel\\Models\\MetadataTrait', class_uses($name)) &&
+                is_subclass_of($name, '\\Illuminate\\Database\\Eloquent\\Model')) {
                     $ends[] = $name;
                 }
             }

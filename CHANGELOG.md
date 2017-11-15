@@ -1,5 +1,6 @@
 Unreleased
 ----------
+   * Only load concrete, trait-using models when processing metadata
    * Unconditionally convert default primitive property values to strings
 
 0.3.1 (2017-11-09)
