@@ -1,12 +1,13 @@
 Unreleased
 ----------
+   * Hook Eloquent model $cast array to metadata generation
    * Only load concrete, trait-using models when processing metadata
    * Unconditionally convert default primitive property values to strings
 
 0.3.1 (2017-11-09)
 ------------------
    * Fix mispointed composer.json dependency for POData
-        Thank you to kodermax@gmail.com for reporting this
+     -  Thank you to kodermax@gmail.com for reporting this
    * Cache table field list lookups
    * Respect hidden/visible getters in metadata processing
    * Require property names to be case-insensitive unique
@@ -30,7 +31,7 @@ Unreleased
    * Implement Laravel-specialised object model serialiser
    * Get skipToken handling working
    * Add capability to use Laravel's passport authentication (if available)
-        Thank you to Renan William Alves de Paula
+     -  Thank you to Renan William Alves de Paula
         (renan@4success.com.br) for the patch
    * Add functionality to customise endpoint names
    * Only squash cli provider exceptions
