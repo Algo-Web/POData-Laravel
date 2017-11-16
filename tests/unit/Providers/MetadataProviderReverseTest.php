@@ -62,6 +62,9 @@ class MetadataProviderReverseTest extends TestCase
         $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cache->shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        $cache->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        $cache->shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
+        $cache->shouldReceive('put')->with('objectmap', m::any(), 10)->never();
         Cache::swap($cache);
 
         $foo = $this->metadataProvider;
@@ -107,6 +110,9 @@ class MetadataProviderReverseTest extends TestCase
         $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cache->shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        $cache->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        $cache->shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
+        $cache->shouldReceive('put')->with('objectmap', m::any(), 10)->never();
         Cache::swap($cache);
 
         $foo = $this->metadataProvider;
@@ -152,6 +158,9 @@ class MetadataProviderReverseTest extends TestCase
         $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cache->shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        $cache->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        $cache->shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
+        $cache->shouldReceive('put')->with('objectmap', m::any(), 10)->never();
         Cache::swap($cache);
 
         $foo = $this->metadataProvider;
@@ -190,6 +199,9 @@ class MetadataProviderReverseTest extends TestCase
         $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cache->shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        $cache->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        $cache->shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
+        $cache->shouldReceive('put')->with('objectmap', m::any(), 10)->never();
         Cache::swap($cache);
 
         $foo = $this->metadataProvider;

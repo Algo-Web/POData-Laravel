@@ -7,6 +7,7 @@ use AlgoWeb\PODataLaravel\Models\MetadataProviderDummy;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use AlgoWeb\PODataLaravel\Models\TestCase;
 use AlgoWeb\PODataLaravel\Models\TestCastModel;
 use AlgoWeb\PODataLaravel\Models\TestGetterModel;
@@ -73,6 +74,8 @@ class MetadataProviderRelationTest extends TestCase
         $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->never();
+        $cache->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        $cache->shouldReceive('put')->with('objectmap', m::any(), 10)->never();
         $cache->shouldReceive('forget')->andReturn(null);
         Cache::swap($cache);
 

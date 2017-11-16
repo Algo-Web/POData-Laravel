@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestCastModel;
 use AlgoWeb\PODataLaravel\Models\TestGetterModel;
@@ -101,11 +102,15 @@ class MetadataProviderTest extends TestCase
     {
         $this->setUpSchemaFacade();
 
-        $meta = \Mockery::mock(SimpleMetadataProvider::class);
+        $meta = m::mock(SimpleMetadataProvider::class);
         App::instance('metadata', $meta);
+
+        $map = m::mock(Map::class);
+        App::instance('objectmap', $map);
 
         $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn('aybabtu')->once();
+        $cache->shouldReceive('get')->withArgs(['objectmap'])->andReturn('wombat')->once();
         Cache::swap($cache);
 
         $foo = $this->object;
@@ -114,6 +119,8 @@ class MetadataProviderTest extends TestCase
         $foo->boot();
         $result = App::make('metadata');
         $this->assertEquals('aybabtu', $result);
+        $result = App::make('objectmap');
+        $this->assertEquals('wombat', $result);
     }
 
     public function testBootHasMigrationsShouldBeCached()
@@ -147,6 +154,8 @@ class MetadataProviderTest extends TestCase
         $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->once();
+        $cache->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        $cache->shouldReceive('put')->with('objectmap', m::any(), 10)->once();
         Cache::swap($cache);
 
         $foo = $this->object;
@@ -174,6 +183,8 @@ class MetadataProviderTest extends TestCase
         $cacheStore = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cacheStore->shouldReceive('forget')->withArgs(['metadata'])->andReturnNull()->once();
+        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        $cacheStore->shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
         Cache::swap($cacheStore);
 
         $foo = $this->object;
@@ -206,6 +217,7 @@ class MetadataProviderTest extends TestCase
 
         $cacheStore = Cache::getFacadeRoot();
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $foo = $this->object;
         $foo->shouldReceive('getCandidateModels')->andReturn([TestModel::class]);
@@ -228,6 +240,7 @@ class MetadataProviderTest extends TestCase
 
         $cacheStore = Cache::getFacadeRoot();
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $classen = [TestMonomorphicOneAndManySource::class, TestMonomorphicOneAndManyTarget::class,
             TestMorphManyToManyTarget::class, TestMorphManyToManySource::class, TestMonomorphicSource::class,
@@ -272,6 +285,7 @@ class MetadataProviderTest extends TestCase
 
         $cacheStore = Cache::getFacadeRoot();
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $classen = [TestMorphManySource::class, TestMorphTarget::class];
 
@@ -318,6 +332,7 @@ class MetadataProviderTest extends TestCase
 
         $cacheStore = Cache::getFacadeRoot();
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $classen = [TestGetterModel::class, TestMorphManySource::class, TestMorphOneSource::class,
             TestMorphTarget::class, TestMonomorphicManySource::class, TestMonomorphicManyTarget::class,
@@ -370,6 +385,7 @@ class MetadataProviderTest extends TestCase
 
         $cacheStore = Cache::getFacadeRoot();
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $auth = Auth::getFacadeRoot();
         $auth->shouldReceive('user')->andReturn($testModel)->once();
@@ -410,6 +426,9 @@ class MetadataProviderTest extends TestCase
         $this->assertTrue($result instanceof SimpleMetadataProvider);
         $this->assertEquals('Data', $result->getContainerName());
         $this->assertEquals('Data', $result->getContainerNameSpace());
+
+        $result = App::make('objectmap');
+        $this->assertTrue($result instanceof Map);
     }
 
     public function testPostBootHandlingRoundTrip()
