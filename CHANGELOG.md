@@ -1,5 +1,6 @@
 Unreleased
 ----------
+   * Cache object map along with metadata
 
 0.3.2 (2017-11-15)
 ------------------
