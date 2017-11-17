@@ -6,6 +6,7 @@ use AlgoWeb\ODataMetadata\MetadataManager;
 use AlgoWeb\ODataMetadata\MetadataV3\edm\TEntityTypeType;
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\MetadataProviderDummy;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestCastModel;
 use AlgoWeb\PODataLaravel\Models\TestGetterModel;
@@ -113,11 +114,15 @@ class MetadataProviderNewTest extends TestCase
     {
         $this->setUpSchemaFacade();
 
-        $meta = \Mockery::mock(SimpleMetadataProvider::class);
+        $meta = m::mock(SimpleMetadataProvider::class);
         App::instance('metadata', $meta);
+
+        $map = m::mock(Map::class);
+        App::instance('objectmap', $map);
 
         $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn('aybabtu')->once();
+        $cache->shouldReceive('get')->withArgs(['objectmap'])->andReturn('wombat')->once();
         Cache::swap($cache);
 
         $foo = $this->object;
@@ -126,6 +131,8 @@ class MetadataProviderNewTest extends TestCase
         $foo->boot();
         $result = App::make('metadata');
         $this->assertEquals('aybabtu', $result);
+        $result = App::make('objectmap');
+        $this->assertEquals('wombat', $result);
     }
 
     public function testBootHasMigrationsShouldBeCached()
@@ -139,6 +146,9 @@ class MetadataProviderNewTest extends TestCase
 
         $meta = new SimpleMetadataProvider('Data', 'Data');
         App::instance('metadata', $meta);
+
+        $map = m::mock(Map::class);
+        App::instance('objectmap', $map);
 
         $classen = [TestModel::class, TestGetterModel::class, TestMorphManySource::class, TestMorphOneSource::class,
             TestMorphTarget::class, TestMonomorphicManySource::class, TestMonomorphicManyTarget::class,
@@ -159,6 +169,8 @@ class MetadataProviderNewTest extends TestCase
         $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cache->shouldReceive('put')->with('metadata', m::any(), 10)->once();
+        $cache->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        $cache->shouldReceive('put')->with('objectmap', m::any(), 10)->once();
         Cache::swap($cache);
 
         $foo = $this->object;
@@ -184,9 +196,14 @@ class MetadataProviderNewTest extends TestCase
         $meta = new SimpleMetadataProvider('Data', 'Data');
         App::instance('metadata', $meta);
 
+        $map = m::mock(Map::class);
+        App::instance('objectmap', $map);
+
         $cacheStore = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cacheStore->shouldReceive('forget')->withArgs(['metadata'])->andReturnNull()->once();
+        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        $cacheStore->shouldReceive('forget')->withArgs(['objectmap'])->andReturnNull()->once();
         Cache::swap($cacheStore);
 
         $foo = $this->object;
@@ -216,6 +233,9 @@ class MetadataProviderNewTest extends TestCase
 
         $meta = new SimpleMetadataProvider('Data', 'Data');
         App::instance('metadata', $meta);
+
+        $map = m::mock(Map::class);
+        App::instance('objectmap', $map);
 
         $cacheStore = Cache::getFacadeRoot();
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();

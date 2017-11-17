@@ -255,10 +255,12 @@ class MetadataProvider extends MetadataBaseProvider
         assert(false === self::$isBooted, 'Provider booted twice');
         $isCaching = true === $this->getIsCaching();
         $meta = Cache::get('metadata');
-        $hasCache = null != $meta;
+        $objectMap = Cache::get('objectmap');
+        $hasCache = null != $meta && null != $objectMap;
 
         if ($isCaching && $hasCache) {
             App::instance('metadata', $meta);
+            App::instance('objectmap', $objectMap);
             return;
         }
         $meta = App::make('metadata');
@@ -273,7 +275,9 @@ class MetadataProvider extends MetadataBaseProvider
         $this->implement($objectModel);
         $this->completedObjectMap = $objectModel;
         $key = 'metadata';
+        $objKey = 'objectmap';
         $this->handlePostBoot($isCaching, $hasCache, $key, $meta);
+        $this->handlePostBoot($isCaching, $hasCache, $objKey, $objectModel);
         self::$isBooted = true;
     }
 
@@ -286,6 +290,9 @@ class MetadataProvider extends MetadataBaseProvider
     {
         $this->app->singleton('metadata', function ($app) {
             return new SimpleMetadataProvider('Data', self::$metaNAMESPACE);
+        });
+        $this->app->singleton('objectmap', function ($app) {
+            return new Map();
         });
     }
 
