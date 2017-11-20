@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
@@ -171,11 +172,13 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
      */
     private function setupMockMetadataProvider($classen)
     {
+        $map = new Map();
         $holder = new MetadataGubbinsHolder();
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->reset();
+        App::instance('objectmap', $map);
         return $metaProv;
     }
 }

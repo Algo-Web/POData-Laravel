@@ -59,6 +59,8 @@ class MetadataProviderTest extends TestCase
     public function setUp()
     {
         parent::setUp();
+        $map = new Map();
+        App::instance('objectmap', $map);
         $holder = new MetadataGubbinsHolder();
         $this->object = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $this->object->shouldReceive('getRelationHolder')->andReturn($holder);
