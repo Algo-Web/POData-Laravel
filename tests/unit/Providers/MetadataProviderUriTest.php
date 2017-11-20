@@ -40,6 +40,8 @@ class MetadataProviderUriTest extends TestCase
     public function setUp()
     {
         parent::setUp();
+        $map = new Map();
+        App::instance('objectmap', $map);
         $foo = m::mock(MetadataProvider::class)->makePartial();
         $foo->reset();
     }

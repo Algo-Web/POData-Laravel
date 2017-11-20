@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
@@ -265,6 +266,7 @@ class SerialiserWritePrimitiveTest extends SerialiserTestBase
      */
     private function setUpDataServiceDeps($request)
     {
+        $map = new Map();
         $holder = new MetadataGubbinsHolder();
         $metadata = [];
         $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -273,6 +275,7 @@ class SerialiserWritePrimitiveTest extends SerialiserTestBase
 
         $testModel = new TestModel($metadata, null);
         App::instance(TestModel::class, $testModel);
+        App::instance('objectmap', $map);
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);

@@ -63,6 +63,8 @@ class MetadataProviderNewTest extends TestCase
     public function setUp()
     {
         parent::setUp();
+        $map = new Map();
+        App::instance('objectmap', $map);
 //        $this->object = new \AlgoWeb\PODataLaravel\Providers\MetadataProvider();
         $holder = new MetadataGubbinsHolder();
         $this->object = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
@@ -147,9 +149,6 @@ class MetadataProviderNewTest extends TestCase
         $meta = new SimpleMetadataProvider('Data', 'Data');
         App::instance('metadata', $meta);
 
-        $map = m::mock(Map::class);
-        App::instance('objectmap', $map);
-
         $classen = [TestModel::class, TestGetterModel::class, TestMorphManySource::class, TestMorphOneSource::class,
             TestMorphTarget::class, TestMonomorphicManySource::class, TestMonomorphicManyTarget::class,
             TestMonomorphicSource::class, TestMonomorphicTarget::class, TestMorphManyToManySource::class,
@@ -196,9 +195,6 @@ class MetadataProviderNewTest extends TestCase
         $meta = new SimpleMetadataProvider('Data', 'Data');
         App::instance('metadata', $meta);
 
-        $map = m::mock(Map::class);
-        App::instance('objectmap', $map);
-
         $cacheStore = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cacheStore->shouldReceive('forget')->withArgs(['metadata'])->andReturnNull()->once();
@@ -233,9 +229,6 @@ class MetadataProviderNewTest extends TestCase
 
         $meta = new SimpleMetadataProvider('Data', 'Data');
         App::instance('metadata', $meta);
-
-        $map = m::mock(Map::class);
-        App::instance('objectmap', $map);
 
         $cacheStore = Cache::getFacadeRoot();
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
@@ -427,6 +420,44 @@ class MetadataProviderNewTest extends TestCase
         $model = new TestModel();
         $model->name = 'VNV Nation';
         return $model;
+    }
+
+    public function testObjectMapDugOutOfContainer()
+    {
+        $metaRaw = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $testModel = new TestModel($metaRaw);
+        App::instance(TestModel::class, $testModel);
+
+        $this->setUpSchemaFacade();
+
+        $meta = new SimpleMetadataProvider('Data', 'Data');
+        App::instance('metadata', $meta);
+
+        $map = m::mock(Map::class)->makePartial();
+        $map->shouldReceive('addEntity')->passthru()->atLeast(1);
+        $map->shouldReceive('getEntities')->passthru()->atLeast(1);
+        $map->shouldReceive('setAssociations')->passthru()->atLeast(1);
+        $map->shouldReceive('getAssociations')->passthru()->atLeast(2);
+        $map->shouldReceive('isOK')->passthru()->atLeast(1);
+        App::instance('objectmap', $map);
+
+        $cacheStore = Cache::getFacadeRoot();
+        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+
+        $foo = $this->object;
+        $foo->shouldReceive('getCandidateModels')->andReturn([TestModel::class]);
+        $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
+
+        $foo->boot();
+
+        $resources = $meta->getResourceSets();
+        $this->assertTrue(is_array($resources));
+        $this->assertEquals(1, count($resources));
     }
 
 

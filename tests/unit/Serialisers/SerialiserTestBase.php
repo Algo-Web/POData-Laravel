@@ -2,8 +2,10 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
@@ -13,6 +15,8 @@ class SerialiserTestBase extends TestCase
 {
     protected function setUpSchemaFacade()
     {
+        $map = new Map();
+        App::instance('objectmap', $map);
         $schema = Schema::getFacadeRoot();
         $schema->shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(true);
         $schema->shouldReceive('hasTable')->andReturn(true);
@@ -27,6 +31,8 @@ class SerialiserTestBase extends TestCase
      */
     protected function setUpRequest()
     {
+        $map = new Map();
+        App::instance('objectmap', $map);
         $this->setUpSchemaFacade();
         $request = m::mock(Request::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $request->initialize();

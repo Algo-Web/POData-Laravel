@@ -79,7 +79,7 @@ class MetadataProvider extends MetadataBaseProvider
 
     private function extract(array $modelNames)
     {
-        $objectMap = new Map();
+        $objectMap = App::make('objectmap');
         foreach ($modelNames as $modelName) {
             try {
                 $modelInstance = App::make($modelName);
