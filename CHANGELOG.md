@@ -1,6 +1,7 @@
 Unreleased
 ----------
    * Cache object map along with metadata
+   * Dig object map out of container when building metadata
 
 0.3.2 (2017-11-15)
 ------------------
