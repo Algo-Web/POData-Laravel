@@ -2,6 +2,7 @@ Unreleased
 ----------
    * Cache object map along with metadata
    * Dig object map out of container when building metadata
+   * Fix goof that stopped empty result set serialisation in some cases.
 
 0.3.2 (2017-11-15)
 ------------------

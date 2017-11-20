@@ -288,6 +288,12 @@ class IronicSerialiser implements IObjectSerialiser
     {
         $res = $entryObjects->results;
         assert(is_array($res) || $res instanceof Collection, '!is_array($entryObjects->results)');
+        if (is_array($res) && 0 == count($res)) {
+            $entryObjects->hasMore = false;
+        }
+        if ($res instanceof Collection && 0 == $res->count()) {
+            $entryObjects->hasMore = false;
+        }
 
         $this->loadStackIfEmpty();
         $setName = $this->getRequest()->getTargetResourceSetWrapper()->getName();

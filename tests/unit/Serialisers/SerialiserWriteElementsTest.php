@@ -338,4 +338,98 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $this->assertEquals($expectedExceptionClass, $actualExceptionClass);
         $this->assertEquals($expected, $actual);
     }
+
+    public function testWriteTopLevelElementsWithEmptyArrayAndHasMore()
+    {
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestModels');
+        $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestModels');
+
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $testModel = new TestModel($meta, null);
+        App::instance(TestModel::class, $testModel);
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri('/odata.svc/');
+
+        $holder = new MetadataGubbinsHolder();
+        $classen = [TestModel::class];
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
+        $metaProv->boot();
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        // default data service
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $object = new ObjectModelSerializer($service, $processor->getRequest());
+        $ironic = new IronicSerialiser($service, $processor->getRequest());
+
+        $collection = new QueryResult();
+        $collection->results = [];
+        $collection->hasMore = true;
+
+        $objectResult = $object->writeTopLevelElements($collection);
+        $ironicResult = $ironic->writeTopLevelElements($collection);
+
+        $this->assertEquals(get_class($objectResult), get_class($ironicResult));
+        $this->assertEquals($objectResult, $ironicResult);
+    }
+
+    public function testWriteTopLevelElementsWithEmptyCollectionAndHasMore()
+    {
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestModels');
+        $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestModels');
+
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $testModel = new TestModel($meta, null);
+        App::instance(TestModel::class, $testModel);
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri('/odata.svc/');
+
+        $holder = new MetadataGubbinsHolder();
+        $classen = [TestModel::class];
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
+        $metaProv->boot();
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        // default data service
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $object = new ObjectModelSerializer($service, $processor->getRequest());
+        $ironic = new IronicSerialiser($service, $processor->getRequest());
+
+        $collection = new QueryResult();
+        $collection->results = collect([]);
+        $collection->hasMore = true;
+
+        $objectResult = $object->writeTopLevelElements($collection);
+        $ironicResult = $ironic->writeTopLevelElements($collection);
+
+        $this->assertEquals(get_class($objectResult), get_class($ironicResult));
+        $this->assertEquals($objectResult, $ironicResult);
+    }
 }
