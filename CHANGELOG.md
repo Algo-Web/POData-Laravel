@@ -1,5 +1,6 @@
 Unreleased
 ----------
+   * Initialise empty object-map associations as arrays, not null
 
 0.3.3 (2017-11-21)
 ------------------
