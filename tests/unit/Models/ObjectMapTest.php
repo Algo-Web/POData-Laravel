@@ -61,4 +61,13 @@ class ObjectMapTest extends TestCase
         }
         $this->assertEquals($expected, $actual);
     }
+
+    public function testAssociationsOnEmpty()
+    {
+        $foo = new Map();
+
+        $result = $foo->getAssociations();
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(0, count($result));
+    }
 }
