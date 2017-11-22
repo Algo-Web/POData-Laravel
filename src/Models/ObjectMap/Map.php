@@ -15,7 +15,7 @@ class Map
     /**
      * @var Association[]
      */
-    private $associations;
+    private $associations = [];
 
     /**
      * @param EntityGubbins $entity
@@ -69,9 +69,6 @@ class Map
      */
     public function addAssociation(Association $association)
     {
-        if (!is_array($this->associations)) {
-            $this->associations = [];
-        }
         if ($association instanceof AssociationMonomorphic) {
             $this->addAssociationMonomorphic($association);
         } else {

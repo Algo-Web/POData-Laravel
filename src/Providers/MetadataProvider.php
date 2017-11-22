@@ -144,7 +144,7 @@ class MetadataProvider extends MetadataBaseProvider
         $expected = 2 * $entityCount;
         assert($metaCount == $expected, 'Expected ' . $expected . ' items, actually got '.$metaCount);
 
-        if (null === $objectModel->getAssociations()) {
+        if (0 === count($objectModel->getAssociations())) {
             return;
         }
         $assoc = $objectModel->getAssociations();
