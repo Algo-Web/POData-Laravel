@@ -24,22 +24,22 @@ class EntityGubbins
     /**
      * @var EntityField[]
      */
-    private $keyFields;
+    private $keyFields = [];
 
     /**
      * @var EntityField[]
      */
-    private $fields;
+    private $fields = [];
 
     /**
      * @var AssociationStubBase[]
      */
-    private $stubs;
+    private $stubs = [];
 
     /**
      * @var Association[]
      */
-    private $associations;
+    private $associations = [];
     /**
      * @var ResourceEntityType
      */
