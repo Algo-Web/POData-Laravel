@@ -163,4 +163,28 @@ class EntityGubbinsTest extends TestCase
         }
         $this->assertEquals($expected, $actual);
     }
+
+    public function testEmptyAssociationSet()
+    {
+        $foo = new EntityGubbins();
+        $result = $foo->getAssociations();
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(0, count($result));
+    }
+
+    public function testEmptyStubSet()
+    {
+        $foo = new EntityGubbins();
+        $result = $foo->getStubs();
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(0, count($result));
+    }
+
+    public function testEmptyKeyFieldsSet()
+    {
+        $foo = new EntityGubbins();
+        $result = $foo->getKeyFields();
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(0, count($result));
+    }
 }
