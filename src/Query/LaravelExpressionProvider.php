@@ -63,7 +63,7 @@ class LaravelExpressionProvider implements IExpressionProvider
             return 'str_replace(' . $params[1] . ', ' . $params[2] . ', ' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_STARTSWITH] = function ($params) {
-            return '(strpos(' . $params[0] . ', ' . $params[1] . ') === 0)';
+            return $params[1] == "''"  ? 'true' : '(strpos(' . $params[0] . ', ' . $params[1] . ') === 0)';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_TOLOWER] = function ($params) {
             return 'strtolower(' . $params[0] . ')';
