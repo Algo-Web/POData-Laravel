@@ -222,12 +222,16 @@ class MetadataProvider extends MetadataBaseProvider
                 $odataEntity->addNamedStream($streamInfo);
                 continue;
             }
+
+            $default = $field->getDefaultValue();
+            $default = (!is_bool($default)) ? strval($default) : $default ? 'true' : 'false';
+
             $meta->addPrimitiveProperty(
                 $odataEntity,
                 $field->getName(),
                 $field->getEdmFieldType(),
                 $field->getFieldType() == EntityFieldType::PRIMITIVE_BAG(),
-                strval($field->getDefaultValue()),
+                $default,
                 $field->getIsNullable()
             );
         }
