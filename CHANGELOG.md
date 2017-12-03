@@ -1,5 +1,11 @@
 Unreleased
 ----------
+
+0.3.4 (2017-12-04)
+------------------
+   * Fix default-value handling for boolean fields
+   * Make IronicSerialiser handle empty payloads
+   * Retrieve object-map when cached, along with metadata
    * Initialise empty object-map associations as arrays, not null
 
 0.3.3 (2017-11-21)
