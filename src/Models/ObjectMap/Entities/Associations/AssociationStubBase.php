@@ -17,6 +17,13 @@ abstract class AssociationStubBase
     protected $keyField;
 
     /**
+     * Foreign key field of imtermate relation.
+     *
+     * @var string
+     */
+    protected $throughField;
+
+    /**
      * Foreign key field of other end of relation.
      *
      * @var string
@@ -98,6 +105,7 @@ abstract class AssociationStubBase
         $thatMono = $otherStub instanceof AssociationStubMonomorphic;
 
         $count = ($thisPoly ? 1 : 0)+($thatPoly ? 1 : 0)+($thisMono ? 1 : 0)+($thatMono ? 1 : 0);
+        /** @scrutinizer ignore-call */
         assert(2 == $count);
         if ($thisPoly && $thatMono) {
             return false;
@@ -196,6 +204,22 @@ abstract class AssociationStubBase
     public function setForeignField($foreignField)
     {
         $this->foreignField = $foreignField;
+    }
+
+    /**
+     * @return string
+     */
+    public function getThroughField()
+    {
+        return $this->throughField;
+    }
+
+    /**
+     * @param string $foreignField
+     */
+    public function setThroughField($foreignField)
+    {
+        $this->throughField = $foreignField;
     }
 
     /**

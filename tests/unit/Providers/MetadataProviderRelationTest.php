@@ -352,6 +352,38 @@ class MetadataProviderRelationTest extends TestCase
         $this->assertTrue(false !== strpos($xml, $type2));
     }
 
+    public function testExposeHasManyThroughRelation()
+    {
+        $metaRaw = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $this->setUpSchemaFacade();
+
+        $cacheStore = Cache::getFacadeRoot();
+        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+
+        $classen = [TestMonomorphicParentOfMorphTarget::class, TestMorphTarget::class,
+            TestMonomorphicChildOfMorphTarget::class];
+        //shuffle($classen);
+
+        foreach ($classen as $className) {
+            $testModel = new $className($metaRaw);
+            App::instance($className, $testModel);
+        }
+
+        $app = App::make('app');
+        $foo = new MetadataProviderDummy($app);
+        $foo->setCandidateModels($classen);
+        $foo->boot(false);
+
+        $metadata = App::make('metadata');
+        $xml = $metadata->getXML();
+        $relString = 'TestMonomorphicParentOfMorphTargets_monomorphicChildren';
+        $this->assertTrue(false !== strpos($xml, $relString));
+    }
+
     private function setUpSchemaFacade()
     {
         $schema = Schema::getFacadeRoot();
