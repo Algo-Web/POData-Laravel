@@ -511,23 +511,12 @@ trait MetadataTrait
             }
             $mult = '*';
             $targ = get_class($foo->getRelated());
-            $thruName = null;
-            if ($foo instanceof HasManyThrough) {
-                $isBelong = false;
-                list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, true);
-                $thruName = $this->polyglotThroughKeyMethodNames($foo);
-            } elseif ($foo instanceof BelongsToMany) {
-                $isBelong = true;
-                list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isBelong);
-            } else {
-                $isBelong = false;
-                list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, !$isBelong);
-            }
+            list($thruName, $fkMethodName, $rkMethodName) = $this->getRelationsHasManyKeyNames($foo);
 
-            $keyRaw = $isBelong ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
+            $keyRaw = $foo->$fkMethodName();
             $keySegments = explode('.', $keyRaw);
             $keyName = $keySegments[count($keySegments)-1];
-            $localRaw = $isBelong ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
+            $localRaw = $foo->$rkMethodName();
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments)-1];
             if (null !== $thruName) {
@@ -803,5 +792,21 @@ trait MetadataTrait
         self::$tableData = [];
         self::$tableColumnsDoctrine = [];
         self::$tableColumns = [];
+    }
+
+    private function getRelationsHasManyKeyNames($foo)
+    {
+        $thruName = null;
+        if ($foo instanceof HasManyThrough) {
+            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodBackupNames($foo, true);
+            $thruName = $this->polyglotThroughKeyMethodNames($foo);
+            return array($thruName, $fkMethodName, $rkMethodName);
+        } elseif ($foo instanceof BelongsToMany) {
+            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, true);
+            return array($thruName, $fkMethodName, $rkMethodName);
+        } else {
+            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodBackupNames($foo, true);
+            return array($thruName, $fkMethodName, $rkMethodName);
+        }
     }
 }
