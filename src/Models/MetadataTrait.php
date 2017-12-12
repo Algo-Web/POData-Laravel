@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
+use Mockery\Mock;
 
 trait MetadataTrait
 {
@@ -115,10 +116,8 @@ trait MetadataTrait
         $visible = $this->getVisible();
         $hidden = $this->getHidden();
         if (0 < count($visible)) {
-            assert(!empty($visible));
             $attribs = array_intersect($visible, $attribs);
         } elseif (0 < count($hidden)) {
-            assert(!empty($hidden));
             $attribs = array_diff($attribs, $hidden);
         }
 
@@ -128,13 +127,14 @@ trait MetadataTrait
     /*
      * Get the endpoint name being exposed
      *
+     * @return null|string;
      */
     public function getEndpointName()
     {
         $endpoint = isset($this->endpoint) ? $this->endpoint : null;
 
         if (!isset($endpoint)) {
-            $bitter = get_class();
+            $bitter = get_class($this);
             $name = substr($bitter, strrpos($bitter, '\\')+1);
             return ($name);
         }
@@ -234,8 +234,8 @@ trait MetadataTrait
                             'Function definition must have keyword \'function\''
                         );
                         $begin = strpos($code, 'function(');
-                        $code = substr($code, $begin, strrpos($code, '}')-$begin+1);
-                        $lastCode = $code[strlen($code)-1];
+                        $code = substr($code, /** @scrutinizer ignore-type */$begin, strrpos($code, '}')-$begin+1);
+                        $lastCode = $code[strlen(/** @scrutinizer ignore-type */$code)-1];
                         assert('}' == $lastCode, 'Final character of function definition must be closing brace');
                         foreach ([
                                      'hasMany',
@@ -250,7 +250,7 @@ trait MetadataTrait
                                      'morphedByMany'
                                  ] as $relation) {
                             $search = '$this->' . $relation . '(';
-                            if ($pos = stripos($code, $search)) {
+                            if (stripos(/** @scrutinizer ignore-type */$code, $search)) {
                                 //Resolve the relation's model to a Relation object.
                                 $relationObj = $model->$method();
                                 if ($relationObj instanceof Relation) {
@@ -372,7 +372,7 @@ trait MetadataTrait
 
         foreach ($getterz as $getter) {
             $residual = substr($getter, 3);
-            $residual = substr($residual, 0, -9);
+            $residual = substr(/** @scrutinizer ignore-type */$residual, 0, -9);
             $methods[] = $residual;
         }
         return $methods;
@@ -633,7 +633,7 @@ trait MetadataTrait
      */
     public function getEagerLoad()
     {
-        assert(is_array($this->loadEagerRelations));
+        assert(is_array($this->loadEagerRelations), 'LoadEagerRelations not an array');
         return $this->loadEagerRelations;
     }
 
@@ -738,7 +738,7 @@ trait MetadataTrait
                     if (null !== $relGubbins['through']) {
                         $stub->setThroughField($relGubbins['through']);
                     }
-                    assert($stub->isOk());
+                    assert($stub->isOk(), 'Generated stub not consistent');
                     $stubs[$property] = $stub;
                 }
             }
@@ -754,6 +754,9 @@ trait MetadataTrait
             return;
         }
         $fieldName = LaravelReadQuery::PK;
+        /* As MetadataTrait is assumed to be deployed on top of an Eloquent model, which has getKey(), this is a
+           false positive */
+        /** @scrutinizer ignore-call */
         $this->$fieldName = $this->getKey();
     }
 
