@@ -466,7 +466,6 @@ trait MetadataTrait
     {
         $thruList = ['getThroughKey', 'getQualifiedFirstKeyName'];
 
-        $thruName = null;
         $methodList = get_class_methods(get_class($foo));
         $thruCombo = array_values(array_intersect($thruList, $methodList));
         return $thruCombo[0];
@@ -512,15 +511,17 @@ trait MetadataTrait
             }
             $mult = '*';
             $targ = get_class($foo->getRelated());
+            $thruName = null;
             if ($foo instanceof HasManyThrough) {
                 $isBelong = false;
                 list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, true);
                 $thruName = $this->polyglotThroughKeyMethodNames($foo);
-            } else {
-                $isBelong = $foo instanceof BelongsToMany;
+            } elseif ($foo instanceof BelongsToMany) {
+                $isBelong = true;
                 list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isBelong);
+            } else {
+                $isBelong = false;
                 list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, !$isBelong);
-                $thruName = null;
             }
 
             $keyRaw = $isBelong ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();

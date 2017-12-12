@@ -72,13 +72,11 @@ class TestMonomorphicChildOfMorphTarget extends Model
 
     public function monomorphicParent()
     {
-
         return $this->hasManyThrough(
             TestMonomorphicParentOfMorphTarget::class,
             TestMorphTarget::class,
             'child_id',
             'parent_id'
         );
-
     }
 }
