@@ -359,4 +359,28 @@ class MetadataGubbinsHolderTest extends TestCase
         $stubs = $gubbins->getStubs();
         $this->assertTrue(array_key_exists('monomorphicChildren', $stubs));
     }
+
+    public function testGetBidirectionalHasManyThroughRelation()
+    {
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $model = new TestMonomorphicParentOfMorphTarget($metaRaw);
+        $nuModel = new TestMonomorphicChildOfMorphTarget($metaRaw);
+
+        $modelGubbins = $model->extractGubbins();
+        $nuModelGubbins = $nuModel->extractGubbins();
+
+        $left = $modelGubbins->getStubs()['monomorphicChildren'];
+        $right = $nuModelGubbins->getStubs()['monomorphicParent'];
+        $this->assertTrue($left->isCompatible($right));
+
+        $foo = new MetadataGubbinsHolder();
+        $foo->addEntity($model->extractGubbins());
+        $foo->addEntity($nuModel->extractGubbins());
+
+        $result = $foo->getRelationsByRelationName(TestMonomorphicParentOfMorphTarget::class, 'monomorphicChildren');
+        $this->assertTrue(0 < count($result));
+    }
 }

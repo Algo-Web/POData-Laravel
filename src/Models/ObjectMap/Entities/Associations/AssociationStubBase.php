@@ -17,6 +17,13 @@ abstract class AssociationStubBase
     protected $keyField;
 
     /**
+     * Foreign key field of imtermate relation.
+     *
+     * @var string
+     */
+    protected $throughField;
+
+    /**
      * Foreign key field of other end of relation.
      *
      * @var string
@@ -196,6 +203,22 @@ abstract class AssociationStubBase
     public function setForeignField($foreignField)
     {
         $this->foreignField = $foreignField;
+    }
+
+    /**
+     * @return string
+     */
+    public function getThroughField()
+    {
+        return $this->throughField;
+    }
+
+    /**
+     * @param string $foreignField
+     */
+    public function setThroughField($foreignField)
+    {
+        $this->throughField = $foreignField;
     }
 
     /**

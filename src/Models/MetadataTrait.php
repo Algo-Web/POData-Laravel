@@ -469,10 +469,6 @@ trait MetadataTrait
         $thruName = null;
         $methodList = get_class_methods(get_class($foo));
         $thruCombo = array_values(array_intersect($thruList, $methodList));
-        if (0 == count($thruCombo)) {
-            $msg = 'Expected at least 1 element in thru-key list, got ' . count($thruCombo);
-            throw new \Exception($msg);
-        }
         return $thruCombo[0];
     }
 
@@ -749,6 +745,9 @@ trait MetadataTrait
                     $stub->setForeignField($targType ? $key : null);
                     $stub->setMultiplicity($multArray[$relGubbins['multiplicity']]);
                     $stub->setTargType($targType);
+                    if (null !== $relGubbins['through']) {
+                        $stub->setThroughField($relGubbins['through']);
+                    }
                     assert($stub->isOk());
                     $stubs[$property] = $stub;
                 }
