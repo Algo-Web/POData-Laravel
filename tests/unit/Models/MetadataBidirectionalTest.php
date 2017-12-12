@@ -16,13 +16,15 @@ class MetadataBidirectionalTest extends TestCase
                 [
                     $targ => [
                         'manySource' =>
-                            [ 'property' => 'manySource', 'local' => 'many_id', 'multiplicity' => '*', 'type' => null]]
+                            [ 'property' => 'manySource', 'local' => 'many_id', 'multiplicity' => '*', 'type' => null,
+                                'through' => null]]
                 ],
             'one_source' =>
                 [
                     $targ => [
                         'oneSource' =>
-                            ['property' => 'oneSource', 'local' => 'one_id', 'multiplicity' => '0..1', 'type' => null]]
+                            ['property' => 'oneSource', 'local' => 'one_id', 'multiplicity' => '0..1', 'type' => null,
+                                'through' => null]]
                 ]
         ];
 
@@ -56,7 +58,8 @@ class MetadataBidirectionalTest extends TestCase
                         'property' => 'manyTarget',
                         'local' => 'many_source',
                         'multiplicity' => '1',
-                        'type' => null
+                        'type' => null,
+                        'through' => null
                             ]
                     ]
                 ],
@@ -67,7 +70,8 @@ class MetadataBidirectionalTest extends TestCase
                         'property' => 'oneTarget',
                         'local' => 'one_source',
                         'multiplicity' => '1',
-                        'type' => null
+                        'type' => null,
+                        'through' => null
                             ]
                     ]
                 ]
@@ -105,7 +109,8 @@ class MetadataBidirectionalTest extends TestCase
                             'property' => 'manySource',
                             'local' => 'many_id',
                             'multiplicity' => '*',
-                            'type' => null
+                            'type' => null,
+                            'through' => null
                         ]
                     ]
                 ]
@@ -118,7 +123,8 @@ class MetadataBidirectionalTest extends TestCase
                             'property' => 'manyTarget',
                             'local' => 'many_source',
                             'multiplicity' => '*',
-                            'type' => null
+                            'type' => null,
+                            'through' => null
                         ]
                     ]
                 ]
@@ -166,7 +172,8 @@ class MetadataBidirectionalTest extends TestCase
             'morph_id' =>
                 [
                     $targ => [ 'morph' => [
-                        'property' => 'morph', 'local' => 'id', 'multiplicity' => '1', 'type' => 'known']]
+                        'property' => 'morph', 'local' => 'id', 'multiplicity' => '1', 'type' => 'known',
+                        'through' => null]]
                 ],
             'id' =>
                 [
@@ -174,14 +181,16 @@ class MetadataBidirectionalTest extends TestCase
                         'property' => 'childMorph',
                         'local' => 'morph_id',
                         'multiplicity' => '0..1',
-                        'type' => 'unknown'
+                        'type' => 'unknown',
+                        'through' => null
                     ]
                     ],
                     $monoParent => [ 'monomorphicParent' => [
                         'property' => 'monomorphicParent',
                         'local' => 'child_id',
                         'multiplicity' => '1',
-                        'type' => null
+                        'type' => null,
+                        'through' => null
                     ]
                     ]
                 ],
@@ -191,7 +200,8 @@ class MetadataBidirectionalTest extends TestCase
                         'property' => 'monomorphicChildren',
                         'local' => 'id',
                         'multiplicity' => '*',
-                        'type' => null
+                        'type' => null,
+                        'through' => null
                     ]
                     ]
                 ]
@@ -227,7 +237,8 @@ class MetadataBidirectionalTest extends TestCase
                         'property' => 'morphTarget',
                         'local' => 'morph_id',
                         'multiplicity' => '*',
-                        'type' => 'unknown'
+                        'type' => 'unknown',
+                        'through' => null
                             ]
                     ]
                 ]
@@ -263,7 +274,8 @@ class MetadataBidirectionalTest extends TestCase
                         'property' => 'morphTarget',
                         'local' => 'morph_id',
                         'multiplicity' => '0..1',
-                        'type' => 'unknown'
+                        'type' => 'unknown',
+                        'through' => null
                             ]
                     ]
                 ]
@@ -299,7 +311,8 @@ class MetadataBidirectionalTest extends TestCase
                         'property' => 'manySource',
                         'local' => 'target_id',
                         'multiplicity' => '*',
-                        'type' => 'unknown'
+                        'type' => 'unknown',
+                        'through' => null
                             ]
                     ]
                 ]
@@ -335,7 +348,8 @@ class MetadataBidirectionalTest extends TestCase
                         'property' => 'manyTarget',
                         'local' => 'source_id',
                         'multiplicity' => '*',
-                        'type' => 'known'
+                        'type' => 'known',
+                        'through' => null
                             ]
                     ]
                 ]
@@ -368,14 +382,17 @@ class MetadataBidirectionalTest extends TestCase
             'one_id' =>
                 [
                     $targ => ['oneTarget' => [
-                        'property' => 'oneTarget', 'local' => 'id', 'multiplicity' => '0..1', 'type' => null]],
+                        'property' => 'oneTarget', 'local' => 'id', 'multiplicity' => '0..1', 'type' => null,
+                        'through' => null]],
                     $twoTarg => ['twoTarget' => [
-                        'property' => 'twoTarget', 'local' => 'id', 'multiplicity' => '0..1', 'type' => null]]
+                        'property' => 'twoTarget', 'local' => 'id', 'multiplicity' => '0..1', 'type' => null,
+                        'through' => null]]
                 ],
             'many_id' =>
                 [
                     $targ => ['manyTarget' =>
-                        ['property' => 'manyTarget', 'local' => 'id', 'multiplicity' => '*', 'type' => null]]
+                        ['property' => 'manyTarget', 'local' => 'id', 'multiplicity' => '*', 'type' => null,
+                            'through' => null]]
                 ]
         ];
 
@@ -406,11 +423,14 @@ class MetadataBidirectionalTest extends TestCase
             'id' =>
                 [
                     $targName => ['oneSource' => [
-                            'property' => 'oneSource', 'local' => 'one_id', 'multiplicity' => '1', 'type' => null],
+                            'property' => 'oneSource', 'local' => 'one_id', 'multiplicity' => '1', 'type' => null,
+                        'through' => null],
                         'twoSource' => [
-                            'property' => 'twoSource', 'local' => 'two_id', 'multiplicity' => '1', 'type' => null],
+                            'property' => 'twoSource', 'local' => 'two_id', 'multiplicity' => '1', 'type' => null,
+                            'through' => null],
                         'manySource' => [
-                            'property' => 'manySource', 'local' => 'many_id', 'multiplicity' => '1', 'type' => null]]
+                            'property' => 'manySource', 'local' => 'many_id', 'multiplicity' => '1', 'type' => null,
+                            'through' => null]]
                 ]
         ];
 

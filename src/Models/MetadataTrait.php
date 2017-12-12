@@ -462,6 +462,21 @@ trait MetadataTrait
         return [$fkMethodName, $rkMethodName];
     }
 
+    private function polyglotThroughKeyMethodNames(HasManyThrough $foo)
+    {
+        $thruList = ['getThroughKey', 'getQualifiedFirstKeyName'];
+
+        $thruName = null;
+        $methodList = get_class_methods(get_class($foo));
+        $thruCombo = array_values(array_intersect($thruList, $methodList));
+        if (0 == count($thruCombo)) {
+            $msg = 'Expected at least 1 element in thru-key list, got ' . count($thruCombo);
+            throw new \Exception($msg);
+        }
+        return $thruCombo[0];
+    }
+
+
     /**
      * @param             $hooks
      * @param             $first
@@ -472,7 +487,7 @@ trait MetadataTrait
      * @param string|null $targ
      * @param null|mixed  $type
      */
-    private function addRelationsHook(&$hooks, $first, $property, $last, $mult, $targ, $type = null)
+    private function addRelationsHook(&$hooks, $first, $property, $last, $mult, $targ, $type = null, $through = null)
     {
         if (!isset($hooks[$first])) {
             $hooks[$first] = [];
@@ -483,6 +498,7 @@ trait MetadataTrait
         $hooks[$first][$targ][$property] = [
             'property' => $property,
             'local' => $last,
+            'through' => $through,
             'multiplicity' => $mult,
             'type' => $type
         ];
@@ -503,10 +519,12 @@ trait MetadataTrait
             if ($foo instanceof HasManyThrough) {
                 $isBelong = false;
                 list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, true);
+                $thruName = $this->polyglotThroughKeyMethodNames($foo);
             } else {
                 $isBelong = $foo instanceof BelongsToMany;
                 list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isBelong);
                 list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, !$isBelong);
+                $thruName = null;
             }
 
             $keyRaw = $isBelong ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
@@ -515,9 +533,14 @@ trait MetadataTrait
             $localRaw = $isBelong ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments)-1];
+            if (null !== $thruName) {
+                $thruRaw = $foo->$thruName();
+                $thruSegments = explode('.', $thruRaw);
+                $thruName = $thruSegments[count($thruSegments)-1];
+            }
             $first = $keyName;
             $last = $localName;
-            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
+            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, null, $thruName);
         }
     }
 
