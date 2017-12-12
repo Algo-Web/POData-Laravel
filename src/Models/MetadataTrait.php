@@ -12,6 +12,7 @@ use AlgoWeb\PODataLaravel\Query\LaravelReadQuery;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -428,7 +429,7 @@ trait MetadataTrait
 
     private function polyglotKeyMethodBackupNames($foo, $condition = false)
     {
-        $fkList = ['getForeignKey', 'getForeignKeyName'];
+        $fkList = ['getForeignKey', 'getForeignKeyName', 'getQualifiedFarKeyName'];
         $rkList = ['getOtherKey', 'getQualifiedParentKeyName'];
 
         $fkMethodName = null;
@@ -497,12 +498,16 @@ trait MetadataTrait
             if ($foo instanceof MorphMany || $foo instanceof MorphToMany) {
                 continue;
             }
-            $isBelong = $foo instanceof BelongsToMany;
             $mult = '*';
             $targ = get_class($foo->getRelated());
-
-            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isBelong);
-            list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, !$isBelong);
+            if ($foo instanceof HasManyThrough) {
+                $isBelong = false;
+                list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, true);
+            } else {
+                $isBelong = $foo instanceof BelongsToMany;
+                list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isBelong);
+                list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, !$isBelong);
+            }
 
             $keyRaw = $isBelong ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
             $keySegments = explode('.', $keyRaw);
