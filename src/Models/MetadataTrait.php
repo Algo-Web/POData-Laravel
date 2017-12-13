@@ -793,29 +793,29 @@ trait MetadataTrait
         return App::runningInConsole() && !App::runningUnitTests();
     }
 
-    protected function getTableColumns()
+    protected function getTableColumns($srcTable = null)
     {
-        if (0 === count(self::$tableColumns)) {
-            $table = $this->getTable();
+        $table = (null === $srcTable) ? $this->getTable() : $srcTable;
+        if (!array_key_exists($table, self::$tableColumns)) {
             $connect = $this->getConnection();
             $builder = $connect->getSchemaBuilder();
             $columns = $builder->getColumnListing($table);
 
-            self::$tableColumns = $columns;
+            self::$tableColumns[$table] = $columns;
         }
-        return self::$tableColumns;
+        return self::$tableColumns[$table];
     }
 
-    protected function getTableDoctrineColumns()
+    protected function getTableDoctrineColumns($srcTable = null)
     {
-        if (0 === count(self::$tableColumnsDoctrine)) {
-            $table = $this->getTable();
+        $table = (null === $srcTable) ? $this->getTable() : $srcTable;
+        if (!array_key_exists($table, self::$tableColumnsDoctrine)) {
             $connect = $this->getConnection();
             $columns = $connect->getDoctrineSchemaManager()->listTableColumns($table);
 
-            self::$tableColumnsDoctrine = $columns;
+            self::$tableColumnsDoctrine[$table] = $columns;
         }
-        return self::$tableColumnsDoctrine;
+        return self::$tableColumnsDoctrine[$table];
     }
 
     public function reset()
@@ -848,6 +848,7 @@ trait MetadataTrait
             $arr = ((array)$foo);
             $prefix = chr(0) . '*' . chr(0);
             $pivotColumns = $arr[$prefix . 'pivotColumns'];
+            $pivotTable = $arr[$prefix.'table'];
         }
         return 0 == count($pivotColumns) ? null : $pivotColumns;
     }
