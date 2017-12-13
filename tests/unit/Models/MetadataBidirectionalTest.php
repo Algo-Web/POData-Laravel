@@ -352,6 +352,19 @@ class MetadataBidirectionalTest extends TestCase
                             'pivot' => null
                         ]
                     ]
+                ],
+            'source_pivot_id' =>
+                [
+                    $targ => [
+                        'manySourcePivot' => [
+                            'property' => 'manySourcePivot',
+                            'local' => 'target_pivot_id',
+                            'multiplicity' => '*',
+                            'type' => 'unknown',
+                            'through' => null,
+                            'pivot' => null
+                        ]
+                    ]
                 ]
         ];
 
@@ -384,6 +397,19 @@ class MetadataBidirectionalTest extends TestCase
                         'manyTarget' => [
                             'property' => 'manyTarget',
                             'local' => 'source_id',
+                            'multiplicity' => '*',
+                            'type' => 'known',
+                            'through' => null,
+                            'pivot' => null
+                        ]
+                    ]
+                ],
+            'target_pivot_id' =>
+                [
+                    $targ => [
+                        'manyTargetPivot' => [
+                            'property' => 'manyTargetPivot',
+                            'local' => 'source_pivot_id',
                             'multiplicity' => '*',
                             'type' => 'known',
                             'through' => null,

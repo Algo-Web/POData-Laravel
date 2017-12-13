@@ -443,7 +443,7 @@ class MetadataProviderUriTest extends TestCase
 
         MetadataProvider::setAfterImplement(function (Map $objectMap) {
             $assoc = $objectMap->getAssociations();
-            $this->assertEquals(1, count($assoc));
+            $this->assertEquals(2, count($assoc));
             $entities = $objectMap->getEntities();
             $this->assertEquals(2, count($entities));
         });

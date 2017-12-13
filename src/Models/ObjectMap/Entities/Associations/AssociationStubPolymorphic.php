@@ -49,6 +49,18 @@ class AssociationStubPolymorphic extends AssociationStubBase
             return false;
         }
 
+        if (AssociationStubRelationType::MANY() == $this->getMultiplicity()
+            && AssociationStubRelationType::MANY() == $otherStub->getMultiplicity()) {
+
+            if ($thisNull && ($otherStub->getForeignField() != $this->getKeyField())) {
+                return false;
+            }
+
+            if ($thatNull && ($this->getForeignField() != $otherStub->getKeyField())) {
+                return false;
+            }
+        }
+
         return true;
     }
 

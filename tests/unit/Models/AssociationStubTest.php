@@ -99,7 +99,7 @@ class AssociationStubTest extends TestCase
         $foo = new AssociationStubPolymorphic();
         $bar = new AssociationStubPolymorphic();
         $foo->setKeyField('key');
-        $bar->setKeyField('key');
+        $bar->setKeyField('foreign');
         $foo->setRelationName('rel');
         $bar->setRelationName('rel');
         $foo->setBaseType(TestMorphManyToManySource::class);

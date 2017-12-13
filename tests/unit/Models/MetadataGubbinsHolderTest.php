@@ -310,6 +310,25 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertEquals($expected, $result[0]);
     }
 
+    public function testGetAssociationsOverTwoManyToManyPolymorphicAssociations()
+    {
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $model = new TestMorphManyToManySource($metaRaw);
+        $nuModel = new TestMorphManyToManyTarget($metaRaw);
+
+        $modelGubbins = $model->extractGubbins();
+        $nuModelGubbins = $nuModel->extractGubbins();
+
+        $foo = new MetadataGubbinsHolder();
+        $foo->addEntity($modelGubbins);
+        $foo->addEntity($nuModelGubbins);
+
+        $rel = $foo->getRelations();
+        $this->assertEquals(2, count($rel));
+    }
+
     public function testGetRelationsByRelNameMorphedByMany()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -344,6 +363,8 @@ class MetadataGubbinsHolderTest extends TestCase
         $result = $foo->getRelations();
         $this->assertEquals(2, count($result));
         $this->assertTrue($result[0] instanceof AssociationMonomorphic, get_class($result[0]));
+        $this->assertEquals(1, count($result[0]->getLast()));
+        $this->assertTrue($result[1] instanceof AssociationMonomorphic, get_class($result[1]));
         $this->assertEquals(1, count($result[0]->getLast()));
     }
 

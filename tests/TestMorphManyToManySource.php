@@ -46,6 +46,17 @@ class TestMorphManyToManySource extends Model
         );
     }
 
+    public function manySourcePivot()
+    {
+        return $this->morphToMany(
+            TestMorphManyToManyTarget::class,
+            'footable',
+            'footables',
+            'source_pivot_id',
+            'target_pivot_id'
+        )->withPivot('fooType', 'fooValue');
+    }
+
     public function getConnectionName()
     {
         return 'testconnection';
