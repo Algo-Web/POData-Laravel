@@ -226,15 +226,20 @@ class MetadataProvider extends MetadataBaseProvider
             $default = $field->getDefaultValue();
             $isFieldBool = TypeCode::BOOLEAN == $field->getEdmFieldType();
             $default = $isFieldBool ? ($default ? 'true' : 'false') : strval($default);
+            $fieldType = $field->getFieldType();
 
-            $meta->addPrimitiveProperty(
-                $odataEntity,
-                $field->getName(),
-                $field->getEdmFieldType(),
-                $field->getFieldType() == EntityFieldType::PRIMITIVE_BAG(),
-                $default,
-                $field->getIsNullable()
-            );
+            if (EntityFieldType::COMPLEX() == $fieldType) {
+                // todo: Complex property hookup still WIP
+            } else {
+                $meta->addPrimitiveProperty(
+                    $odataEntity,
+                    $field->getName(),
+                    $field->getEdmFieldType(),
+                    $fieldType == EntityFieldType::PRIMITIVE_BAG(),
+                    $default,
+                    $field->getIsNullable()
+                );
+            }
         }
     }
 

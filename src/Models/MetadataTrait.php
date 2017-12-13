@@ -581,6 +581,7 @@ trait MetadataTrait
             $targ = get_class($foo->getRelated());
             $mult = $isMany ? '*' : $foo instanceof MorphMany ? '*' : '1';
             $mult = $foo instanceof MorphOne ? '0..1' : $mult;
+            $pivotColumns = $this->getPivotColumns($foo);
 
             list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isMany);
             list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, !$isMany);
@@ -593,7 +594,7 @@ trait MetadataTrait
             $localName = $localSegments[count($localSegments)-1];
             $first = $isMany ? $keyName : $localName;
             $last = $isMany ? $localName : $keyName;
-            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, 'unknown');
+            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, 'unknown', null, $pivotColumns);
         }
     }
 
@@ -607,6 +608,7 @@ trait MetadataTrait
             $isMany = $foo instanceof MorphToMany;
             $targ = get_class($foo->getRelated());
             $mult = $isMany ? '*' : '1';
+            $pivotColumns = $this->getPivotColumns($foo);
 
             list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isMany);
             list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, !$isMany);
@@ -620,7 +622,7 @@ trait MetadataTrait
 
             $first = $keyName;
             $last = (isset($localName) && '' != $localName) ? $localName : $foo->getRelated()->getKeyName();
-            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, 'known');
+            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, 'known', null, $pivotColumns);
         }
     }
 
@@ -751,8 +753,23 @@ trait MetadataTrait
                     }
                     assert($stub->isOk(), 'Generated stub not consistent');
                     $stubs[$property] = $stub;
+                    if (null !== $relGubbins['pivot']) {
+                        $fieldName = 'pivot_'.$relGubbins['property'];
+                        $nuField = new EntityField();
+                        $nuField->setName($fieldName);
+                        $nuField->setFieldType(EntityFieldType::COMPLEX());
+                        $nuField->setIsKeyField(false);
+                        $nuField->setReadOnly(false);
+                        $nuField->setCreateOnly(false);
+                        $nuField->setIsNullable(true);
+                        $nuField->setDefaultValue(null);
+                        $entityFields[$fieldName] = $nuField;
+                    }
                 }
             }
+        }
+        if (!($isEmpty && $this->isRunningInArtisan())) {
+            $gubbins->setFields($entityFields);
         }
         $gubbins->setStubs($stubs);
 

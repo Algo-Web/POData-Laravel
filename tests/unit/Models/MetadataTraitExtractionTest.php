@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType as RelType;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\StringType;
@@ -77,6 +78,48 @@ class MetadataTraitExtractionTest extends TestCase
             $this->assertTrue(in_array($stub->getKeyField(), $relKeys));
             $this->assertTrue(in_array($stub->getRelationName(), $relations));
         }
+    }
+
+    public function testExtractGubbinsWithPolymorphicManyToManyWithPivotData()
+    {
+        $metaRaw = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $foo = new TestMorphManyToManyTarget($metaRaw);
+
+        $result = $foo->extractGubbins();
+        $this->assertEquals(1, count($result->getKeyFields()));
+        $this->assertEquals('id', $result->getKeyFields()['id']->getName());
+        $fields = $result->getFields();
+        // three existing primitive fields and the single complex field on the pivoted M:N relation
+        $this->assertEquals(4, count($fields));
+        // check naming scheme - pivot_{$relName}
+        $this->assertTrue(isset($fields['pivot_manyTargetPivot']));
+        $pivotField = $fields['pivot_manyTargetPivot'];
+        $this->assertEquals(EntityFieldType::COMPLEX(), $pivotField->getFieldType());
+    }
+
+    public function testExtractGubbinsWithMonomorphicManyToManyWithPivotData()
+    {
+        $metaRaw = [];
+        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+
+        $foo = new TestMonomorphicManySource($metaRaw);
+
+        $result = $foo->extractGubbins();
+        $this->assertEquals(1, count($result->getKeyFields()));
+        $this->assertEquals('id', $result->getKeyFields()['id']->getName());
+        $fields = $result->getFields();
+        // three existing primitive fields and the single complex field on the pivoted M:N relation
+        $this->assertEquals(4, count($fields));
+        // check naming scheme - pivot_{$relName}
+        $this->assertTrue(isset($fields['pivot_manySourcePivot']));
+        $pivotField = $fields['pivot_manySourcePivot'];
+        $this->assertEquals(EntityFieldType::COMPLEX(), $pivotField->getFieldType());
     }
 
     public function testCollidingPrimitivePropertyNames()
