@@ -495,7 +495,8 @@ trait MetadataTrait
             'local' => $last,
             'through' => $through,
             'multiplicity' => $mult,
-            'type' => $type
+            'type' => $type,
+            'pivot' => null
         ];
     }
 
