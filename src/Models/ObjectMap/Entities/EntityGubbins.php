@@ -175,7 +175,7 @@ class EntityGubbins
             }
             $propertyName = $stub->getRelationName();
         }
-        assert(isset($propertyName));
+        assert(isset($propertyName), 'Property name not set');
         $this->associations[$propertyName] = $association;
     }
 

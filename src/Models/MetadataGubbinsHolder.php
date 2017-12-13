@@ -80,7 +80,7 @@ class MetadataGubbinsHolder
                 $first = -1 === $stub->compare($others);
                 $assoc->setFirst($first ? $stub : $others);
                 $assoc->setLast($first ? $others : $stub);
-                assert($assoc->isOk());
+                assert($assoc->isOk(), 'Constructed association not consistent');
                 $associations[] = $assoc;
             }
         }
@@ -141,7 +141,7 @@ class MetadataGubbinsHolder
                     $first = -1 === $stub->compare($lc);
                     $assoc->setFirst($first ? $stub : $lc);
                     $assoc->setLast($first ? $lc : $stub);
-                    assert($assoc->isOk());
+                    assert($assoc->isOk(), 'Constructed association not consistent');
                     $polyAssoc[] = $assoc;
                 }
             }
