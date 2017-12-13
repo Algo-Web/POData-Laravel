@@ -482,8 +482,17 @@ trait MetadataTrait
      * @param string|null $targ
      * @param null|mixed  $type
      */
-    private function addRelationsHook(&$hooks, $first, $property, $last, $mult, $targ, $type = null, $through = null)
-    {
+    private function addRelationsHook(
+        &$hooks,
+        $first,
+        $property,
+        $last,
+        $mult,
+        $targ,
+        $type = null,
+        $through = null,
+        array $pivot = null
+    ) {
         if (!isset($hooks[$first])) {
             $hooks[$first] = [];
         }
@@ -496,7 +505,7 @@ trait MetadataTrait
             'through' => $through,
             'multiplicity' => $mult,
             'type' => $type,
-            'pivot' => null
+            'pivot' => $pivot
         ];
     }
 
@@ -510,6 +519,7 @@ trait MetadataTrait
             if ($foo instanceof MorphMany || $foo instanceof MorphToMany) {
                 continue;
             }
+            $pivotColumns = $this->getPivotColumns($foo);
             $mult = '*';
             $targ = get_class($foo->getRelated());
             list($thruName, $fkMethodName, $rkMethodName) = $this->getRelationsHasManyKeyNames($foo);
@@ -527,7 +537,7 @@ trait MetadataTrait
             }
             $first = $keyName;
             $last = $localName;
-            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, null, $thruName);
+            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, null, $thruName, $pivotColumns);
         }
     }
 
@@ -812,5 +822,16 @@ trait MetadataTrait
             list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodBackupNames($foo, true);
             return array($thruName, $fkMethodName, $rkMethodName);
         }
+    }
+
+    private function getPivotColumns(Relation $foo)
+    {
+        $pivotColumns = null;
+        if ($foo instanceof BelongsToMany) {
+            $arr = ((array)$foo);
+            $prefix = chr(0) . '*' . chr(0);
+            $pivotColumns = $arr[$prefix . 'pivotColumns'];
+        }
+        return 0 == count($pivotColumns) ? null : $pivotColumns;
     }
 }

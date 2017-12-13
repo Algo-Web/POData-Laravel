@@ -116,6 +116,19 @@ class MetadataBidirectionalTest extends TestCase
                             'pivot' => null
                         ]
                     ]
+                ],
+            'many_pivot_source' =>
+                [
+                    $fooTarg => [
+                        'manySourcePivot' => [
+                            'property' => 'manySourcePivot',
+                            'local' => 'many_pivot_id',
+                            'multiplicity' => '*',
+                            'type' => null,
+                            'through' => null,
+                            'pivot' => ['fooType', 'fooValue']
+                        ]
+                    ]
                 ]
         ];
         $expectedBar = [
@@ -129,6 +142,20 @@ class MetadataBidirectionalTest extends TestCase
                             'type' => null,
                             'through' => null,
                             'pivot' => null
+                        ],
+
+                    ]
+                ],
+            'many_pivot_id' =>
+                [
+                    $barTarg => [
+                        'manyTargetPivot' => [
+                            'property' => 'manyTargetPivot',
+                            'local' => 'many_pivot_source',
+                            'multiplicity' => '*',
+                            'type' => null,
+                            'through' => null,
+                            'pivot' => ['fooType', 'fooValue']
                         ]
                     ]
                 ]

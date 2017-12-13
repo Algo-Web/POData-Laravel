@@ -521,6 +521,12 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $link->type = 'application/atom+xml;type=feed';
         $link->url = 'TestMonomorphicManySources(id=1)/manySource';
 
+        $nulink = new ODataLink();
+        $nulink->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/manySourcePivot';
+        $nulink->title = 'manySourcePivot';
+        $nulink->type = 'application/atom+xml;type=feed';
+        $nulink->url = 'TestMonomorphicManySources(id=1)/manySourcePivot';
+
         $expected = new ODataEntry();
         $expected->id = 'http://localhost/odata.svc/TestMonomorphicManySources(id=1)';
         $expected->title = new ODataTitle('TestMonomorphicManySource');
@@ -532,7 +538,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $expected->type = new ODataCategory('TestMonomorphicManySource');
         $expected->isMediaLinkEntry = false;
         $expected->resourceSetName = 'TestMonomorphicManySources';
-        $expected->links = [$link];
+        $expected->links = [$link, $nulink];
         $expected->propertyContent = $propContent;
         $expected->updated = '2017-01-01T00:00:00+00:00';
         $expected->baseURI = 'http://localhost/odata.svc/';

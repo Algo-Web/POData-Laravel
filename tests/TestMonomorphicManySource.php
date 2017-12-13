@@ -40,6 +40,16 @@ class TestMonomorphicManySource extends Model
         return $this->belongsToMany(TestMonomorphicManyTarget::class, 'target_source', 'many_source', 'many_id');
     }
 
+    public function manySourcePivot()
+    {
+        return $this->belongsToMany(
+            TestMonomorphicManyTarget::class,
+            'target_source',
+            'many_pivot_source',
+            'many_pivot_id'
+        )->withPivot('fooType', 'fooValue');
+    }
+
     public function getTable()
     {
         return 'testMonomorphicManySource';

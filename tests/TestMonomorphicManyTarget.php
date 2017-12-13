@@ -52,6 +52,16 @@ class TestMonomorphicManyTarget extends Model
         return $this->belongsToMany(TestMonomorphicManySource::class, 'target_source', 'many_id', 'many_source');
     }
 
+    public function manyTargetPivot()
+    {
+        return $this->belongsToMany(
+            TestMonomorphicManySource::class,
+            'target_source',
+            'many_pivot_id',
+            'many_pivot_source'
+        )->withPivot('fooType', 'fooValue');
+    }
+
     public function metadata()
     {
         if (isset($this->metaArray)) {
