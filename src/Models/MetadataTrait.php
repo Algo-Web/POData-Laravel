@@ -841,15 +841,19 @@ trait MetadataTrait
         }
     }
 
-    private function getPivotColumns(Relation $foo)
+    protected function getPivotColumns(Relation $foo)
     {
         $pivotColumns = null;
+        $pivot = [];
         if ($foo instanceof BelongsToMany) {
             $arr = ((array)$foo);
             $prefix = chr(0) . '*' . chr(0);
             $pivotColumns = $arr[$prefix . 'pivotColumns'];
             $pivotTable = $arr[$prefix.'table'];
+            foreach ($pivotColumns as $column) {
+                $pivot[$column] = [];
+            }
         }
-        return 0 == count($pivotColumns) ? null : $pivotColumns;
+        return 0 == count($pivot) ? null : $pivot;
     }
 }

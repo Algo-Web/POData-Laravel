@@ -126,7 +126,7 @@ class MetadataBidirectionalTest extends TestCase
                             'multiplicity' => '*',
                             'type' => null,
                             'through' => null,
-                            'pivot' => ['fooType', 'fooValue']
+                            'pivot' => ['fooType' => [], 'fooValue' => []]
                         ]
                     ]
                 ]
@@ -155,7 +155,7 @@ class MetadataBidirectionalTest extends TestCase
                             'multiplicity' => '*',
                             'type' => null,
                             'through' => null,
-                            'pivot' => ['fooType', 'fooValue']
+                            'pivot' => ['fooType' => [], 'fooValue' => []]
                         ]
                     ]
                 ]
@@ -362,7 +362,7 @@ class MetadataBidirectionalTest extends TestCase
                             'multiplicity' => '*',
                             'type' => 'unknown',
                             'through' => null,
-                            'pivot' => ['fooType', 'fooValue']
+                            'pivot' => ['fooType' => [], 'fooValue' => []]
                         ]
                     ]
                 ]
@@ -413,7 +413,7 @@ class MetadataBidirectionalTest extends TestCase
                             'multiplicity' => '*',
                             'type' => 'known',
                             'through' => null,
-                            'pivot' => ['fooType', 'fooValue']
+                            'pivot' => ['fooType' => [], 'fooValue' => []]
                         ]
                     ]
                 ]
