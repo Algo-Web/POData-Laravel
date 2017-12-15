@@ -32,6 +32,7 @@ class LaravelQuery implements IQueryProvider
     protected $expression;
     protected $auth;
     protected $reader;
+    protected $modelHook;
     public $queryProviderClassName;
     private $verbMap = [];
     protected $metadataProvider;
@@ -44,6 +45,7 @@ class LaravelQuery implements IQueryProvider
         $this->queryProviderClassName = get_class($this);
         $this->auth = isset($auth) ? $auth : new NullAuthProvider();
         $this->reader = new LaravelReadQuery($this->auth);
+        $this->modelHook = new LaravelHookQuery($this->auth);
         $this->verbMap['create'] = ActionVerb::CREATE();
         $this->verbMap['update'] = ActionVerb::UPDATE();
         $this->verbMap['delete'] = ActionVerb::DELETE();
@@ -81,6 +83,16 @@ class LaravelQuery implements IQueryProvider
     public function getReader()
     {
         return $this->reader;
+    }
+
+    /**
+     * Gets the LaravelHookQuery instance used to handle hook/unhook queries (repetitious, nyet?).
+     *
+     * @return LaravelHookQuery
+     */
+    public function getModelHook()
+    {
+        return $this->modelHook;
     }
 
     /**
@@ -620,22 +632,13 @@ class LaravelQuery implements IQueryProvider
         $targetEntityInstance,
         $navPropName
     ) {
-        $relation = $this->isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName);
-        assert(
-            $sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model,
-            'Both input entities must be Eloquent models'
+        return $this->getModelHook()->hookSingleModel(
+            $sourceResourceSet,
+            $sourceEntityInstance,
+            $targetResourceSet,
+            $targetEntityInstance,
+            $navPropName
         );
-        // in case the fake 'PrimaryKey' attribute got set inbound for a polymorphic-affected model, flatten it now
-        unset($targetEntityInstance->PrimaryKey);
-
-        if ($relation instanceof BelongsTo) {
-            $relation->associate($targetEntityInstance);
-        } elseif ($relation instanceof BelongsToMany) {
-            $relation->attach($targetEntityInstance);
-        } elseif ($relation instanceof HasOneOrMany) {
-            $relation->save($targetEntityInstance);
-        }
-        return true;
     }
 
     /**
@@ -656,63 +659,13 @@ class LaravelQuery implements IQueryProvider
         $targetEntityInstance,
         $navPropName
     ) {
-        $relation = $this->isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName);
-        assert(
-            $sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model,
-            'Both input entities must be Eloquent models'
+        return $this->getModelHook()->unhookSingleModel(
+            $sourceResourceSet,
+            $sourceEntityInstance,
+            $targetResourceSet,
+            $targetEntityInstance,
+            $navPropName
         );
-        // in case the fake 'PrimaryKey' attribute got set inbound for a polymorphic-affected model, flatten it now
-        unset($targetEntityInstance->PrimaryKey);
-
-        if ($relation instanceof BelongsTo) {
-            $relation->dissociate();
-        } elseif ($relation instanceof BelongsToMany) {
-            $relation->detach($targetEntityInstance);
-        } elseif ($relation instanceof HasOneOrMany) {
-            // dig up inverse property name, so we can pass it to unhookSingleModel with source and target elements
-            // swapped
-            $otherPropName = $this->getMetadataProvider()
-                ->resolveReverseProperty($sourceEntityInstance, $navPropName);
-            if (null === $otherPropName) {
-                $srcClass = get_class($sourceEntityInstance);
-                $msg = 'Bad navigation property, ' . $navPropName . ', on source model ' . $srcClass;
-                throw new \InvalidArgumentException($msg);
-            }
-            $this->unhookSingleModel(
-                $targetResourceSet,
-                $targetEntityInstance,
-                $sourceResourceSet,
-                $sourceEntityInstance,
-                $otherPropName
-            );
-        }
-        return true;
-    }
-
-    /**
-     * @param $sourceEntityInstance
-     * @param $targetEntityInstance
-     * @param $navPropName
-     * @throws \InvalidArgumentException
-     * @return Relation
-     */
-    protected function isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName)
-    {
-        if (!$sourceEntityInstance instanceof Model || !$targetEntityInstance instanceof Model) {
-            $msg = 'Both source and target must be Eloquent models';
-            throw new \InvalidArgumentException($msg);
-        }
-        $relation = $sourceEntityInstance->$navPropName();
-        if (!$relation instanceof Relation) {
-            $msg = 'Navigation property must be an Eloquent relation';
-            throw new \InvalidArgumentException($msg);
-        }
-        $targType = $relation->getRelated();
-        if (!$targetEntityInstance instanceof $targType) {
-            $msg = 'Target instance must be of type compatible with relation declared in method ' . $navPropName;
-            throw new \InvalidArgumentException($msg);
-        }
-        return $relation;
     }
 
     /**
