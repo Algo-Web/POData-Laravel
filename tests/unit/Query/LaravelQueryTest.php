@@ -6,6 +6,8 @@ use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Controllers\TestController;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
+use AlgoWeb\PODataLaravel\Models\LaravelHookQueryDummy;
+use AlgoWeb\PODataLaravel\Models\LaravelQueryDummy;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
@@ -1455,7 +1457,9 @@ class LaravelQueryTest extends TestCase
         $targInstance = null;
         $navPropName = 'metadata';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial();
         $foo = m::mock(LaravelQuery::class)->makePartial();
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $expected = 'Both source and target must be Eloquent models';
         $actual = null;
@@ -1476,7 +1480,9 @@ class LaravelQueryTest extends TestCase
         $targInstance = null;
         $navPropName = 'metadata';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial();
         $foo = m::mock(LaravelQuery::class)->makePartial();
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $expected = 'Both source and target must be Eloquent models';
         $actual = null;
@@ -1497,7 +1503,9 @@ class LaravelQueryTest extends TestCase
         $targInstance = m::mock(Model::class);
         $navPropName = 'metadata';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial();
         $foo = m::mock(LaravelQuery::class)->makePartial();
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $expected = 'Both source and target must be Eloquent models';
         $actual = null;
@@ -1518,7 +1526,9 @@ class LaravelQueryTest extends TestCase
         $targInstance = null;
         $navPropName = 'metadata';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial();
         $foo = m::mock(LaravelQuery::class)->makePartial();
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $expected = 'Both source and target must be Eloquent models';
         $actual = null;
@@ -1539,7 +1549,9 @@ class LaravelQueryTest extends TestCase
         $targInstance = $this->generateTestModelWithMetadata();
         $navPropName = 'metadata';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial();
         $foo = m::mock(LaravelQuery::class)->makePartial();
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $expected = 'Navigation property must be an Eloquent relation';
         $actual = null;
@@ -1567,7 +1579,9 @@ class LaravelQueryTest extends TestCase
         $targInstance = new TestMonomorphicSource($meta);
         $navPropName = 'manySource';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial();
         $foo = m::mock(LaravelQuery::class)->makePartial();
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $expected = 'Target instance must be of type compatible with relation declared in method '.$navPropName;
         $actual = null;
@@ -1600,8 +1614,11 @@ class LaravelQueryTest extends TestCase
         $targInstance = new TestMonomorphicTarget($meta);
         $navPropName = 'manySource';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $hook->shouldReceive('isModelHookInputsOk')->andReturn($hasMany);
+
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('isModelHookInputsOk')->andReturn($hasMany);
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
     }
@@ -1626,8 +1643,11 @@ class LaravelQueryTest extends TestCase
         $targInstance = new TestMorphTarget($meta);
         $navPropName = 'morphTarget';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
     }
@@ -1652,8 +1672,11 @@ class LaravelQueryTest extends TestCase
         $targInstance = new TestMorphManyToManyTarget($meta);
         $navPropName = 'morphTarget';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphToMany);
+
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphToMany);
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $this->assertTrue($foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName));
     }
@@ -1678,8 +1701,11 @@ class LaravelQueryTest extends TestCase
         $targInstance = new TestMorphOneSource($meta);
         $navPropName = 'morphTarget';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $this->assertTrue($foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName));
     }
@@ -1704,8 +1730,11 @@ class LaravelQueryTest extends TestCase
         $targInstance = new TestMorphOneSource($meta);
         $navPropName = 'morphTarget';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $expected = 'assert(): Both input entities must be Eloquent models failed';
         $actual = null;
@@ -1738,8 +1767,11 @@ class LaravelQueryTest extends TestCase
         $targInstance = new TestMorphOneSource($meta);
         $navPropName = 'morphTarget';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $expected = 'assert(): Both input entities must be Eloquent models failed';
         $actual = null;
@@ -1772,8 +1804,11 @@ class LaravelQueryTest extends TestCase
         $targInstance = new TestMorphOneSource($meta);
         $navPropName = 'morphTarget';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $expected = 'assert(): Both input entities must be Eloquent models failed';
         $actual = null;
@@ -1819,8 +1854,11 @@ class LaravelQueryTest extends TestCase
         $metaProv = m::mock(MetadataProvider::class);
         $metaProv->shouldReceive('resolveReverseProperty')->andReturn($childNavName);
 
-        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getMetadataProvider')->andReturn($metaProv);
+        $hook = m::mock(LaravelHookQueryDummy::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $hook->setMetadataProvider($metaProv);
+
+        $foo = m::mock(LaravelQueryDummy::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->setModelHook($hook);
         $this->assertTrue($foo->unhookSingleModel($source, $parent, $target, $child, $parentNavName));
     }
 
@@ -1844,9 +1882,13 @@ class LaravelQueryTest extends TestCase
         $metaProv = m::mock(MetadataProvider::class);
         $metaProv->shouldReceive('resolveReverseProperty')->andReturn(null);
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $hook->shouldReceive('getMetadataProvider')->andReturn($metaProv);
+        $hook->shouldReceive('isModelHookInputsOk')->andReturn($hasMany);
+
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getMetadataProvider')->andReturn($metaProv);
-        $foo->shouldReceive('isModelHookInputsOk')->andReturn($hasMany);
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $expected = 'Bad navigation property, manySource, on source model '
                     .'AlgoWeb\PODataLaravel\Models\TestMonomorphicSource';
@@ -1878,8 +1920,11 @@ class LaravelQueryTest extends TestCase
         $manyToMany = m::mock(BelongsToMany::class)->makePartial();
         $manyToMany->shouldReceive('detach')->andReturn(null)->once();
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $hook->shouldReceive('isModelHookInputsOk')->andReturn($manyToMany)->once();
+
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('isModelHookInputsOk')->andReturn($manyToMany)->once();
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $this->assertTrue($foo->unhookSingleModel($source, $srcInstance, $target, $targInstance, 'manySource'));
     }
@@ -1904,8 +1949,11 @@ class LaravelQueryTest extends TestCase
         $targInstance = new TestMorphOneSource($meta);
         $navPropName = 'morphTarget';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne)->once();
+
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $expected = 'assert(): Both input entities must be Eloquent models failed';
         $actual = null;
@@ -1938,8 +1986,11 @@ class LaravelQueryTest extends TestCase
         $targInstance = new TestMorphOneSource($meta);
         $navPropName = 'morphTarget';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne)->once();
+
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $expected = 'assert(): Both input entities must be Eloquent models failed';
         $actual = null;
@@ -1972,8 +2023,11 @@ class LaravelQueryTest extends TestCase
         $targInstance = new TestMorphOneSource($meta);
         $navPropName = 'morphTarget';
 
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne)->once();
+
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $expected = 'assert(): Both input entities must be Eloquent models failed';
         $actual = null;

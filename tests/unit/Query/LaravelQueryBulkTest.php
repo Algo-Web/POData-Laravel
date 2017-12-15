@@ -4,6 +4,8 @@ namespace AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Controllers\TestController;
+use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
+use AlgoWeb\PODataLaravel\Models\LaravelBulkQueryDummy;
 use AlgoWeb\PODataLaravel\Models\LaravelQueryDummy;
 use AlgoWeb\PODataLaravel\Models\TestBulkCreateRequest;
 use AlgoWeb\PODataLaravel\Models\TestBulkUpdateRequest;
@@ -11,6 +13,7 @@ use AlgoWeb\PODataLaravel\Models\TestCase;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Requests\TestRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -42,8 +45,9 @@ class LaravelQueryBulkTest extends TestCase
     public function testBulkCreate()
     {
         $resultModel = m::mock(TestModel::class);
-        $container = m::mock(MetadataControllerContainer::class);
+        $container = m::mock(MetadataControllerContainer::class)->makePartial();
         $container->shouldReceive('getMapping')->andReturn(null)->once();
+        App::instance('metadataControllers', $container);
 
         $db = DB::getFacadeRoot();
         $db->shouldReceive('rollBack')->andReturnNull()->never();
@@ -57,9 +61,19 @@ class LaravelQueryBulkTest extends TestCase
         $source->shouldReceive('getResourceType')->andReturn($type);
         $data = [ ['data']];
 
-        $foo = m::mock(LaravelQuery::class)->makePartial();
-        $foo->shouldReceive('createResourceforResourceSet')->andReturn($resultModel);
+        $auth = m::mock(AuthInterface::class);
+        $auth->shouldReceive('canAuth')->andReturn(true);
+
+        $bulk = m::mock(LaravelBulkQueryDummy::class)->makePartial();
+        $bulk->shouldReceive('getControllerContainer')->andReturn($container);
+        $bulk->shouldReceive('getQuery->createResourceForResourceSet')->andReturn($resultModel);
+
+        $foo = m::mock(LaravelQueryDummy::class)->makePartial();
+        $foo->shouldReceive('getBulk')->andReturn($bulk);
         $foo->shouldReceive('getControllerContainer')->andReturn($container);
+        $bulk->shouldReceive('createResourceforResourceSet')->andReturn($resultModel);
+        $bulk->setQuery($foo);
+        $foo->setAuth($auth);
 
         $actual = $foo->createBulkResourceforResourceSet($source, $data);
         $this->assertEquals(1, count($actual));
@@ -82,8 +96,12 @@ class LaravelQueryBulkTest extends TestCase
         $source->shouldReceive('getResourceType')->andReturn($type);
         $data = [ ['data']];
 
+        $bulk = m::mock(LaravelBulkQuery::class)->makePartial();
+        $bulk->shouldReceive('getControllerContainer')->andReturn($container);
+        $bulk->shouldReceive('getQuery->createResourceForResourceSet')->andReturn(null);
+
         $foo = m::mock(LaravelQuery::class)->makePartial();
-        $foo->shouldReceive('createResourceforResourceSet')->andReturn(null);
+        $foo->shouldReceive('getBulk')->andReturn($bulk);
         $foo->shouldReceive('getControllerContainer')->andReturn($container);
 
         $expected = 'Bulk model creation failed';
@@ -127,8 +145,12 @@ class LaravelQueryBulkTest extends TestCase
         $source = m::mock(ResourceSet::class);
         $source->shouldReceive('getResourceType')->andReturn($type);
 
+        $bulk = m::mock(LaravelBulkQuery::class)->makePartial();
+        $bulk->shouldReceive('getControllerContainer')->andReturn($container);
+
         $foo = m::mock(LaravelQuery::class)->makePartial();
         $foo->shouldReceive('getControllerContainer')->andReturn($container);
+        $foo->shouldReceive('getBulk')->andReturn($bulk);
 
         $expected = 'Target models not successfully created';
         $actual = null;
@@ -171,8 +193,12 @@ class LaravelQueryBulkTest extends TestCase
         $source = m::mock(ResourceSet::class);
         $source->shouldReceive('getResourceType')->andReturn($type);
 
+        $bulk = m::mock(LaravelBulkQuery::class)->makePartial();
+        $bulk->shouldReceive('getControllerContainer')->andReturn($container);
+
         $foo = m::mock(LaravelQuery::class)->makePartial();
         $foo->shouldReceive('getControllerContainer')->andReturn($container);
+        $foo->shouldReceive('getBulk')->andReturn($bulk);
 
         $expected = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel].';
         $actual = null;
@@ -212,7 +238,9 @@ class LaravelQueryBulkTest extends TestCase
         $rawData[] = ['name' => 'name', 'date' => $date, 'weight' => 0, 'code' => '42', 'success' => true];
         $rawData[] = ['name' => 'name', 'date' => $date, 'weight' => 0, 'code' => '42', 'success' => true];
 
-        $request = $query->prepareBulkRequestInput($paramList['parameters'], $rawData);
+        $bulk = m::mock(LaravelBulkQueryDummy::class)->makePartial();
+
+        $request = $bulk->prepareBulkRequestInput($paramList['parameters'], $rawData);
         $request = $request[0];
         $this->assertTrue($request instanceof TestBulkCreateRequest, get_class($request));
 
@@ -253,7 +281,8 @@ class LaravelQueryBulkTest extends TestCase
         $rawData[] = ['name' => 'name', 'date' => $date, 'weight' => 0, 'code' => '42', 'success' => true];
         $rawData[] = ['name' => 'name', 'date' => $date, 'weight' => 0, 'code' => '42', 'success' => true];
 
-        $request = $query->prepareBulkRequestInput($paramList['parameters'], $rawData, [$descOne, $descTwo]);
+        $bulk = m::mock(LaravelBulkQueryDummy::class)->makePartial();
+        $request = $bulk->prepareBulkRequestInput($paramList['parameters'], $rawData, [$descOne, $descTwo]);
         $request = $request[0];
         $this->assertTrue($request instanceof TestBulkUpdateRequest, get_class($request));
 
@@ -281,8 +310,12 @@ class LaravelQueryBulkTest extends TestCase
         $keys = [ m::mock(KeyDescriptor::class)];
         $resultModel = m::mock(TestModel::class);
 
+        $bulk = m::mock(LaravelBulkQuery::class)->makePartial();
+        $bulk->shouldReceive('getControllerContainer')->andReturn($container);
+        $bulk->shouldReceive('getQuery->updateResource')->andReturn($resultModel);
+
         $foo = m::mock(LaravelQuery::class)->makePartial();
-        $foo->shouldReceive('updateResource')->andReturn($resultModel);
+        $foo->shouldReceive('getBulk')->andReturn($bulk);
         $foo->shouldReceive('getControllerContainer')->andReturn($container);
 
         $actual = $foo->updateBulkResource($source, null, $keys, $data);
@@ -307,8 +340,12 @@ class LaravelQueryBulkTest extends TestCase
         $data = [ ['data']];
         $keys = [ m::mock(KeyDescriptor::class)];
 
+        $bulk = m::mock(LaravelBulkQuery::class)->makePartial();
+        $bulk->shouldReceive('getControllerContainer')->andReturn($container);
+        $bulk->shouldReceive('getQuery->updateResource')->andReturn(null);
+
         $foo = m::mock(LaravelQuery::class)->makePartial();
-        $foo->shouldReceive('updateResource')->andReturn(null);
+        $foo->shouldReceive('getBulk')->andReturn($bulk);
         $foo->shouldReceive('getControllerContainer')->andReturn($container);
 
         $expected = 'Bulk model update failed';
@@ -329,8 +366,11 @@ class LaravelQueryBulkTest extends TestCase
         $keys = [ ];
         $resultModel = m::mock(TestModel::class);
 
+        $bulk = m::mock(LaravelBulkQuery::class)->makePartial();
+        $bulk->shouldReceive('getQuery->updateResource')->andReturn($resultModel);
+
         $foo = m::mock(LaravelQuery::class)->makePartial();
-        $foo->shouldReceive('updateResource')->andReturn($resultModel);
+        $foo->shouldReceive('getBulk')->andReturn($bulk);
 
         $expected = 'Key descriptor array and data array must be same length';
         $actual = null;
@@ -377,7 +417,11 @@ class LaravelQueryBulkTest extends TestCase
         $source = m::mock(ResourceSet::class);
         $source->shouldReceive('getResourceType')->andReturn($type);
 
+        $bulk = m::mock(LaravelBulkQuery::class)->makePartial();
+        $bulk->shouldReceive('getControllerContainer')->andReturn($container);
+
         $foo = m::mock(LaravelQuery::class)->makePartial();
+        $foo->shouldReceive('getBulk')->andReturn($bulk);
         $foo->shouldReceive('getControllerContainer')->andReturn($container);
 
         $expected = 'Target models not successfully updated';
@@ -426,7 +470,11 @@ class LaravelQueryBulkTest extends TestCase
         $source = m::mock(ResourceSet::class);
         $source->shouldReceive('getResourceType')->andReturn($type);
 
+        $bulk = m::mock(LaravelBulkQuery::class)->makePartial();
+        $bulk->shouldReceive('getControllerContainer')->andReturn($container);
+
         $foo = m::mock(LaravelQuery::class)->makePartial();
+        $foo->shouldReceive('getBulk')->andReturn($bulk);
         $foo->shouldReceive('getControllerContainer')->andReturn($container);
 
         $expected = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel].';
@@ -440,6 +488,9 @@ class LaravelQueryBulkTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     *
+     */
     public function testBulkCustomUpdateGoodLookup()
     {
         $callResult = response()->json(['status' => 'success', 'id' => [2, 4, 6], 'errors' => null]);
@@ -474,12 +525,53 @@ class LaravelQueryBulkTest extends TestCase
         $source = m::mock(ResourceSet::class);
         $source->shouldReceive('getResourceType')->andReturn($type);
 
-        $foo = m::mock(LaravelQuery::class)->makePartial();
+        $bulk = m::mock(LaravelBulkQueryDummy::class)->makePartial();
+        $bulk->setControllerContainer($container);
+
+        $foo = m::mock(LaravelQueryDummy::class)->makePartial();
         $foo->shouldReceive('getControllerContainer')->andReturn($container);
+        $foo->setBulk($bulk);
 
         $result = $foo->updateBulkResource($source, m::mock(TestModel::class), $keys, $data);
         $this->assertTrue(is_array($result));
         $this->assertEquals(3, count($result));
+    }
+
+    public function testProcessOutputMalformedResponse()
+    {
+        $response = m::mock(JsonResponse::class);
+        $response->shouldReceive('getData')->andReturn('bork bork bork!');
+
+        $bulk = m::mock(LaravelBulkQueryDummy::class)->makePartial();
+
+        $expected = 'Controller response does not have an array.';
+        $actual = null;
+
+        try {
+            $bulk->createUpdateDeleteProcessOutput($response);
+        } catch (ODataException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testProcessOutputMalformedArrayResponse()
+    {
+        $response = m::mock(JsonResponse::class);
+        $response->shouldReceive('getData')->andReturn([]);
+
+        $bulk = m::mock(LaravelBulkQueryDummy::class)->makePartial();
+        $this->assertNull($bulk->getQuery());
+
+        $expected = 'Controller response array missing at least one of id, status and/or errors fields.';
+        $actual = null;
+
+        try {
+            $bulk->createUpdateDeleteProcessOutput($response);
+        } catch (ODataException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 
     public function setUp()
