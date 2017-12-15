@@ -33,6 +33,7 @@ class LaravelQuery implements IQueryProvider
     protected $auth;
     protected $reader;
     protected $modelHook;
+    protected $bulk;
     public $queryProviderClassName;
     private $verbMap = [];
     protected $metadataProvider;
@@ -46,9 +47,7 @@ class LaravelQuery implements IQueryProvider
         $this->auth = isset($auth) ? $auth : new NullAuthProvider();
         $this->reader = new LaravelReadQuery($this->auth);
         $this->modelHook = new LaravelHookQuery($this->auth);
-        $this->verbMap['create'] = ActionVerb::CREATE();
-        $this->verbMap['update'] = ActionVerb::UPDATE();
-        $this->verbMap['delete'] = ActionVerb::DELETE();
+        $this->bulk = new LaravelBulkQuery($this, $this->auth);
         $this->metadataProvider = new MetadataProvider(App::make('app'));
         $this->controllerContainer = App::make('metadataControllers');
     }
@@ -96,6 +95,16 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
+     * Gets the LaravelBulkQuery instance used to handle bulk queries (repetitious, nyet?).
+     *
+     * @return LaravelBulkQuery
+     */
+    public function getBulk()
+    {
+        return $this->bulk;
+    }
+
+    /**
      * Dig out local copy of POData-Laravel metadata provider.
      *
      * @return MetadataProvider
@@ -114,6 +123,16 @@ class LaravelQuery implements IQueryProvider
     {
         assert(null !== $this->controllerContainer, get_class($this->controllerContainer));
         return $this->controllerContainer;
+    }
+
+    public function getVerbMap()
+    {
+        if (0 == count($this->verbMap)) {
+            $this->verbMap['create'] = ActionVerb::CREATE();
+            $this->verbMap['update'] = ActionVerb::UPDATE();
+            $this->verbMap['delete'] = ActionVerb::DELETE();
+        }
+        return $this->verbMap;
     }
 
     /**
@@ -435,7 +454,7 @@ class LaravelQuery implements IQueryProvider
     {
         $lastWord = 'update' == $verb ? 'updated' : 'created';
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
-        if (!$this->auth->canAuth($this->verbMap[$verb], $class, $source)) {
+        if (!$this->auth->canAuth($this->getVerbMap()[$verb], $class, $source)) {
             throw new ODataException('Access denied', 403);
         }
 
@@ -459,7 +478,7 @@ class LaravelQuery implements IQueryProvider
      * @param  Model|null $sourceEntityInstance
      * @return array
      */
-    private function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance = null)
+    protected function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance = null)
     {
         $parms = [];
 
@@ -534,31 +553,7 @@ class LaravelQuery implements IQueryProvider
         ResourceSet $sourceResourceSet,
         array $data
     ) {
-        $verbName = 'bulkCreate';
-        $mapping = $this->getOptionalVerbMapping($sourceResourceSet, $verbName);
-
-        $result = [];
-        try {
-            DB::beginTransaction();
-            if (null === $mapping) {
-                foreach ($data as $newItem) {
-                    $raw = $this->createResourceforResourceSet($sourceResourceSet, null, $newItem);
-                    if (null === $raw) {
-                        throw new \Exception('Bulk model creation failed');
-                    }
-                    $result[] = $raw;
-                }
-            } else {
-                $keyDescriptor = null;
-                $pastVerb = 'created';
-                $result = $this->processBulkCustom($sourceResourceSet, $data, $mapping, $pastVerb, $keyDescriptor);
-            }
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
-        return $result;
+        return $this->getBulk()->createBulkResourceForResourceSet($sourceResourceSet, $data);
     }
 
     /**
@@ -580,38 +575,14 @@ class LaravelQuery implements IQueryProvider
         array $data,
         $shouldUpdate = false
     ) {
-        $numKeys = count($keyDescriptor);
-        if ($numKeys !== count($data)) {
-            $msg = 'Key descriptor array and data array must be same length';
-            throw new \InvalidArgumentException($msg);
-        }
-        $result = [];
-
-        $verbName = 'bulkUpdate';
-        $mapping = $this->getOptionalVerbMapping($sourceResourceSet, $verbName);
-
-        try {
-            DB::beginTransaction();
-            if (null === $mapping) {
-                for ($i = 0; $i < $numKeys; $i++) {
-                    $newItem = $data[$i];
-                    $newKey = $keyDescriptor[$i];
-                    $raw = $this->updateResource($sourceResourceSet, $sourceEntityInstance, $newKey, $newItem);
-                    if (null === $raw) {
-                        throw new \Exception('Bulk model update failed');
-                    }
-                    $result[] = $raw;
-                }
-            } else {
-                $pastVerb = 'updated';
-                $result = $this->processBulkCustom($sourceResourceSet, $data, $mapping, $pastVerb, $keyDescriptor);
-            }
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
-        return $result;
+        return $this->getBulk()
+            ->updateBulkResource(
+                $sourceResourceSet,
+                $sourceEntityInstance,
+                $keyDescriptor,
+                $data,
+                $shouldUpdate
+            );
     }
 
     /**
@@ -666,103 +637,6 @@ class LaravelQuery implements IQueryProvider
             $targetEntityInstance,
             $navPropName
         );
-    }
-
-    /**
-     * @param ResourceSet $sourceResourceSet
-     * @param $verbName
-     * @return array|null
-     */
-    protected function getOptionalVerbMapping(ResourceSet $sourceResourceSet, $verbName)
-    {
-        // dig up target class name
-        $type = $sourceResourceSet->getResourceType()->getInstanceType();
-        assert($type instanceof \ReflectionClass, get_class($type));
-        $modelName = $type->getName();
-        return $this->getControllerContainer()->getMapping($modelName, $verbName);
-    }
-
-    /**
-     * Prepare bulk request from supplied data.  If $keyDescriptors is not null, its elements are assumed to
-     * correspond 1-1 to those in $data.
-     *
-     * @param $paramList
-     * @param array                $data
-     * @param KeyDescriptor[]|null $keyDescriptors
-     */
-    protected function prepareBulkRequestInput($paramList, array $data, array $keyDescriptors = null)
-    {
-        $parms = [];
-        $isCreate = null === $keyDescriptors;
-
-        // for moment, we're only processing parameters of type Request
-        foreach ($paramList as $spec) {
-            $varType = isset($spec['type']) ? $spec['type'] : null;
-            if (null !== $varType) {
-                $var = new $varType();
-                if ($spec['isRequest']) {
-                    $var->setMethod($isCreate ? 'POST' : 'PUT');
-                    $bulkData = ['data' => $data];
-                    if (null !== $keyDescriptors) {
-                        $keys = [];
-                        foreach ($keyDescriptors as $desc) {
-                            assert($desc instanceof KeyDescriptor, get_class($desc));
-                            $rawPayload = $desc->getNamedValues();
-                            $keyPayload = [];
-                            foreach ($rawPayload as $keyName => $keyVal) {
-                                $keyPayload[$keyName] = $keyVal[0];
-                            }
-                            $keys[] = $keyPayload;
-                        }
-                        $bulkData['keys'] = $keys;
-                    }
-                    $var->request = new \Symfony\Component\HttpFoundation\ParameterBag($bulkData);
-                }
-                $parms[] = $var;
-            }
-        }
-        return $parms;
-    }
-
-    /**
-     * @param ResourceSet $sourceResourceSet
-     * @param array       $data
-     * @param $mapping
-     * @param $pastVerb
-     * @param  KeyDescriptor[]|null $keyDescriptor
-     * @throws ODataException
-     * @return array
-     */
-    protected function processBulkCustom(
-        ResourceSet $sourceResourceSet,
-        array $data,
-        $mapping,
-        $pastVerb,
-        array $keyDescriptor = null
-    ) {
-        $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
-        $controlClass = $mapping['controller'];
-        $method = $mapping['method'];
-        $paramList = $mapping['parameters'];
-        $controller = App::make($controlClass);
-        $parms = $this->prepareBulkRequestInput($paramList, $data, $keyDescriptor);
-
-        $callResult = call_user_func_array(array($controller, $method), $parms);
-        $payload = $this->createUpdateDeleteProcessOutput($callResult);
-        $success = isset($payload['id']) && is_array($payload['id']);
-
-        if ($success) {
-            try {
-                // return array of Model objects underlying collection returned by findMany
-                $result = $class::findMany($payload['id'])->flatten()->all();
-                return $result;
-            } catch (\Exception $e) {
-                throw new ODataException($e->getMessage(), 500);
-            }
-        } else {
-            $msg = 'Target models not successfully ' . $pastVerb;
-            throw new ODataException($msg, 422);
-        }
     }
 
     /**
