@@ -78,12 +78,15 @@ class LaravelReadQuery
         }
 
         $keyName = null;
+        $tableName = null;
         if ($sourceEntityInstance instanceof Model) {
             $modelLoad = $sourceEntityInstance->getEagerLoad();
             $keyName = $sourceEntityInstance->getKeyName();
+            $tableName = $sourceEntityInstance->getTable();
         } elseif ($sourceEntityInstance instanceof Relation) {
             $modelLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
             $keyName = $sourceEntityInstance->getRelated()->getKeyName();
+            $tableName = $sourceEntityInstance->getRelated()->getTable();
         }
         assert(isset($keyName));
         $rawLoad = array_values(array_unique(array_merge($rawLoad, $modelLoad)));
@@ -100,6 +103,7 @@ class LaravelReadQuery
                 foreach ($order->getSubPathSegments() as $subOrder) {
                     $subName = $subOrder->getName();
                     $subName = (self::PK == $subName) ? $keyName : $subName;
+                    $subName = $tableName.'.'.$subName;
                     $sourceEntityInstance = $sourceEntityInstance->orderBy(
                         $subName,
                         $order->isAscending() ? 'asc' : 'desc'

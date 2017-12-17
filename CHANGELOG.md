@@ -1,5 +1,6 @@
 Unreleased
 ----------
+   * Disambiguate order-by columns to stop tripping join queries up
    * Handle HasManyThrough relations where reverse relation is defined
 
 0.3.4 (2017-12-04)
