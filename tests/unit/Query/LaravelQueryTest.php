@@ -227,7 +227,7 @@ class LaravelQueryTest extends TestCase
         $rawResult->shouldReceive('with')->andReturnSelf()->once();
         $this->assertTrue(null != ($rawResult->getQuery()->getProcessor()));
 
-        $sourceEntity = \Mockery::mock(TestMorphManySource::class);
+        $sourceEntity = \Mockery::mock(TestMorphManySource::class)->makePartial();
         $sourceEntity->shouldReceive('getKeyName')->andReturn('id');
         $sourceEntity->shouldReceive('getEagerLoad')->andReturn([]);
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
@@ -358,13 +358,15 @@ class LaravelQueryTest extends TestCase
         $newQuery->shouldReceive('getModels')->andReturn([$morphTarg, $morphTarg, $morphTarg]);
         $newQuery->shouldReceive('get')->andReturn($resultSet);
 
-        $sourceEntity = \Mockery::mock(TestMorphManySource::class);
+        $sourceEntity = \Mockery::mock(TestMorphManySource::class)->makePartial();
         $sourceEntity->shouldReceive('getKeyName')->andReturn('id');
         $sourceEntity->shouldReceive('getQuery')->andReturn($newQuery);
         $sourceEntity->shouldReceive('getEagerLoad')->andReturn([]);
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
-        $sourceEntity->shouldReceive('orderBy')->withArgs(['hammer', 'asc'])->andReturnSelf()->once();
-        $sourceEntity->shouldReceive('orderBy')->withArgs(['hammer', 'desc'])->andReturnSelf()->once();
+        $sourceEntity->shouldReceive('orderBy')->withArgs(['testmorphmanytarget.hammer', 'asc'])
+            ->andReturnSelf()->once();
+        $sourceEntity->shouldReceive('orderBy')->withArgs(['testmorphmanytarget.hammer', 'desc'])
+            ->andReturnSelf()->once();
         $sourceEntity->shouldReceive('count')->andReturn(3)->once();
         $sourceEntity->shouldReceive('skip')->andReturn($sourceEntity)->never();
         $sourceEntity->shouldReceive('take')->andReturn($sourceEntity)->never();

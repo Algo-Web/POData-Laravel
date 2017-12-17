@@ -228,8 +228,8 @@ class LaravelReadQueryTest extends TestCase
 
         $model = m::mock(TestModel::class)->makePartial();
         $model->shouldReceive('metadata')->andReturn($rawMeta);
-        $model->shouldReceive('orderBy')->andReturn($builder)->times(1);
-
+        $model->shouldReceive('orderBy')->withArgs(['testmodel.name', 'desc'])->andReturn($builder)->times(1);
+        $model->shouldReceive('getTable')->andReturn('testmodel');
 
         $firstSeg = m::mock(OrderBySubPathSegment::class);
         $firstSeg->shouldReceive('getName')->andReturn('name');
