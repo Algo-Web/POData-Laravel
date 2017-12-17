@@ -500,7 +500,7 @@ class MetadataProviderNewTest extends TestCase
 
     public function testEmptyGubbinsNotUnderArtisan()
     {
-        $expected = 'Fields array must not be empty';
+        $expected = 'Fields array must not be empty for AlgoWeb\PODataLaravel\Models\TestModel';
         $actual = null;
         $meta = [];
 

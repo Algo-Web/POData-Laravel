@@ -29,7 +29,7 @@ class EntityGubbinsTest extends TestCase
     public function testSetEmptyFieldsArray()
     {
         $foo = new EntityGubbins();
-        $expected = 'Fields array must not be empty';
+        $expected = 'Fields array must not be empty for ';
         $actual = null;
 
         try {
@@ -43,7 +43,8 @@ class EntityGubbinsTest extends TestCase
     public function testSetBadFieldsArray()
     {
         $foo = new EntityGubbins();
-        $expected = 'Fields array must only have EntityField objects';
+        $foo->setClassName('className');
+        $expected = 'Fields array must only have EntityField objects for className';
         $actual = null;
 
         try {
@@ -57,7 +58,8 @@ class EntityGubbinsTest extends TestCase
     public function testSetNoKeyFieldsArray()
     {
         $foo = new EntityGubbins();
-        $expected = 'No key field supplied in fields array';
+        $foo->setClassName('className');
+        $expected = 'No key field supplied in fields array for className';
         $actual = null;
 
         $field = new EntityField();
