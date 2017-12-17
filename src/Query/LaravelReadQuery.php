@@ -114,34 +114,7 @@ class LaravelReadQuery
 
         // throttle up for trench run
         if (null != $skipToken) {
-            $parameters = [];
-            $processed = [];
-            $segments = $skipToken->getOrderByInfo()->getOrderByPathSegments();
-            $values = $skipToken->getOrderByKeysInToken();
-            $numValues = count($values);
-            assert($numValues == count($segments));
-
-            for ($i = 0; $i < $numValues; $i++) {
-                $relation = $segments[$i]->isAscending() ? '>' : '<';
-                $name = $segments[$i]->getSubPathSegments()[0]->getName();
-                $name = (self::PK == $name) ? $keyName : $name;
-                $parameters[$name] = ['direction' => $relation, 'value' => trim($values[$i][0], '\'')];
-            }
-
-            foreach ($parameters as $name => $line) {
-                $processed[$name] = ['direction' => $line['direction'], 'value' => $line['value']];
-                $sourceEntityInstance = $sourceEntityInstance
-                    ->orWhere(
-                        function ($query) use ($processed) {
-                            foreach ($processed as $key => $proc) {
-                                $query->where($key, $proc['direction'], $proc['value']);
-                            }
-                        }
-                    );
-                // now we've handled the later-in-order segment for this key, drop it back to equality in prep
-                // for next key - same-in-order for processed keys and later-in-order for next
-                $processed[$name]['direction'] = '=';
-            }
+            $sourceEntityInstance = $this->processSkipToken($skipToken, $sourceEntityInstance, $keyName);
         }
 
         if (!isset($skip)) {
@@ -160,53 +133,14 @@ class LaravelReadQuery
             $nullFilter = false;
         }
 
-        $bulkSetCount = $sourceEntityInstance->count();
-        $bigSet = 20000 < $bulkSetCount;
-
-        if ($nullFilter) {
-            // default no-filter case, palm processing off to database engine - is a lot faster
-            $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($rawLoad)->get();
-            $resultCount = $bulkSetCount;
-        } elseif ($bigSet) {
-            assert(isset($isvalid), 'Filter closure not set');
-            $resultSet = collect([]);
-            $rawCount = 0;
-            $rawTop = null === $top ? $bulkSetCount : $top;
-
-            // loop thru, chunk by chunk, to reduce chances of exhausting memory
-            $sourceEntityInstance->chunk(
-                5000,
-                function ($results) use ($isvalid, &$skip, &$resultSet, &$rawCount, $rawTop) {
-                    // apply filter
-                    $results = $results->filter($isvalid);
-                    // need to iterate through full result set to find count of items matching filter,
-                    // so we can't bail out early
-                    $rawCount += $results->count();
-                    // now bolt on filtrate to accumulating result set if we haven't accumulated enough bitz
-                    if ($rawTop > $resultSet->count()+$skip) {
-                        $resultSet = collect(array_merge($resultSet->all(), $results->all()));
-                        $sliceAmount = min($skip, $resultSet->count());
-                        $resultSet = $resultSet->slice($sliceAmount);
-                        $skip -= $sliceAmount;
-                    }
-                }
-            );
-
-            // clean up residual to-be-skipped records
-            $resultSet = $resultSet->slice($skip);
-            $resultCount = $rawCount;
-        } else {
-            if ($sourceEntityInstance instanceof Model) {
-                $sourceEntityInstance = $sourceEntityInstance->getQuery();
-            }
-            $resultSet = $sourceEntityInstance->with($rawLoad)->get();
-            $resultSet = $resultSet->filter($isvalid);
-            $resultCount = $resultSet->count();
-
-            if (isset($skip)) {
-                $resultSet = $resultSet->slice($skip);
-            }
-        }
+        list($bulkSetCount, $resultSet, $resultCount, $skip) = $this->applyFiltering(
+            $top,
+            $skip,
+            $sourceEntityInstance,
+            $nullFilter,
+            $rawLoad,
+            $isvalid
+        );
 
         if (isset($top)) {
             $resultSet = $resultSet->take($top);
@@ -512,5 +446,93 @@ class LaravelReadQuery
             $laravelProperty = substr($laravelProperty, 0, $pos);
         }
         return $laravelProperty;
+    }
+
+    protected function processSkipToken($skipToken, $sourceEntityInstance, $keyName)
+    {
+        $parameters = [];
+        $processed = [];
+        $segments = $skipToken->getOrderByInfo()->getOrderByPathSegments();
+        $values = $skipToken->getOrderByKeysInToken();
+        $numValues = count($values);
+        assert($numValues == count($segments));
+
+        for ($i = 0; $i < $numValues; $i++) {
+            $relation = $segments[$i]->isAscending() ? '>' : '<';
+            $name = $segments[$i]->getSubPathSegments()[0]->getName();
+            $name = (self::PK == $name) ? $keyName : $name;
+            $parameters[$name] = ['direction' => $relation, 'value' => trim($values[$i][0], '\'')];
+        }
+
+        foreach ($parameters as $name => $line) {
+            $processed[$name] = ['direction' => $line['direction'], 'value' => $line['value']];
+            $sourceEntityInstance = $sourceEntityInstance
+                ->orWhere(
+                    function ($query) use ($processed) {
+                        foreach ($processed as $key => $proc) {
+                            $query->where($key, $proc['direction'], $proc['value']);
+                        }
+                    }
+                );
+            // now we've handled the later-in-order segment for this key, drop it back to equality in prep
+            // for next key - same-in-order for processed keys and later-in-order for next
+            $processed[$name]['direction'] = '=';
+        }
+        return $sourceEntityInstance;
+    }
+
+    protected function applyFiltering($top, $skip, $sourceEntityInstance, $nullFilter, $rawLoad, $isvalid)
+    {
+        $bulkSetCount = $sourceEntityInstance->count();
+        $bigSet = 20000 < $bulkSetCount;
+
+        if ($nullFilter) {
+            // default no-filter case, palm processing off to database engine - is a lot faster
+            $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($rawLoad)->get();
+            $resultCount = $bulkSetCount;
+            return array($bulkSetCount, $resultSet, $resultCount, $skip);
+        } elseif ($bigSet) {
+            assert(isset($isvalid), 'Filter closure not set');
+            $resultSet = collect([]);
+            $rawCount = 0;
+            $rawTop = null === $top ? $bulkSetCount : $top;
+
+            // loop thru, chunk by chunk, to reduce chances of exhausting memory
+            $sourceEntityInstance->chunk(
+                5000,
+                function ($results) use ($isvalid, &$skip, &$resultSet, &$rawCount, $rawTop) {
+                    // apply filter
+                    $results = $results->filter($isvalid);
+                    // need to iterate through full result set to find count of items matching filter,
+                    // so we can't bail out early
+                    $rawCount += $results->count();
+                    // now bolt on filtrate to accumulating result set if we haven't accumulated enough bitz
+                    if ($rawTop > $resultSet->count() + $skip) {
+                        $resultSet = collect(array_merge($resultSet->all(), $results->all()));
+                        $sliceAmount = min($skip, $resultSet->count());
+                        $resultSet = $resultSet->slice($sliceAmount);
+                        $skip -= $sliceAmount;
+                    }
+                }
+            );
+
+            // clean up residual to-be-skipped records
+            $resultSet = $resultSet->slice($skip);
+            $resultCount = $rawCount;
+            return array($bulkSetCount, $resultSet, $resultCount, $skip);
+        } else {
+            if ($sourceEntityInstance instanceof Model) {
+                $sourceEntityInstance = $sourceEntityInstance->getQuery();
+            }
+            $resultSet = $sourceEntityInstance->with($rawLoad)->get();
+            $resultSet = $resultSet->filter($isvalid);
+            $resultCount = $resultSet->count();
+
+            if (isset($skip)) {
+                $resultSet = $resultSet->slice($skip);
+                return array($bulkSetCount, $resultSet, $resultCount, $skip);
+            }
+            return array($bulkSetCount, $resultSet, $resultCount, $skip);
+        }
     }
 }
