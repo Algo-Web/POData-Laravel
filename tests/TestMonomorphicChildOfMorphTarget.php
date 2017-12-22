@@ -76,7 +76,7 @@ class TestMonomorphicChildOfMorphTarget extends Model
             TestMonomorphicParentOfMorphTarget::class,
             TestMorphTarget::class,
             'child_id',
-            'parent_id'
+            'id'
         );
     }
 }
