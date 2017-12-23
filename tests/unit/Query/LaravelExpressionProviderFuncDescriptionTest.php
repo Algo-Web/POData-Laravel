@@ -87,4 +87,16 @@ class LaravelExpressionProviderFuncDescriptionTest extends TestCase
         $actual = $foo->onFunctionCallExpression($function, [ 'strng', '']);
         $this->assertEquals($expected, $actual);
     }
+
+    public function testEmptyStringIsNull()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = 'is_null';
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '' ]);
+        $this->assertEquals($expected, $actual);
+    }
 }

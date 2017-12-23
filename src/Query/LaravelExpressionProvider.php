@@ -132,7 +132,9 @@ class LaravelExpressionProvider implements IExpressionProvider
             return self::TYPE_NAMESPACE . 'Binary::binaryEqual(' . $params[0] . ', ' . $params[1] . ')';
         };
         $this->functionDescriptionParsers['is_null'] = function ($params) {
-            return 'is_null(' . $params[0] . ')';
+            return $params[0] == ''
+                ? 'true'
+                : 'is_null(' . $params[0] . ')';
         };
     }
     /**
