@@ -50,7 +50,9 @@ class LaravelExpressionProvider implements IExpressionProvider
     public function __construct()
     {
         $this->functionDescriptionParsers[ODataConstants::STRFUN_COMPARE] = function ($params) {
-            return 'strcmp(' . $params[0] . ', ' . $params[1] . ')';
+            return $params[0] == '' || $params[1] == ''
+                ? 'true'
+                : 'strcmp(' . $params[0] . ', ' . $params[1] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_ENDSWITH] = function ($params) {
             if ($params[0] == '' || $params[1] == '') {

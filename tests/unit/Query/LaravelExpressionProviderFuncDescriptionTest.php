@@ -71,4 +71,20 @@ class LaravelExpressionProviderFuncDescriptionTest extends TestCase
         $actual = $foo->onFunctionCallExpression($function, [ '', 'strng']);
         $this->assertEquals($expected, $actual);
     }
+
+    public function testCompareWithEmptyString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::STRFUN_COMPARE;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '', 'strng']);
+        $this->assertEquals($expected, $actual);
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ 'strng', '']);
+        $this->assertEquals($expected, $actual);
+    }
 }
