@@ -53,6 +53,9 @@ class LaravelExpressionProvider implements IExpressionProvider
             return 'strcmp(' . $params[0] . ', ' . $params[1] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_ENDSWITH] = function ($params) {
+            if ($params[0] == '' || $params[1] == '') {
+                return 'true';
+            }
             return '(strcmp(substr(' . $params[0] . ', strlen(' . $params[0] . ') - strlen(' . $params[1] . ')), '
                    .$params[1] . ') === 0)';
         };
@@ -63,7 +66,9 @@ class LaravelExpressionProvider implements IExpressionProvider
             return 'str_replace(' . $params[1] . ', ' . $params[2] . ', ' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_STARTSWITH] = function ($params) {
-            return $params[1] == "''"  ? 'true' : '(strpos(' . $params[0] . ', ' . $params[1] . ') === 0)';
+            return $params[1] == '' || $params[1] == "''"
+                ? 'true'
+                : '(strpos(' . $params[0] . ', ' . $params[1] . ') === 0)';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_TOLOWER] = function ($params) {
             return 'strtolower(' . $params[0] . ')';
@@ -76,7 +81,8 @@ class LaravelExpressionProvider implements IExpressionProvider
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_SUBSTRING] = function ($params) {
             return count($params) == 3 ?
-                'substr(' . $params[0] . ', ' . $params[1] . ', ' . $params[2] . ')' : 'substr(' . $params[0] . ', ' . $params[1] . ')';
+                'substr(' . $params[0] . ', ' . $params[1] . ', ' . $params[2] . ')'
+                : 'substr(' . $params[0] . ', ' . $params[1] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_SUBSTRINGOF] = function ($params) {
             return '(strpos(' . $params[1] . ', ' . $params[0] . ') !== false)';
