@@ -62,7 +62,9 @@ class LaravelExpressionProvider implements IExpressionProvider
                    .$params[1] . ') === 0)';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_INDEXOF] = function ($params) {
-            return 'strpos(' . $params[0] . ', ' . $params[1] . ')';
+            return $params[0] == '' || $params[1] == ''
+                ? 'true'
+                : 'strpos(' . $params[0] . ', ' . $params[1] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_REPLACE] = function ($params) {
             return 'str_replace(' . $params[1] . ', ' . $params[2] . ', ' . $params[0] . ')';
@@ -87,7 +89,9 @@ class LaravelExpressionProvider implements IExpressionProvider
                 : 'substr(' . $params[0] . ', ' . $params[1] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_SUBSTRINGOF] = function ($params) {
-            return '(strpos(' . $params[1] . ', ' . $params[0] . ') !== false)';
+            return $params[0] == '' || $params[1] == ''
+                ? 'true'
+                : '(strpos(' . $params[1] . ', ' . $params[0] . ') !== false)';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_CONCAT] = function ($params) {
             return $params[0] . ' . ' . $params[1];

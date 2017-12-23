@@ -99,4 +99,52 @@ class LaravelExpressionProviderFuncDescriptionTest extends TestCase
         $actual = $foo->onFunctionCallExpression($function, [ '' ]);
         $this->assertEquals($expected, $actual);
     }
+
+    public function testIndexOfEmptyQuotedString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::STRFUN_INDEXOF;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '', 'strng']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testIndexByEmptyQuotedString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::STRFUN_INDEXOF;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ 'strng', '']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testSubstringOfEmptyQuotedString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::STRFUN_SUBSTRINGOF;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '', 'strng']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testSubstringByEmptyQuotedString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::STRFUN_SUBSTRINGOF;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ 'strng', '']);
+        $this->assertEquals($expected, $actual);
+    }
 }
