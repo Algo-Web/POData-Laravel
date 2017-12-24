@@ -124,13 +124,19 @@ class LaravelExpressionProvider implements IExpressionProvider
             return self::TYPE_NAMESPACE . 'DateTime::second(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::MATHFUN_ROUND] = function ($params) {
-            return 'round(' . $params[0] . ')';
+            return $params[0] == ''
+                ? 'true'
+                : 'round(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::MATHFUN_CEILING] = function ($params) {
-            return 'ceil(' . $params[0] . ')';
+            return $params[0] == ''
+                ? 'true'
+                : 'ceil(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::MATHFUN_FLOOR] = function ($params) {
-            return 'floor(' . $params[0] . ')';
+            return $params[0] == ''
+                ? 'true'
+                : 'floor(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::BINFUL_EQUAL] = function ($params) {
             return self::TYPE_NAMESPACE . 'Binary::binaryEqual(' . $params[0] . ', ' . $params[1] . ')';

@@ -147,4 +147,40 @@ class LaravelExpressionProviderFuncDescriptionTest extends TestCase
         $actual = $foo->onFunctionCallExpression($function, [ 'strng', '']);
         $this->assertEquals($expected, $actual);
     }
+
+    public function testRoundEmptyString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::MATHFUN_ROUND;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testCeilEmptyString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::MATHFUN_CEILING;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testFloorEmptyString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::MATHFUN_FLOOR;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '']);
+        $this->assertEquals($expected, $actual);
+    }
 }
