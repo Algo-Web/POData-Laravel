@@ -67,7 +67,7 @@ class LaravelExpressionProviderFuncDescriptionTest extends TestCase
         $function = m::mock(FunctionDescription::class);
         $function->name = ODataConstants::STRFUN_STARTSWITH;
 
-        $expected = '(strpos(\'\', string) === 0)';
+        $expected = 'true';
         $actual = $foo->onFunctionCallExpression($function, [ "''", 'string']);
         $this->assertEquals($expected, $actual);
     }
@@ -305,6 +305,110 @@ class LaravelExpressionProviderFuncDescriptionTest extends TestCase
 
         $expected = 'true';
         $actual = $foo->onFunctionCallExpression($function, [ 'string', '']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDateTimeCompareEmptyStrings()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::DATETIME_COMPARE;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '', 'strng']);
+        $this->assertEquals($expected, $actual);
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ 'string', '']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDateTimeCompareEmptyQuotedStrings()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::DATETIME_COMPARE;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ 'strng', "''"]);
+        $this->assertEquals($expected, $actual);
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ "''", 'strng']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDateTimeYearEmptyStrings()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::DATETIME_YEAR;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '' ]);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDateTimeMonthEmptyStrings()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::DATETIME_MONTH;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '' ]);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDateTimeDayEmptyStrings()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::DATETIME_DAY;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '' ]);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDateTimeHourEmptyStrings()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::DATETIME_HOUR;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '' ]);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDateTimeMinuteEmptyStrings()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::DATETIME_MINUTE;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '' ]);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDateTimeSecondEmptyStrings()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::DATETIME_SECOND;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '' ]);
         $this->assertEquals($expected, $actual);
     }
 }

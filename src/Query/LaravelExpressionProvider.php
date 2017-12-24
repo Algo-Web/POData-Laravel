@@ -116,25 +116,39 @@ class LaravelExpressionProvider implements IExpressionProvider
             return self::TYPE_NAMESPACE . 'Guid::guidEqual(' . $params[0] . ', ' . $params[1] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::DATETIME_COMPARE] = function ($params) {
-            return self::TYPE_NAMESPACE . 'DateTime::dateTimeCmp(' . $params[0] . ', ' . $params[1] . ')';
+            return $this->checkEmptyString($params)
+                ? 'true'
+                : self::TYPE_NAMESPACE . 'DateTime::dateTimeCmp(' . $params[0] . ', ' . $params[1] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::DATETIME_YEAR] = function ($params) {
-            return self::TYPE_NAMESPACE . 'DateTime::year(' . $params[0] . ')';
+            return $this->checkEmptyString($params)
+                ? 'true'
+                : self::TYPE_NAMESPACE . 'DateTime::year(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::DATETIME_MONTH] = function ($params) {
-            return self::TYPE_NAMESPACE . 'DateTime::month(' . $params[0] . ')';
+            return $this->checkEmptyString($params)
+                ? 'true'
+                : self::TYPE_NAMESPACE . 'DateTime::month(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::DATETIME_DAY] = function ($params) {
-            return self::TYPE_NAMESPACE . 'DateTime::day(' . $params[0] . ')';
+            return $this->checkEmptyString($params)
+                ? 'true'
+                : self::TYPE_NAMESPACE . 'DateTime::day(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::DATETIME_HOUR] = function ($params) {
-            return self::TYPE_NAMESPACE . 'DateTime::hour(' . $params[0] . ')';
+            return $this->checkEmptyString($params)
+                ? 'true'
+                : self::TYPE_NAMESPACE . 'DateTime::hour(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::DATETIME_MINUTE] = function ($params) {
-            return self::TYPE_NAMESPACE . 'DateTime::minute(' . $params[0] . ')';
+            return $this->checkEmptyString($params)
+                ? 'true'
+                : self::TYPE_NAMESPACE . 'DateTime::minute(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::DATETIME_SECOND] = function ($params) {
-            return self::TYPE_NAMESPACE . 'DateTime::second(' . $params[0] . ')';
+            return $this->checkEmptyString($params)
+                ? 'true'
+                : self::TYPE_NAMESPACE . 'DateTime::second(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::MATHFUN_ROUND] = function ($params) {
             return $this->checkEmptyString($params)
@@ -388,6 +402,13 @@ class LaravelExpressionProvider implements IExpressionProvider
             if ('' == $string) {
                 return true;
             }
+            // to catch strings that aren't themselves wrapping strings - if this is missed, then run massive
+            // risk of referencing undefined constants
+            if (is_string($string)) {
+                if (ltrim($string, '\'\"') == $string || rtrim($string, '\'\"') == $string) {
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -398,7 +419,8 @@ class LaravelExpressionProvider implements IExpressionProvider
             if (!array_key_exists($index, $parms)) {
                 return true;
             }
-            if ('""' == $parms[$index] || "''" == $parms[$index]) {
+            $parm = $parms[$index];
+            if ('""' == $parm || "''" == $parm) {
                 return true;
             }
         }
