@@ -50,19 +50,19 @@ class LaravelExpressionProvider implements IExpressionProvider
     public function __construct()
     {
         $this->functionDescriptionParsers[ODataConstants::STRFUN_COMPARE] = function ($params) {
-            return $params[0] == '' || $params[1] == ''
+            return $this->checkEmptyString($params)
                 ? 'true'
                 : 'strcmp(' . $params[0] . ', ' . $params[1] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_ENDSWITH] = function ($params) {
-            if ($params[0] == '' || $params[1] == '') {
+            if ($this->checkEmptyString($params) || $this->checkBlankString($params, [1])) {
                 return 'true';
             }
             return '(strcmp(substr(' . $params[0] . ', strlen(' . $params[0] . ') - strlen(' . $params[1] . ')), '
                    .$params[1] . ') === 0)';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_INDEXOF] = function ($params) {
-            return $params[0] == '' || $params[1] == ''
+            return $this->checkEmptyString($params) || $this->checkBlankString($params, [1])
                 ? 'true'
                 : 'strpos(' . $params[0] . ', ' . $params[1] . ')';
         };
@@ -70,27 +70,27 @@ class LaravelExpressionProvider implements IExpressionProvider
             return 'str_replace(' . $params[1] . ', ' . $params[2] . ', ' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_STARTSWITH] = function ($params) {
-            return $params[0] == '' || $params[1] == '' || $params[1] == "''"
+            return $this->checkEmptyString($params) || $this->checkBlankString($params, [1])
                 ? 'true'
                 : '(strpos(' . $params[0] . ', ' . $params[1] . ') === 0)';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_TOLOWER] = function ($params) {
-            return $params[0] == ''
+            return $this->checkEmptyString($params)
                 ? 'true'
                 : 'strtolower(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_TOUPPER] = function ($params) {
-            return $params[0] == ''
+            return $this->checkEmptyString($params)
                 ? 'true'
                 : 'strtoupper(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_TRIM] = function ($params) {
-            return $params[0] == ''
+            return $this->checkEmptyString($params)
                 ? 'true'
                 : 'trim(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_SUBSTRING] = function ($params) {
-            if ($params[0] == '' || $params[1] == '') {
+            if ($this->checkEmptyString($params)) {
                 return 'true';
             }
             return count($params) == 3 ?
@@ -98,17 +98,17 @@ class LaravelExpressionProvider implements IExpressionProvider
                 : 'substr(' . $params[0] . ', ' . $params[1] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_SUBSTRINGOF] = function ($params) {
-            return $params[0] == '' || $params[1] == ''
+            return $this->checkEmptyString($params)
                 ? 'true'
                 : '(strpos(' . $params[1] . ', ' . $params[0] . ') !== false)';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_CONCAT] = function ($params) {
-            return $params[0] == '' || $params[1] == ''
+            return $this->checkEmptyString($params)
                 ? 'true'
                 : $params[0] . ' . ' . $params[1];
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_LENGTH] = function ($params) {
-            return $params[0] == ''
+            return $this->checkEmptyString($params)
                 ? 'true'
                 : 'strlen(' . $params[0] . ')';
         };
@@ -137,17 +137,17 @@ class LaravelExpressionProvider implements IExpressionProvider
             return self::TYPE_NAMESPACE . 'DateTime::second(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::MATHFUN_ROUND] = function ($params) {
-            return $params[0] == ''
+            return $this->checkEmptyString($params)
                 ? 'true'
                 : 'round(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::MATHFUN_CEILING] = function ($params) {
-            return $params[0] == ''
+            return $this->checkEmptyString($params)
                 ? 'true'
                 : 'ceil(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::MATHFUN_FLOOR] = function ($params) {
-            return $params[0] == ''
+            return $this->checkEmptyString($params)
                 ? 'true'
                 : 'floor(' . $params[0] . ')';
         };
@@ -155,7 +155,7 @@ class LaravelExpressionProvider implements IExpressionProvider
             return self::TYPE_NAMESPACE . 'Binary::binaryEqual(' . $params[0] . ', ' . $params[1] . ')';
         };
         $this->functionDescriptionParsers['is_null'] = function ($params) {
-            return $params[0] == ''
+            return $this->checkEmptyString($params)
                 ? 'true'
                 : 'is_null(' . $params[0] . ')';
         };
@@ -380,5 +380,28 @@ class LaravelExpressionProvider implements IExpressionProvider
             $type = $expressionType;
         }
         return $type;
+    }
+
+    private function checkEmptyString(array $parms)
+    {
+        foreach ($parms as $string) {
+            if ('' == $string) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function checkBlankString(array $parms, array $indices)
+    {
+        foreach ($indices as $index) {
+            if (!array_key_exists($index, $parms)) {
+                return true;
+            }
+            if ('""' == $parms[$index] || "''" == $parms[$index]) {
+                return true;
+            }
+        }
+        return false;
     }
 }
