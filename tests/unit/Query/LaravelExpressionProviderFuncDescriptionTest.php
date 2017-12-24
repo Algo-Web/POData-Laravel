@@ -48,6 +48,42 @@ class LaravelExpressionProviderFuncDescriptionTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testStartsOfEmptyString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::STRFUN_STARTSWITH;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '', 'string']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testStartsOfEmptyQuotedString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::STRFUN_STARTSWITH;
+
+        $expected = '(strpos(\'\', string) === 0)';
+        $actual = $foo->onFunctionCallExpression($function, [ "''", 'string']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testStartsOfNullString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::STRFUN_STARTSWITH;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '', 'string']);
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testEndsWithEmptyQuotedString()
     {
         $foo = new LaravelExpressionProvider();
@@ -181,6 +217,94 @@ class LaravelExpressionProviderFuncDescriptionTest extends TestCase
 
         $expected = 'true';
         $actual = $foo->onFunctionCallExpression($function, [ '']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testToLowerEmptyString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::STRFUN_TOLOWER;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testToUpperEmptyString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::STRFUN_TOUPPER;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testTrimEmptyString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::STRFUN_TRIM;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testConcatEmptyQuotedString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::STRFUN_CONCAT;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ 'strng', '']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testConcatToEmptyQuotedString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::STRFUN_CONCAT;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '', 'strng']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testLengthOfEmptyQuotedString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::STRFUN_LENGTH;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '', 'strng']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testSubstringEmptyQuotedString()
+    {
+        $foo = new LaravelExpressionProvider();
+
+        $function = m::mock(FunctionDescription::class);
+        $function->name = ODataConstants::STRFUN_SUBSTRING;
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ '', 'strng']);
+        $this->assertEquals($expected, $actual);
+
+        $expected = 'true';
+        $actual = $foo->onFunctionCallExpression($function, [ 'string', '']);
         $this->assertEquals($expected, $actual);
     }
 }

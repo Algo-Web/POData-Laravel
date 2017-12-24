@@ -70,20 +70,29 @@ class LaravelExpressionProvider implements IExpressionProvider
             return 'str_replace(' . $params[1] . ', ' . $params[2] . ', ' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_STARTSWITH] = function ($params) {
-            return $params[1] == '' || $params[1] == "''"
+            return $params[0] == '' || $params[1] == '' || $params[1] == "''"
                 ? 'true'
                 : '(strpos(' . $params[0] . ', ' . $params[1] . ') === 0)';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_TOLOWER] = function ($params) {
-            return 'strtolower(' . $params[0] . ')';
+            return $params[0] == ''
+                ? 'true'
+                : 'strtolower(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_TOUPPER] = function ($params) {
-            return 'strtoupper(' . $params[0] . ')';
+            return $params[0] == ''
+                ? 'true'
+                : 'strtoupper(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_TRIM] = function ($params) {
-            return 'trim(' . $params[0] . ')';
+            return $params[0] == ''
+                ? 'true'
+                : 'trim(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_SUBSTRING] = function ($params) {
+            if ($params[0] == '' || $params[1] == '') {
+                return 'true';
+            }
             return count($params) == 3 ?
                 'substr(' . $params[0] . ', ' . $params[1] . ', ' . $params[2] . ')'
                 : 'substr(' . $params[0] . ', ' . $params[1] . ')';
@@ -94,10 +103,14 @@ class LaravelExpressionProvider implements IExpressionProvider
                 : '(strpos(' . $params[1] . ', ' . $params[0] . ') !== false)';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_CONCAT] = function ($params) {
-            return $params[0] . ' . ' . $params[1];
+            return $params[0] == '' || $params[1] == ''
+                ? 'true'
+                : $params[0] . ' . ' . $params[1];
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_LENGTH] = function ($params) {
-            return 'strlen(' . $params[0] . ')';
+            return $params[0] == ''
+                ? 'true'
+                : 'strlen(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::GUIDFUN_EQUAL] = function ($params) {
             return self::TYPE_NAMESPACE . 'Guid::guidEqual(' . $params[0] . ', ' . $params[1] . ')';
