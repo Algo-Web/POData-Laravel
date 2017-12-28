@@ -210,6 +210,9 @@ class LaravelBulkQuery
             try {
                 // return array of Model objects underlying collection returned by findMany
                 $result = $class::findMany($payload['id'])->flatten()->all();
+                foreach ($result as $model) {
+                    LaravelQuery::queueModel($model);
+                }
                 return $result;
             } catch (\Exception $e) {
                 throw new ODataException($e->getMessage(), 500);
