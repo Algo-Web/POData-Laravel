@@ -132,7 +132,7 @@ class MetadataProvider extends MetadataBaseProvider
             $baseType = null;
             $className = $entity->getClassName();
             $entityName = $entity->getName();
-            $entityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, false, $baseType);
+            $entityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, null, false, $baseType);
             assert($entityType->hasBaseType() === isset($baseType));
             $entity->setOdataResourceType($entityType);
             $this->implementProperties($entity);
