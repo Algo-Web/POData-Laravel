@@ -325,7 +325,9 @@ class LaravelQuery implements IQueryProvider
         $source = $this->unpackSourceEntity($sourceEntityInstance);
 
         $verb = 'update';
-        return $this->createUpdateCoreWrapper($sourceResourceSet, $data, $verb, $source);
+        $result = $this->createUpdateCoreWrapper($sourceResourceSet, $data, $verb, $source);
+        LaravelQuery::queueModel($result);
+        return $result;
     }
     /**
      * Delete resource from a resource set.
@@ -375,7 +377,9 @@ class LaravelQuery implements IQueryProvider
         $source = $this->unpackSourceEntity($sourceEntityInstance);
 
         $verb = 'create';
-        return $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source);
+        $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source);
+        LaravelQuery::queueModel($result);
+        return $result;
     }
 
     /**
@@ -454,7 +458,7 @@ class LaravelQuery implements IQueryProvider
      * @throws ODataException
      * @return mixed
      */
-    private function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $data, $verb, Model $source = null)
+    protected function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $data, $verb, Model $source = null)
     {
         $lastWord = 'update' == $verb ? 'updated' : 'created';
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();

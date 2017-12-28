@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
+use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolver;
 use Illuminate\Filesystem\FilesystemAdapter;
@@ -45,6 +46,8 @@ class TestCase extends BaseTestCase
     {
         Cache::swap($this->origFacade['cache']);
         //Schema::swap($this->origFacade['schema']);
+        $foo = new LaravelQuery(null);
+        unset($foo);
         parent::tearDown();
     }
 

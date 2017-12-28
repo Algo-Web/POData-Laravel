@@ -71,4 +71,43 @@ class LaravelQueryBatchTest extends TestCase
         LaravelQuery::queueModel($model);
         $foo->commitTransaction();
     }
+
+    public function testUpdateResultGetsQueuedAndProcessed()
+    {
+        $db = App::make('db');
+        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
+        $db->shouldReceive('commit')->andReturnNull()->once();
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('save')->andReturn(true)->once();
+
+        $rSet = m::mock(ResourceSet::class);
+        $keyDesc = m::mock(KeyDescriptor::class);
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('createUpdateCoreWrapper')->andReturn($model);
+
+        $foo->startTransaction(true);
+        $foo->updateResource($rSet, $model, $keyDesc, new \stdClass);
+        $foo->commitTransaction();
+    }
+
+    public function testCreateResultGetsQueuedAndProcessed()
+    {
+        $db = App::make('db');
+        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
+        $db->shouldReceive('commit')->andReturnNull()->once();
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('save')->andReturn(true)->once();
+
+        $rSet = m::mock(ResourceSet::class);
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('createUpdateCoreWrapper')->andReturn($model);
+
+        $foo->startTransaction(true);
+        $foo->createResourceforResourceSet($rSet, $model, new \stdClass);
+        $foo->commitTransaction();
+    }
 }
