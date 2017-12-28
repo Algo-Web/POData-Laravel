@@ -38,6 +38,8 @@ class LaravelQuery implements IQueryProvider
     private $verbMap = [];
     protected $metadataProvider;
     protected $controllerContainer;
+    private static $touchList = [];
+    private static $inBatch;
 
     public function __construct(AuthInterface $auth = null)
     {
@@ -50,6 +52,8 @@ class LaravelQuery implements IQueryProvider
         $this->bulk = new LaravelBulkQuery($this, $this->auth);
         $this->metadataProvider = new MetadataProvider(App::make('app'));
         $this->controllerContainer = App::make('metadataControllers');
+        self::$touchList = [];
+        self::$inBatch = false;
     }
 
     /**
@@ -318,10 +322,8 @@ class LaravelQuery implements IQueryProvider
         $data,
         $shouldUpdate = false
     ) {
-        $source = $this->unpackSourceEntity($sourceEntityInstance);
-
         $verb = 'update';
-        return $this->createUpdateCoreWrapper($sourceResourceSet, $data, $verb, $source);
+        return $this->createUpdateMainWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb);
     }
     /**
      * Delete resource from a resource set.
@@ -368,10 +370,8 @@ class LaravelQuery implements IQueryProvider
         $sourceEntityInstance,
         $data
     ) {
-        $source = $this->unpackSourceEntity($sourceEntityInstance);
-
         $verb = 'create';
-        return $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source);
+        return $this->createUpdateMainWrapper($resourceSet, $sourceEntityInstance, $data, $verb);
     }
 
     /**
@@ -450,7 +450,7 @@ class LaravelQuery implements IQueryProvider
      * @throws ODataException
      * @return mixed
      */
-    private function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $data, $verb, Model $source = null)
+    protected function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $data, $verb, Model $source = null)
     {
         $lastWord = 'update' == $verb ? 'updated' : 'created';
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
@@ -642,8 +642,10 @@ class LaravelQuery implements IQueryProvider
     /**
      * Start database transaction.
      */
-    public function startTransaction()
+    public function startTransaction($isBulk = false)
     {
+        self::$touchList = [];
+        self::$inBatch = true === $isBulk;
         DB::beginTransaction();
     }
 
@@ -652,7 +654,15 @@ class LaravelQuery implements IQueryProvider
      */
     public function commitTransaction()
     {
+        // fire model save again, to give Laravel app final chance to finalise anything that needs finalising after
+        // batch processing
+        foreach (self::$touchList as $model) {
+            $model->save();
+        }
+
         DB::commit();
+        self::$touchList = [];
+        self::$inBatch = false;
     }
 
     /**
@@ -661,5 +671,26 @@ class LaravelQuery implements IQueryProvider
     public function rollBackTransaction()
     {
         DB::rollBack();
+        self::$touchList = [];
+        self::$inBatch = false;
+    }
+
+    public static function queueModel(Model &$model)
+    {
+        // if we're not processing a batch, don't queue anything
+        if (!self::$inBatch) {
+            return;
+        }
+        // if we are in a batch, add to queue to process on transaction commit
+        self::$touchList[] = $model;
+    }
+
+    protected function createUpdateMainWrapper(ResourceSet $resourceSet, $sourceEntityInstance, $data, $verb)
+    {
+        $source = $this->unpackSourceEntity($sourceEntityInstance);
+
+        $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source);
+        self::queueModel($result);
+        return $result;
     }
 }

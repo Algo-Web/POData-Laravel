@@ -68,6 +68,8 @@ class LaravelHookQuery
         } elseif ($relation instanceof HasOneOrMany) {
             $relation->save($targetEntityInstance);
         }
+        LaravelQuery::queueModel($sourceEntityInstance);
+        LaravelQuery::queueModel($targetEntityInstance);
         return true;
     }
 
@@ -97,10 +99,14 @@ class LaravelHookQuery
         // in case the fake 'PrimaryKey' attribute got set inbound for a polymorphic-affected model, flatten it now
         unset($targetEntityInstance->PrimaryKey);
 
+        $changed = false;
+
         if ($relation instanceof BelongsTo) {
             $relation->dissociate();
+            $changed = true;
         } elseif ($relation instanceof BelongsToMany) {
             $relation->detach($targetEntityInstance);
+            $changed = true;
         } elseif ($relation instanceof HasOneOrMany) {
             // dig up inverse property name, so we can pass it to unhookSingleModel with source and target elements
             // swapped
@@ -118,6 +124,10 @@ class LaravelHookQuery
                 $sourceEntityInstance,
                 $otherPropName
             );
+        }
+        if ($changed) {
+            LaravelQuery::queueModel($sourceEntityInstance);
+            LaravelQuery::queueModel($targetEntityInstance);
         }
         return true;
     }
