@@ -649,7 +649,7 @@ class LaravelQuery implements IQueryProvider
     public function startTransaction($isBulk = false)
     {
         self::$touchList = [];
-        self::$inBatch = true;
+        self::$inBatch = true === $isBulk;
         DB::beginTransaction();
     }
 
@@ -658,6 +658,12 @@ class LaravelQuery implements IQueryProvider
      */
     public function commitTransaction()
     {
+        // fire model save again, to give Laravel app final chance to finalise anything that needs finalising after
+        // batch processing
+        foreach (self::$touchList as $model) {
+            $model->save();
+        }
+
         DB::commit();
         self::$touchList = [];
         self::$inBatch = false;
@@ -673,7 +679,7 @@ class LaravelQuery implements IQueryProvider
         self::$inBatch = false;
     }
 
-    public function queueModel(Model $model)
+    public static function queueModel(Model &$model)
     {
         // if we're not processing a batch, don't queue anything
         if (!self::$inBatch) {
