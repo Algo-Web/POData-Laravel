@@ -1,5 +1,6 @@
 Unreleased
 ----------
+   * Handle batch processing requests
    * Annotate EntityGubbins failures with supplied class name
    * Disambiguate order-by columns to stop tripping join queries up
    * Handle HasManyThrough relations where reverse relation is defined
