@@ -25,7 +25,7 @@ use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\Type\Int32;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 
-class LaravelQueryBatchTest extends TestCase
+class LaravelQueryBatchProcessingTest extends TestCase
 {
     public function testQueuedSaveTriggeredOnTransactionCommitInBatch()
     {

@@ -322,12 +322,8 @@ class LaravelQuery implements IQueryProvider
         $data,
         $shouldUpdate = false
     ) {
-        $source = $this->unpackSourceEntity($sourceEntityInstance);
-
         $verb = 'update';
-        $result = $this->createUpdateCoreWrapper($sourceResourceSet, $data, $verb, $source);
-        LaravelQuery::queueModel($result);
-        return $result;
+        return $this->createUpdateMainWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb);
     }
     /**
      * Delete resource from a resource set.
@@ -374,12 +370,8 @@ class LaravelQuery implements IQueryProvider
         $sourceEntityInstance,
         $data
     ) {
-        $source = $this->unpackSourceEntity($sourceEntityInstance);
-
         $verb = 'create';
-        $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source);
-        LaravelQuery::queueModel($result);
-        return $result;
+        return $this->createUpdateMainWrapper($resourceSet, $sourceEntityInstance, $data, $verb);
     }
 
     /**
@@ -691,5 +683,14 @@ class LaravelQuery implements IQueryProvider
         }
         // if we are in a batch, add to queue to process on transaction commit
         self::$touchList[] = $model;
+    }
+
+    protected function createUpdateMainWrapper(ResourceSet $resourceSet, $sourceEntityInstance, $data, $verb)
+    {
+        $source = $this->unpackSourceEntity($sourceEntityInstance);
+
+        $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source);
+        self::queueModel($result);
+        return $result;
     }
 }
