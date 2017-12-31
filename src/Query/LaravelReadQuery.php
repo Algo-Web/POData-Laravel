@@ -306,11 +306,11 @@ class LaravelReadQuery
 
         $propertyName = $targetProperty->getName();
         $propertyName = $this->getLaravelRelationName($propertyName);
-        $result = $sourceEntityInstance->$propertyName;
+        $result = $sourceEntityInstance->$propertyName()->first();
         if (null === $result) {
             return null;
         }
-        assert($result instanceof Model, get_class($result));
+        assert($result instanceof Model, 'Model not retrieved from Eloquent relation');
         if ($targetProperty->getResourceType()->getInstanceType()->getName() != get_class($result)) {
             return null;
         }

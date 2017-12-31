@@ -202,7 +202,7 @@ class LaravelReadQueryTest extends TestCase
         $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
 
         $rel = m::mock(HasOne::class)->makePartial();
-        $rel->shouldReceive('getResults')->andReturn(null)->once();
+        $rel->shouldReceive('first')->andReturn(null)->once();
 
         $entity = m::mock(TestMonomorphicSource::class)->makePartial();
         $entity->shouldReceive('oneSource')->andReturn($rel)->once();
