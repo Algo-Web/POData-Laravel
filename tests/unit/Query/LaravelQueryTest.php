@@ -733,14 +733,21 @@ class LaravelQueryTest extends TestCase
         $sourceEntity = \Mockery::mock(TestMorphManySource::class)->makePartial();
         $sourceEntity->shouldReceive('where')->andReturnSelf();
         $sourceEntity->shouldReceive('orderBy')->andReturnSelf();
-        $sourceEntity->shouldReceive('getAttribute')->withArgs(['morphTarget'])->andReturnSelf()->once();
-        $sourceEntity->shouldReceive('get')->andReturn(collect(['a']))->once();
+        $sourceEntity->shouldReceive('morphTarget')->andReturnSelf()->once();
+        $sourceEntity->shouldReceive('first')->andReturn('a')->once();
         $property->shouldReceive('getResourceType->getInstanceType->getName')->andReturn(get_class($sourceEntity));
 
         $foo = new LaravelQuery();
 
-        $result = $foo->getRelatedResourceReference($srcResource, $sourceEntity, $dstResource, $property);
-        $this->assertEquals('a', $result->get()->first());
+        $expected = 'assert(): Model not retrieved from Eloquent relation failed';
+        $actual = null;
+
+        try {
+            $result = $foo->getRelatedResourceReference($srcResource, $sourceEntity, $dstResource, $property);
+        } catch (\ErrorException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 
     public function testGetRelatedResourceReferenceWithValidGubbins()
@@ -748,8 +755,8 @@ class LaravelQueryTest extends TestCase
         $mod1 = new TestModel();
         $mod1->name = 'Hammer, MC';
 
-        $model = new TestModel();
-        $model->name = $mod1;
+        $model = m::mock(TestModel::class)->makePartial();
+        $model->shouldReceive('name->first')->andReturn($mod1);
 
         $source = m::mock(ResourceSet::class);
         $targ = m::mock(ResourceSet::class);
@@ -759,7 +766,7 @@ class LaravelQueryTest extends TestCase
 
         $foo = new LaravelQuery();
         $result = $foo->getRelatedResourceReference($source, $model, $targ, $property);
-        $this->assertEquals($model->name, $result);
+        $this->assertEquals($mod1->name, $result->name);
     }
 
     public function testGetRelatedResourceReferenceWithInValidGubbins()
@@ -767,8 +774,8 @@ class LaravelQueryTest extends TestCase
         $mod1 = new TestModel();
         $mod1->name = 'Hammer, MC';
 
-        $model = new TestModel();
-        $model->name = $mod1;
+        $model = m::mock(TestModel::class)->makePartial();
+        $model->shouldReceive('name->first')->andReturn($mod1);
 
         $source = m::mock(ResourceSet::class);
         $targ = m::mock(ResourceSet::class);
@@ -786,8 +793,8 @@ class LaravelQueryTest extends TestCase
         $mod1 = new TestModel();
         $mod1->name = 'Hammer, MC';
 
-        $model = new TestModel();
-        $model->name = $mod1;
+        $model = m::mock(TestModel::class)->makePartial();
+        $model->shouldReceive('noname->first')->andReturn(null);
 
         $source = m::mock(ResourceSet::class);
         $targ = m::mock(ResourceSet::class);
