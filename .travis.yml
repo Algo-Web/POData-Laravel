@@ -20,7 +20,7 @@ script:
   - phpunit --coverage-clover build/logs/clover.xml
 
 after_script:
-  - php vendor/bin/coveralls --exclude-no-stmt
+  - php vendor/bin/php-coveralls --exclude-no-stmt
 
 after_success:
   - coveralls
