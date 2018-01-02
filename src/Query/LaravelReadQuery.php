@@ -401,9 +401,10 @@ class LaravelReadQuery
     private function processKeyDescriptor(&$sourceEntityInstance, KeyDescriptor $keyDescriptor = null)
     {
         if ($keyDescriptor) {
+            $table = ($sourceEntityInstance instanceof Model) ? $sourceEntityInstance->getTable().'.' : '';
             foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
                 $trimValue = trim($value[0], '\'');
-                $sourceEntityInstance = $sourceEntityInstance->where($key, $trimValue);
+                $sourceEntityInstance = $sourceEntityInstance->where($table.$key, $trimValue);
             }
         }
     }

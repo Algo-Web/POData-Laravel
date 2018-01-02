@@ -1,5 +1,6 @@
 Unreleased
 ----------
+   * Make key-descriptor columns unambiguous when processed on models
    * Flatten residual references to PrimaryKey alias field
    * Handle batch processing requests
    * Annotate EntityGubbins failures with supplied class name
