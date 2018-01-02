@@ -505,20 +505,4 @@ class MetadataTraitTest extends TestCase
             [TestMorphManySourceWithUnexposedTarget::class, false]
         ];
     }
-
-    public function testSynthLiteralPKNotOnUnknownSide()
-    {
-        $foo = new TestModel();
-        $foo->id = 42;
-        $foo->synthLiteralPK();
-        $this->assertEquals(null, $foo->PrimaryKey);
-    }
-
-    public function testSynthLiteralPKOnUnknownSide()
-    {
-        $foo = new TestMorphManySource();
-        $foo->id = 42;
-        $foo->synthLiteralPK();
-        $this->assertEquals(42, $foo->PrimaryKey);
-    }
 }

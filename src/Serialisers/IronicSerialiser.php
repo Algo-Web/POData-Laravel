@@ -48,8 +48,6 @@ use POData\UriProcessor\SegmentStack;
 
 class IronicSerialiser implements IObjectSerialiser
 {
-    const PK = 'PrimaryKey';
-
     private $propertiesCache = [];
 
     /**
@@ -562,7 +560,7 @@ class IronicSerialiser implements IObjectSerialiser
             $keyType = $resourceProperty->getInstanceType();
             assert($keyType instanceof IType, '$keyType not instanceof IType');
             $keyName = $resourceProperty->getName();
-            $keyValue = (self::PK == $keyName) ? $entityInstance->getKey() : $entityInstance->$keyName;
+            $keyValue = $entityInstance->$keyName;
             if (!isset($keyValue)) {
                 throw ODataException::createInternalServerError(
                     Messages::badQueryNullKeysAreNotSupported($typeName, $keyName)

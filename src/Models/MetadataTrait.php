@@ -748,18 +748,6 @@ trait MetadataTrait
         return $gubbins;
     }
 
-    public function synthLiteralPK()
-    {
-        if (!$this->isKnownPolymorphSide()) {
-            return;
-        }
-        $fieldName = LaravelReadQuery::PK;
-        /* As MetadataTrait is assumed to be deployed on top of an Eloquent model, which has getKey(), this is a
-           false positive */
-        /** @scrutinizer ignore-call */
-        $this->$fieldName = $this->getKey();
-    }
-
     public function isRunningInArtisan()
     {
         return App::runningInConsole() && !App::runningUnitTests();
