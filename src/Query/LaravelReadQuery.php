@@ -22,8 +22,6 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 class LaravelReadQuery
 {
-    const PK = 'PrimaryKey';
-
     protected $auth;
 
     public function __construct(AuthInterface $auth = null)
@@ -102,7 +100,6 @@ class LaravelReadQuery
             foreach ($orderBy->getOrderByInfo()->getOrderByPathSegments() as $order) {
                 foreach ($order->getSubPathSegments() as $subOrder) {
                     $subName = $subOrder->getName();
-                    $subName = (self::PK == $subName) ? $keyName : $subName;
                     $subName = $tableName.'.'.$subName;
                     $sourceEntityInstance = $sourceEntityInstance->orderBy(
                         $subName,
@@ -279,7 +276,6 @@ class LaravelReadQuery
             return null;
         }
         $result = $sourceEntityInstance->first();
-        $result->PrimaryKey = $result->getKey();
 
         return $result;
     }
@@ -406,7 +402,6 @@ class LaravelReadQuery
     {
         if ($keyDescriptor) {
             foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
-                $key = (self::PK == $key) ? $sourceEntityInstance->getKeyName() : $key;
                 $trimValue = trim($value[0], '\'');
                 $sourceEntityInstance = $sourceEntityInstance->where($key, $trimValue);
             }
@@ -460,7 +455,6 @@ class LaravelReadQuery
         for ($i = 0; $i < $numValues; $i++) {
             $relation = $segments[$i]->isAscending() ? '>' : '<';
             $name = $segments[$i]->getSubPathSegments()[0]->getName();
-            $name = (self::PK == $name) ? $keyName : $name;
             $parameters[$name] = ['direction' => $relation, 'value' => trim($values[$i][0], '\'')];
         }
 
