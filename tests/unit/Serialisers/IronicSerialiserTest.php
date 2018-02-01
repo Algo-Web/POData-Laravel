@@ -463,7 +463,7 @@ class IronicSerialiserTest extends SerialiserTestBase
             'eTag'
         );
         $mediaLink = new ODataMediaLink(
-            'TestMorphTarget',
+            'Data.TestMorphTarget',
             '/$value',
             'TestMorphTargets(id=42)/$value',
             '*/*',
@@ -478,7 +478,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $expected->editLink->url = 'TestMorphTargets(id=42)';
         $expected->editLink->name = 'edit';
         $expected->editLink->title = 'TestMorphTarget';
-        $expected->type = new ODataCategory('TestMorphTarget');
+        $expected->type = new ODataCategory('Data.TestMorphTarget');
         $expected->propertyContent = $propContent;
         $expected->links[] = $odataLink;
         $expected->links[] = $odataLink1;
@@ -633,7 +633,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $model->shouldReceive('metadata')->andReturn($metadata);
         $model->id = 1;
         $model->name = 'Name';
-        $model->shouldReceive('getAttribute')->withArgs(['manySource'])->andReturn([]);
+        $model->shouldReceive('getAttribute')->withArgs(['manySource'])->andReturn(collect([]));
 
         $result = new QueryResult();
         $result->results = $model;
@@ -651,7 +651,9 @@ class IronicSerialiserTest extends SerialiserTestBase
         $ironic->shouldReceive('getUpdated')->andReturn($known);
 
         $ironicResult = $ironic->writeTopLevelElement($result);
-        $this->assertNull($ironicResult->links[0]->expandedResult);
+        $this->assertTrue($ironicResult->links[0]->expandedResult instanceof ODataFeed);
+        $this->assertEquals(0, count($ironicResult->links[0]->expandedResult->entries));
+
     }
 
     public function testCrankshaftFeedExpansion()
@@ -696,7 +698,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $hasMany->shouldReceive('getResults')->andReturn([$targ]);
 
         $emptyMany = m::mock(HasMany::class)->makePartial();
-        $emptyMany->shouldReceive('getResults')->andReturn([]);
+        $emptyMany->shouldReceive('getResults')->andReturn(collect([]));
 
         $src1 = m::mock(TestMonomorphicSource::class)->makePartial();
         $src1->shouldReceive('metadata')->andReturn($metadata);
@@ -740,8 +742,10 @@ class IronicSerialiserTest extends SerialiserTestBase
         $this->assertNull($ironicResult->entries[1]->links[0]->expandedResult);
         $this->assertNull($ironicResult->entries[2]->links[0]->expandedResult);
         $this->assertTrue($ironicResult->entries[0]->links[1]->expandedResult instanceof ODataFeed);
-        $this->assertNull($ironicResult->entries[1]->links[1]->expandedResult);
+        $this->assertTrue($ironicResult->entries[0]->links[1]->expandedResult instanceof ODataFeed);
+        $this->assertEquals(1, count($ironicResult->entries[0]->links[1]->expandedResult));
         $this->assertTrue($ironicResult->entries[2]->links[1]->expandedResult instanceof ODataFeed);
+        $this->assertEquals(1, count($ironicResult->entries[2]->links[1]->expandedResult));
     }
 
     public function testGetConcreteTypeFromAbstractTypeWhereAbstractHasNoDerivedTypes()

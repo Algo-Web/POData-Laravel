@@ -322,15 +322,15 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $query = m::mock(LaravelQuery::class);
 
         $expandNode = m::mock(ExpandedProjectionNode::class);
-        $expandNode->shouldReceive('canSelectAllProperties')->andReturn(true);
-        $expandNode->shouldReceive('isExpansionSpecified')->andReturn(false);
-        $expandNode->shouldReceive('findNode')->andReturn(null);
+        $expandNode->shouldReceive('canSelectAllProperties')->andReturn(true)->times(0);
+        $expandNode->shouldReceive('isExpansionSpecified')->andReturn(false)->times(0);
+        $expandNode->shouldReceive('findNode')->andReturn(null)->times(4);
 
         $node = m::mock(RootProjectionNode::class);
-        $node->shouldReceive('getPropertyName')->andReturn('oneSource');
-        $node->shouldReceive('isExpansionSpecified')->andReturn(true, true, true, false);
+        $node->shouldReceive('getPropertyName')->andReturn('oneSource')->times(0);
+        $node->shouldReceive('isExpansionSpecified')->andReturn(true)->times(0);
         $node->shouldReceive('canSelectAllProperties')->andReturn(true);
-        $node->shouldReceive('findNode')->andReturn($expandNode);
+        $node->shouldReceive('findNode')->andReturn($expandNode)->times(12);
 
         $service = new TestDataService($query, $meta, $host);
         $processor = $service->handleRequest();
@@ -364,15 +364,19 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $result->results = $model;
 
         $objectResult = $object->writeTopLevelElement($result);
+        $ironicResult = $ironic->writeTopLevelElement($result);
+        $this->assertEquals(get_class($objectResult), get_class($ironicResult));
 
         // check that object result is properly set up - if not, no point comparing it to anything
         $this->assertTrue($objectResult->links[0]->isExpanded);
         $this->assertFalse($objectResult->links[0]->isCollection);
         $this->assertTrue($objectResult->links[1]->isExpanded);
         $this->assertTrue($objectResult->links[1]->isCollection);
+        $this->assertTrue($ironicResult->links[0]->isExpanded);
+        $this->assertFalse($ironicResult->links[0]->isCollection);
+        $this->assertTrue($ironicResult->links[1]->isExpanded);
+        $this->assertTrue($ironicResult->links[1]->isCollection);
 
-        $ironicResult = $ironic->writeTopLevelElement($result);
-        $this->assertEquals(get_class($objectResult), get_class($ironicResult));
         $this->assertEquals($objectResult, $ironicResult, '', 0, 20);
 
         $numProperties = count($objectResult->propertyContent->properties);
@@ -520,6 +524,8 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $link->title = 'manySource';
         $link->type = 'application/atom+xml;type=feed';
         $link->url = 'TestMonomorphicManySources(id=1)/manySource';
+        $link->isCollection = true;
+        $link->isExpanded = false;
 
         $expected = new ODataEntry();
         $expected->id = 'http://localhost/odata.svc/TestMonomorphicManySources(id=1)';
@@ -529,7 +535,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $expected->editLink->url = 'TestMonomorphicManySources(id=1)';
         $expected->editLink->name = 'edit';
         $expected->editLink->title = 'TestMonomorphicManySource';
-        $expected->type = new ODataCategory('TestMonomorphicManySource');
+        $expected->type = new ODataCategory('Data.TestMonomorphicManySource');
         $expected->isMediaLinkEntry = false;
         $expected->resourceSetName = 'TestMonomorphicManySources';
         $expected->links = [$link];
@@ -654,7 +660,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $feed1->editLink->url = 'TestMonomorphicTargets(id=1)';
         $feed1->editLink->name = 'edit';
         $feed1->editLink->title = 'TestMonomorphicTarget';
-        $feed1->type = new ODataCategory('TestMonomorphicTarget');
+        $feed1->type = new ODataCategory('Data.TestMonomorphicTarget');
         $feed1->propertyContent = $feed1Content;
         $feed1->isMediaLinkEntry = false;
         $feed1->resourceSetName = 'TestMonomorphicTargets';
@@ -667,7 +673,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $feed2->editLink->url = 'TestMonomorphicTargets(id=2)';
         $feed2->editLink->name = 'edit';
         $feed2->editLink->title = 'TestMonomorphicTarget';
-        $feed2->type = new ODataCategory('TestMonomorphicTarget');
+        $feed2->type = new ODataCategory('Data.TestMonomorphicTarget');
         $feed2->propertyContent = $feed2Content;
         $feed2->isMediaLinkEntry = false;
         $feed2->resourceSetName = 'TestMonomorphicTargets';
@@ -712,7 +718,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $expected->editLink->url = 'TestMonomorphicSources(id=1)';
         $expected->editLink->name = 'edit';
         $expected->editLink->title = 'TestMonomorphicSource';
-        $expected->type = new ODataCategory('TestMonomorphicSource');
+        $expected->type = new ODataCategory('Data.TestMonomorphicSource');
         $expected->propertyContent = $propContent;
         $expected->links = !$isFirst ? [$link1, $link2] : [$link2, $link1];
         $expected->isMediaLinkEntry = false;
