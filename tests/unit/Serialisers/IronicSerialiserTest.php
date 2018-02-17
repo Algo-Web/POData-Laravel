@@ -653,7 +653,6 @@ class IronicSerialiserTest extends SerialiserTestBase
         $ironicResult = $ironic->writeTopLevelElement($result);
         $this->assertTrue($ironicResult->links[0]->expandedResult instanceof ODataFeed);
         $this->assertEquals(0, count($ironicResult->links[0]->expandedResult->entries));
-
     }
 
     public function testCrankshaftFeedExpansion()
