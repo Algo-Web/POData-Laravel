@@ -176,10 +176,8 @@ class IronicSerialiserTest extends SerialiserTestBase
         $mockService = m::mock(IService::class);
         $mockService->shouldReceive('getHost->getAbsoluteServiceUri->getUrlAsString')
             ->andReturn('http://localhost/odata.svc/Models');
-        $kidNode = m::mock(ExpandedProjectionNode::class);
-        $kidNode->shouldReceive('findNode')->andReturn(null)->once();
         $node = m::mock(RootProjectionNode::class);
-        $node->shouldReceive('findNode')->withArgs(['edge'])->andReturn($kidNode)->once();
+        $node->shouldReceive('findNode')->withArgs(['edge'])->andReturn(null)->once();
         $request = m::mock(RequestDescription::class)->makePartial();
         $request->shouldReceive('getRootProjectionNode')->andReturn($node)->times(1);
 
@@ -207,10 +205,8 @@ class IronicSerialiserTest extends SerialiserTestBase
         $mockService = m::mock(IService::class);
         $mockService->shouldReceive('getHost->getAbsoluteServiceUri->getUrlAsString')
             ->andReturn('http://localhost/odata.svc/Models');
-        $kidNode = m::mock(ExpandedProjectionNode::class);
-        $kidNode->shouldReceive('findNode')->andReturn('eins')->once();
         $node = m::mock(RootProjectionNode::class);
-        $node->shouldReceive('findNode')->withArgs(['edge'])->andReturn($kidNode)->once();
+        $node->shouldReceive('findNode')->withArgs(['edge'])->andReturn('eins')->times(1);
         $request = m::mock(RequestDescription::class)->makePartial();
         $request->shouldReceive('getRootProjectionNode')->andReturn($node)->times(1);
 

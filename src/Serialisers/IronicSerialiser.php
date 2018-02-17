@@ -673,8 +673,9 @@ class IronicSerialiser implements IObjectSerialiser
             //which is 'ExpandedProjectionNode'
             // for resource identified by resource path.
             if (0 != $depth) {
-                for ($i = 1; $i < $depth; ++$i) {
-                    $expandedProjectionNode = $expandedProjectionNode->findNode($segmentNames[$i]['prop']);
+                for ($i = 2; $i < $depth; ++$i) {
+                    $segName = $segmentNames[$i]['prop'];
+                    $expandedProjectionNode = $expandedProjectionNode->findNode($segName);
                     assert(null !== $expandedProjectionNode, 'is_null($expandedProjectionNode)');
                     assert(
                         $expandedProjectionNode instanceof ExpandedProjectionNode,

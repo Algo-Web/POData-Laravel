@@ -17,6 +17,7 @@ use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -324,15 +325,15 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $expandNode = m::mock(ExpandedProjectionNode::class);
         $expandNode->shouldReceive('canSelectAllProperties')->andReturn(true)->times(0);
         $expandNode->shouldReceive('isExpansionSpecified')->andReturn(false)->times(0);
-        $expandNode->shouldReceive('findNode')->andReturn(null)->times(4);
+        $expandNode->shouldReceive('findNode')->andReturn(null)->times(0);
 
         $node = m::mock(RootProjectionNode::class);
         $node->shouldReceive('getPropertyName')->andReturn('oneSource')->times(0);
         $node->shouldReceive('isExpansionSpecified')->andReturn(true)->times(0);
         $node->shouldReceive('canSelectAllProperties')->andReturn(true);
-        $node->shouldReceive('findNode')->withArgs(['oneSource'])->andReturn($expandNode)->times(4);
-        $node->shouldReceive('findNode')->withArgs(['manySource'])->andReturn($expandNode)->times(4);
-        $node->shouldReceive('findNode')->andReturn(null)->times(4);
+        $node->shouldReceive('findNode')->withArgs(['oneSource'])->andReturn($expandNode)->times(2);
+        $node->shouldReceive('findNode')->withArgs(['manySource'])->andReturn($expandNode)->times(2);
+        $node->shouldReceive('findNode')->andReturn(null)->times(8);
 
         $service = new TestDataService($query, $meta, $host);
         $processor = $service->handleRequest();
@@ -906,5 +907,193 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $expectedLinksCount = 2;
         $actualLinksCount = count($actual->links[0]->expandedResult->entries);
         $this->assertEquals($expectedLinksCount, $actualLinksCount);
+    }
+
+    public function testExpandSingleModelEmpty()
+    {
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')
+            ->andReturn('/odata.svc/TestMonomorphicSources(id=42)?$expand=oneSource');
+        $request->shouldReceive('fullUrl')
+            ->andReturn('http://localhost/odata.svc/TestMonomorphicSources(id=42)?$expand=oneSource');
+        $request->request = new ParameterBag(['$expand' => 'oneSource']);
+
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $source = new TestMonomorphicSource($metadata, null);
+        $target = new TestMonomorphicTarget($metadata, null);
+
+        App::instance(TestMonomorphicSource::class, $source);
+        App::instance(TestMonomorphicTarget::class, $target);
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri('/odata.svc/');
+
+        $holder = new MetadataGubbinsHolder();
+        $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
+        $metaProv->boot();
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        $expandNode = m::mock(ExpandedProjectionNode::class);
+        $expandNode->shouldReceive('canSelectAllProperties')->andReturn(true)->times(0);
+        $expandNode->shouldReceive('isExpansionSpecified')->andReturn(false)->times(0);
+        $expandNode->shouldReceive('findNode')->andReturn(null)->times(0);
+
+        $node = m::mock(RootProjectionNode::class);
+        $node->shouldReceive('getPropertyName')->andReturn('oneSource')->times(0);
+        $node->shouldReceive('isExpansionSpecified')->andReturn(true)->times(0);
+        $node->shouldReceive('canSelectAllProperties')->andReturn(true);
+        $node->shouldReceive('findNode')->withArgs(['oneSource'])->andReturn($expandNode)->times(2);
+        $node->shouldReceive('findNode')->withArgs(['manySource'])->andReturn(null)->times(2);
+
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $request = $processor->getRequest();
+        $request->setRootProjectionNode($node);
+
+        $object = new ObjectModelSerializer($service, $request);
+        $ironic = new IronicSerialiser($service, $request);
+
+        $belongsTo = m::mock(BelongsTo::class)->makePartial();
+        $belongsTo->shouldReceive('getResults')->andReturn(null);
+        $targ = m::mock(TestMonomorphicTarget::class)->makePartial();
+        $targ->shouldReceive('metadata')->andReturn($metadata);
+        $targ->shouldReceive('manyTarget')->andReturn($belongsTo);
+        $targ->shouldReceive('oneTarget')->andReturn($belongsTo);
+        $targ->id = 11;
+
+        $hasOne = m::mock(HasMany::class)->makePartial();
+        $hasOne->shouldReceive('getResults')->andReturn(null);
+
+        $hasMany = m::mock(HasMany::class)->makePartial();
+        $hasMany->shouldReceive('getResults')->andReturn([$targ]);
+
+        $model = m::mock(TestMonomorphicSource::class)->makePartial();
+        $model->shouldReceive('hasOne')->andReturn($hasOne);
+        $model->shouldReceive('manySource')->andReturn($hasMany);
+        $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->id = 42;
+
+        $result = new QueryResult();
+        $result->results = $model;
+
+        $objectResult = $object->writeTopLevelElement($result);
+        $ironicResult = $ironic->writeTopLevelElement($result);
+        $this->assertEquals(get_class($objectResult), get_class($ironicResult));
+
+        $this->assertEquals($objectResult, $ironicResult, '', 0, 20);
+    }
+
+    public function testExpandSingleModelWithArrayPayload()
+    {
+        $request = $this->setUpRequest();
+        $request->shouldReceive('prepareRequestUri')
+            ->andReturn('/odata.svc/TestMonomorphicSources(id=42)?$expand=oneSource');
+        $request->shouldReceive('fullUrl')
+            ->andReturn('http://localhost/odata.svc/TestMonomorphicSources(id=42)?$expand=oneSource');
+        $request->request = new ParameterBag(['$expand' => 'oneSource']);
+
+        $metadata = [];
+        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $source = new TestMonomorphicSource($metadata, null);
+        $target = new TestMonomorphicTarget($metadata, null);
+
+        App::instance(TestMonomorphicSource::class, $source);
+        App::instance(TestMonomorphicTarget::class, $target);
+
+        $op = new OperationContextAdapter($request);
+        $host = new ServiceHost($op, $request);
+        $host->setServiceUri('/odata.svc/');
+
+        $holder = new MetadataGubbinsHolder();
+        $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
+        $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
+        $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
+        $metaProv->reset();
+        $metaProv->boot();
+
+        $meta = App::make('metadata');
+
+        $query = m::mock(LaravelQuery::class);
+
+        $expandNode = m::mock(ExpandedProjectionNode::class);
+        $expandNode->shouldReceive('canSelectAllProperties')->andReturn(true)->times(0);
+        $expandNode->shouldReceive('isExpansionSpecified')->andReturn(false)->times(0);
+        $expandNode->shouldReceive('findNode')->andReturn(null)->times(0);
+
+        $node = m::mock(RootProjectionNode::class);
+        $node->shouldReceive('getPropertyName')->andReturn('oneSource')->times(0);
+        $node->shouldReceive('isExpansionSpecified')->andReturn(true)->times(0);
+        $node->shouldReceive('canSelectAllProperties')->andReturn(true);
+        $node->shouldReceive('findNode')->withArgs(['oneSource'])->andReturn($expandNode)->times(2);
+        $node->shouldReceive('findNode')->andReturn(null)->times(6);
+
+        $service = new TestDataService($query, $meta, $host);
+        $processor = $service->handleRequest();
+        $request = $processor->getRequest();
+        $request->setRootProjectionNode($node);
+
+        $ironicArray = new IronicSerialiser($service, $request);
+        $ironicSingle = new IronicSerialiser($service, $request);
+
+        $belongsTo = m::mock(BelongsTo::class)->makePartial();
+        $belongsTo->shouldReceive('getResults')->andReturn(null);
+        $targ = m::mock(TestMonomorphicTarget::class)->makePartial();
+        $targ->shouldReceive('metadata')->andReturn($metadata);
+        $targ->shouldReceive('manyTarget')->andReturn($belongsTo);
+        $targ->shouldReceive('oneTarget')->andReturn($belongsTo);
+        $targ->id = 11;
+
+        $hasOne = m::mock(HasOne::class)->makePartial();
+        $hasOne->shouldReceive('getResults')->andReturn([$targ])->times(1);
+
+        $hasTwo = m::mock(HasOne::class)->makePartial();
+        $hasTwo->shouldReceive('getResults')->andReturn($targ)->times(1);
+
+        $hasMany = m::mock(HasMany::class)->makePartial();
+        $hasMany->shouldReceive('getResults')->andReturn(collect([]));
+
+        $model = m::mock(TestMonomorphicSource::class)->makePartial();
+        $model->shouldReceive('oneSource')->andReturn($hasTwo)->times(1);
+        $model->shouldReceive('manySource')->andReturn($hasMany);
+        $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->id = 42;
+
+        $arrayModel = m::mock(TestMonomorphicSource::class)->makePartial();
+        $arrayModel->shouldReceive('oneSource')->andReturn($hasOne)->times(1);
+        $arrayModel->shouldReceive('manySource')->andReturn($hasMany);
+        $arrayModel->shouldReceive('metadata')->andReturn($metadata);
+        $arrayModel->id = 42;
+
+        $result = new QueryResult();
+        $result->results = $model;
+        $this->assertTrue(is_object($result->results));
+
+        $arrayResult = new QueryResult();
+        $arrayResult->results = $arrayModel;
+
+        $ironicArrayResult = $ironicArray->writeTopLevelElement($arrayResult);
+        $ironicSingleResult = $ironicSingle->writeTopLevelElement($result);
+        $this->assertEquals(get_class($ironicSingleResult), get_class($ironicArrayResult));
+
+        // null out media link tags - don't care if they are different as they're time based - we only want to see
+        // if the ironic serialiser can handle payloads in and out of arrays
+        $ironicArrayResult->mediaLink->eTag = null;
+        $ironicSingleResult->mediaLink->eTag = null;
+
+        $this->assertEquals($ironicSingleResult, $ironicArrayResult, '', 0, 20);
     }
 }
