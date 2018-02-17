@@ -330,7 +330,7 @@ class IronicSerialiser implements IObjectSerialiser
                 $query = $entry;
             }
             assert($query instanceof QueryResult, get_class($query));
-            assert($query->results instanceof Model, get_class($query->results));
+            assert($query->results instanceof Model, get_class(/** @scrutinizer ignore-type */$query->results));
             $odata->entries[] = $this->writeTopLevelElement($query);
         }
 

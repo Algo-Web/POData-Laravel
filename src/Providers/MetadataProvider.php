@@ -152,7 +152,6 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
         $assoc = $objectModel->getAssociations();
-        $assoc = null === $assoc ? [] : $assoc;
         foreach ($assoc as $association) {
             assert($association->isOk());
             $this->implementAssociationsMonomorphic($objectModel, $association);
