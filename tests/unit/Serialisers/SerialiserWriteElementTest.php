@@ -330,7 +330,9 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $node->shouldReceive('getPropertyName')->andReturn('oneSource')->times(0);
         $node->shouldReceive('isExpansionSpecified')->andReturn(true)->times(0);
         $node->shouldReceive('canSelectAllProperties')->andReturn(true);
-        $node->shouldReceive('findNode')->andReturn($expandNode)->times(12);
+        $node->shouldReceive('findNode')->withArgs(['oneSource'])->andReturn($expandNode)->times(4);
+        $node->shouldReceive('findNode')->withArgs(['manySource'])->andReturn($expandNode)->times(4);
+        $node->shouldReceive('findNode')->andReturn(null)->times(4);
 
         $service = new TestDataService($query, $meta, $host);
         $processor = $service->handleRequest();

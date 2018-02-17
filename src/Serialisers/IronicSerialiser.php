@@ -241,6 +241,7 @@ class IronicSerialiser implements IObjectSerialiser
             $nuLink->isCollection = 'feed' === $propTail;
 
             $shouldExpand = $this->shouldExpandSegment($propName);
+
             $navProp = new ODataNavigationPropertyInfo($prop, $shouldExpand);
             if ($navProp->expanded) {
                 $this->expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName);
