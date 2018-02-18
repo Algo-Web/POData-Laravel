@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema as Schema;
+use Illuminate\Support\Str;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceStreamInfo;
@@ -127,17 +128,20 @@ class MetadataProvider extends MetadataBaseProvider
     private function implement(Map $objectModel)
     {
         $meta = App::make('metadata');
+        $namespace = $meta->getContainerNamespace().'.';
+
         $entities = $objectModel->getEntities();
         foreach ($entities as $entity) {
             $baseType = null;
             $className = $entity->getClassName();
             $entityName = $entity->getName();
+            $pluralName = Str::plural($entityName);
             $entityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, null, false, $baseType);
             assert($entityType->hasBaseType() === isset($baseType));
             $entity->setOdataResourceType($entityType);
             $this->implementProperties($entity);
-            $meta->addResourceSet($entity->getClassName(), $entityType);
-            $meta->oDataEntityMap[$className] = $meta->oDataEntityMap[$entityName];
+            $meta->addResourceSet($pluralName, $entityType);
+            $meta->oDataEntityMap[$className] = $meta->oDataEntityMap[$namespace.$entityName];
         }
         $metaCount = count($meta->oDataEntityMap);
         $entityCount = count($entities);
@@ -148,7 +152,6 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
         $assoc = $objectModel->getAssociations();
-        $assoc = null === $assoc ? [] : $assoc;
         foreach ($assoc as $association) {
             assert($association->isOk());
             $this->implementAssociationsMonomorphic($objectModel, $association);

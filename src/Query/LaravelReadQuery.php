@@ -485,7 +485,6 @@ class LaravelReadQuery
             // default no-filter case, palm processing off to database engine - is a lot faster
             $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($rawLoad)->get();
             $resultCount = $bulkSetCount;
-            return array($bulkSetCount, $resultSet, $resultCount, $skip);
         } elseif ($bigSet) {
             assert(isset($isvalid), 'Filter closure not set');
             $resultSet = collect([]);
@@ -514,7 +513,6 @@ class LaravelReadQuery
             // clean up residual to-be-skipped records
             $resultSet = $resultSet->slice($skip);
             $resultCount = $rawCount;
-            return array($bulkSetCount, $resultSet, $resultCount, $skip);
         } else {
             if ($sourceEntityInstance instanceof Model) {
                 $sourceEntityInstance = $sourceEntityInstance->getQuery();
@@ -525,9 +523,8 @@ class LaravelReadQuery
 
             if (isset($skip)) {
                 $resultSet = $resultSet->slice($skip);
-                return array($bulkSetCount, $resultSet, $resultCount, $skip);
             }
-            return array($bulkSetCount, $resultSet, $resultCount, $skip);
         }
+        return [$bulkSetCount, $resultSet, $resultCount, $skip];
     }
 }

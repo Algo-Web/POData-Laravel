@@ -237,11 +237,17 @@ class IronicSerialiser implements IObjectSerialiser
             $nuLink->name = ODataConstants::ODATA_RELATED_NAMESPACE . $propName;
             $nuLink->url = $relativeUri . '/' . $propName;
             $nuLink->type = $propType;
+            $nuLink->isExpanded = false;
+            $nuLink->isCollection = 'feed' === $propTail;
 
-            $navProp = new ODataNavigationPropertyInfo($prop, $this->shouldExpandSegment($propName));
+            $shouldExpand = $this->shouldExpandSegment($propName);
+
+            $navProp = new ODataNavigationPropertyInfo($prop, $shouldExpand);
             if ($navProp->expanded) {
                 $this->expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName);
             }
+            $nuLink->isExpanded = isset($nuLink->expandedResult);
+            assert(null !== $nuLink->isCollection);
 
             $links[] = $nuLink;
         }
@@ -324,7 +330,7 @@ class IronicSerialiser implements IObjectSerialiser
                 $query = $entry;
             }
             assert($query instanceof QueryResult, get_class($query));
-            assert($query->results instanceof Model, get_class($query->results));
+            assert($query->results instanceof Model, get_class(/** @scrutinizer ignore-type */$query->results));
             $odata->entries[] = $this->writeTopLevelElement($query);
         }
 
@@ -667,8 +673,9 @@ class IronicSerialiser implements IObjectSerialiser
             //which is 'ExpandedProjectionNode'
             // for resource identified by resource path.
             if (0 != $depth) {
-                for ($i = 1; $i < $depth; ++$i) {
-                    $expandedProjectionNode = $expandedProjectionNode->findNode($segmentNames[$i]['prop']);
+                for ($i = 2; $i < $depth; ++$i) {
+                    $segName = $segmentNames[$i]['prop'];
+                    $expandedProjectionNode = $expandedProjectionNode->findNode($segName);
                     assert(null !== $expandedProjectionNode, 'is_null($expandedProjectionNode)');
                     assert(
                         $expandedProjectionNode instanceof ExpandedProjectionNode,
@@ -890,13 +897,22 @@ class IronicSerialiser implements IObjectSerialiser
         $nextName = $prop->getResourceType()->getName();
         $nuLink->isExpanded = true;
         $value = $entryObject->results->$propName;
-        $isCombo = is_array($value) || $value instanceof Collection;
-        $isCollection = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind || $isCombo;
+        $isCollection = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
         $nuLink->isCollection = $isCollection;
+
+        if (is_array($value)) {
+            if (1 == count($value) && !$isCollection) {
+                $value = $value[0];
+            } else {
+                $value = collect($value);
+            }
+        }
 
         $result = new QueryResult();
         $result->results = $value;
-        $resultCount = $isCollection ? count($value) : 1;
+        $nullResult = null === $value;
+        $isSingleton = $value instanceof Model;
+        $resultCount = $nullResult ? 0 : ($isSingleton ? 1 : $value->count());
 
         if (0 < $resultCount) {
             $newStackLine = ['type' => $nextName, 'prop' => $propName, 'count' => $resultCount];
@@ -909,18 +925,25 @@ class IronicSerialiser implements IObjectSerialiser
                 $expandedResult = $this->writeTopLevelElements($result);
             }
             $nuLink->expandedResult = $expandedResult;
-        }
-        if (!isset($nuLink->expandedResult)) {
-            $nuLink->isCollection = null;
-            $nuLink->isExpanded = null;
         } else {
-            if (isset($nuLink->expandedResult->selfLink)) {
-                $nuLink->expandedResult->selfLink->title = $propName;
-                $nuLink->expandedResult->selfLink->url = $nuLink->url;
-                $nuLink->expandedResult->title = new ODataTitle($propName);
-                $nuLink->expandedResult->id = rtrim($this->absoluteServiceUri, '/') . '/' . $nuLink->url;
+            $type = $this->getService()->getProvidersWrapper()->resolveResourceType($nextName);
+            if (!$isCollection) {
+                $result = new ODataEntry();
+                $result->resourceSetName = $type->getName();
+            } else {
+                $result = new ODataFeed();
+                $result->selfLink = new ODataLink();
+                $result->selfLink->name = ODataConstants::ATOM_SELF_RELATION_ATTRIBUTE_VALUE;
             }
+            $nuLink->expandedResult = $result;
         }
+        if (isset($nuLink->expandedResult->selfLink)) {
+            $nuLink->expandedResult->selfLink->title = $propName;
+            $nuLink->expandedResult->selfLink->url = $nuLink->url;
+            $nuLink->expandedResult->title = new ODataTitle($propName);
+            $nuLink->expandedResult->id = rtrim($this->absoluteServiceUri, '/') . '/' . $nuLink->url;
+        }
+        assert(isset($nuLink->expandedResult));
     }
 
     /**
