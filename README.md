@@ -20,6 +20,7 @@ Edit `config/app.php` and add this to providers section:
 AlgoWeb\PODataLaravel\Providers\MetadataProvider::class,
 AlgoWeb\PODataLaravel\Providers\MetadataRouteProvider::class,
 AlgoWeb\PODataLaravel\Providers\QueryProvider::class,
+AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider::class,
 ```
 
 You then add the trait to the models you want to expose.
