@@ -178,6 +178,20 @@ class MetadataTraitTest extends TestCase
         }
     }
 
+    public function testMetadataGenerationFromExplicitModel()
+    {
+        $expected = [];
+        $expected['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $expected['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $foo = new TestExplicitModel();
+        $result = $foo->metadata();
+        $this->assertEquals(count($expected), count($result));
+        foreach ($expected as $key => $val) {
+            $this->assertTrue($val === $result[$key]);
+        }
+    }
+
     /**
      * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::metadataMask
      */
