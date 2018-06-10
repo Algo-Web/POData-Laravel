@@ -78,7 +78,6 @@ class ODataController extends BaseController
             $responseCode = $headers[\POData\Common\ODataConstants::HTTPRESPONSE_HEADER_STATUS_CODE];
             $responseCode = isset($responseCode) ? intval($responseCode) : 200;
             $response = new Response($content, $responseCode);
-            $response->setStatusCode($headers['Status']);
 
             foreach ($headers as $headerName => $headerValue) {
                 if (null !== $headerValue) {
