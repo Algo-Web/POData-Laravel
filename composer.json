@@ -10,7 +10,7 @@
         "laravel/framework": ">=5.1.11",
         "illuminate/http": ">=5.1.11",
         "voku/anti-xss": "2.1.*",
-        "symfony/yaml": "^3.4"
+        "symfony/yaml": "^2.7"
     },
     "require-dev": {
         "mockery/mockery": "dev-master",
