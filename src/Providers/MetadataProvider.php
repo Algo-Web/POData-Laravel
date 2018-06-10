@@ -311,7 +311,11 @@ class MetadataProvider extends MetadataBaseProvider
     {
         $classes = $this->getClassMap();
         $ends = [];
-        $startName = $this->app->getNamespace();
+        try {
+            $startName = App::getNamespace();
+        } catch (\Exception $e) {
+            $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : 'App';
+        }
         foreach ($classes as $name) {
             if (\Illuminate\Support\Str::startsWith($name, $startName)) {
                 if (in_array('AlgoWeb\\PODataLaravel\\Models\\MetadataTrait', class_uses($name)) &&
