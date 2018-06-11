@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Mockery\Mock;
+use POData\Common\InvalidOperationException;
 
 trait MetadataTrait
 {
@@ -37,7 +38,9 @@ trait MetadataTrait
      */
     public function metadata()
     {
-        assert($this instanceof Model, get_class($this));
+        if (!$this instanceof Model) {
+            throw new InvalidOperationException(get_class($this));
+        }
 
         if (0 !== count(self::$tableData)) {
             return self::$tableData;

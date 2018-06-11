@@ -739,12 +739,12 @@ class LaravelQueryTest extends TestCase
 
         $foo = new LaravelQuery();
 
-        $expected = 'assert(): Model not retrieved from Eloquent relation failed';
+        $expected = 'Model not retrieved from Eloquent relation';
         $actual = null;
 
         try {
             $result = $foo->getRelatedResourceReference($srcResource, $sourceEntity, $dstResource, $property);
-        } catch (\ErrorException $e) {
+        } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
@@ -1745,7 +1745,7 @@ class LaravelQueryTest extends TestCase
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
 
-        $expected = 'assert(): Both input entities must be Eloquent models failed';
+        $expected = 'Both input entities must be Eloquent models';
         $actual = null;
 
         try {
@@ -1782,7 +1782,7 @@ class LaravelQueryTest extends TestCase
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
 
-        $expected = 'assert(): Both input entities must be Eloquent models failed';
+        $expected = 'Both input entities must be Eloquent models';
         $actual = null;
 
         try {
@@ -1819,7 +1819,7 @@ class LaravelQueryTest extends TestCase
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
 
-        $expected = 'assert(): Both input entities must be Eloquent models failed';
+        $expected = 'Both input entities must be Eloquent models';
         $actual = null;
 
         try {
@@ -1964,7 +1964,7 @@ class LaravelQueryTest extends TestCase
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
 
-        $expected = 'assert(): Both input entities must be Eloquent models failed';
+        $expected = 'Both input entities must be Eloquent models';
         $actual = null;
 
         try {
@@ -2001,7 +2001,7 @@ class LaravelQueryTest extends TestCase
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
 
-        $expected = 'assert(): Both input entities must be Eloquent models failed';
+        $expected = 'Both input entities must be Eloquent models';
         $actual = null;
 
         try {
@@ -2038,7 +2038,7 @@ class LaravelQueryTest extends TestCase
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
 
-        $expected = 'assert(): Both input entities must be Eloquent models failed';
+        $expected = 'Both input entities must be Eloquent models';
         $actual = null;
 
         try {

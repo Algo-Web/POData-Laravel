@@ -86,7 +86,9 @@ class LaravelReadQuery
             $keyName = $sourceEntityInstance->getRelated()->getKeyName();
             $tableName = $sourceEntityInstance->getRelated()->getTable();
         }
-        assert(isset($keyName));
+        if (null === $keyName) {
+            throw new InvalidOperationException('Key name not retrieved');
+        }
         $rawLoad = array_values(array_unique(array_merge($rawLoad, $modelLoad)));
 
         $checkInstance = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : null;
@@ -306,7 +308,9 @@ class LaravelReadQuery
         if (null === $result) {
             return null;
         }
-        assert($result instanceof Model, 'Model not retrieved from Eloquent relation');
+        if (!$result instanceof Model) {
+            throw new InvalidOperationException('Model not retrieved from Eloquent relation');
+        }
         if ($targetProperty->getResourceType()->getInstanceType()->getName() != get_class($result)) {
             return null;
         }
@@ -418,7 +422,9 @@ class LaravelReadQuery
         $load = (null === $eagerLoad) ? [] : $eagerLoad;
         $rawLoad = [];
         foreach ($load as $line) {
-            assert(is_string($line), 'Eager-load elements must be non-empty strings');
+            if (!is_string($line)) {
+                throw new InvalidOperationException('Eager-load elements must be non-empty strings');
+            }
             $lineParts = explode('/', $line);
             $numberOfParts = count($lineParts);
             for ($i = 0; $i<$numberOfParts; $i++) {

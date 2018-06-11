@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
+use POData\Common\InvalidOperationException;
 
 trait MetadataControllerTrait
 {
@@ -37,7 +38,9 @@ trait MetadataControllerTrait
         // enforce we're actually hooked up to a controller
         assert($this instanceof BaseController, get_class($this));
         // enforce that mapping is actually not empty
-        assert(0 < count($this->mapping), 'Mapping array must not be empty');
+        if (0 == count($this->mapping)) {
+            throw new InvalidOperationException('Mapping array must not be empty');
+        }
 
         if (!array_key_exists($modelName, $this->mapping)) {
             $msg = 'Metadata mapping for model ' . $modelName . ' not defined';

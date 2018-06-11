@@ -156,8 +156,13 @@ class IronicSerialiser implements IObjectSerialiser
             array_pop($this->lightStack);
             return null;
         }
-        assert($entryObject instanceof QueryResult, get_class($entryObject));
-        assert($entryObject->results instanceof Model, get_class($entryObject->results));
+        if (!$entryObject instanceof QueryResult) {
+            throw new InvalidOperationException(get_class($entryObject));
+        }
+        if (!$entryObject->results instanceof Model) {
+            throw new InvalidOperationException(get_class($entryObject->results));
+        }
+
         $this->loadStackIfEmpty();
 
         $baseURI = $this->isBaseWritten ? null : $this->absoluteServiceUriWithSlash;
@@ -676,11 +681,13 @@ class IronicSerialiser implements IObjectSerialiser
                 for ($i = 2; $i < $depth; ++$i) {
                     $segName = $segmentNames[$i]['prop'];
                     $expandedProjectionNode = $expandedProjectionNode->findNode($segName);
-                    assert(null !== $expandedProjectionNode, 'is_null($expandedProjectionNode)');
-                    assert(
-                        $expandedProjectionNode instanceof ExpandedProjectionNode,
-                        '$expandedProjectionNode not instanceof ExpandedProjectionNode'
-                    );
+                    if (null === $expandedProjectionNode) {
+                        throw new InvalidOperationException('is_null($expandedProjectionNode)');
+                    }
+                    if (!$expandedProjectionNode instanceof ExpandedProjectionNode) {
+                        $msg = '$expandedProjectionNode not instanceof ExpandedProjectionNode';
+                        throw new InvalidOperationException($msg);
+                    }
                 }
             }
         }
@@ -1084,7 +1091,9 @@ class IronicSerialiser implements IObjectSerialiser
     {
         if ($resourceType->isAbstract()) {
             $derived = $this->getMetadata()->getDerivedTypes($resourceType);
-            assert(0 < count($derived), 'Supplied abstract type must have at least one derived type');
+            if (0 == count($derived)) {
+                throw new InvalidOperationException('Supplied abstract type must have at least one derived type');
+            }
             foreach ($derived as $rawType) {
                 if (!$rawType->isAbstract()) {
                     $name = $rawType->getInstanceType()->getName();
@@ -1097,7 +1106,9 @@ class IronicSerialiser implements IObjectSerialiser
         }
         // despite all set up, checking, etc, if we haven't picked a concrete resource type,
         // wheels have fallen off, so blow up
-        assert(!$resourceType->isAbstract(), 'Concrete resource type not selected for payload ' . $payloadClass);
+        if ($resourceType->isAbstract()) {
+            throw new InvalidOperationException('Concrete resource type not selected for payload ' . $payloadClass);
+        }
         return $resourceType;
     }
 }
