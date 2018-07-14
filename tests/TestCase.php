@@ -4,9 +4,11 @@ namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use Illuminate\Cache\CacheManager;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolver;
 use Illuminate\Filesystem\FilesystemAdapter;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -17,6 +19,7 @@ use org\bovigo\vfs\vfsStreamDirectory;
 
 use org\bovigo\vfs\vfsStreamWrapper;
 use PHPUnit_Framework_TestCase;
+use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 
 class TestCase extends BaseTestCase
@@ -61,6 +64,10 @@ class TestCase extends BaseTestCase
      */
     public function createApplication()
     {
+        $version = $this->getLaravelVersion();
+        if (5 > $version['major']) {
+            throw new InvalidOperationException('Go home Composer, you\'re drunk!');
+        }
         $file = \Mockery::mock(FilesystemAdapter::class)->makePartial();
         $schema = \Mockery::mock(\Illuminate\Database\Schema\Blueprint::class)->makePartial();
         $grammar = \Mockery::mock(\Illuminate\Database\Schema\Grammars\Grammar::class)->makePartial();
@@ -81,8 +88,13 @@ class TestCase extends BaseTestCase
         $confRepo = \Mockery::mock(\Illuminate\Config\Repository::class)->makePartial();
         $confRepo->shouldReceive('shouldRecompile')->andReturn(false);
 
-        $cacheRepo = \Mockery::mock(\Illuminate\Cache\Repository::class)->makePartial();
-        $cacheStore = \Mockery::mock(\Illuminate\Cache\ArrayStore::class)->makePartial();
+        if (6 > $version['minor']) {
+            $cacheRepo = \Mockery::mock(\Illuminate\Cache\Repository::class)->makePartial();
+            $cacheStore = \Mockery::mock(\Illuminate\Cache\ArrayStore::class)->makePartial();
+        } else {
+            $cacheRepo = \Mockery::mock(\Illuminate\Cache\Repository::class)->makePartial();
+            $cacheStore = \Mockery::mock(\Illuminate\Cache\ArrayStore::class)->makePartial();
+        }
 
         $fileSys = \Mockery::mock(\Illuminate\Filesystem\Filesystem::class)->makePartial();
         $fileSys->shouldReceive('put')->andReturnNull();
@@ -99,6 +111,7 @@ class TestCase extends BaseTestCase
         // Lifted straight out of the stock bootstrap/app.php shipped with Laravel
         // and repointed to underlying classes
         $app = new \AlgoWeb\PODataLaravel\Models\TestApplication($fileSys);
+
         $app['env'] = 'testing';
         $app->instance('config', $confRepo);
         $app->config->set(
@@ -189,5 +202,24 @@ class TestCase extends BaseTestCase
             $grammar,
             $processor
         );
+    }
+
+    public function getRawLaravelVersion()
+    {
+        return Application::VERSION;
+    }
+
+    public function getLaravelVersion()
+    {
+        $raw = $this->getRawLaravelVersion();
+        $bitz = explode('.', $raw);
+        // check to see if we're running in a dev version
+        if (2 == count($bitz)) {
+            $payload = explode('-', $bitz[1]);
+            $version = ['major' => intval($bitz[0]), 'minor' => intval($payload[0]), 'patch' => $payload[1]];
+        } else {
+            $version = ['major' => intval($bitz[0]), 'minor' => intval($bitz[1]), 'patch' => $bitz[2]];
+        }
+        return $version;
     }
 }
