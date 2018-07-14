@@ -1,5 +1,7 @@
 Unreleased
 ----------
+   * Allow Eloquent models to explicitly define metadata
+     - Thank you to NoelDeMartin (noeldemartin@gmail.com) for contributing this
    * Make key-descriptor columns unambiguous when processed on models
    * Flatten residual references to PrimaryKey alias field
    * Handle batch processing requests
