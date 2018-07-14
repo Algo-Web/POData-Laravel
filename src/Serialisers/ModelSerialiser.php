@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use AlgoWeb\PODataLaravel\Query\LaravelReadQuery;
 use Illuminate\Database\Eloquent\Model;
+use POData\Common\InvalidOperationException;
 
 class ModelSerialiser
 {
@@ -28,7 +29,9 @@ class ModelSerialiser
     public function bulkSerialise($model)
     {
         $class = get_class($model);
-        assert($model instanceof Model, $class);
+        if (!$model instanceof Model) {
+            throw new InvalidOperationException($class);
+        }
         // dig up metadata
         if (!isset(self::$metadataCache[$class])) {
             self::$metadataCache[$class] = $model->metadata();
