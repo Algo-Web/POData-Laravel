@@ -156,11 +156,10 @@ class IronicSerialiser implements IObjectSerialiser
             array_pop($this->lightStack);
             return null;
         }
-        if (!$entryObject instanceof QueryResult) {
-            throw new InvalidOperationException(get_class($entryObject));
-        }
         if (!$entryObject->results instanceof Model) {
-            throw new InvalidOperationException(get_class($entryObject->results));
+            $res = $entryObject->results;
+            $msg = is_array($res) ? 'Entry object must be single Model' : get_class($res);
+            throw new InvalidOperationException($msg);
         }
 
         $this->loadStackIfEmpty();
@@ -347,7 +346,9 @@ class IronicSerialiser implements IObjectSerialiser
                 throw new InvalidOperationException(get_class($query));
             }
             if (!$query->results instanceof Model) {
-                throw new InvalidOperationException(get_class($query->results));
+                $res = $query->results;
+                $msg = is_array($res) ? 'Entry object must be single Model' : get_class($res);
+                throw new InvalidOperationException($msg);
             }
             $odata->entries[] = $this->writeTopLevelElement($query);
         }
@@ -799,7 +800,7 @@ class IronicSerialiser implements IObjectSerialiser
         $queryParameterString = $this->getNextPageLinkQueryParametersForRootResourceSet();
 
         $skipToken = $internalOrderByInfo->buildSkipTokenValue($lastObject);
-        if (null === $skipToken) {
+        if (empty($skipToken)) {
             throw new InvalidOperationException('!is_null($skipToken)');
         }
         $token = (1 < $numSegments) ? '$skiptoken=' : '$skip=';

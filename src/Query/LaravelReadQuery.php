@@ -298,7 +298,7 @@ class LaravelReadQuery
      * @param ResourceSet      $targetResourceSet    The entity set containing the entity pointed to by the nav property
      * @param ResourceProperty $targetProperty       The navigation property to fetch
      *
-     * @return object|null The related resource if found else null
+     * @return Model|null The related resource if found else null
      */
     public function getRelatedResourceReference(
         ResourceSet $sourceResourceSet,
@@ -351,7 +351,7 @@ class LaravelReadQuery
         $sourceEntityInstance = $sourceEntityInstance->$propertyName();
         $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
         $result = $this->getResource(null, null, [], [], $sourceEntityInstance);
-        if (!($result instanceof Model || null == $result)) {
+        if (!(null == $result || $result instanceof Model)) {
             $msg = 'GetResourceFromRelatedResourceSet must return an entity or null';
             throw new InvalidOperationException($msg);
         }

@@ -174,9 +174,6 @@ trait MetadataControllerTrait
      */
     private function checkCrudVerbDefined($crudVerb)
     {
-        if (!is_string($crudVerb)) {
-            throw new InvalidOperationException('');
-        }
         $lowVerb = strtolower($crudVerb);
         if (!in_array($lowVerb, $this->crudVerbs) && !in_array($crudVerb, $this->optionalVerbs)) {
             $msg = 'CRUD verb ' . $crudVerb . ' not defined';

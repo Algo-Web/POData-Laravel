@@ -40,7 +40,7 @@ abstract class AssociationStubBase
     /**
      * Target type this relation points to, if known.  Is null for known-side polymorphic relations.
      *
-     * @var string
+     * @var string|null
      */
     protected $targType;
 

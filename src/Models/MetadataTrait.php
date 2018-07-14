@@ -111,9 +111,11 @@ trait MetadataTrait
         return $tableData;
     }
 
-    /*
+    /**
      * Return the set of fields that are permitted to be in metadata
      * - following same visible-trumps-hidden guideline as Laravel
+     *
+     * @return array
      */
     public function metadataMask()
     {
@@ -636,7 +638,7 @@ trait MetadataTrait
     public function retrieveCasts()
     {
         $exists = method_exists($this, 'getCasts');
-        return $exists ? $this->getCasts() : $this->casts;
+        return $exists ? (array)$this->getCasts() : (array)$this->casts;
     }
 
     /**
@@ -646,10 +648,6 @@ trait MetadataTrait
      */
     public function getEagerLoad()
     {
-        if (!is_array($this->loadEagerRelations)) {
-            throw new InvalidOperationException('LoadEagerRelations not an array');
-        }
-
         return $this->loadEagerRelations;
     }
 
@@ -774,6 +772,11 @@ trait MetadataTrait
         return App::runningInConsole() && !App::runningUnitTests();
     }
 
+    /**
+     * Get columns for selected table
+     *
+     * @return array
+     */
     protected function getTableColumns()
     {
         if (0 === count(self::$tableColumns)) {
@@ -782,11 +785,16 @@ trait MetadataTrait
             $builder = $connect->getSchemaBuilder();
             $columns = $builder->getColumnListing($table);
 
-            self::$tableColumns = $columns;
+            self::$tableColumns = (array)$columns;
         }
         return self::$tableColumns;
     }
 
+    /**
+     * Get Doctrine columns for selected table
+     *
+     * @return array
+     */
     protected function getTableDoctrineColumns()
     {
         if (0 === count(self::$tableColumnsDoctrine)) {
@@ -806,6 +814,9 @@ trait MetadataTrait
         self::$tableColumns = [];
     }
 
+    /**
+     * @return array|null
+     */
     private function getRelationsHasManyKeyNames($foo)
     {
         $thruName = null;

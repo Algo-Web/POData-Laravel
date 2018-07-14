@@ -256,7 +256,7 @@ class LaravelBulkQuery
     public function getControllerContainer()
     {
         if (null === $this->controllerContainer) {
-            throw new InvalidOperationException(get_class($this->controllerContainer));
+            throw new InvalidOperationException('Controller container must not be null');
         }
         return $this->controllerContainer;
     }

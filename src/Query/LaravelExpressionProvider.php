@@ -140,7 +140,7 @@ class LaravelExpressionProvider implements IExpressionProvider
     /**
      * Get the resource type.
      *
-     * @return object|null
+     * @return ResourceType|null
      */
     public function getResourceType()
     {
