@@ -25,7 +25,7 @@ abstract class MetadataBaseProvider extends ServiceProvider
     protected function handlePostBoot($isCaching, $hasCache, $key, $meta)
     {
         if ($isCaching) {
-            assert(isset($hasCache));
+            $hasCache = isset($hasCache) ? boolval($hasCache) : false;
             if (!$hasCache) {
                 $cacheTime = env('APP_METADATA_CACHE_DURATION', null);
                 $cacheTime = !is_numeric($cacheTime) ? 10 : abs($cacheTime);
