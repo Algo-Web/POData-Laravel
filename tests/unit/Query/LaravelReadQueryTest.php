@@ -62,7 +62,7 @@ class LaravelReadQueryTest extends TestCase
 
     public function testSkipTokenWithSegmentValueCountMismatch()
     {
-        $expected = 'Method Mockery_';
+        $expected = 'Expected 1, got 0';
         $actual = null;
 
         $source = m::mock(TestModel::class)->makePartial();

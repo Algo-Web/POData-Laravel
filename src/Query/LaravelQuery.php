@@ -125,7 +125,9 @@ class LaravelQuery implements IQueryProvider
      */
     public function getControllerContainer()
     {
-        assert(null !== $this->controllerContainer, get_class($this->controllerContainer));
+        if (null === $this->controllerContainer) {
+            throw new InvalidOperationException(get_class($this->controllerContainer));
+        }
         return $this->controllerContainer;
     }
 
@@ -399,7 +401,10 @@ class LaravelQuery implements IQueryProvider
             );
         }
 
-        assert(null !== $data, 'Data must not be null');
+        if (null === $data) {
+            $msg = 'Data must not be null';
+            throw new InvalidOperationException($msg);
+        }
         if (is_object($data)) {
             $arrayData = (array) $data;
         } else {

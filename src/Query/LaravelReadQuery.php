@@ -254,7 +254,10 @@ class LaravelReadQuery
         $rawLoad = $this->processEagerLoadList($eagerLoad);
 
         if (null == $sourceEntityInstance) {
-            assert(null != $resourceSet);
+            if (null == $resourceSet) {
+                $msg = '';
+                throw new InvalidOperationException($msg);
+            }
             $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
         }
 
@@ -264,7 +267,10 @@ class LaravelReadQuery
         } elseif ($sourceEntityInstance instanceof Relation) {
             $modelLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
         }
-        assert(isset($modelLoad));
+        if (!(isset($modelLoad))) {
+            $msg = '';
+            throw new InvalidOperationException($msg);
+        }
 
         $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
         foreach ($whereCondition as $fieldName => $fieldValue) {
@@ -345,10 +351,10 @@ class LaravelReadQuery
         $sourceEntityInstance = $sourceEntityInstance->$propertyName();
         $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
         $result = $this->getResource(null, null, [], [], $sourceEntityInstance);
-        assert(
-            $result instanceof Model || null == $result,
-            'GetResourceFromRelatedResourceSet must return an entity or null'
-        );
+        if (!($result instanceof Model || null == $result)) {
+            $msg = 'GetResourceFromRelatedResourceSet must return an entity or null';
+            throw new InvalidOperationException($msg);
+        }
         return $result;
     }
 
@@ -457,7 +463,10 @@ class LaravelReadQuery
         $segments = $skipToken->getOrderByInfo()->getOrderByPathSegments();
         $values = $skipToken->getOrderByKeysInToken();
         $numValues = count($values);
-        assert($numValues == count($segments));
+        if ($numValues != count($segments)) {
+            $msg = 'Expected '.count($segments).', got '.$numValues;
+            throw new InvalidOperationException($msg);
+        }
 
         for ($i = 0; $i < $numValues; $i++) {
             $relation = $segments[$i]->isAscending() ? '>' : '<';
@@ -492,7 +501,10 @@ class LaravelReadQuery
             $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($rawLoad)->get();
             $resultCount = $bulkSetCount;
         } elseif ($bigSet) {
-            assert(isset($isvalid), 'Filter closure not set');
+            if (!(isset($isvalid))) {
+                $msg = 'Filter closure not set';
+                throw new InvalidOperationException($msg);
+            }
             $resultSet = collect([]);
             $rawCount = 0;
             $rawTop = null === $top ? $bulkSetCount : $top;
