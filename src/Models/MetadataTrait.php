@@ -39,6 +39,12 @@ trait MetadataTrait
     {
         assert($this instanceof Model, get_class($this));
 
+        if (0 !== count(self::$tableData)) {
+            return self::$tableData;
+        } elseif (isset($this->odata)) {
+            return self::$tableData = $this->odata;
+        }
+
         // Break these out separately to enable separate reuse
         $connect = $this->getConnection();
         $builder = $connect->getSchemaBuilder();
@@ -46,10 +52,7 @@ trait MetadataTrait
         $table = $this->getTable();
 
         if (!$builder->hasTable($table)) {
-            return [];
-        }
-        if (0 !== count(self::$tableData)) {
-            return self::$tableData;
+            return self::$tableData = [];
         }
 
         $columns = $this->getTableColumns();
