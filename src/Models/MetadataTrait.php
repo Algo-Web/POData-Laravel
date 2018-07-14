@@ -235,14 +235,17 @@ trait MetadataTrait
                         }
 
                         $code = trim(preg_replace('/\s\s+/', '', $code));
-                        assert(
-                            false !== stripos($code, 'function'),
-                            'Function definition must have keyword \'function\''
-                        );
+                        if (false === stripos($code, 'function')) {
+                            $msg = 'Function definition must have keyword \'function\'';
+                            throw new InvalidOperationException($msg);
+                        }
                         $begin = strpos($code, 'function(');
                         $code = substr($code, /** @scrutinizer ignore-type */$begin, strrpos($code, '}')-$begin+1);
                         $lastCode = $code[strlen(/** @scrutinizer ignore-type */$code)-1];
-                        assert('}' == $lastCode, 'Final character of function definition must be closing brace');
+                        if ('}' != $lastCode) {
+                            $msg = 'Final character of function definition must be closing brace';
+                            throw new InvalidOperationException($msg);
+                        }
                         foreach ([
                                      'hasMany',
                                      'hasManyThrough',
@@ -411,10 +414,10 @@ trait MetadataTrait
                         break;
                     }
                 }
-                assert(
-                    in_array($fkMethodName, $methodList),
-                    'Selected method, ' . $fkMethodName . ', not in method list'
-                );
+                if (!(in_array($fkMethodName, $methodList))) {
+                    $msg = 'Selected method, ' . $fkMethodName . ', not in method list';
+                    throw new InvalidOperationException($msg);
+                }
                 $rkMethodName = 'getQualifiedRelatedPivotKeyName';
                 foreach ($rkList as $option) {
                     if (in_array($option, $methodList)) {
@@ -422,10 +425,10 @@ trait MetadataTrait
                         break;
                     }
                 }
-                assert(
-                    in_array($rkMethodName, $methodList),
-                    'Selected method, ' . $rkMethodName . ', not in method list'
-                );
+                if (!(in_array($rkMethodName, $methodList))) {
+                    $msg = 'Selected method, ' . $rkMethodName . ', not in method list';
+                    throw new InvalidOperationException($msg);
+                }
                 $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
                 static::$methodPrimary[get_class($foo)] = $line;
             }
@@ -448,19 +451,25 @@ trait MetadataTrait
             } else {
                 $methodList = get_class_methods(get_class($foo));
                 $fkCombo = array_values(array_intersect($fkList, $methodList));
-                assert(1 <= count($fkCombo), 'Expected at least 1 element in foreign-key list, got ' . count($fkCombo));
+                if (!(1 <= count($fkCombo))) {
+                    $msg = 'Expected at least 1 element in foreign-key list, got ' . count($fkCombo);
+                    throw new InvalidOperationException($msg);
+                }
                 $fkMethodName = $fkCombo[0];
-                assert(
-                    in_array($fkMethodName, $methodList),
-                    'Selected method, ' . $fkMethodName . ', not in method list'
-                );
+                if (!(in_array($fkMethodName, $methodList))) {
+                    $msg = 'Selected method, ' . $fkMethodName . ', not in method list';
+                    throw new InvalidOperationException($msg);
+                }
                 $rkCombo = array_values(array_intersect($rkList, $methodList));
-                assert(1 <= count($rkCombo), 'Expected at least 1 element in related-key list, got ' . count($rkCombo));
+                if (!(1 <= count($rkCombo))) {
+                    $msg = 'Expected at least 1 element in related-key list, got ' . count($rkCombo);
+                    throw new InvalidOperationException($msg);
+                }
                 $rkMethodName = $rkCombo[0];
-                assert(
-                    in_array($rkMethodName, $methodList),
-                    'Selected method, ' . $rkMethodName . ', not in method list'
-                );
+                if (!(in_array($rkMethodName, $methodList))) {
+                    $msg = 'Selected method, ' . $rkMethodName . ', not in method list';
+                    throw new InvalidOperationException($msg);
+                }
                 $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
                 static::$methodAlternate[get_class($foo)] = $line;
             }
@@ -637,7 +646,10 @@ trait MetadataTrait
      */
     public function getEagerLoad()
     {
-        assert(is_array($this->loadEagerRelations), 'LoadEagerRelations not an array');
+        if (!is_array($this->loadEagerRelations)) {
+            throw new InvalidOperationException('LoadEagerRelations not an array');
+        }
+
         return $this->loadEagerRelations;
     }
 
@@ -649,7 +661,10 @@ trait MetadataTrait
     public function setEagerLoad(array $relations)
     {
         $check = array_map('strval', $relations);
-        assert($relations == $check, 'All supplied relations must be resolvable to strings');
+        if ($relations != $check) {
+            throw new InvalidOperationException('All supplied relations must be resolvable to strings');
+        }
+
         $this->loadEagerRelations = $relations;
     }
 
@@ -742,7 +757,9 @@ trait MetadataTrait
                     if (null !== $relGubbins['through']) {
                         $stub->setThroughField($relGubbins['through']);
                     }
-                    assert($stub->isOk(), 'Generated stub not consistent');
+                    if (!$stub->isOk()) {
+                        throw new InvalidOperationException('Generated stub not consistent');
+                    }
                     $stubs[$property] = $stub;
                 }
             }

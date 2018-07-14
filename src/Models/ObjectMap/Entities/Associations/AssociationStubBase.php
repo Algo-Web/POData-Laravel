@@ -2,6 +2,8 @@
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
+use POData\Common\InvalidOperationException;
+
 abstract class AssociationStubBase
 {
     /**
@@ -105,8 +107,9 @@ abstract class AssociationStubBase
         $thatMono = $otherStub instanceof AssociationStubMonomorphic;
 
         $count = ($thisPoly ? 1 : 0)+($thatPoly ? 1 : 0)+($thisMono ? 1 : 0)+($thatMono ? 1 : 0);
-        /** @scrutinizer ignore-call */
-        assert(2 == $count);
+        if (!(2 == $count)) {
+            throw new InvalidOperationException('');
+        }
         if ($thisPoly && $thatMono) {
             return false;
         }

@@ -8,6 +8,7 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStub
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
+use POData\Common\InvalidOperationException;
 
 class MetadataGubbinsHolder
 {
@@ -68,11 +69,11 @@ class MetadataGubbinsHolder
         foreach ($stubs as $relName => $stub) {
             $others = $this->getRelationsByRelationName($className, $relName);
             if ($stub instanceof AssociationStubMonomorphic) {
-                assert(
-                    1 >= count($others),
-                    'Monomorphic relation stub on ' . $className . ' ' . $relName
-                    . ' should point to at most 1 other stub'
-                );
+                $msg = 'Monomorphic relation stub on ' . $className . ' ' . $relName
+                       . ' should point to at most 1 other stub';
+                if (!(1 >= count($others))) {
+                    throw new InvalidOperationException($msg);
+                }
             }
             if (1 === count($others)) {
                 $others = $others[0];
@@ -80,7 +81,9 @@ class MetadataGubbinsHolder
                 $first = -1 === $stub->compare($others);
                 $assoc->setFirst($first ? $stub : $others);
                 $assoc->setLast($first ? $others : $stub);
-                assert($assoc->isOk());
+                if (!$assoc->isOk()) {
+                    throw new InvalidOperationException('');
+                }
                 $associations[] = $assoc;
             }
         }
@@ -141,7 +144,9 @@ class MetadataGubbinsHolder
                     $first = -1 === $stub->compare($lc);
                     $assoc->setFirst($first ? $stub : $lc);
                     $assoc->setLast($first ? $lc : $stub);
-                    assert($assoc->isOk());
+                    if (!$assoc->isOk()) {
+                        throw new InvalidOperationException('');
+                    }
                     $polyAssoc[] = $assoc;
                 }
             }

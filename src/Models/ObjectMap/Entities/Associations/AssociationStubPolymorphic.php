@@ -2,6 +2,8 @@
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
+use POData\Common\InvalidOperationException;
+
 class AssociationStubPolymorphic extends AssociationStubBase
 {
     /**
@@ -54,7 +56,9 @@ class AssociationStubPolymorphic extends AssociationStubBase
 
     public function isKnownSide()
     {
-        assert($this->isOk(), 'Polymorphic stub not OK so known-side determination is meaningless');
+        if (!($this->isOk())) {
+            throw new InvalidOperationException('Polymorphic stub not OK so known-side determination is meaningless');
+        }
         return null === $this->targType;
     }
 }
