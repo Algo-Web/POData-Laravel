@@ -125,7 +125,9 @@ class LaravelQuery implements IQueryProvider
      */
     public function getControllerContainer()
     {
-        assert(null !== $this->controllerContainer, get_class($this->controllerContainer));
+        if (null === $this->controllerContainer) {
+            throw new InvalidOperationException('Controller container must not be null');
+        }
         return $this->controllerContainer;
     }
 
@@ -285,7 +287,7 @@ class LaravelQuery implements IQueryProvider
      * @param ResourceSet      $targetResourceSet    The entity set containing the entity pointed to by the nav property
      * @param ResourceProperty $targetProperty       The navigation property to fetch
      *
-     * @return object|null The related resource if found else null
+     * @return Model|null The related resource if found else null
      */
     public function getRelatedResourceReference(
         ResourceSet $sourceResourceSet,
@@ -313,7 +315,7 @@ class LaravelQuery implements IQueryProvider
      * @param object        $data                 the New data for the entity instance
      * @param bool          $shouldUpdate         Should undefined values be updated or reset to default
      *
-     * @return object|null the new resource value if it is assignable or throw exception for null
+     * @return Model|null the new resource value if it is assignable or throw exception for null
      */
     public function updateResource(
         ResourceSet $sourceResourceSet,
@@ -362,7 +364,7 @@ class LaravelQuery implements IQueryProvider
      * @param object      $sourceEntityInstance The source entity instance
      * @param object      $data                 the New data for the entity instance
      *
-     * @returns object|null                     returns the newly created model if successful,
+     * @returns Model|null                      returns the newly created model if successful,
      *                                          or null if model creation failed.
      */
     public function createResourceforResourceSet(
@@ -399,7 +401,10 @@ class LaravelQuery implements IQueryProvider
             );
         }
 
-        assert(null !== $data, 'Data must not be null');
+        if (null === $data) {
+            $msg = 'Data must not be null';
+            throw new InvalidOperationException($msg);
+        }
         if (is_object($data)) {
             $arrayData = (array) $data;
         } else {
@@ -448,7 +453,7 @@ class LaravelQuery implements IQueryProvider
      * @param  Model|null                $source
      * @throws InvalidOperationException
      * @throws ODataException
-     * @return mixed
+     * @return Model|null
      */
     protected function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $data, $verb, Model $source = null)
     {

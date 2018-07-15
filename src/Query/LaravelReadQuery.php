@@ -86,7 +86,9 @@ class LaravelReadQuery
             $keyName = $sourceEntityInstance->getRelated()->getKeyName();
             $tableName = $sourceEntityInstance->getRelated()->getTable();
         }
-        assert(isset($keyName));
+        if (null === $keyName) {
+            throw new InvalidOperationException('Key name not retrieved');
+        }
         $rawLoad = array_values(array_unique(array_merge($rawLoad, $modelLoad)));
 
         $checkInstance = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : null;
@@ -252,7 +254,10 @@ class LaravelReadQuery
         $rawLoad = $this->processEagerLoadList($eagerLoad);
 
         if (null == $sourceEntityInstance) {
-            assert(null != $resourceSet);
+            if (null == $resourceSet) {
+                $msg = '';
+                throw new InvalidOperationException($msg);
+            }
             $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
         }
 
@@ -262,7 +267,10 @@ class LaravelReadQuery
         } elseif ($sourceEntityInstance instanceof Relation) {
             $modelLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
         }
-        assert(isset($modelLoad));
+        if (!(isset($modelLoad))) {
+            $msg = '';
+            throw new InvalidOperationException($msg);
+        }
 
         $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
         foreach ($whereCondition as $fieldName => $fieldValue) {
@@ -290,7 +298,7 @@ class LaravelReadQuery
      * @param ResourceSet      $targetResourceSet    The entity set containing the entity pointed to by the nav property
      * @param ResourceProperty $targetProperty       The navigation property to fetch
      *
-     * @return object|null The related resource if found else null
+     * @return Model|null The related resource if found else null
      */
     public function getRelatedResourceReference(
         ResourceSet $sourceResourceSet,
@@ -306,7 +314,9 @@ class LaravelReadQuery
         if (null === $result) {
             return null;
         }
-        assert($result instanceof Model, 'Model not retrieved from Eloquent relation');
+        if (!$result instanceof Model) {
+            throw new InvalidOperationException('Model not retrieved from Eloquent relation');
+        }
         if ($targetProperty->getResourceType()->getInstanceType()->getName() != get_class($result)) {
             return null;
         }
@@ -341,10 +351,10 @@ class LaravelReadQuery
         $sourceEntityInstance = $sourceEntityInstance->$propertyName();
         $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
         $result = $this->getResource(null, null, [], [], $sourceEntityInstance);
-        assert(
-            $result instanceof Model || null == $result,
-            'GetResourceFromRelatedResourceSet must return an entity or null'
-        );
+        if (!(null == $result || $result instanceof Model)) {
+            $msg = 'GetResourceFromRelatedResourceSet must return an entity or null';
+            throw new InvalidOperationException($msg);
+        }
         return $result;
     }
 
@@ -418,7 +428,9 @@ class LaravelReadQuery
         $load = (null === $eagerLoad) ? [] : $eagerLoad;
         $rawLoad = [];
         foreach ($load as $line) {
-            assert(is_string($line), 'Eager-load elements must be non-empty strings');
+            if (!is_string($line)) {
+                throw new InvalidOperationException('Eager-load elements must be non-empty strings');
+            }
             $lineParts = explode('/', $line);
             $numberOfParts = count($lineParts);
             for ($i = 0; $i<$numberOfParts; $i++) {
@@ -451,7 +463,10 @@ class LaravelReadQuery
         $segments = $skipToken->getOrderByInfo()->getOrderByPathSegments();
         $values = $skipToken->getOrderByKeysInToken();
         $numValues = count($values);
-        assert($numValues == count($segments));
+        if ($numValues != count($segments)) {
+            $msg = 'Expected '.count($segments).', got '.$numValues;
+            throw new InvalidOperationException($msg);
+        }
 
         for ($i = 0; $i < $numValues; $i++) {
             $relation = $segments[$i]->isAscending() ? '>' : '<';
@@ -486,7 +501,10 @@ class LaravelReadQuery
             $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($rawLoad)->get();
             $resultCount = $bulkSetCount;
         } elseif ($bigSet) {
-            assert(isset($isvalid), 'Filter closure not set');
+            if (!(isset($isvalid))) {
+                $msg = 'Filter closure not set';
+                throw new InvalidOperationException($msg);
+            }
             $resultSet = collect([]);
             $rawCount = 0;
             $rawTop = null === $top ? $bulkSetCount : $top;

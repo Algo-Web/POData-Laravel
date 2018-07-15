@@ -65,7 +65,7 @@ class MetadataTraitTest extends TestCase
     {
         $class = get_class($this->object);
         $blewUp = false;
-        $expected = 'assert(): '.$class.' failed';
+        $expected = $class;
         $actual = null;
 
         try {

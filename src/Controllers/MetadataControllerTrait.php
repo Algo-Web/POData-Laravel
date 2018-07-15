@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
+use POData\Common\InvalidOperationException;
 
 trait MetadataControllerTrait
 {
@@ -35,9 +36,16 @@ trait MetadataControllerTrait
     public function getMethodName($modelName, $crudVerb)
     {
         // enforce we're actually hooked up to a controller
-        assert($this instanceof BaseController, get_class($this));
+        if (!$this instanceof BaseController) {
+            throw new InvalidOperationException(get_class($this));
+        }
+        if (!$this instanceof BaseController) {
+            throw new InvalidOperationException(get_class($this));
+        }
         // enforce that mapping is actually not empty
-        assert(0 < count($this->mapping), 'Mapping array must not be empty');
+        if (0 == count($this->mapping)) {
+            throw new InvalidOperationException('Mapping array must not be empty');
+        }
 
         if (!array_key_exists($modelName, $this->mapping)) {
             $msg = 'Metadata mapping for model ' . $modelName . ' not defined';
@@ -81,9 +89,14 @@ trait MetadataControllerTrait
     public function getMappings()
     {
         // enforce we're actually hooked up to a controller
-        assert($this instanceof BaseController, get_class($this));
+        if (!$this instanceof BaseController) {
+            throw new InvalidOperationException(get_class($this));
+        }
         // enforce that mapping is actually not empty
-        assert(!empty($this->mapping), 'Mapping array must not be empty');
+        if (empty($this->mapping)) {
+            throw new InvalidOperationException('Mapping array must not be empty');
+        }
+
 
         $allMappings = [];
 
@@ -161,7 +174,6 @@ trait MetadataControllerTrait
      */
     private function checkCrudVerbDefined($crudVerb)
     {
-        assert(is_string($crudVerb));
         $lowVerb = strtolower($crudVerb);
         if (!in_array($lowVerb, $this->crudVerbs) && !in_array($crudVerb, $this->optionalVerbs)) {
             $msg = 'CRUD verb ' . $crudVerb . ' not defined';

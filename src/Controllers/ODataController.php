@@ -23,7 +23,6 @@ class ODataController extends BaseController
      */
     public function index(Request $request)
     {
-        $dump = $this->isDumping();
         $dryRun = $this->isDryRun();
         $commitCall = $dryRun ? 'rollBack' : 'commit';
 
@@ -47,31 +46,6 @@ class ODataController extends BaseController
 
             $odataResponse = $context->outgoingResponse();
 
-            if (true === $dump) {
-                // iff XTest header is set, containing class and method name
-                // dump outgoing odataResponse, metadata, and incoming request
-                $xTest = $request->header('XTest');
-                $date = Carbon::now(0);
-                $timeString = $date->toTimeString();
-                $xTest = (null !== $xTest) ? $xTest
-                    : $request->method() . ';' . str_replace('/', '-', $request->path()) . ';' . $timeString . ';';
-                if (null != $xTest) {
-                    $reflectionClass = new \ReflectionClass('Illuminate\Http\Request');
-                    $reflectionProperty = $reflectionClass->getProperty('userResolver');
-                    $reflectionProperty->setAccessible(true);
-                    $reflectionProperty->setValue($request, null);
-                    $reflectionProperty = $reflectionClass->getProperty('routeResolver');
-                    $reflectionProperty->setAccessible(true);
-                    $reflectionProperty->setValue($request, null);
-                    $cerealRequest = serialize($request);
-                    $cerealMeta = serialize($meta);
-                    $cerealResponse = serialize($odataResponse);
-                    Storage::put($xTest . 'request', $cerealRequest);
-                    Storage::put($xTest . 'metadata', $cerealMeta);
-                    Storage::put($xTest . 'response', $cerealResponse);
-                }
-            }
-
             $content = $odataResponse->getStream();
 
             $headers = $odataResponse->getHeaders();
@@ -90,15 +64,6 @@ class ODataController extends BaseController
             throw $e;
         }
         return $response;
-    }
-
-    /**
-     * @return bool
-     */
-    protected function isDumping()
-    {
-        $configDump = env('APP_DUMP_REQUESTS', false);
-        return true === $configDump;
     }
 
     /**

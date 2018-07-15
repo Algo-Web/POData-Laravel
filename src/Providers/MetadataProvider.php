@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema as Schema;
 use Illuminate\Support\Str;
+use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceStreamInfo;
@@ -137,7 +138,9 @@ class MetadataProvider extends MetadataBaseProvider
             $entityName = $entity->getName();
             $pluralName = Str::plural($entityName);
             $entityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, null, false, $baseType);
-            assert($entityType->hasBaseType() === isset($baseType));
+            if ($entityType->hasBaseType() !== isset($baseType)) {
+                throw new InvalidOperationException('');
+            }
             $entity->setOdataResourceType($entityType);
             $this->implementProperties($entity);
             $meta->addResourceSet($pluralName, $entityType);
@@ -146,14 +149,19 @@ class MetadataProvider extends MetadataBaseProvider
         $metaCount = count($meta->oDataEntityMap);
         $entityCount = count($entities);
         $expected = 2 * $entityCount;
-        assert($metaCount == $expected, 'Expected ' . $expected . ' items, actually got '.$metaCount);
+        if ($metaCount != $expected) {
+            $msg = 'Expected ' . $expected . ' items, actually got '.$metaCount;
+            throw new InvalidOperationException($msg);
+        }
 
         if (0 === count($objectModel->getAssociations())) {
             return;
         }
         $assoc = $objectModel->getAssociations();
         foreach ($assoc as $association) {
-            assert($association->isOk());
+            if (!$association->isOk()) {
+                throw new InvalidOperationException('');
+            }
             $this->implementAssociationsMonomorphic($objectModel, $association);
         }
         if (null != self::$afterImplement) {
@@ -221,7 +229,10 @@ class MetadataProvider extends MetadataBaseProvider
             if ($field->getPrimitiveType() == 'blob') {
                 $odataEntity->setMediaLinkEntry(true);
                 $streamInfo = new ResourceStreamInfo($field->getName());
-                assert($odataEntity->isMediaLinkEntry());
+                if (!$odataEntity->isMediaLinkEntry()) {
+                    throw new InvalidOperationException('');
+                }
+
                 $odataEntity->addNamedStream($streamInfo);
                 continue;
             }
@@ -260,7 +271,9 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
 
-        assert(false === self::$isBooted, 'Provider booted twice');
+        if (false !== self::$isBooted) {
+            throw new InvalidOperationException('Provider booted twice');
+        }
         $isCaching = true === $this->getIsCaching();
         $meta = Cache::get('metadata');
         $objectMap = Cache::get('objectmap');
@@ -354,7 +367,9 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function resolveReverseProperty(Model $source, $propName)
     {
-        assert(is_string($propName), 'Property name must be string');
+        if (!is_string($propName)) {
+            throw new InvalidOperationException('Property name must be string');
+        }
         $entity = $this->getObjectMap()->resolveEntity(get_class($source));
         if (null === $entity) {
             $msg = 'Source model not defined';
@@ -369,7 +384,9 @@ class MetadataProvider extends MetadataBaseProvider
             return $association->getFirst()->getRelationName();
         }
 
-        assert($association instanceof AssociationMonomorphic);
+        if (!$association instanceof AssociationMonomorphic) {
+            throw new InvalidOperationException('');
+        }
         return $association->getLast()->getRelationName();
     }
 

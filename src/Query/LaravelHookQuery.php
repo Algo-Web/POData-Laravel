@@ -53,11 +53,11 @@ class LaravelHookQuery
         $targetEntityInstance,
         $navPropName
     ) {
+        if (!($sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model)) {
+            throw new InvalidOperationException('Both input entities must be Eloquent models');
+        }
         $relation = $this->isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName);
-        assert(
-            $sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model,
-            'Both input entities must be Eloquent models'
-        );
+
         // in case the fake 'PrimaryKey' attribute got set inbound for a polymorphic-affected model, flatten it now
         unset($targetEntityInstance->PrimaryKey);
 
@@ -91,11 +91,11 @@ class LaravelHookQuery
         $targetEntityInstance,
         $navPropName
     ) {
+        if (!($sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model)) {
+            throw new InvalidOperationException('Both input entities must be Eloquent models');
+        }
         $relation = $this->isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName);
-        assert(
-            $sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model,
-            'Both input entities must be Eloquent models'
-        );
+
         // in case the fake 'PrimaryKey' attribute got set inbound for a polymorphic-affected model, flatten it now
         unset($targetEntityInstance->PrimaryKey);
 

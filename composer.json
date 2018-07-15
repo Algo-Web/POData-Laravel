@@ -15,8 +15,7 @@
     "require-dev": {
         "mockery/mockery": "dev-master",
         "php-coveralls/php-coveralls": ">=v2.1",
-        "phpunit/phpunit": "^5.6",
-        "humbug/humbug": "1.0.0-alpha2"
+        "phpunit/phpunit": "^5.6"
     },
     "autoload": {
         "psr-4": {

@@ -47,7 +47,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo = new TestController();
         $foo->setMapping([]);
 
-        $expected = 'assert(): Mapping array must not be empty failed';
+        $expected = 'Mapping array must not be empty';
         $actual = null;
         try {
             $foo->getMethodName('', '');

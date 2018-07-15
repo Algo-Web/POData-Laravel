@@ -161,7 +161,10 @@ class LaravelBulkQuery
                     if (null !== $keyDescriptors) {
                         $keys = [];
                         foreach ($keyDescriptors as $desc) {
-                            assert($desc instanceof KeyDescriptor, get_class($desc));
+                            if (!($desc instanceof KeyDescriptor)) {
+                                $msg = get_class($desc);
+                                throw new InvalidOperationException($msg);
+                            }
                             $rawPayload = $desc->getNamedValues();
                             $keyPayload = [];
                             foreach ($rawPayload as $keyName => $keyVal) {
@@ -232,7 +235,10 @@ class LaravelBulkQuery
     {
         // dig up target class name
         $type = $sourceResourceSet->getResourceType()->getInstanceType();
-        assert($type instanceof \ReflectionClass, get_class($type));
+        if (!($type instanceof \ReflectionClass)) {
+            $msg = get_class($type);
+            throw new InvalidOperationException($msg);
+        }
         $modelName = $type->getName();
         return $this->getControllerContainer()->getMapping($modelName, $verbName);
     }
@@ -249,7 +255,9 @@ class LaravelBulkQuery
      */
     public function getControllerContainer()
     {
-        assert(null !== $this->controllerContainer, get_class($this->controllerContainer));
+        if (null === $this->controllerContainer) {
+            throw new InvalidOperationException('Controller container must not be null');
+        }
         return $this->controllerContainer;
     }
 

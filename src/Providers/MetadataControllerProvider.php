@@ -7,6 +7,7 @@ use AlgoWeb\PODataLaravel\Controllers\MetadataControllerTrait;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
+use POData\Common\InvalidOperationException;
 
 class MetadataControllerProvider extends MetadataBaseProvider
 {
@@ -59,10 +60,10 @@ class MetadataControllerProvider extends MetadataBaseProvider
                         // if we've picked up a default mapping for an optional verb, then we can overwrite it
                         $alreadyKey = null === $metamix[$key][$barrel] ? false : $alreadyKey;
                     }
-                    assert(
-                        !$alreadyKey,
-                        'Mapping already defined for model ' . $key . ' and CRUD verb ' . $barrel
-                    );
+                    if ($alreadyKey) {
+                        $msg = 'Mapping already defined for model ' . $key . ' and CRUD verb ' . $barrel;
+                        throw new InvalidOperationException($msg);
+                    }
                     $metamix[$key][$barrel] = $roll;
                 }
             }
@@ -111,7 +112,9 @@ class MetadataControllerProvider extends MetadataBaseProvider
                 if (in_array(MetadataControllerTrait::class, class_uses($name, false))) {
                     $result = App::make($name);
                     $ends[] = $result;
-                    assert($result instanceof Controller, 'Resolved result not a controller');
+                    if (!$result instanceof Controller) {
+                        throw new InvalidOperationException('Resolved result not a controller');
+                    }
                 }
             } catch (\Exception $e) {
                 if (!App::runningInConsole()) {

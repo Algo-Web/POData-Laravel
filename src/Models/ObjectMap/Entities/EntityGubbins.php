@@ -7,6 +7,7 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMono
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
+use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceEntityType;
 
 class EntityGubbins
@@ -175,7 +176,9 @@ class EntityGubbins
             }
             $propertyName = $stub->getRelationName();
         }
-        assert(isset($propertyName));
+        if (!isset($propertyName)) {
+            throw new InvalidOperationException('');
+        }
         $this->associations[$propertyName] = $association;
     }
 

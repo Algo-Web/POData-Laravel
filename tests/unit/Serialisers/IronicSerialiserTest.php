@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
+use POData\Common\InvalidOperationException;
 use POData\Common\ODataConstants;
 use POData\Common\Url;
 use POData\IService;
@@ -189,12 +190,12 @@ class IronicSerialiserTest extends SerialiserTestBase
         $foo = new IronicSerialiserDummy($mockService, $request);
         $foo->setLightStack($stack);
 
-        $expected = 'assert(): is_null($expandedProjectionNode) failed';
+        $expected = 'is_null($expandedProjectionNode)';
         $actual = null;
 
         try {
             $result = $foo->getCurrentExpandedProjectionNode();
-        } catch (\ErrorException $e) {
+        } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
@@ -218,12 +219,12 @@ class IronicSerialiserTest extends SerialiserTestBase
         $foo = new IronicSerialiserDummy($mockService, $request);
         $foo->setLightStack($stack);
 
-        $expected = 'assert(): $expandedProjectionNode not instanceof ExpandedProjectionNode failed';
+        $expected = '$expandedProjectionNode not instanceof ExpandedProjectionNode';
         $actual = null;
 
         try {
             $result = $foo->getCurrentExpandedProjectionNode();
-        } catch (\ErrorException $e) {
+        } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
@@ -567,8 +568,8 @@ class IronicSerialiserTest extends SerialiserTestBase
         $foo->shouldReceive('getRequest')->andReturn($request);
         $foo->shouldReceive('getService->getProvidersWrapper->resolveResourceType')->andReturn($targType);
 
-        $expected = 'assert(): Concrete resource type not selected for payload'.
-                    ' AlgoWeb\PODataLaravel\Models\TestMorphTarget failed';
+        $expected = 'Concrete resource type not selected for payload'.
+                    ' AlgoWeb\PODataLaravel\Models\TestMorphTarget';
         $actual = null;
 
         try {
@@ -756,12 +757,12 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
 
-        $expected = 'assert(): Supplied abstract type must have at least one derived type failed';
+        $expected = 'Supplied abstract type must have at least one derived type';
         $actual = null;
 
         try {
             $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
-        } catch (\ErrorException $e) {
+        } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
@@ -780,12 +781,12 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
 
-        $expected = 'assert(): Concrete resource type not selected for payload payloadClass failed';
+        $expected = 'Concrete resource type not selected for payload payloadClass';
         $actual = null;
 
         try {
             $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
-        } catch (\ErrorException $e) {
+        } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
@@ -808,12 +809,12 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
 
-        $expected = 'assert(): Concrete resource type not selected for payload payloadClass failed';
+        $expected = 'Concrete resource type not selected for payload payloadClass';
         $actual = null;
 
         try {
             $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
-        } catch (\ErrorException $e) {
+        } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);

@@ -1,5 +1,9 @@
 Unreleased
 ----------
+   * Make README hopefully less confusing
+     - Thank you to donmbelembe for tripping over this
+   * Unbreak APP_DISABLE_AUTH env parameter
+     - Thank you to donmbelembe for finding this and helping to fix it
    * Allow Eloquent models to explicitly define metadata
      - Thank you to NoelDeMartin (noeldemartin@gmail.com) for contributing this
    * Make key-descriptor columns unambiguous when processed on models

@@ -42,7 +42,7 @@ class LaravelReadQueryTest extends TestCase
 
     public function testBadEagerLoad()
     {
-        $expected = 'assert(): Eager-load elements must be non-empty strings failed';
+        $expected = 'Eager-load elements must be non-empty strings';
         $actual = null;
 
         $query = m::mock(QueryType::class);
@@ -62,7 +62,7 @@ class LaravelReadQueryTest extends TestCase
 
     public function testSkipTokenWithSegmentValueCountMismatch()
     {
-        $expected = 'assert():';
+        $expected = 'Expected 1, got 0';
         $actual = null;
 
         $source = m::mock(TestModel::class)->makePartial();

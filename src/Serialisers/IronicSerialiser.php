@@ -156,8 +156,12 @@ class IronicSerialiser implements IObjectSerialiser
             array_pop($this->lightStack);
             return null;
         }
-        assert($entryObject instanceof QueryResult, get_class($entryObject));
-        assert($entryObject->results instanceof Model, get_class($entryObject->results));
+        if (!$entryObject->results instanceof Model) {
+            $res = $entryObject->results;
+            $msg = is_array($res) ? 'Entry object must be single Model' : get_class($res);
+            throw new InvalidOperationException($msg);
+        }
+
         $this->loadStackIfEmpty();
 
         $baseURI = $this->isBaseWritten ? null : $this->absoluteServiceUriWithSlash;
@@ -172,12 +176,15 @@ class IronicSerialiser implements IObjectSerialiser
         $resourceType = $this->getConcreteTypeFromAbstractType($resourceType, $payloadClass);
 
         // make sure we're barking up right tree
-        assert($resourceType instanceof ResourceEntityType, get_class($resourceType));
+        if (!$resourceType instanceof ResourceEntityType) {
+            throw new InvalidOperationException(get_class($resourceType));
+        }
         $targClass = $resourceType->getInstanceType()->getName();
-        assert(
-            $entryObject->results instanceof $targClass,
-            'Object being serialised not instance of expected class, ' . $targClass . ', is actually ' . $payloadClass
-        );
+        if (!($entryObject->results instanceof $targClass)) {
+            $msg = 'Object being serialised not instance of expected class, '
+                   . $targClass . ', is actually ' . $payloadClass;
+            throw new InvalidOperationException($msg);
+        }
 
         if (!array_key_exists($targClass, $this->propertiesCache)) {
             $rawProp = $resourceType->getAllProperties();
@@ -199,7 +206,9 @@ class IronicSerialiser implements IObjectSerialiser
         $nonRelProp = $this->propertiesCache[$targClass]['nonRel'];
 
         $resourceSet = $resourceType->getCustomState();
-        assert($resourceSet instanceof ResourceSet);
+        if (!$resourceSet instanceof ResourceSet) {
+            throw new InvalidOperationException('');
+        }
         $title = $resourceType->getName();
         $type = $resourceType->getFullName();
 
@@ -224,12 +233,12 @@ class IronicSerialiser implements IObjectSerialiser
             $nuLink = new ODataLink();
             $propKind = $prop->getKind();
 
-            assert(
-                ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind
-                || ResourcePropertyKind::RESOURCE_REFERENCE == $propKind,
-                '$propKind != ResourcePropertyKind::RESOURCESET_REFERENCE &&'
-                .' $propKind != ResourcePropertyKind::RESOURCE_REFERENCE'
-            );
+            if (!(ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind
+                  || ResourcePropertyKind::RESOURCE_REFERENCE == $propKind)) {
+                $msg = '$propKind != ResourcePropertyKind::RESOURCESET_REFERENCE &&'
+                       .' $propKind != ResourcePropertyKind::RESOURCE_REFERENCE';
+                throw new InvalidOperationException($msg);
+            }
             $propTail = ResourcePropertyKind::RESOURCE_REFERENCE == $propKind ? 'entry' : 'feed';
             $propType = 'application/atom+xml;type=' . $propTail;
             $propName = $prop->getName();
@@ -247,7 +256,9 @@ class IronicSerialiser implements IObjectSerialiser
                 $this->expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName);
             }
             $nuLink->isExpanded = isset($nuLink->expandedResult);
-            assert(null !== $nuLink->isCollection);
+            if (null === $nuLink->isCollection) {
+                throw new InvalidOperationException('');
+            }
 
             $links[] = $nuLink;
         }
@@ -270,10 +281,10 @@ class IronicSerialiser implements IObjectSerialiser
         $odata->baseURI = $baseURI;
 
         $newCount = count($this->lightStack);
-        assert(
-            $newCount == $stackCount,
-            'Should have ' . $stackCount . ' elements in stack, have ' . $newCount . ' elements'
-        );
+        if ($newCount != $stackCount) {
+            $msg = 'Should have ' . $stackCount . ' elements in stack, have ' . $newCount . ' elements';
+            throw new InvalidOperationException($msg);
+        }
         $this->lightStack[$newCount-1]['count']--;
         if (0 == $this->lightStack[$newCount-1]['count']) {
             array_pop($this->lightStack);
@@ -291,7 +302,9 @@ class IronicSerialiser implements IObjectSerialiser
     public function writeTopLevelElements(QueryResult & $entryObjects)
     {
         $res = $entryObjects->results;
-        assert(is_array($res) || $res instanceof Collection, '!is_array($entryObjects->results)');
+        if (!(is_array($res) || $res instanceof Collection)) {
+            throw new InvalidOperationException('!is_array($entryObjects->results)');
+        }
         if (is_array($res) && 0 == count($res)) {
             $entryObjects->hasMore = false;
         }
@@ -329,8 +342,14 @@ class IronicSerialiser implements IObjectSerialiser
             } else {
                 $query = $entry;
             }
-            assert($query instanceof QueryResult, get_class($query));
-            assert($query->results instanceof Model, get_class(/** @scrutinizer ignore-type */$query->results));
+            if (!$query instanceof QueryResult) {
+                throw new InvalidOperationException(get_class($query));
+            }
+            if (!$query->results instanceof Model) {
+                $res = $query->results;
+                $msg = is_array($res) ? 'Entry object must be single Model' : get_class($res);
+                throw new InvalidOperationException($msg);
+            }
             $odata->entries[] = $this->writeTopLevelElement($query);
         }
 
@@ -481,19 +500,25 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeTopLevelPrimitive(QueryResult & $primitiveValue, ResourceProperty & $resourceProperty = null)
     {
-        assert(null != $resourceProperty, 'Resource property must not be null');
+        if (null === $resourceProperty) {
+            throw new InvalidOperationException('Resource property must not be null');
+        }
         $propertyContent = new ODataPropertyContent();
 
         $odataProperty = new ODataProperty();
         $odataProperty->name = $resourceProperty->getName();
         $iType = $resourceProperty->getInstanceType();
-        assert($iType instanceof IType, get_class($iType));
+        if (!$iType instanceof IType) {
+            throw new InvalidOperationException(get_class($iType));
+        }
         $odataProperty->typeName = $iType->getFullTypeName();
         if (null == $primitiveValue->results) {
             $odataProperty->value = null;
         } else {
             $rType = $resourceProperty->getResourceType()->getInstanceType();
-            assert($rType instanceof IType, get_class($rType));
+            if (!$rType instanceof IType) {
+                throw new InvalidOperationException(get_class($rType));
+            }
             $odataProperty->value = $this->primitiveToString($rType, $primitiveValue->results);
         }
 
@@ -509,7 +534,9 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function getRequest()
     {
-        assert(null != $this->request, 'Request not yet set');
+        if (null == $this->request) {
+            throw new InvalidOperationException('Request not yet set');
+        }
 
         return $this->request;
     }
@@ -559,12 +586,16 @@ class IronicSerialiser implements IObjectSerialiser
     {
         $typeName = $resourceType->getName();
         $keyProperties = $resourceType->getKeyProperties();
-        assert(count($keyProperties) != 0, 'count($keyProperties) == 0');
+        if (0 == count($keyProperties)) {
+            throw new InvalidOperationException('count($keyProperties) == 0');
+        }
         $keyString = $containerName . '(';
         $comma = null;
         foreach ($keyProperties as $keyName => $resourceProperty) {
             $keyType = $resourceProperty->getInstanceType();
-            assert($keyType instanceof IType, '$keyType not instanceof IType');
+            if (!$keyType instanceof IType) {
+                throw new InvalidOperationException('$keyType not instanceof IType');
+            }
             $keyName = $resourceProperty->getName();
             $keyValue = $entityInstance->$keyName;
             if (!isset($keyValue)) {
@@ -594,7 +625,9 @@ class IronicSerialiser implements IObjectSerialiser
     {
         $context = $this->getService()->getOperationContext();
         $streamProviderWrapper = $this->getService()->getStreamProviderWrapper();
-        assert(null != $streamProviderWrapper, 'Retrieved stream provider must not be null');
+        if (null == $streamProviderWrapper) {
+            throw new InvalidOperationException('Retrieved stream provider must not be null');
+        }
 
         $mediaLink = null;
         if ($resourceType->isMediaLinkEntry()) {
@@ -676,11 +709,13 @@ class IronicSerialiser implements IObjectSerialiser
                 for ($i = 2; $i < $depth; ++$i) {
                     $segName = $segmentNames[$i]['prop'];
                     $expandedProjectionNode = $expandedProjectionNode->findNode($segName);
-                    assert(null !== $expandedProjectionNode, 'is_null($expandedProjectionNode)');
-                    assert(
-                        $expandedProjectionNode instanceof ExpandedProjectionNode,
-                        '$expandedProjectionNode not instanceof ExpandedProjectionNode'
-                    );
+                    if (null === $expandedProjectionNode) {
+                        throw new InvalidOperationException('is_null($expandedProjectionNode)');
+                    }
+                    if (!$expandedProjectionNode instanceof ExpandedProjectionNode) {
+                        $msg = '$expandedProjectionNode not instanceof ExpandedProjectionNode';
+                        throw new InvalidOperationException($msg);
+                    }
                 }
             }
         }
@@ -758,14 +793,16 @@ class IronicSerialiser implements IObjectSerialiser
     {
         $currentExpandedProjectionNode = $this->getCurrentExpandedProjectionNode();
         $internalOrderByInfo = $currentExpandedProjectionNode->getInternalOrderByInfo();
-        assert(null != $internalOrderByInfo);
-        assert(is_object($internalOrderByInfo));
-        assert($internalOrderByInfo instanceof InternalOrderByInfo, get_class($internalOrderByInfo));
+        if (!$internalOrderByInfo instanceof InternalOrderByInfo) {
+            throw new InvalidOperationException(get_class($internalOrderByInfo));
+        }
         $numSegments = count($internalOrderByInfo->getOrderByPathSegments());
         $queryParameterString = $this->getNextPageLinkQueryParametersForRootResourceSet();
 
         $skipToken = $internalOrderByInfo->buildSkipTokenValue($lastObject);
-        assert(null !== $skipToken, '!is_null($skipToken)');
+        if (empty($skipToken)) {
+            throw new InvalidOperationException('!is_null($skipToken)');
+        }
         $token = (1 < $numSegments) ? '$skiptoken=' : '$skip=';
         $skipToken = (1 < $numSegments) ? $skipToken : intval(trim($skipToken, '\''));
         $skipToken = '?' . $queryParameterString . $token . $skipToken;
@@ -943,7 +980,9 @@ class IronicSerialiser implements IObjectSerialiser
             $nuLink->expandedResult->title = new ODataTitle($propName);
             $nuLink->expandedResult->id = rtrim($this->absoluteServiceUri, '/') . '/' . $nuLink->url;
         }
-        assert(isset($nuLink->expandedResult));
+        if (!isset($nuLink->expandedResult)) {
+            throw new InvalidOperationException('');
+        }
     }
 
     /**
@@ -965,13 +1004,15 @@ class IronicSerialiser implements IObjectSerialiser
      */
     protected function writeBagValue(ResourceType & $resourceType, $result)
     {
-        assert(null == $result || is_array($result), 'Bag parameter must be null or array');
+        if (!(null == $result || is_array($result))) {
+            throw new InvalidOperationException('Bag parameter must be null or array');
+        }
         $typeKind = $resourceType->getResourceTypeKind();
-        assert(
-            ResourceTypeKind::PRIMITIVE() == $typeKind || ResourceTypeKind::COMPLEX() == $typeKind,
-            '$bagItemResourceTypeKind != ResourceTypeKind::PRIMITIVE'
-            .' && $bagItemResourceTypeKind != ResourceTypeKind::COMPLEX'
-        );
+        if (!(ResourceTypeKind::PRIMITIVE() == $typeKind || ResourceTypeKind::COMPLEX() == $typeKind)) {
+            $msg = '$bagItemResourceTypeKind != ResourceTypeKind::PRIMITIVE'
+                   .' && $bagItemResourceTypeKind != ResourceTypeKind::COMPLEX';
+            throw new InvalidOperationException($msg);
+        }
         if (null == $result) {
             return null;
         }
@@ -980,7 +1021,9 @@ class IronicSerialiser implements IObjectSerialiser
             if (isset($value)) {
                 if (ResourceTypeKind::PRIMITIVE() == $typeKind) {
                     $instance = $resourceType->getInstanceType();
-                    assert($instance instanceof IType, get_class($instance));
+                    if (!$instance instanceof IType) {
+                        throw new InvalidOperationException(get_class($instance));
+                    }
                     $bag->propertyContents[] = $this->primitiveToString($instance, $value);
                 } elseif (ResourceTypeKind::COMPLEX() == $typeKind) {
                     $bag->propertyContents[] = $this->writeComplexValue($resourceType, $value);
@@ -998,7 +1041,9 @@ class IronicSerialiser implements IObjectSerialiser
      */
     protected function writeComplexValue(ResourceType & $resourceType, &$result, $propertyName = null)
     {
-        assert(is_object($result), 'Supplied $customObject must be an object');
+        if (!is_object($result)) {
+            throw new InvalidOperationException('Supplied $customObject must be an object');
+        }
 
         $count = count($this->complexTypeInstanceCollection);
         for ($i = 0; $i < $count; ++$i) {
@@ -1021,11 +1066,16 @@ class IronicSerialiser implements IObjectSerialiser
             $internalProperty->name = $propName;
             if (static::isMatchPrimitive($resourceKind)) {
                 $iType = $prop->getInstanceType();
-                assert($iType instanceof IType, get_class($iType));
+                if (!$iType instanceof IType) {
+                    throw new InvalidOperationException(get_class($iType));
+                }
                 $internalProperty->typeName = $iType->getFullTypeName();
 
                 $rType = $prop->getResourceType()->getInstanceType();
-                assert($rType instanceof IType, get_class($rType));
+                if (!$rType instanceof IType) {
+                    throw new InvalidOperationException(get_class($rType));
+                }
+
                 $internalProperty->value = $this->primitiveToString($rType, $result->$propName);
 
                 $internalContent->properties[$propName] = $internalProperty;
@@ -1084,7 +1134,9 @@ class IronicSerialiser implements IObjectSerialiser
     {
         if ($resourceType->isAbstract()) {
             $derived = $this->getMetadata()->getDerivedTypes($resourceType);
-            assert(0 < count($derived), 'Supplied abstract type must have at least one derived type');
+            if (0 == count($derived)) {
+                throw new InvalidOperationException('Supplied abstract type must have at least one derived type');
+            }
             foreach ($derived as $rawType) {
                 if (!$rawType->isAbstract()) {
                     $name = $rawType->getInstanceType()->getName();
@@ -1097,7 +1149,9 @@ class IronicSerialiser implements IObjectSerialiser
         }
         // despite all set up, checking, etc, if we haven't picked a concrete resource type,
         // wheels have fallen off, so blow up
-        assert(!$resourceType->isAbstract(), 'Concrete resource type not selected for payload ' . $payloadClass);
+        if ($resourceType->isAbstract()) {
+            throw new InvalidOperationException('Concrete resource type not selected for payload ' . $payloadClass);
+        }
         return $resourceType;
     }
 }

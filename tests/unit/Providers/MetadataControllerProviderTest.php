@@ -13,6 +13,7 @@ use ErrorException;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Mockery as m;
+use POData\Common\InvalidOperationException;
 
 class MetadataControllerProviderTest extends TestCase
 {
@@ -120,13 +121,13 @@ class MetadataControllerProviderTest extends TestCase
         $foo = m::mock(MetadataControllerProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCandidateControllers')->andReturn([$controller1, $controller2])->once();
 
-        $expected = 'assert(): Mapping already defined for model AlgoWeb\PODataLaravel\Models\TestModel'
-                    .' and CRUD verb create failed';
+        $expected = 'Mapping already defined for model AlgoWeb\PODataLaravel\Models\TestModel'
+                    .' and CRUD verb create';
         $actual = null;
 
         try {
             $foo->boot();
-        } catch (\ErrorException $e) {
+        } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
@@ -171,13 +172,13 @@ class MetadataControllerProviderTest extends TestCase
         $foo = m::mock(MetadataControllerProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCandidateControllers')->andReturn([$controller1, $controller2])->once();
 
-        $expected = 'assert(): Mapping already defined for model AlgoWeb\PODataLaravel\Models\TestModel'
-                    .' and CRUD verb bulkCreate failed';
+        $expected = 'Mapping already defined for model AlgoWeb\PODataLaravel\Models\TestModel'
+                    .' and CRUD verb bulkCreate';
         $actual = null;
 
         try {
             $foo->boot();
-        } catch (\ErrorException $e) {
+        } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
@@ -295,12 +296,12 @@ class MetadataControllerProviderTest extends TestCase
         $foo->shouldReceive('getClassMap')->andReturn([TestController::class])->once();
         $foo->shouldReceive('getIsCaching')->andReturn(false)->once();
 
-        $expected = 'assert(): Resolved result not a controller failed';
+        $expected = 'Resolved result not a controller';
         $actual = null;
 
         try {
             $foo->boot();
-        } catch (ErrorException $e) {
+        } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
