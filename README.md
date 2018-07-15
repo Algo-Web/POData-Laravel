@@ -9,7 +9,8 @@
 
 # POData-Laravel
 Composer Package to provide Odata functionality to Laravel
-to install run
+
+To install, run
 ```
 composer require algo-web/podata-laravel
 ```
@@ -29,6 +30,19 @@ You then add the trait to the models you want to expose.
     use \AlgoWeb\PODataLaravel\Models\MetadataTrait;
 ```
 
+By default, following Laravel convention, POData-Laravel pluralises the
+model names to use as endpoints.
+That's an implementation choice in POData-Laravel, not anything intrinsic to OData itself.
+
+Eg, for User model, all else equal:
+```php
+    /odata.svc/Users
+```
+
+If you have just installed the package and have trouble reaching your models'
+endpoints, try setting APP_DISABLE_AUTH=true in your project's .env file
+temporarily, and then try reaching those endpoints again.
+
 -- Known Limitations --
 
 * Cannot expose two models with the same class name in different
@@ -40,6 +54,8 @@ of the colliding models.
 * Controller input parameters map 'id' to underlying model's primary key
 
 -- Configuration options --
+These need to go in your Laravel project's .env file.
+
 * APP_METADATA_CACHING - Whether or not to turn model metadata caching on
 * APP_METADATA_CACHE_DURATION - If caching, how long (in minutes) to
 retain cached metadata
