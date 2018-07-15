@@ -74,7 +74,7 @@ class ODataControllerTest extends TestCase
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
-}
+    }
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Controllers\ODataController::index

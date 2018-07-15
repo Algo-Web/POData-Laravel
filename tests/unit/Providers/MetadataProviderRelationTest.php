@@ -114,7 +114,11 @@ class MetadataProviderRelationTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
 
@@ -157,7 +161,11 @@ class MetadataProviderRelationTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $classen = [TestMorphOneSource::class, TestMorphTarget::class];
         //shuffle($classen);
@@ -199,7 +207,11 @@ class MetadataProviderRelationTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $classen = [TestMorphManySource::class, TestMorphTarget::class];
         shuffle($classen);
@@ -242,7 +254,11 @@ class MetadataProviderRelationTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $classen = [TestMorphManyToManySource::class, TestMorphManyToManyTarget::class];
         shuffle($classen);
@@ -362,7 +378,11 @@ class MetadataProviderRelationTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $classen = [TestMonomorphicParentOfMorphTarget::class, TestMorphTarget::class,
             TestMonomorphicChildOfMorphTarget::class];
@@ -387,8 +407,8 @@ class MetadataProviderRelationTest extends TestCase
     private function setUpSchemaFacade()
     {
         $schema = Schema::getFacadeRoot();
-        Schema::shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(true);
-        Schema::shouldReceive('hasTable')->andReturn(true);
-        Schema::shouldReceive('getColumnListing')->andReturn([]);
+        $schema->shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(true);
+        $schema->shouldReceive('hasTable')->andReturn(true);
+        $schema->shouldReceive('getColumnListing')->andReturn([]);
     }
 }

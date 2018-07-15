@@ -218,8 +218,11 @@ class MetadataProviderTest extends TestCase
         App::instance('metadata', $meta);
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
-        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $foo = $this->object;
         $foo->shouldReceive('getCandidateModels')->andReturn([TestModel::class]);
@@ -241,8 +244,11 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
-        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $classen = [TestMonomorphicOneAndManySource::class, TestMonomorphicOneAndManyTarget::class,
             TestMorphManyToManyTarget::class, TestMorphManyToManySource::class, TestMonomorphicSource::class,
@@ -286,8 +292,11 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
-        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $classen = [TestMorphManySource::class, TestMorphTarget::class];
 
@@ -333,8 +342,11 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
-        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $classen = [TestGetterModel::class, TestMorphManySource::class, TestMorphOneSource::class,
             TestMorphTarget::class, TestMonomorphicManySource::class, TestMonomorphicManyTarget::class,
@@ -386,11 +398,14 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
-        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $auth = Auth::getFacadeRoot();
-        $auth->shouldReceive('user')->andReturn($testModel)->once();
+        Auth::shouldReceive('user')->andReturn($testModel)->once();
 
         $classen = [TestModel::class];
 

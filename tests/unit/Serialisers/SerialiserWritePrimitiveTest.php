@@ -8,6 +8,7 @@ use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Mockery as m;
 use POData\ObjectModel\ObjectModelSerializer;
 use POData\OperationContext\ServiceHost;
@@ -279,6 +280,12 @@ class SerialiserWritePrimitiveTest extends SerialiserTestBase
 
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
+
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
         $classen = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();

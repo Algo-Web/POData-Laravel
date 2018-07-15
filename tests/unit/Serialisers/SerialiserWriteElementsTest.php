@@ -48,6 +48,12 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
         $host->setServiceUri('/odata.svc/');
 
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
+
         $holder = new MetadataGubbinsHolder();
         $classen = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
@@ -103,6 +109,12 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
         $host->setServiceUri('/odata.svc/');
+
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
         $holder = new MetadataGubbinsHolder();
         $classen = [TestModel::class];
@@ -161,6 +173,12 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
         $host->setServiceUri('/odata.svc/');
+
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
         $holder = new MetadataGubbinsHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
@@ -223,6 +241,12 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
         $host->setServiceUri('/odata.svc/');
+
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
         $holder = new MetadataGubbinsHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
@@ -295,6 +319,12 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
         $host->setServiceUri('/odata.svc/');
 
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
+
         $holder = new MetadataGubbinsHolder();
         $classen = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
@@ -357,6 +387,12 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
         $host->setServiceUri('/odata.svc/');
 
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
+
         $holder = new MetadataGubbinsHolder();
         $classen = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
@@ -403,6 +439,12 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
         $host->setServiceUri('/odata.svc/');
+
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
         $holder = new MetadataGubbinsHolder();
         $classen = [TestModel::class];
