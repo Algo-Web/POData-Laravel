@@ -56,7 +56,6 @@ class ODataControllerTest extends TestCase
 
     public function testIndexMalformedBaseService()
     {
-        $this->object->shouldReceive('isDumping')->passthru()->once();
         $request = m::mock(Request::class)->makePartial();
         $request->shouldReceive('getMethod')->andReturn('GET');
         $request->shouldReceive('getQueryString')->andReturn('http://192.168.2.1/abm-master/public/odata.svc');
@@ -112,93 +111,5 @@ class ODataControllerTest extends TestCase
         $this->assertEquals(200, $result->getStatusCode());
         $actual = $result->getContent();
         //$this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Controllers\ODataController::index
-     */
-    public function testIndexCallToBaseServiceDumpSetButNoHeader()
-    {
-        $knownDate = new Carbon(2017, 6, 15, 15, 14, 19);
-        Carbon::setTestNow($knownDate);
-
-        $root = 'GET;-;15:17:00;';
-        $this->object->shouldReceive('isDumping')->andReturn(true);
-        $this->object->shouldReceive('getAppPageSize')->andReturn(100);
-
-        $db = DB::getFacadeRoot();
-        $db->shouldReceive('beginTransaction')->andReturn(null)->once();
-        $db->shouldReceive('commit')->andReturn(null)->once();
-        $db->shouldReceive('rollBack')->andReturn(null)->never();
-
-        $storage = Storage::getFacadeRoot();
-        $storage->shouldReceive('put')->withAnyArgs()->andReturnNull()->times(3);
-
-        $request = m::mock(Request::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $request->shouldReceive('getMethod')->andReturn('GET');
-        $request->shouldReceive('getQueryString')->andReturn('');
-        $request->shouldReceive('getBaseUrl')->andReturn('http://192.168.2.1/abm-master/public/odata.svc');
-        $request->initialize();
-
-        $expected = '&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
-<service xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" >
- <workspace>
-  <atom:title>Default</atom:title>
- </workspace>
-</service>
-';
-
-        $result = $this->object->index($request);
-        $this->assertEquals(200, $result->getStatusCode());
-        $actual = $result->getContent();
-        //$this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Controllers\ODataController::index
-     */
-    public function testIndexCallToBaseServiceDumpSetButHasHeader()
-    {
-        $storage = Storage::getFacadeRoot();
-        $storage->shouldReceive('put')->with('catchrequest', m::any())->andReturnNull()->once();
-        $storage->shouldReceive('put')->with('catchmetadata', m::any())->andReturnNull()->once();
-        $storage->shouldReceive('put')->with('catchresponse', m::any())->andReturnNull()->once();
-
-        $db = DB::getFacadeRoot();
-        $db->shouldReceive('beginTransaction')->andReturn(null)->once();
-        $db->shouldReceive('rollBack')->andReturn(null)->never();
-        $db->shouldReceive('commit')->andReturn(null)->once();
-
-        $request = m::mock(Request::class)->makePartial();
-        $request->shouldReceive('getMethod')->andReturn('GET');
-        $request->shouldReceive('getQueryString')->andReturn('');
-        $request->shouldReceive('getBaseUrl')->andReturn('http://192.168.2.1/abm-master/public/odata.svc');
-        $request->shouldReceive('header')->withArgs(['XTest'])->andReturn('catch')->once();
-        $request->initialize();
-        $this->object->shouldReceive('isDumping')->andReturn(true);
-
-        $expected = '&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
-<service xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" >
- <workspace>
-  <atom:title>Default</atom:title>
- </workspace>
-</service>
-';
-
-        $result =  $this->object->index($request);
-        $this->assertEquals(200, $result->getStatusCode());
-        $actual = $result->getContent();
-        //$this->assertEquals($expected, $actual);
-        $headers = $result->headers;
-        $this->assertTrue($headers->has('Content-Type'));
-        $this->assertFalse($headers->has('Content-Length'));
-        $this->assertFalse($headers->has('ETag'));
-        $this->assertTrue($headers->has('Cache-Control'));
-        $this->assertFalse($headers->has('Last-Modified'));
-        $this->assertFalse($headers->has('Location'));
-        $this->assertTrue($headers->has('Status'));
-        $this->assertTrue($headers->has('StatusCode'));
-        $this->assertFalse($headers->has('StatusDesc'));
-        $this->assertTrue($headers->has('DataServiceVersion'));
     }
 }
