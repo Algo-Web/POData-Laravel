@@ -86,8 +86,8 @@ class MetadataProviderNewTest extends TestCase
      */
     public function testBootNoMigrations()
     {
-        //$schema = Schema::getFacadeRoot();
-        Schema::shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(false)->once();
+        $schema = Schema::getFacadeRoot();
+        $schema->shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(false)->once();
 
         $foo = $this->object;
         $foo->boot();
@@ -98,8 +98,8 @@ class MetadataProviderNewTest extends TestCase
      */
     public function testBootNoMigrationsExceptionThrown()
     {
-        //$schema = Schema::getFacadeRoot();
-        Schema::shouldReceive('hasTable')->andThrow(new \Exception())->once();
+        $schema = Schema::getFacadeRoot();
+        $schema->shouldReceive('hasTable')->andThrow(new \Exception())->once();
 
         $foo = $this->object;
         $foo->boot();
@@ -545,9 +545,9 @@ class MetadataProviderNewTest extends TestCase
     private function setUpSchemaFacade()
     {
         $schema = Schema::getFacadeRoot();
-        Schema::shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(true);
-        Schema::shouldReceive('hasTable')->andReturn(true);
-        Schema::shouldReceive('getColumnListing')->andReturn([]);
+        $schema->shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(true);
+        $schema->shouldReceive('hasTable')->andReturn(true);
+        $schema->shouldReceive('getColumnListing')->andReturn([]);
     }
 
     /**

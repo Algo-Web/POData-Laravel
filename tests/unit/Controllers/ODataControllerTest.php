@@ -34,9 +34,6 @@ class ODataControllerTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-//        $this->object  = \Mockery::mock('\AlgoWeb\PODataLaravel\Controllers\ODataController')->makePartial();
-        $this->getMockBuilder('App\Http\Controllers\Controller')->getMock();
-//        $this->mock = \Mockery::mock('App\Http\Controllers\Controller', 'Post');
         $this->object  = \Mockery::mock('\AlgoWeb\PODataLaravel\Controllers\ODataController')
             ->makePartial()->shouldAllowMockingProtectedMethods();
         $this->query = m::mock(LaravelQuery::class)->makePartial();
@@ -63,22 +60,21 @@ class ODataControllerTest extends TestCase
         $request->initialize();
         $dump = false;
 
-        //$db = DB::getFacadeRoot();
-        DB::shouldReceive('beginTransaction')->andReturn(null)->once();
+        $db = DB::getFacadeRoot();
+        $db->shouldReceive('beginTransaction')->andReturn(null)->once();
         DB::shouldReceive('commit')->andReturn(null)->never();
         DB::shouldReceive('rollBack')->andReturn(null)->once();
 
         $expected = 'Malformed base service uri in the configuration file '
                     .'(should end with .svc, there should not be query or fragment in the base service uri)';
         $actual = null;
-
         try {
             $this->object->index($request, $dump);
         } catch (ODataException $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
-    }
+}
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Controllers\ODataController::index
