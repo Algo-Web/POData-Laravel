@@ -276,9 +276,20 @@ class MetadataControllerProviderTest extends TestCase
 
     public function testBootExceptionThrownDuringResolution()
     {
-        $this->markTestSkipped();
-        $app = App::make('app');
-        $app->setConsole(false);
+        App::shouldReceive('runningInConsole')->andReturn(false);
+        App::shouldReceive('make')->passthru();
+        App::shouldReceive('getAlias')->passthru();
+        App::shouldReceive('isAlias')->passthru();
+        App::shouldReceive('getConcrete')->passthru();
+        App::shouldReceive('getContextualConcrete')->passthru();
+        App::shouldReceive('missingLeadingSlash')->passthru();
+        App::shouldReceive('isBuildable')->passthru();
+        App::shouldReceive('build')->passthru();
+        App::shouldReceive('instance')->passthru();
+        App::shouldReceive('bound')->passthru();
+        App::shouldReceive('removeAbstractAlias')->passthru();
+        App::shouldReceive('resolve')->passthru();
+        App::shouldReceive('findInContextualBindings')->passthru();
 
         $container = m::mock(MetadataControllerContainer::class);
         $container->shouldReceive('setMetadata')->withArgs([[]])->passthru()->never();
@@ -296,6 +307,7 @@ class MetadataControllerProviderTest extends TestCase
         $foo = m::mock(MetadataControllerProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getClassMap')->andReturn([TestController::class])->once();
         $foo->shouldReceive('getIsCaching')->andReturn(false)->once();
+        $foo->shouldReceive('getAppNamespace')->andReturn('AlgoWeb\PODataLaravel')->once();
 
         $expected = 'Resolved result not a controller';
         $actual = null;

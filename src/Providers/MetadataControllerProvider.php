@@ -98,8 +98,21 @@ class MetadataControllerProvider extends MetadataBaseProvider
     protected function getCandidateControllers($classes)
     {
         $ends = [];
-        $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : 'App';
+        $startName = $this->getAppNamespace();
+        $rawClasses = [];
         foreach ($classes as $name) {
+            // not in app namespace, keep moving
+            if (!\Illuminate\Support\Str::startsWith($name, $startName)) {
+                continue;
+            }
+            // if class doesn't exist (for whatever reason), skip it now rather than muck about later
+            if (!class_exists($name)) {
+                continue;
+            }
+            $rawClasses[] = $name;
+        }
+
+        foreach ($rawClasses as $name) {
             // not in app namespace, keep moving
             if (!\Illuminate\Support\Str::startsWith($name, $startName)) {
                 continue;
@@ -124,5 +137,11 @@ class MetadataControllerProvider extends MetadataBaseProvider
             }
         }
         return $ends;
+    }
+
+    protected function getAppNamespace()
+    {
+        $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : 'App';
+        return $startName;
     }
 }
