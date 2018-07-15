@@ -82,7 +82,7 @@ class MetadataProviderTest extends TestCase
     public function testBootNoMigrations()
     {
         $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(false)->once();
+        Schema::shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(false)->once();
 
         $foo = $this->object;
         $foo->boot();
@@ -94,7 +94,7 @@ class MetadataProviderTest extends TestCase
     public function testBootNoMigrationsExceptionThrown()
     {
         $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->andThrow(new \Exception())->once();
+        Schema::shouldReceive('hasTable')->andThrow(new \Exception())->once();
 
         $foo = $this->object;
         $foo->boot();
@@ -110,10 +110,10 @@ class MetadataProviderTest extends TestCase
         $map = m::mock(Map::class);
         App::instance('objectmap', $map);
 
-        $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
-        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn('aybabtu')->once();
-        $cache->shouldReceive('get')->withArgs(['objectmap'])->andReturn('wombat')->once();
-        Cache::swap($cache);
+        //$cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn('aybabtu')->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn('wombat')->once();
+        //Cache::swap($cache);
 
         $foo = $this->object;
         $foo->shouldReceive('getIsCaching')->andReturn(true)->once();
@@ -459,9 +459,9 @@ class MetadataProviderTest extends TestCase
     private function setUpSchemaFacade()
     {
         $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(true);
-        $schema->shouldReceive('hasTable')->andReturn(true);
-        $schema->shouldReceive('getColumnListing')->andReturn([]);
+        Schema::shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(true);
+        Schema::shouldReceive('hasTable')->andReturn(true);
+        Schema::shouldReceive('getColumnListing')->andReturn([]);
     }
 
     /**

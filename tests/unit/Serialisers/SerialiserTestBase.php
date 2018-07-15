@@ -18,12 +18,12 @@ class SerialiserTestBase extends TestCase
         $map = new Map();
         App::instance('objectmap', $map);
         $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(true);
-        $schema->shouldReceive('hasTable')->andReturn(true);
-        $schema->shouldReceive('getColumnListing')->andReturn([]);
+        Schema::shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(true);
+        Schema::shouldReceive('hasTable')->andReturn(true);
+        Schema::shouldReceive('getColumnListing')->andReturn([]);
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
     }
 
     /**

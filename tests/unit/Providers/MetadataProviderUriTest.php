@@ -485,9 +485,9 @@ class MetadataProviderUriTest extends TestCase
     private function setUpSchemaFacade()
     {
         $schema = Schema::getFacadeRoot();
-        $schema->shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(true);
-        $schema->shouldReceive('hasTable')->andReturn(true);
-        $schema->shouldReceive('getColumnListing')->andReturn([]);
+        Schema::shouldReceive('hasTable')->withArgs([config('database.migrations')])->andReturn(true);
+        Schema::shouldReceive('hasTable')->andReturn(true);
+        Schema::shouldReceive('getColumnListing')->andReturn([]);
     }
 
     /**

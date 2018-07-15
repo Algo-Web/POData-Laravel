@@ -2052,9 +2052,9 @@ class LaravelQueryTest extends TestCase
     public function testStartTransaction()
     {
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->never();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->never();
+        DB::shouldReceive('rollBack')->andReturnNull()->never();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('commit')->andReturnNull()->never();
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->startTransaction();
@@ -2063,9 +2063,9 @@ class LaravelQueryTest extends TestCase
     public function testCommitTransaction()
     {
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->never();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->never();
-        $db->shouldReceive('commit')->andReturnNull()->once();
+        DB::shouldReceive('rollBack')->andReturnNull()->never();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->never();
+        DB::shouldReceive('commit')->andReturnNull()->once();
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->commitTransaction();
@@ -2074,9 +2074,9 @@ class LaravelQueryTest extends TestCase
     public function testRollBackTransaction()
     {
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->once();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->never();
-        $db->shouldReceive('commit')->andReturnNull()->never();
+        DB::shouldReceive('rollBack')->andReturnNull()->once();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->never();
+        DB::shouldReceive('commit')->andReturnNull()->never();
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->rollBackTransaction();

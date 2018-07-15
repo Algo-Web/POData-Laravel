@@ -63,10 +63,10 @@ class ODataControllerTest extends TestCase
         $request->initialize();
         $dump = false;
 
-        $db = DB::getFacadeRoot();
-        $db->shouldReceive('beginTransaction')->andReturn(null)->once();
-        $db->shouldReceive('commit')->andReturn(null)->never();
-        $db->shouldReceive('rollBack')->andReturn(null)->once();
+        //$db = DB::getFacadeRoot();
+        DB::shouldReceive('beginTransaction')->andReturn(null)->once();
+        DB::shouldReceive('commit')->andReturn(null)->never();
+        DB::shouldReceive('rollBack')->andReturn(null)->once();
 
         $expected = 'Malformed base service uri in the configuration file '
                     .'(should end with .svc, there should not be query or fragment in the base service uri)';
@@ -95,9 +95,9 @@ class ODataControllerTest extends TestCase
         $dump = false;
 
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('beginTransaction')->andReturn(null)->once();
-        $db->shouldReceive('commit')->andReturn(null)->once();
-        $db->shouldReceive('rollBack')->andReturn(null)->never();
+        DB::shouldReceive('beginTransaction')->andReturn(null)->once();
+        DB::shouldReceive('commit')->andReturn(null)->once();
+        DB::shouldReceive('rollBack')->andReturn(null)->never();
 
         $expected = '&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
 <service xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" >

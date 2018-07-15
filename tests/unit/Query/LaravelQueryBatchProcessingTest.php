@@ -30,8 +30,8 @@ class LaravelQueryBatchProcessingTest extends TestCase
     public function testQueuedSaveTriggeredOnTransactionCommitInBatch()
     {
         $db = App::make('db');
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->once();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('commit')->andReturnNull()->once();
         $foo = new LaravelQuery();
 
         $model = m::mock(Model::class);
@@ -45,8 +45,8 @@ class LaravelQueryBatchProcessingTest extends TestCase
     public function testQueuedSaveNotTriggeredOnTransactionRollbackInBatch()
     {
         $db = App::make('db');
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('rollBack')->andReturnNull()->once();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('rollBack')->andReturnNull()->once();
         $foo = new LaravelQuery();
 
         $model = m::mock(Model::class);
@@ -60,8 +60,8 @@ class LaravelQueryBatchProcessingTest extends TestCase
     public function testQueuedSaveTriggeredOnTransactionCommitNotInBatch()
     {
         $db = App::make('db');
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->once();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('commit')->andReturnNull()->once();
         $foo = new LaravelQuery();
 
         $model = m::mock(Model::class);
@@ -75,8 +75,8 @@ class LaravelQueryBatchProcessingTest extends TestCase
     public function testUpdateResultGetsQueuedAndProcessed()
     {
         $db = App::make('db');
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->once();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('commit')->andReturnNull()->once();
 
         $model = m::mock(Model::class);
         $model->shouldReceive('save')->andReturn(true)->once();
@@ -95,8 +95,8 @@ class LaravelQueryBatchProcessingTest extends TestCase
     public function testCreateResultGetsQueuedAndProcessed()
     {
         $db = App::make('db');
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->once();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('commit')->andReturnNull()->once();
 
         $model = m::mock(Model::class);
         $model->shouldReceive('save')->andReturn(true)->once();
