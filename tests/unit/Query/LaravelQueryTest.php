@@ -699,19 +699,6 @@ class LaravelQueryTest extends TestCase
     }
 
     /**
-     * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getResourceFromRelatedResourceSet
-     * @todo   Implement testGetResourceFromRelatedResourceSet().
-     */
-    public function testGetResourceFromRelatedResourceSet()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
-
-    /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getRelatedResourceReference
      */
     public function testGetRelatedResourceReference()

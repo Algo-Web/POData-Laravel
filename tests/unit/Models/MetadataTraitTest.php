@@ -48,18 +48,6 @@ class MetadataTraitTest extends TestCase
 
     /**
      * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::metadata
-     * @todo   Implement testMetadata().
-     */
-    public function testMetadata()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::metadata
      */
     public function testMetadataNotAnEloquentModel()
     {
