@@ -113,14 +113,6 @@ class MetadataControllerProvider extends MetadataBaseProvider
         }
 
         foreach ($rawClasses as $name) {
-            // not in app namespace, keep moving
-            if (!\Illuminate\Support\Str::startsWith($name, $startName)) {
-                continue;
-            }
-            // if class doesn't exist (for whatever reason), skip it now rather than muck about later
-            if (!class_exists($name)) {
-                continue;
-            }
             try {
                 if (in_array(MetadataControllerTrait::class, class_uses($name, false))) {
                     $result = App::make($name);
