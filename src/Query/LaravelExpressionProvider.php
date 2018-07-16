@@ -75,8 +75,9 @@ class LaravelExpressionProvider implements IExpressionProvider
             return 'trim(' . $params[0] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_SUBSTRING] = function ($params) {
-            return count($params) == 3 ?
-                'substr(' . $params[0] . ', ' . $params[1] . ', ' . $params[2] . ')' : 'substr(' . $params[0] . ', ' . $params[1] . ')';
+            return count($params) == 3
+                ? 'substr(' . $params[0] . ', ' . $params[1] . ', ' . $params[2] . ')'
+                : 'substr(' . $params[0] . ', ' . $params[1] . ')';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_SUBSTRINGOF] = function ($params) {
             return '(strpos(' . $params[1] . ', ' . $params[0] . ') !== false)';
