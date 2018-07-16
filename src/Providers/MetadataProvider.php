@@ -229,10 +229,6 @@ class MetadataProvider extends MetadataBaseProvider
             if ($field->getPrimitiveType() == 'blob') {
                 $odataEntity->setMediaLinkEntry(true);
                 $streamInfo = new ResourceStreamInfo($field->getName());
-                if (!$odataEntity->isMediaLinkEntry()) {
-                    throw new InvalidOperationException('');
-                }
-
                 $odataEntity->addNamedStream($streamInfo);
                 continue;
             }
@@ -327,9 +323,10 @@ class MetadataProvider extends MetadataBaseProvider
         $startName = $this->getAppNamespace();
         foreach ($classes as $name) {
             if (\Illuminate\Support\Str::startsWith($name, $startName)) {
-                if (in_array('AlgoWeb\\PODataLaravel\\Models\\MetadataTrait', class_uses($name)) &&
-                is_subclass_of($name, '\\Illuminate\\Database\\Eloquent\\Model')) {
-                    $ends[] = $name;
+                if (in_array('AlgoWeb\\PODataLaravel\\Models\\MetadataTrait', class_uses($name))) {
+                    if (is_subclass_of($name, '\\Illuminate\\Database\\Eloquent\\Model')) {
+                        $ends[] = $name;
+                    }
                 }
             }
         }

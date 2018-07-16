@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Mockery as m;
+use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
@@ -571,6 +572,41 @@ class LaravelQueryBulkTest extends TestCase
         } catch (ODataException $e) {
             $actual = $e->getMessage();
         }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetEmptyControllerContainer()
+    {
+        $foo = m::mock(LaravelBulkQuery::class)->makePartial();
+
+        $expected = 'Controller container must not be null';
+        $actual = null;
+
+        try {
+            $foo->getControllerContainer();
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetOptionalVerbMappingBadInstanceType()
+    {
+        $set = m::mock(ResourceSet::class);
+        $set->shouldReceive('getResourceType->getInstanceType')->andReturnNull();
+
+        $foo = m::mock(LaravelBulkQueryDummy::class)->makePartial();
+
+        $expected = LaravelBulkQuery::class;
+        $actual = null;
+
+        try {
+            $foo->getOptionalVerbMapping($set, 'POST');
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+
         $this->assertEquals($expected, $actual);
     }
 

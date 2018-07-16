@@ -2069,6 +2069,22 @@ class LaravelQueryTest extends TestCase
         $foo->rollBackTransaction();
     }
 
+    public function testGetEmptyControllerContainer()
+    {
+        $foo = m::mock(LaravelQuery::class)->makePartial();
+
+        $expected = 'Controller container must not be null';
+        $actual = null;
+
+        try {
+            $foo->getControllerContainer();
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+
+        $this->assertEquals($expected, $actual);
+    }
+
     private function seedControllerMetadata(TestController $controller = null)
     {
         $translator = \Mockery::mock(\Illuminate\Translation\Translator::class)->makePartial();

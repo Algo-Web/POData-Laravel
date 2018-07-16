@@ -423,6 +423,28 @@ class MetadataProviderTest extends TestCase
         $this->assertEquals('Commence Primary Ignition', $result->name);
     }
 
+    public function testGetDefaultNamespace()
+    {
+        App::shouldReceive('getNamespace')->andThrow(new \Exception())->once();
+
+        $foo = m::mock(MetadataProviderDummy::class)->makePartial();
+
+        $expected = 'App';
+        $actual = $foo->getAppNamespace();
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetNonDefaultNamespace()
+    {
+        App::shouldReceive('getNamespace')->andReturn('hammertime')->once();
+
+        $foo = m::mock(MetadataProviderDummy::class)->makePartial();
+
+        $expected = 'hammertime';
+        $actual = $foo->getAppNamespace();
+        $this->assertEquals($expected, $actual);
+    }
+
     public static function getterSingleton()
     {
         $model = new TestModel();

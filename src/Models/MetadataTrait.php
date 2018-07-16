@@ -658,12 +658,7 @@ trait MetadataTrait
      */
     public function setEagerLoad(array $relations)
     {
-        $check = array_map('strval', $relations);
-        if ($relations != $check) {
-            throw new InvalidOperationException('All supplied relations must be resolvable to strings');
-        }
-
-        $this->loadEagerRelations = $relations;
+        $this->loadEagerRelations = array_map('strval', $relations);
     }
 
     /*
