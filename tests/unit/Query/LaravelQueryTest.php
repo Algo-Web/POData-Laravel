@@ -1727,7 +1727,6 @@ class LaravelQueryTest extends TestCase
         $navPropName = 'morphTarget';
 
         $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
@@ -1764,7 +1763,6 @@ class LaravelQueryTest extends TestCase
         $navPropName = 'morphTarget';
 
         $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
@@ -1801,7 +1799,6 @@ class LaravelQueryTest extends TestCase
         $navPropName = 'morphTarget';
 
         $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
@@ -1946,7 +1943,6 @@ class LaravelQueryTest extends TestCase
         $navPropName = 'morphTarget';
 
         $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne)->never();
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
@@ -1983,7 +1979,6 @@ class LaravelQueryTest extends TestCase
         $navPropName = 'morphTarget';
 
         $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne)->never();
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
@@ -2020,7 +2015,6 @@ class LaravelQueryTest extends TestCase
         $navPropName = 'morphTarget';
 
         $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne)->never();
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);

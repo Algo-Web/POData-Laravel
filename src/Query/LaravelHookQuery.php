@@ -53,9 +53,6 @@ class LaravelHookQuery
         $targetEntityInstance,
         $navPropName
     ) {
-        if (!($sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model)) {
-            throw new InvalidOperationException('Both input entities must be Eloquent models');
-        }
         $relation = $this->isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName);
 
         // in case the fake 'PrimaryKey' attribute got set inbound for a polymorphic-affected model, flatten it now
@@ -91,9 +88,6 @@ class LaravelHookQuery
         $targetEntityInstance,
         $navPropName
     ) {
-        if (!($sourceEntityInstance instanceof Model && $targetEntityInstance instanceof Model)) {
-            throw new InvalidOperationException('Both input entities must be Eloquent models');
-        }
         $relation = $this->isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName);
 
         // in case the fake 'PrimaryKey' attribute got set inbound for a polymorphic-affected model, flatten it now
@@ -142,8 +136,8 @@ class LaravelHookQuery
     protected function isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName)
     {
         if (!$sourceEntityInstance instanceof Model || !$targetEntityInstance instanceof Model) {
-            $msg = 'Both source and target must be Eloquent models';
-            throw new \InvalidArgumentException($msg);
+            $msg = 'Both input entities must be Eloquent models';
+            throw new InvalidOperationException($msg);
         }
         $relation = $sourceEntityInstance->$navPropName();
         if (!$relation instanceof Relation) {
