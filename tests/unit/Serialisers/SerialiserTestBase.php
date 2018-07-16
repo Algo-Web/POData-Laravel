@@ -23,7 +23,11 @@ class SerialiserTestBase extends TestCase
         $schema->shouldReceive('getColumnListing')->andReturn([]);
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
     }
 
     /**

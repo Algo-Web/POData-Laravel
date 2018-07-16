@@ -3,6 +3,8 @@
 namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use AlgoWeb\PODataLaravel\Models\TestCase;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
@@ -22,6 +24,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
+use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\SimpleMetadataProvider;
@@ -234,6 +237,49 @@ class MetadataProviderReverseTest extends TestCase
         try {
             $foo->resolveReverseProperty($left, 'property');
         } catch (\InvalidArgumentException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testMetadataResolveReversePropertyMappingNameNotString()
+    {
+        $foo = m::mock(MetadataProvider::class)->makePartial();
+        $foo->shouldReceive('getObjectMap->resolveEntity')->andReturn(null)->never();
+
+        $expected = 'Property name must be string';
+        $actual = null;
+
+        $left = new TestMorphManySource([]);
+
+        try {
+            $foo->resolveReverseProperty($left, new \stdClass());
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testMetadataResolveReversePropertyMappingAcrossPolymorphicMapping()
+    {
+        $assoc = m::mock(Association::class);
+        $assoc->shouldReceive('getFirst->getRelationName')->andReturn('property')->once();
+        $assoc->shouldReceive('getLast->getRelationName')->andReturnNull()->never();
+
+        $gubbins = m::mock(EntityGubbins::class)->makePartial();
+        $gubbins->shouldReceive('resolveAssociation')->andReturn($assoc)->once();
+
+        $foo = m::mock(MetadataProvider::class)->makePartial();
+        $foo->shouldReceive('getObjectMap->resolveEntity')->andReturn($gubbins)->once();
+
+        $expected = '';
+        $actual = null;
+
+        $left = new TestMorphManySource([]);
+
+        try {
+            $foo->resolveReverseProperty($left, 'property');
+        } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);

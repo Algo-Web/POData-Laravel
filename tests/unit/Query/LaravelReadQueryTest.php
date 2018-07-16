@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
+use AlgoWeb\PODataLaravel\Models\LaravelReadQueryDummy;
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
@@ -9,6 +10,7 @@ use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder;
 use Mockery as m;
+use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\Type\Int32;
@@ -18,6 +20,7 @@ use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
 use POData\UriProcessor\QueryProcessor\OrderByParser\OrderByPathSegment;
 use POData\UriProcessor\QueryProcessor\OrderByParser\OrderBySubPathSegment;
 use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
+use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 
 class LaravelReadQueryTest extends TestCase
 {
@@ -172,6 +175,28 @@ class LaravelReadQueryTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testGetResourceWithBadEagerLoad()
+    {
+        $rSet = m::mock(ResourceSet::class);
+        $source = m::mock(TestModel::class)->makePartial();
+        $source->shouldReceive('get')->andReturn(collect([]));
+        $source->shouldReceive('getEagerLoad')->andReturn(null)->once();
+
+        $foo = m::mock(LaravelReadQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
+
+        $expected = '';
+        $actual = null;
+
+        try {
+            $actual = $foo->getResource($rSet, null, [], null, $source);
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testGetResourceFromRelation()
     {
         $rSet = m::mock(ResourceSet::class);
@@ -209,6 +234,61 @@ class LaravelReadQueryTest extends TestCase
 
         $result = $foo->getRelatedResourceReference($rSet, $entity, $rSet, $targProp);
         $this->assertNull($result);
+    }
+
+    public function testGetRelatedResourceReferenceBadResult()
+    {
+        $rSet = m::mock(ResourceSet::class);
+        $targProp = m::mock(ResourceProperty::class);
+        $targProp->shouldReceive('getName')->andReturn('oneSource')->once();
+
+        $foo = m::mock(LaravelReadQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
+
+        $rel = m::mock(HasOne::class)->makePartial();
+        $rel->shouldReceive('first')->andReturn(new \stdClass())->once();
+
+        $entity = m::mock(TestMonomorphicSource::class)->makePartial();
+        $entity->shouldReceive('oneSource')->andReturn($rel)->once();
+
+        $expected = 'Model not retrieved from Eloquent relation';
+        $actual = null;
+
+        try {
+            $foo->getRelatedResourceReference($rSet, $entity, $rSet, $targProp);
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetResourceFromRelatedResourceSetBadResult()
+    {
+        $rSet = m::mock(ResourceSet::class);
+        $targProp = m::mock(ResourceProperty::class);
+        $targProp->shouldReceive('getName')->andReturn('oneSource')->once();
+
+        $foo = m::mock(LaravelReadQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->never();
+        $foo->shouldReceive('getResource')->andReturn('chaboonagoonga')->once();
+
+        $rel = m::mock(HasOne::class)->makePartial();
+
+        $entity = m::mock(TestMonomorphicSource::class)->makePartial();
+        $entity->shouldReceive('oneSource')->andReturn($rel)->once();
+
+        $key = m::mock(KeyDescriptor::class)->makePartial();
+        $key->shouldReceive('getValidatedNamedValues')->andReturn([]);
+
+        $expected = 'GetResourceFromRelatedResourceSet must return an entity or null';
+        $actual = null;
+
+        try {
+            $foo->getResourceFromRelatedResourceSet($rSet, $entity, $rSet, $targProp, $key);
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 
     public function testNonTrivialOrderByOnModel()
@@ -253,6 +333,29 @@ class LaravelReadQueryTest extends TestCase
         $this->assertFalse($actual->hasMore);
         $this->assertEquals(0, $actual->count);
         $this->assertEquals(0, count($actual->results));
+    }
+
+    public function testApplyFilteringWithNullClosureOnBigSet()
+    {
+        $top = 0;
+        $skip = 0;
+        $sourceEntityInstance = m::mock(TestModel::class)->makePartial();
+        $sourceEntityInstance->shouldReceive('count')->andReturn(25000)->once();
+        $nullFilter = false;
+        $rawLoad = [];
+        $isValid = null;
+
+        $foo = m::mock(LaravelReadQueryDummy::class)->makePartial();
+
+        $expected = 'Filter closure not set';
+        $actual = null;
+
+        try {
+            $foo->applyFiltering($top, $skip, $sourceEntityInstance, $nullFilter, $rawLoad, $isValid);
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 
     /**

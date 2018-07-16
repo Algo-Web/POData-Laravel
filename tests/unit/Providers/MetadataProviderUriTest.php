@@ -55,9 +55,6 @@ class MetadataProviderUriTest extends TestCase
 
         $this->setUpSchemaFacade();
 
-        $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
-
         $reqUrlString = 'http://localhost/odata.svc/TestMonomorphicSources(id=1)/oneSource';
 
         $baseUrl = new Url('http://localhost/odata.svc');
@@ -125,9 +122,6 @@ class MetadataProviderUriTest extends TestCase
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
-
-        $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
 
         $reqUrlString = 'http://localhost/odata.svc/TestMonomorphicSources(id=1)/manySource';
 
@@ -197,9 +191,6 @@ class MetadataProviderUriTest extends TestCase
 
         $this->setUpSchemaFacade();
 
-        $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
-
         $reqUrlString = 'http://localhost/odata.svc/TestMonomorphicManySources(id=1)/manySource';
 
         $baseUrl = new Url('http://localhost/odata.svc');
@@ -261,9 +252,6 @@ class MetadataProviderUriTest extends TestCase
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
-
-        $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
 
         $reqUrlString = 'http://localhost/odata.svc/TestMorphOneSources(id=1)/morphTarget';
 
@@ -329,7 +317,11 @@ class MetadataProviderUriTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $reqUrlString = 'http://localhost/odata.svc/TestMorphManySourceAlternates(alternate_id=1)/morphTarget';
 
@@ -419,7 +411,11 @@ class MetadataProviderUriTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $reqUrlString = 'http://localhost/odata.svc/TestMorphManyToManySources(id=1)/manySource';
 

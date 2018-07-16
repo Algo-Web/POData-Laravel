@@ -39,9 +39,6 @@ trait MetadataControllerTrait
         if (!$this instanceof BaseController) {
             throw new InvalidOperationException(get_class($this));
         }
-        if (!$this instanceof BaseController) {
-            throw new InvalidOperationException(get_class($this));
-        }
         // enforce that mapping is actually not empty
         if (0 == count($this->mapping)) {
             throw new InvalidOperationException('Mapping array must not be empty');

@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Mockery as m;
+use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
@@ -50,9 +51,9 @@ class LaravelQueryBulkTest extends TestCase
         App::instance('metadataControllers', $container);
 
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->never();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->once();
+        DB::shouldReceive('rollBack')->andReturnNull()->never();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('commit')->andReturnNull()->once();
 
         $iType = new \ReflectionClass(TestModel::class);
         $type = m::mock(ResourceEntityType::class);
@@ -85,9 +86,9 @@ class LaravelQueryBulkTest extends TestCase
         $container = m::mock(MetadataControllerContainer::class);
         $container->shouldReceive('getMapping')->andReturn(null)->once();
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->once();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->never();
+        DB::shouldReceive('rollBack')->andReturnNull()->once();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('commit')->andReturnNull()->never();
 
         $iType = new \ReflectionClass(TestModel::class);
         $type = m::mock(ResourceEntityType::class);
@@ -135,9 +136,9 @@ class LaravelQueryBulkTest extends TestCase
         $container->shouldReceive('getMapping')->andReturn($map)->once();
 
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->once();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->never();
+        DB::shouldReceive('rollBack')->andReturnNull()->once();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('commit')->andReturnNull()->never();
 
         $iType = new \ReflectionClass(TestModel::class);
         $type = m::mock(ResourceEntityType::class);
@@ -183,9 +184,9 @@ class LaravelQueryBulkTest extends TestCase
         $container->shouldReceive('getMapping')->andReturn($map)->once();
 
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->once();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->never();
+        DB::shouldReceive('rollBack')->andReturnNull()->once();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('commit')->andReturnNull()->never();
 
         $iType = new \ReflectionClass(TestModel::class);
         $type = m::mock(ResourceEntityType::class);
@@ -297,9 +298,9 @@ class LaravelQueryBulkTest extends TestCase
         $container->shouldReceive('getMapping')->andReturn(null)->once();
 
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->never();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->once();
+        DB::shouldReceive('rollBack')->andReturnNull()->never();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('commit')->andReturnNull()->once();
 
         $iType = new \ReflectionClass(TestModel::class);
         $type = m::mock(ResourceEntityType::class);
@@ -328,9 +329,9 @@ class LaravelQueryBulkTest extends TestCase
         $container = m::mock(MetadataControllerContainer::class);
         $container->shouldReceive('getMapping')->andReturn(null)->once();
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->once();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->never();
+        DB::shouldReceive('rollBack')->andReturnNull()->once();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('commit')->andReturnNull()->never();
 
         $iType = new \ReflectionClass(TestModel::class);
         $type = m::mock(ResourceEntityType::class);
@@ -407,9 +408,9 @@ class LaravelQueryBulkTest extends TestCase
         $container->shouldReceive('getMapping')->andReturn($map)->once();
 
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->once();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->never();
+        DB::shouldReceive('rollBack')->andReturnNull()->once();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('commit')->andReturnNull()->never();
 
         $iType = new \ReflectionClass(TestModel::class);
         $type = m::mock(ResourceEntityType::class);
@@ -460,9 +461,9 @@ class LaravelQueryBulkTest extends TestCase
         $container->shouldReceive('getMapping')->andReturn($map)->once();
 
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->once();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->never();
+        DB::shouldReceive('rollBack')->andReturnNull()->once();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('commit')->andReturnNull()->never();
 
         $iType = new \ReflectionClass(TestModel::class);
         $type = m::mock(ResourceEntityType::class);
@@ -515,9 +516,9 @@ class LaravelQueryBulkTest extends TestCase
         $container->shouldReceive('getMapping')->andReturn($map)->once();
 
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->never();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->once();
+        DB::shouldReceive('rollBack')->andReturnNull()->never();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('commit')->andReturnNull()->once();
 
         $iType = new \ReflectionClass(TestModel::class);
         $type = m::mock(ResourceEntityType::class);
@@ -571,6 +572,41 @@ class LaravelQueryBulkTest extends TestCase
         } catch (ODataException $e) {
             $actual = $e->getMessage();
         }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetEmptyControllerContainer()
+    {
+        $foo = m::mock(LaravelBulkQuery::class)->makePartial();
+
+        $expected = 'Controller container must not be null';
+        $actual = null;
+
+        try {
+            $foo->getControllerContainer();
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetOptionalVerbMappingBadInstanceType()
+    {
+        $set = m::mock(ResourceSet::class);
+        $set->shouldReceive('getResourceType->getInstanceType')->andReturnNull();
+
+        $foo = m::mock(LaravelBulkQueryDummy::class)->makePartial();
+
+        $expected = LaravelBulkQuery::class;
+        $actual = null;
+
+        try {
+            $foo->getOptionalVerbMapping($set, 'POST');
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+
         $this->assertEquals($expected, $actual);
     }
 

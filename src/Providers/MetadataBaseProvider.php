@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 
@@ -52,5 +53,15 @@ abstract class MetadataBaseProvider extends ServiceProvider
 
         $classes = $autoClass::$classMap;
         return array_keys($classes);
+    }
+
+    protected function getAppNamespace()
+    {
+        try {
+            $startName = App::getNamespace();
+        } catch (\Exception $e) {
+            $startName = 'App';
+        }
+        return $startName;
     }
 }

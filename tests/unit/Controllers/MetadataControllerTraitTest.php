@@ -42,6 +42,49 @@ class MetadataControllerTraitTest extends TestCase
         $this->assertEquals(false, $parms['isRequest']);
     }
 
+    public function testGetMappingsOnEmptyArray()
+    {
+        $foo = new TestController();
+        $foo->setMapping([]);
+
+        $expected = 'Mapping array must not be empty';
+        $actual = null;
+        try {
+            $foo->getMappings();
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetMappingsOnNonController()
+    {
+        $foo = new TestModel();
+
+        $expected = TestModel::class;
+        $actual = null;
+        try {
+            $foo->getMappings();
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetMethodNameOnNonController()
+    {
+        $foo = new TestModel();
+
+        $expected = TestModel::class;
+        $actual = null;
+        try {
+            $foo->getMethodName('', '');
+        } catch (\Exception $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testGetMethodNameOnEmptyArray()
     {
         $foo = new TestController();

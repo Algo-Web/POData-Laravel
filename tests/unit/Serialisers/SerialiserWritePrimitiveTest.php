@@ -8,7 +8,9 @@ use AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Mockery as m;
+use POData\Common\InvalidOperationException;
 use POData\ObjectModel\ObjectModelSerializer;
 use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
@@ -280,6 +282,12 @@ class SerialiserWritePrimitiveTest extends SerialiserTestBase
         $op = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
 
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
+
         $classen = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -291,5 +299,51 @@ class SerialiserWritePrimitiveTest extends SerialiserTestBase
 
         $query = m::mock(LaravelQuery::class);
         return array($host, $meta, $query);
+    }
+
+    public function testWritePrimitiveWithBadInstanceType()
+    {
+        $entryObject = new QueryResult();
+        $entryObject->results = new TestModel();
+
+        $prop = m::mock(ResourceProperty::class);
+        $prop->shouldReceive('getName')->andReturn('name')->once();
+        $prop->shouldReceive('getInstanceType')->andReturn(new \stdClass())->once();
+
+        $foo = m::mock(IronicSerialiser::class)->makePartial();
+
+        $expected = 'stdClass';
+        $actual = null;
+
+        try {
+            $foo->writeTopLevelPrimitive($entryObject, $prop);
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testWritePrimitiveWithBadResourceInstanceType()
+    {
+        $entryObject = new QueryResult();
+        $entryObject->results = new TestModel();
+
+        $prop = m::mock(ResourceProperty::class);
+        $prop->shouldReceive('name')->andReturn('name');
+        $prop->shouldReceive('getName')->andReturn('name');
+        $prop->shouldReceive('getInstanceType')->andReturn(new StringType())->once();
+        $prop->shouldReceive('getResourceType->getInstanceType')->andReturn(new \stdClass())->once();
+
+        $foo = m::mock(IronicSerialiser::class)->makePartial();
+
+        $expected = 'stdClass';
+        $actual = null;
+
+        try {
+            $foo->writeTopLevelPrimitive($entryObject, $prop);
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 }

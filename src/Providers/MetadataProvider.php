@@ -229,10 +229,6 @@ class MetadataProvider extends MetadataBaseProvider
             if ($field->getPrimitiveType() == 'blob') {
                 $odataEntity->setMediaLinkEntry(true);
                 $streamInfo = new ResourceStreamInfo($field->getName());
-                if (!$odataEntity->isMediaLinkEntry()) {
-                    throw new InvalidOperationException('');
-                }
-
                 $odataEntity->addNamedStream($streamInfo);
                 continue;
             }
@@ -282,6 +278,7 @@ class MetadataProvider extends MetadataBaseProvider
         if ($isCaching && $hasCache) {
             App::instance('metadata', $meta);
             App::instance('objectmap', $objectMap);
+            self::$isBooted = true;
             return;
         }
         $meta = App::make('metadata');
@@ -324,16 +321,13 @@ class MetadataProvider extends MetadataBaseProvider
     {
         $classes = $this->getClassMap();
         $ends = [];
-        try {
-            $startName = App::getNamespace();
-        } catch (\Exception $e) {
-            $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : 'App';
-        }
+        $startName = $this->getAppNamespace();
         foreach ($classes as $name) {
             if (\Illuminate\Support\Str::startsWith($name, $startName)) {
-                if (in_array('AlgoWeb\\PODataLaravel\\Models\\MetadataTrait', class_uses($name)) &&
-                is_subclass_of($name, '\\Illuminate\\Database\\Eloquent\\Model')) {
-                    $ends[] = $name;
+                if (in_array('AlgoWeb\\PODataLaravel\\Models\\MetadataTrait', class_uses($name))) {
+                    if (is_subclass_of($name, '\\Illuminate\\Database\\Eloquent\\Model')) {
+                        $ends[] = $name;
+                    }
                 }
             }
         }
@@ -376,6 +370,7 @@ class MetadataProvider extends MetadataBaseProvider
             throw new \InvalidArgumentException($msg);
         }
         $association = $entity->resolveAssociation($propName);
+
         if (null === $association) {
             return null;
         }

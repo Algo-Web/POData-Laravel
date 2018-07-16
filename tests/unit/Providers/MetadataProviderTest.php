@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
+use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceType;
@@ -110,10 +111,10 @@ class MetadataProviderTest extends TestCase
         $map = m::mock(Map::class);
         App::instance('objectmap', $map);
 
-        $cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
-        $cache->shouldReceive('get')->withArgs(['metadata'])->andReturn('aybabtu')->once();
-        $cache->shouldReceive('get')->withArgs(['objectmap'])->andReturn('wombat')->once();
-        Cache::swap($cache);
+        //$cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn('aybabtu')->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn('wombat')->once();
+        //Cache::swap($cache);
 
         $foo = $this->object;
         $foo->shouldReceive('getIsCaching')->andReturn(true)->once();
@@ -123,6 +124,37 @@ class MetadataProviderTest extends TestCase
         $this->assertEquals('aybabtu', $result);
         $result = App::make('objectmap');
         $this->assertEquals('wombat', $result);
+    }
+
+    public function testBootBlowsUpWhenBootedTwice()
+    {
+        $this->setUpSchemaFacade();
+
+        $meta = m::mock(SimpleMetadataProvider::class);
+        App::instance('metadata', $meta);
+
+        $map = m::mock(Map::class);
+        App::instance('objectmap', $map);
+
+        //$cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn('aybabtu')->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn('wombat')->once();
+        //Cache::swap($cache);
+
+        $foo = $this->object;
+        $foo->shouldReceive('getIsCaching')->andReturn(true)->once();
+
+        $foo->boot(false);
+
+        $expected = 'Provider booted twice';
+        $actual = null;
+
+        try {
+            $foo->boot(false);
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 
     public function testBootHasMigrationsShouldBeCached()
@@ -218,8 +250,11 @@ class MetadataProviderTest extends TestCase
         App::instance('metadata', $meta);
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
-        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $foo = $this->object;
         $foo->shouldReceive('getCandidateModels')->andReturn([TestModel::class]);
@@ -241,8 +276,11 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
-        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $classen = [TestMonomorphicOneAndManySource::class, TestMonomorphicOneAndManyTarget::class,
             TestMorphManyToManyTarget::class, TestMorphManyToManySource::class, TestMonomorphicSource::class,
@@ -286,8 +324,11 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
-        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $classen = [TestMorphManySource::class, TestMorphTarget::class];
 
@@ -333,8 +374,11 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
-        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $classen = [TestGetterModel::class, TestMorphManySource::class, TestMorphOneSource::class,
             TestMorphTarget::class, TestMonomorphicManySource::class, TestMonomorphicManyTarget::class,
@@ -386,11 +430,14 @@ class MetadataProviderTest extends TestCase
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
-        $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
-        $cacheStore->shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null)->once();
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null)->once();
 
         $auth = Auth::getFacadeRoot();
-        $auth->shouldReceive('user')->andReturn($testModel)->once();
+        Auth::shouldReceive('user')->andReturn($testModel)->once();
 
         $classen = [TestModel::class];
 
@@ -406,6 +453,28 @@ class MetadataProviderTest extends TestCase
         $meta->createSingleton('single', $type, $functionName);
         $result = $meta->callSingleton('single');
         $this->assertEquals('Commence Primary Ignition', $result->name);
+    }
+
+    public function testGetDefaultNamespace()
+    {
+        App::shouldReceive('getNamespace')->andThrow(new \Exception())->once();
+
+        $foo = m::mock(MetadataProviderDummy::class)->makePartial();
+
+        $expected = 'App';
+        $actual = $foo->getAppNamespace();
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetNonDefaultNamespace()
+    {
+        App::shouldReceive('getNamespace')->andReturn('hammertime')->once();
+
+        $foo = m::mock(MetadataProviderDummy::class)->makePartial();
+
+        $expected = 'hammertime';
+        $actual = $foo->getAppNamespace();
+        $this->assertEquals($expected, $actual);
     }
 
     public static function getterSingleton()

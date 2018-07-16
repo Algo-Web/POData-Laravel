@@ -20,4 +20,9 @@ class MetadataProviderDummy extends MetadataProvider
     {
         return parent::getCandidateModels();
     }
+
+    public function getAppNamespace()
+    {
+        return parent::getAppNamespace();
+    }
 }

@@ -15,6 +15,7 @@ use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Mockery as m;
 use POData\Common\InvalidOperationException;
 use POData\Common\ODataConstants;
@@ -419,6 +420,12 @@ class IronicSerialiserTest extends SerialiserTestBase
             App::instance($className, $testModel);
         }
 
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
+
         $holder = new MetadataGubbinsHolder();
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -614,6 +621,12 @@ class IronicSerialiserTest extends SerialiserTestBase
         $host = new ServiceHost($op, $request);
         $host->setServiceUri('/odata.svc/');
 
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
+
         $holder = new MetadataGubbinsHolder();
         $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
@@ -677,6 +690,12 @@ class IronicSerialiserTest extends SerialiserTestBase
         $op = new IlluminateOperationContext($request);
         $host = new ServiceHost($op, $request);
         $host->setServiceUri('/odata.svc/');
+
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadataControllers'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
+        Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
         $holder = new MetadataGubbinsHolder();
         $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
@@ -839,5 +858,40 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $result = $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
         $this->assertEquals($result, $concreteType);
+    }
+
+    public function testGetRequestWhenNotYetSet()
+    {
+        $ironic = m::mock(IronicSerialiser::class)->makePartial();
+
+        $expected = 'Request not yet set';
+        $actual = null;
+
+        try {
+            $ironic->getRequest();
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetNextLinkUriWithBadOrderByInfo()
+    {
+        $lastObject = new \stdClass();
+        $node = m::mock(ExpandedProjectionNode::class)->makePartial();
+        $node->shouldReceive('getInternalOrderByInfo')->andReturn(null);
+
+        $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
+        $ironic->shouldReceive('getCurrentExpandedProjectionNode')->andReturn($node)->once();
+
+        $expected = IronicSerialiser::class;
+        $actual = null;
+
+        try {
+            $ironic->getNextLinkUri($lastObject);
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 }

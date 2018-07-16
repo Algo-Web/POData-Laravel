@@ -195,7 +195,7 @@ class MetadataControllerProviderTest extends TestCase
         $expectedMap['delete'] = [ 'method' => 'destroyTestModel', 'controller' => ElectricBoogalooController::class];
 
         $foo = m::mock(MetadataControllerProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getClassMap')->andReturn([PODATA_LARAVEL_APP_ROOT_NAMESPACE.'500MileController']);
+        $foo->shouldReceive('getClassMap')->andReturn(['App\Http\Controllers\500MileController']);
 
         $foo->boot();
 
@@ -208,8 +208,8 @@ class MetadataControllerProviderTest extends TestCase
     {
         //$cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cache = Cache::getFacadeRoot();
-        $cache->shouldReceive('has')->withArgs(['metadataControllers'])->andReturn(true)->once();
-        $cache->shouldReceive('get')->withArgs(['metadataControllers'])->andReturn('aybabtu')->once();
+        Cache::shouldReceive('has')->withArgs(['metadataControllers'])->andReturn(true)->once();
+        Cache::shouldReceive('get')->withArgs(['metadataControllers'])->andReturn('aybabtu')->once();
         //Cache::swap($cache);
 
         $foo = m::mock(MetadataControllerProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
@@ -224,9 +224,9 @@ class MetadataControllerProviderTest extends TestCase
     {
         //$cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cache = Cache::getFacadeRoot();
-        $cache->shouldReceive('has')->withArgs(['metadataControllers'])->andReturn(true)->never();
-        $cache->shouldReceive('get')->withArgs(['metadataControllers'])->andReturn('aybabtu')->never();
-        $cache->shouldReceive('forget')->andReturnNull()->once();
+        Cache::shouldReceive('has')->withArgs(['metadataControllers'])->andReturn(true)->never();
+        Cache::shouldReceive('get')->withArgs(['metadataControllers'])->andReturn('aybabtu')->never();
+        Cache::shouldReceive('forget')->andReturnNull()->once();
         //Cache::swap($cache);
 
         $foo = m::mock(MetadataControllerProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
@@ -239,9 +239,9 @@ class MetadataControllerProviderTest extends TestCase
     {
         //$cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cache = Cache::getFacadeRoot();
-        $cache->shouldReceive('has')->withArgs(['metadataControllers'])->andReturn(false)->once();
-        $cache->shouldReceive('get')->withArgs(['metadataControllers'])->andReturn('aybabtu')->never();
-        $cache->shouldReceive('put')->with('metadataControllers', m::any(), 10)->once();
+        Cache::shouldReceive('has')->withArgs(['metadataControllers'])->andReturn(false)->once();
+        Cache::shouldReceive('get')->withArgs(['metadataControllers'])->andReturn('aybabtu')->never();
+        Cache::shouldReceive('put')->with('metadataControllers', m::any(), 10)->once();
         //Cache::swap($cache);
 
         $foo = m::mock(MetadataControllerProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
@@ -259,9 +259,9 @@ class MetadataControllerProviderTest extends TestCase
         App::instance('metadataControllers', $container);
 
         $cache = Cache::getFacadeRoot();
-        $cache->shouldReceive('has')->withArgs(['metadataControllers'])->andReturn(false)->never();
-        $cache->shouldReceive('get')->withArgs(['metadataControllers'])->andReturn('aybabtu')->never();
-        $cache->shouldReceive('forget')->with('metadataControllers')->once();
+        Cache::shouldReceive('has')->withArgs(['metadataControllers'])->andReturn(false)->never();
+        Cache::shouldReceive('get')->withArgs(['metadataControllers'])->andReturn('aybabtu')->never();
+        Cache::shouldReceive('forget')->with('metadataControllers')->once();
 
         $foo = m::mock(MetadataControllerProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getClassMap')->andReturn(['abc', 'def'])->once();
@@ -276,8 +276,20 @@ class MetadataControllerProviderTest extends TestCase
 
     public function testBootExceptionThrownDuringResolution()
     {
-        $app = App::make('app');
-        $app->setConsole(false);
+        App::shouldReceive('runningInConsole')->andReturn(false);
+        App::shouldReceive('make')->passthru();
+        App::shouldReceive('getAlias')->passthru();
+        App::shouldReceive('isAlias')->passthru();
+        App::shouldReceive('getConcrete')->passthru();
+        App::shouldReceive('getContextualConcrete')->passthru();
+        App::shouldReceive('missingLeadingSlash')->passthru();
+        App::shouldReceive('isBuildable')->passthru();
+        App::shouldReceive('build')->passthru();
+        App::shouldReceive('instance')->passthru();
+        App::shouldReceive('bound')->passthru();
+        App::shouldReceive('removeAbstractAlias')->passthru();
+        App::shouldReceive('resolve')->passthru();
+        App::shouldReceive('findInContextualBindings')->passthru();
 
         $container = m::mock(MetadataControllerContainer::class);
         $container->shouldReceive('setMetadata')->withArgs([[]])->passthru()->never();
@@ -288,13 +300,14 @@ class MetadataControllerProviderTest extends TestCase
         App::instance(TestController::class, $container);
 
         $cache = Cache::getFacadeRoot();
-        $cache->shouldReceive('has')->withArgs(['metadataControllers'])->andReturn(false)->never();
-        $cache->shouldReceive('get')->withArgs(['metadataControllers'])->andReturn('aybabtu')->never();
-        $cache->shouldReceive('forget')->with('metadataControllers')->never();
+        Cache::shouldReceive('has')->withArgs(['metadataControllers'])->andReturn(false)->never();
+        Cache::shouldReceive('get')->withArgs(['metadataControllers'])->andReturn('aybabtu')->never();
+        Cache::shouldReceive('forget')->with('metadataControllers')->never();
 
         $foo = m::mock(MetadataControllerProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getClassMap')->andReturn([TestController::class])->once();
         $foo->shouldReceive('getIsCaching')->andReturn(false)->once();
+        $foo->shouldReceive('getAppNamespace')->andReturn('AlgoWeb\PODataLaravel')->once();
 
         $expected = 'Resolved result not a controller';
         $actual = null;

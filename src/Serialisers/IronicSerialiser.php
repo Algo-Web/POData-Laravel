@@ -163,7 +163,6 @@ class IronicSerialiser implements IObjectSerialiser
         }
 
         $this->loadStackIfEmpty();
-
         $baseURI = $this->isBaseWritten ? null : $this->absoluteServiceUriWithSlash;
         $this->isBaseWritten = true;
 
@@ -344,11 +343,6 @@ class IronicSerialiser implements IObjectSerialiser
             }
             if (!$query instanceof QueryResult) {
                 throw new InvalidOperationException(get_class($query));
-            }
-            if (!$query->results instanceof Model) {
-                $res = $query->results;
-                $msg = is_array($res) ? 'Entry object must be single Model' : get_class($res);
-                throw new InvalidOperationException($msg);
             }
             $odata->entries[] = $this->writeTopLevelElement($query);
         }

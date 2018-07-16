@@ -3,9 +3,11 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use ErrorException;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
+use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 
 /**
@@ -44,18 +46,6 @@ class MetadataTraitTest extends TestCase
     public function tearDown()
     {
         parent::tearDown();
-    }
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::metadata
-     * @todo   Implement testMetadata().
-     */
-    public function testMetadata()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -518,5 +508,20 @@ class MetadataTraitTest extends TestCase
             [TestMorphTargetChild::class, true],
             [TestMorphManySourceWithUnexposedTarget::class, false]
         ];
+    }
+
+    public function testSetEagerLoadMalformedPayloadObject()
+    {
+        $foo = new TestMonomorphicSource();
+
+        $expected = 'Object of class stdClass could not be converted to string';
+        $actual = null;
+
+        try {
+            $foo->setEagerLoad(['foobar', new \stdClass()]);
+        } catch (ErrorException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 }

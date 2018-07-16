@@ -34,9 +34,6 @@ class ODataControllerTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-//        $this->object  = \Mockery::mock('\AlgoWeb\PODataLaravel\Controllers\ODataController')->makePartial();
-        $this->getMockBuilder('App\Http\Controllers\Controller')->getMock();
-//        $this->mock = \Mockery::mock('App\Http\Controllers\Controller', 'Post');
         $this->object  = \Mockery::mock('\AlgoWeb\PODataLaravel\Controllers\ODataController')
             ->makePartial()->shouldAllowMockingProtectedMethods();
         $this->query = m::mock(LaravelQuery::class)->makePartial();
@@ -65,13 +62,12 @@ class ODataControllerTest extends TestCase
 
         $db = DB::getFacadeRoot();
         $db->shouldReceive('beginTransaction')->andReturn(null)->once();
-        $db->shouldReceive('commit')->andReturn(null)->never();
-        $db->shouldReceive('rollBack')->andReturn(null)->once();
+        DB::shouldReceive('commit')->andReturn(null)->never();
+        DB::shouldReceive('rollBack')->andReturn(null)->once();
 
         $expected = 'Malformed base service uri in the configuration file '
                     .'(should end with .svc, there should not be query or fragment in the base service uri)';
         $actual = null;
-
         try {
             $this->object->index($request, $dump);
         } catch (ODataException $e) {
@@ -95,9 +91,9 @@ class ODataControllerTest extends TestCase
         $dump = false;
 
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('beginTransaction')->andReturn(null)->once();
-        $db->shouldReceive('commit')->andReturn(null)->once();
-        $db->shouldReceive('rollBack')->andReturn(null)->never();
+        DB::shouldReceive('beginTransaction')->andReturn(null)->once();
+        DB::shouldReceive('commit')->andReturn(null)->once();
+        DB::shouldReceive('rollBack')->andReturn(null)->never();
 
         $expected = '&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
 <service xml:base="http://:http://192.168.2.1/abm-master/public/odata.svc" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" >

@@ -699,19 +699,6 @@ class LaravelQueryTest extends TestCase
     }
 
     /**
-     * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getResourceFromRelatedResourceSet
-     * @todo   Implement testGetResourceFromRelatedResourceSet().
-     */
-    public function testGetResourceFromRelatedResourceSet()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
-
-    /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getRelatedResourceReference
      */
     public function testGetRelatedResourceReference()
@@ -1740,7 +1727,6 @@ class LaravelQueryTest extends TestCase
         $navPropName = 'morphTarget';
 
         $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
@@ -1777,7 +1763,6 @@ class LaravelQueryTest extends TestCase
         $navPropName = 'morphTarget';
 
         $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
@@ -1814,7 +1799,6 @@ class LaravelQueryTest extends TestCase
         $navPropName = 'morphTarget';
 
         $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne);
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
@@ -1959,7 +1943,6 @@ class LaravelQueryTest extends TestCase
         $navPropName = 'morphTarget';
 
         $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne)->never();
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
@@ -1996,7 +1979,6 @@ class LaravelQueryTest extends TestCase
         $navPropName = 'morphTarget';
 
         $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne)->never();
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
@@ -2033,7 +2015,6 @@ class LaravelQueryTest extends TestCase
         $navPropName = 'morphTarget';
 
         $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $hook->shouldReceive('isModelHookInputsOk')->andReturn($morphOne)->never();
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
@@ -2052,9 +2033,9 @@ class LaravelQueryTest extends TestCase
     public function testStartTransaction()
     {
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->never();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->once();
-        $db->shouldReceive('commit')->andReturnNull()->never();
+        DB::shouldReceive('rollBack')->andReturnNull()->never();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->once();
+        DB::shouldReceive('commit')->andReturnNull()->never();
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->startTransaction();
@@ -2063,9 +2044,9 @@ class LaravelQueryTest extends TestCase
     public function testCommitTransaction()
     {
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->never();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->never();
-        $db->shouldReceive('commit')->andReturnNull()->once();
+        DB::shouldReceive('rollBack')->andReturnNull()->never();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->never();
+        DB::shouldReceive('commit')->andReturnNull()->once();
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->commitTransaction();
@@ -2074,12 +2055,28 @@ class LaravelQueryTest extends TestCase
     public function testRollBackTransaction()
     {
         $db = DB::getFacadeRoot();
-        $db->shouldReceive('rollBack')->andReturnNull()->once();
-        $db->shouldReceive('beginTransaction')->andReturnNull()->never();
-        $db->shouldReceive('commit')->andReturnNull()->never();
+        DB::shouldReceive('rollBack')->andReturnNull()->once();
+        DB::shouldReceive('beginTransaction')->andReturnNull()->never();
+        DB::shouldReceive('commit')->andReturnNull()->never();
 
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->rollBackTransaction();
+    }
+
+    public function testGetEmptyControllerContainer()
+    {
+        $foo = m::mock(LaravelQuery::class)->makePartial();
+
+        $expected = 'Controller container must not be null';
+        $actual = null;
+
+        try {
+            $foo->getControllerContainer();
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+
+        $this->assertEquals($expected, $actual);
     }
 
     private function seedControllerMetadata(TestController $controller = null)

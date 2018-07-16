@@ -106,10 +106,6 @@ abstract class AssociationStubBase
         $thisMono = $this instanceof AssociationStubMonomorphic;
         $thatMono = $otherStub instanceof AssociationStubMonomorphic;
 
-        $count = ($thisPoly ? 1 : 0)+($thatPoly ? 1 : 0)+($thisMono ? 1 : 0)+($thatMono ? 1 : 0);
-        if (!(2 == $count)) {
-            throw new InvalidOperationException('');
-        }
         if ($thisPoly && $thatMono) {
             return false;
         }

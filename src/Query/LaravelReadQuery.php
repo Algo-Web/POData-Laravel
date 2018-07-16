@@ -254,22 +254,18 @@ class LaravelReadQuery
         $rawLoad = $this->processEagerLoadList($eagerLoad);
 
         if (null == $sourceEntityInstance) {
-            if (null == $resourceSet) {
-                $msg = '';
-                throw new InvalidOperationException($msg);
-            }
             $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
         }
 
         $this->checkAuth($sourceEntityInstance);
+        $modelLoad = null;
         if ($sourceEntityInstance instanceof Model) {
             $modelLoad = $sourceEntityInstance->getEagerLoad();
         } elseif ($sourceEntityInstance instanceof Relation) {
             $modelLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
         }
         if (!(isset($modelLoad))) {
-            $msg = '';
-            throw new InvalidOperationException($msg);
+            throw new InvalidOperationException('');
         }
 
         $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
@@ -491,8 +487,14 @@ class LaravelReadQuery
         return $sourceEntityInstance;
     }
 
-    protected function applyFiltering($top, $skip, $sourceEntityInstance, $nullFilter, $rawLoad, $isvalid)
-    {
+    protected function applyFiltering(
+        $top,
+        $skip,
+        $sourceEntityInstance,
+        $nullFilter,
+        $rawLoad,
+        callable $isvalid = null
+    ) {
         $bulkSetCount = $sourceEntityInstance->count();
         $bigSet = 20000 < $bulkSetCount;
 

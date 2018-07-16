@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
+use AlgoWeb\PODataLaravel\Controllers\MetadataControllerTrait;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Connection as Connection;
@@ -17,6 +18,7 @@ class TestModel extends Model
         // not bury ourselves under a stack overflow and segfault
         isRunningInArtisan as isArtisan;
     }
+    use MetadataControllerTrait;
 
     protected $metaArray;
     protected $connect;

@@ -2,195 +2,51 @@
 
 namespace AlgoWeb\PODataLaravel\Models;
 
-use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
-use AlgoWeb\PODataLaravel\Query\LaravelQuery;
-use Illuminate\Cache\CacheManager;
+use AlgoWeb\PODataLaravel\Kernels\ConsoleKernel;
 use Illuminate\Database\ConnectionInterface;
-use Illuminate\Database\ConnectionResolver;
-use Illuminate\Filesystem\FilesystemAdapter;
-use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
-use Mockery;
-use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamDirectory;
-
-use org\bovigo\vfs\vfsStreamWrapper;
-use PHPUnit_Framework_TestCase;
-use POData\Common\InvalidOperationException;
-use POData\Providers\Metadata\SimpleMetadataProvider;
+use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
     protected $origFacade = [];
-
-    /**
-     * The base URL to use while testing the application.
-     *
-     * @var string
-     */
-    protected $baseUrl = 'http://localhost/';
-
     
-    public function setUp()
+    protected function getPackageProviders($app)
     {
-        if (!defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE')) {
-            define('PODATA_LARAVEL_APP_ROOT_NAMESPACE', 'AlgoWeb\PODataLaravel');
-        }
-        parent::setUp();
-        date_default_timezone_set('UTC');
-        $this->origFacade['cache'] = Cache::getFacadeRoot();
-        //$this->origFacade['schema'] = Schema::getFacadeRoot();
+        return [\AlgoWeb\PODataLaravel\Providers\MetadataProvider::class,
+            \AlgoWeb\PODataLaravel\Providers\MetadataRouteProvider::class,
+            \AlgoWeb\PODataLaravel\Providers\QueryProvider::class,
+            \AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider::class];
     }
-
-    public function tearDown()
-    {
-        Cache::swap($this->origFacade['cache']);
-        //Schema::swap($this->origFacade['schema']);
-        $foo = new LaravelQuery(null);
-        unset($foo);
-        parent::tearDown();
-    }
-
 
     /**
-     * Creates the application.
+     * Resolve application Console Kernel implementation.
      *
-     * Needs to be implemented by subclasses.
-     *
-     * @return \Symfony\Component\HttpKernel\HttpKernelInterface
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
      */
-    public function createApplication()
+    protected function resolveApplicationConsoleKernel($app)
     {
-        $version = $this->getLaravelVersion();
-        if (5 > $version['major']) {
-            throw new InvalidOperationException('Go home Composer, you\'re drunk!');
-        }
-        $file = \Mockery::mock(FilesystemAdapter::class)->makePartial();
-        $schema = \Mockery::mock(\Illuminate\Database\Schema\Blueprint::class)->makePartial();
-        $grammar = \Mockery::mock(\Illuminate\Database\Schema\Grammars\Grammar::class)->makePartial();
+        $app->singleton('Illuminate\Contracts\Console\Kernel', ConsoleKernel::class);
+    }
 
-        $dbConn = \Mockery::mock(\Illuminate\Database\Connection::class)->makePartial();
-        $dbConn->shouldReceive('getSchemaBuilder')->andReturn($schema);
-        $dbConn->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-
-        $builder = $this->getBuilder($dbConn);
-
-        $database = \Mockery::mock(\Illuminate\Database\DatabaseManager::class)->makePartial();
-        $database->shouldReceive('table')->withAnyArgs()->andReturn($builder);
-        $database->shouldReceive('connection')->andReturn($dbConn);
-
-        $resolver = \Mockery::mock(ConnectionResolver::class)->makePartial();
-        $resolver->shouldReceive('connection')->andReturn($dbConn);
-
-        $confRepo = \Mockery::mock(\Illuminate\Config\Repository::class)->makePartial();
-        $confRepo->shouldReceive('shouldRecompile')->andReturn(false);
-
-        $fileSys = \Mockery::mock(\Illuminate\Filesystem\Filesystem::class)->makePartial();
-        $fileSys->shouldReceive('put')->andReturnNull();
-
-        $log = \Mockery::mock(\Illuminate\Log\Writer::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $log->shouldReceive('writeLog')->withAnyArgs()->andReturnNull();
-
-        $guard = \Mockery::mock(\Illuminate\Contracts\Auth\Guard::class);
-        $guard->shouldReceive('basic')->andReturn(null);
-        $auth = \Mockery::mock(\Illuminate\Auth\AuthManager::class)
-            ->makePartial()->shouldAllowMockingProtectedMethods();
-        $auth->shouldReceive('guard')->withAnyArgs()->andReturn($guard);
-
-        // Lifted straight out of the stock bootstrap/app.php shipped with Laravel
-        // and repointed to underlying classes
-        $app = new \AlgoWeb\PODataLaravel\Models\TestApplication($fileSys);
-
-        if (6 > $version['minor']) {
-            $cacheRepo = \Mockery::mock(\Illuminate\Cache\Repository::class)->makePartial();
-            $cacheStore = \Mockery::mock(\Illuminate\Cache\ArrayStore::class)->makePartial();
-        } else {
-            $rawStore = \Mockery::mock(\Illuminate\Cache\ArrayStore::class)->makePartial();
-            $cacheRepo = new \Illuminate\Cache\Repository($rawStore);
-            $cacheMgr = new CacheManager($app);
-        }
-
-        $app['env'] = 'testing';
-        $app->instance('config', $confRepo);
-        $app->config->set(
-            'app.providers',
-            [
-                \AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider::class,
-                \AlgoWeb\PODataLaravel\Providers\MetadataRouteProvider::class,
-                \Illuminate\View\ViewServiceProvider::class,
-            ]
-        );
-        $app->config->set(
-            'view.paths',
-            [
-                realpath(base_path('resources/views'))
-            ]
-        );
-        $app->config->set('database.default', 'sqlite');
-        $app->config->set('database.connections', ['sqlite' => [
+    /**
+     * Define environment setup.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
+    protected function getEnvironmentSetUp($app)
+    {
+        // Setup default database to use sqlite :memory:
+        $app['config']->set('database.default', 'testbench');
+        $app['config']->set('database.connections.testbench', [
             'driver'   => 'sqlite',
             'database' => ':memory:',
             'prefix'   => '',
-        ]]);
-        $app->config->set('app.aliases', []);
-        if (6 > $version['minor']) {
-            $app->instance('cache.store', $cacheRepo);
-            $app->instance('cache', $cacheStore);
-        } else {
-            $app->instance('cache', $cacheMgr);
-            $app->instance('cache.store', $cacheRepo);
-            $app->config->set('cache.default', 'array');
-            $app->config->set('cache.stores.array', ['driver' => 'array']);
-        }
-        $app->instance('db', $database);
-        $app->instance('log', $log);
-        $app->instance('filesystem', $file);
-        $app->instance('auth', $auth);
-
-
-        $app->singleton(
-            \Illuminate\Contracts\Http\Kernel::class,
-            \Illuminate\Foundation\Http\Kernel::class
-        );
-
-        $app->singleton(
-            \Illuminate\Contracts\Console\Kernel::class,
-            \AlgoWeb\PODataLaravel\Kernels\ConsoleKernel::class
-        );
-
-        $app->singleton(
-            \Illuminate\Contracts\Debug\ExceptionHandler::class,
-            \Illuminate\Foundation\Exceptions\Handler::class
-        );
-
-        $kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
-        $kernel->bootstrap();
-
-        $app->singleton(
-            'metadata',
-            function () {
-                return new SimpleMetadataProvider('Data', 'Data');
-            }
-        );
-
-        $app->singleton('metadataControllers', function ($app) {
-            return new MetadataControllerContainer();
-        });
-
-        $app->singleton('files', function () {
-            return new \Illuminate\Filesystem\Filesystem();
-        });
-
-        $app->singleton('auth.basic', function () use ($auth) {
-            return new \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth($auth);
-        });
-
-        \Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver);
-
-        return $app;
+        ]);
     }
 
     protected function getBuilder(ConnectionInterface $conn = null)
@@ -200,11 +56,10 @@ class TestCase extends BaseTestCase
         if (null != $conn) {
             $connect = $conn;
         } else {
-            $connect = \Mockery::mock('Illuminate\Database\ConnectionInterface');
+            $connect = \Mockery::mock('Illuminate\Database\ConnectionInterface')->makePartial();
             $connect->shouldReceive('getQueryGrammar')->andReturn($grammar);
             $connect->shouldReceive('getPostProcessor')->andReturn($processor);
         }
-
         return new \Illuminate\Database\Query\Builder(
             $connect,
             $grammar,
@@ -212,22 +67,48 @@ class TestCase extends BaseTestCase
         );
     }
 
-    public function getRawLaravelVersion()
+    protected function getDatabase(Builder $builder = null, ConnectionInterface $conn = null)
     {
-        return Application::VERSION;
+        if (null === $conn) {
+            $schema = \Mockery::mock(\Illuminate\Database\Schema\Builder::class);
+            $conn = \Mockery::mock('Illuminate\Database\ConnectionInterface')->makePartial();
+            $conn->shouldReceive('getSchemaBuilder')->andReturn($schema);
+        }
+        if (null === $builder) {
+            $builder = $this->getBuilder($conn);
+        }
+
+        $database = \Mockery::mock(\Illuminate\Database\DatabaseManager::class)->makePartial();
+        $database->shouldReceive('table')->withAnyArgs()->andReturn($builder);
+        $database->shouldReceive('connection')->andReturn($conn);
+
+        return $database;
     }
 
-    public function getLaravelVersion()
+    public function setUp()
     {
-        $raw = $this->getRawLaravelVersion();
-        $bitz = explode('.', $raw);
-        // check to see if we're running in a dev version
-        if (2 == count($bitz)) {
-            $payload = explode('-', $bitz[1]);
-            $version = ['major' => intval($bitz[0]), 'minor' => intval($payload[0]), 'patch' => $payload[1]];
-        } else {
-            $version = ['major' => intval($bitz[0]), 'minor' => intval($bitz[1]), 'patch' => $bitz[2]];
-        }
-        return $version;
+        parent::setUp();
+        date_default_timezone_set('UTC');
+        $this->origFacade['schema'] = Schema::getFacadeRoot();
+        $builder = $this->getBuilder();
+        $database = $this->getDatabase($builder);
+        App::instance('db', $database);
+
+
+
+        //Schema::swap($builder);
+    }
+
+    public function tearDown()
+    {
+        //Schema::swap($this->origFacade['schema']);
+        parent::tearDown();
+    }
+
+    protected function getPackageAliases($app)
+    {
+        return [
+            'Schema' => \AlgoWeb\PODataLaravel\Facades\Schema::class
+        ];
     }
 }
