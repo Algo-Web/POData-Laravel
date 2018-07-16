@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
+use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceType;
@@ -123,6 +124,37 @@ class MetadataProviderTest extends TestCase
         $this->assertEquals('aybabtu', $result);
         $result = App::make('objectmap');
         $this->assertEquals('wombat', $result);
+    }
+
+    public function testBootBlowsUpWhenBootedTwice()
+    {
+        $this->setUpSchemaFacade();
+
+        $meta = m::mock(SimpleMetadataProvider::class);
+        App::instance('metadata', $meta);
+
+        $map = m::mock(Map::class);
+        App::instance('objectmap', $map);
+
+        //$cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
+        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn('aybabtu')->once();
+        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn('wombat')->once();
+        //Cache::swap($cache);
+
+        $foo = $this->object;
+        $foo->shouldReceive('getIsCaching')->andReturn(true)->once();
+
+        $foo->boot(false);
+
+        $expected = 'Provider booted twice';
+        $actual = null;
+
+        try {
+            $foo->boot(false);
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 
     public function testBootHasMigrationsShouldBeCached()

@@ -278,6 +278,7 @@ class MetadataProvider extends MetadataBaseProvider
         if ($isCaching && $hasCache) {
             App::instance('metadata', $meta);
             App::instance('objectmap', $objectMap);
+            self::$isBooted = true;
             return;
         }
         $meta = App::make('metadata');
@@ -369,6 +370,7 @@ class MetadataProvider extends MetadataBaseProvider
             throw new \InvalidArgumentException($msg);
         }
         $association = $entity->resolveAssociation($propName);
+
         if (null === $association) {
             return null;
         }
