@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
+use POData\Common\InvalidOperationException;
 use POData\ObjectModel\ObjectModelSerializer;
 use POData\ObjectModel\ODataCategory;
 use POData\ObjectModel\ODataEntry;
@@ -34,6 +35,9 @@ use POData\ObjectModel\ODataPropertyContent;
 use POData\ObjectModel\ODataTitle;
 use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
+use POData\Providers\Metadata\ResourceComplexType;
+use POData\Providers\Metadata\ResourceEntityType;
+use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
@@ -1167,5 +1171,73 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $ironicSingleResult->mediaLink->eTag = null;
 
         $this->assertEquals($ironicSingleResult, $ironicArrayResult, '', 0, 20);
+    }
+
+    public function testWriteTopLevelElementWithBadPayload()
+    {
+        $entryObject = new QueryResult();
+        $entryObject->results = [];
+
+        $foo = m::mock(IronicSerialiser::class)->makePartial();
+
+        $expected = 'Entry object must be single Model';
+        $actual = null;
+
+        try {
+            $foo->writeTopLevelElement($entryObject);
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testWriteTopLevelElementWithBadConcreteType()
+    {
+        $entryObject = new QueryResult();
+        $entryObject->results = new TestModel();
+
+        $firstType = m::mock(ResourceEntityType::class)->makePartial();
+        $secondType = m::mock(ResourceComplexType::class)->makePartial();
+
+        $foo = m::mock(IronicSerialiser::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getService->getProvidersWrapper->resolveResourceType')->andReturn($firstType)->once();
+        $foo->shouldReceive('getConcreteTypeFromAbstractType')->andReturn($secondType)->once();
+        $foo->shouldReceive('getRequest->getTargetResourceType->getName')->andReturn('TestModel');
+
+        $expected = 'POData_Providers_Metadata_ResourceComplexType';
+        $actual = null;
+
+        try {
+            $foo->writeTopLevelElement($entryObject);
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertContains($expected, $actual);
+    }
+
+    public function testWriteTopLevelElementWithBadSerialisedType()
+    {
+        $entryObject = new QueryResult();
+        $entryObject->results = new TestModel();
+
+        $firstType = m::mock(ResourceEntityType::class)->makePartial();
+        $secondType = m::mock(ResourceEntityType::class)->makePartial();
+        $secondType->shouldReceive('getInstanceType->getName')->andReturn(TestMonomorphicSource::class);
+
+        $foo = m::mock(IronicSerialiser::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getService->getProvidersWrapper->resolveResourceType')->andReturn($firstType)->once();
+        $foo->shouldReceive('getConcreteTypeFromAbstractType')->andReturn($secondType)->once();
+        $foo->shouldReceive('getRequest->getTargetResourceType->getName')->andReturn('TestModel');
+
+        $expected = 'Object being serialised not instance of expected class, ' .TestMonomorphicSource::class
+                    .', is actually AlgoWeb\PODataLaravel\Models\TestModel';
+        $actual = null;
+
+        try {
+            $foo->writeTopLevelElement($entryObject);
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
     }
 }

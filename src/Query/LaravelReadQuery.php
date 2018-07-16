@@ -254,10 +254,6 @@ class LaravelReadQuery
         $rawLoad = $this->processEagerLoadList($eagerLoad);
 
         if (null == $sourceEntityInstance) {
-            if (null == $resourceSet) {
-                $msg = '';
-                throw new InvalidOperationException($msg);
-            }
             $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
         }
 

@@ -859,4 +859,39 @@ class IronicSerialiserTest extends SerialiserTestBase
         $result = $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
         $this->assertEquals($result, $concreteType);
     }
+
+    public function testGetRequestWhenNotYetSet()
+    {
+        $ironic = m::mock(IronicSerialiser::class)->makePartial();
+
+        $expected = 'Request not yet set';
+        $actual = null;
+
+        try {
+            $ironic->getRequest();
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetNextLinkUriWithBadOrderByInfo()
+    {
+        $lastObject = new \stdClass();
+        $node = m::mock(ExpandedProjectionNode::class)->makePartial();
+        $node->shouldReceive('getInternalOrderByInfo')->andReturn(null);
+
+        $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
+        $ironic->shouldReceive('getCurrentExpandedProjectionNode')->andReturn($node)->once();
+
+        $expected = IronicSerialiser::class;
+        $actual = null;
+
+        try {
+            $ironic->getNextLinkUri($lastObject);
+        } catch (InvalidOperationException $e) {
+            $actual = $e->getMessage();
+        }
+        $this->assertEquals($expected, $actual);
+    }
 }
