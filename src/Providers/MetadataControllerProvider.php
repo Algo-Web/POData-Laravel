@@ -138,10 +138,4 @@ class MetadataControllerProvider extends MetadataBaseProvider
         }
         return $ends;
     }
-
-    protected function getAppNamespace()
-    {
-        $startName = defined('PODATA_LARAVEL_APP_ROOT_NAMESPACE') ? PODATA_LARAVEL_APP_ROOT_NAMESPACE : 'App';
-        return $startName;
-    }
 }
