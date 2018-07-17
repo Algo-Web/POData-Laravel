@@ -1,5 +1,5 @@
-Unreleased
-----------
+0.3.5 (2018-07-17)
+------------------
    * Make README hopefully less confusing
      - Thank you to donmbelembe for tripping over this
    * Unbreak APP_DISABLE_AUTH env parameter

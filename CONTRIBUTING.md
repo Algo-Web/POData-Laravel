@@ -31,6 +31,21 @@ out.  We've found keeping coverage high (95% or better) to be a very
 effective way of keeping the dev train steaming onwards at full throttle
 with a low bug load.  Since we've all done it, you need to do it as well.
 
+* **Pay attention to Scrutinizer results**
+Static analysis is another effective method to reduce bugs, so we use it
+on this project.  We've hooked up Scrutinizer as part of our CI process
+and have found that it both finds bugs directly, and makes other bugs
+easier to find.
+
+Please don't introduce any new critical-severity issues - the one
+currently in codebase we do want to get rid of.
+
+For every new issue you end up introducing, please ensure that you
+resolve at least two others.
+
+Yes, this makes it easier (to get your changes approved) to fix issues
+as you go, rather than later.  This is deliberate.
+
 * **Eat.  Sleep.  PSR-2.  Repeat.**
 As POData-Laravel is a Composer package, we apply the PSR-2 coding
 standard.  Code formatted to one standard is a heck of a lot easier to
