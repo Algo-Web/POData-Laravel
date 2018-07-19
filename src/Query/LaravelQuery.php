@@ -646,6 +646,7 @@ class LaravelQuery implements IQueryProvider
 
     /**
      * Start database transaction.
+     * @param mixed $isBulk
      */
     public function startTransaction($isBulk = false)
     {

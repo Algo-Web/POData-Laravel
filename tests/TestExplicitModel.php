@@ -3,8 +3,8 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
-use Illuminate\Database\Eloquent\Model as Model;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType;
+use Illuminate\Database\Eloquent\Model as Model;
 
 class TestExplicitModel extends Model
 {
