@@ -113,7 +113,7 @@ trait MetadataTrait
 
     /**
      * Return the set of fields that are permitted to be in metadata
-     * - following same visible-trumps-hidden guideline as Laravel
+     * - following same visible-trumps-hidden guideline as Laravel.
      *
      * @return array
      */
@@ -242,8 +242,8 @@ trait MetadataTrait
                             throw new InvalidOperationException($msg);
                         }
                         $begin = strpos($code, 'function(');
-                        $code = substr($code, /** @scrutinizer ignore-type */$begin, strrpos($code, '}')-$begin+1);
-                        $lastCode = $code[strlen(/** @scrutinizer ignore-type */$code)-1];
+                        $code = substr($code, /* @scrutinizer ignore-type */$begin, strrpos($code, '}')-$begin+1);
+                        $lastCode = $code[strlen(/* @scrutinizer ignore-type */$code)-1];
                         if ('}' != $lastCode) {
                             $msg = 'Final character of function definition must be closing brace';
                             throw new InvalidOperationException($msg);
@@ -261,7 +261,7 @@ trait MetadataTrait
                                      'morphedByMany'
                                  ] as $relation) {
                             $search = '$this->' . $relation . '(';
-                            if (stripos(/** @scrutinizer ignore-type */$code, $search)) {
+                            if (stripos(/* @scrutinizer ignore-type */$code, $search)) {
                                 //Resolve the relation's model to a Relation object.
                                 $relationObj = $model->$method();
                                 if ($relationObj instanceof Relation) {
@@ -383,7 +383,7 @@ trait MetadataTrait
 
         foreach ($getterz as $getter) {
             $residual = substr($getter, 3);
-            $residual = substr(/** @scrutinizer ignore-type */$residual, 0, -9);
+            $residual = substr(/* @scrutinizer ignore-type */$residual, 0, -9);
             $methods[] = $residual;
         }
         return $methods;
@@ -498,6 +498,7 @@ trait MetadataTrait
      * @param             $targ
      * @param string|null $targ
      * @param null|mixed  $type
+     * @param null|mixed  $through
      */
     private function addRelationsHook(&$hooks, $first, $property, $last, $mult, $targ, $type = null, $through = null)
     {
@@ -768,7 +769,7 @@ trait MetadataTrait
     }
 
     /**
-     * Get columns for selected table
+     * Get columns for selected table.
      *
      * @return array
      */
@@ -786,7 +787,7 @@ trait MetadataTrait
     }
 
     /**
-     * Get Doctrine columns for selected table
+     * Get Doctrine columns for selected table.
      *
      * @return array
      */
@@ -810,6 +811,7 @@ trait MetadataTrait
     }
 
     /**
+     * @param  mixed      $foo
      * @return array|null
      */
     private function getRelationsHasManyKeyNames($foo)
