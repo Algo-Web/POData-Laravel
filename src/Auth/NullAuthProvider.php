@@ -10,11 +10,9 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 class NullAuthProvider implements AuthInterface
 {
     /**
-     * Is the requester permitted to perform the requested action on the model class (and instance, if supplied)?
-     *
-     * @param ActionVerb          $verb
-     * @param                     $modelname Model class to access
-     * @param Model|Relation|null $model     Specific model or relation to access
+     * @param ActionVerb|AlgoWeb\PODataLaravel\Enums\ActionVerb                                                                                                                                                              $verb
+     * @param string                                                                                                                                                                                                         $modelname
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|Mockery_21_AlgoWeb_PODataLaravel_Models_TestModel|Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource|Mockery_75_Illuminate_Database_Eloquent_Relations_HasMany $model
      *
      * @return bool
      */

@@ -20,11 +20,9 @@ class ModelSerialiser
     }
 
     /**
-     * Serialise needed bits of supplied model, taking fast path where possible.
+     * @param AlgoWeb\PODataLaravel\Models\TestCastModel|AlgoWeb\PODataLaravel\Models\TestGetterModel|AlgoWeb\PODataLaravel\Models\TestModel|AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource|AlgoWeb\PODataLaravel\Models\TestMonomorphicSource|AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget|AlgoWeb\PODataLaravel\Models\TestMorphTarget|Mockery_116_AlgoWeb_PODataLaravel_Models_TestMonomorphicManySource|Mockery_117_AlgoWeb_PODataLaravel_Models_TestMonomorphicParentOfMorphTarget|Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource|Mockery_85_AlgoWeb_PODataLaravel_Models_TestMonomorphicSource|Mockery_92_AlgoWeb_PODataLaravel_Models_TestMonomorphicTarget $model
      *
-     * @param  $model
-     *
-     * @return mixed
+     * @return null[]|string[]
      */
     public function bulkSerialise($model)
     {
@@ -65,6 +63,9 @@ class ModelSerialiser
         return $result;
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         self::$mutatorCache = [];

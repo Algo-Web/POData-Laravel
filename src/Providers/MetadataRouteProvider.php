@@ -9,15 +9,16 @@ use Illuminate\Support\ServiceProvider;
 class MetadataRouteProvider extends ServiceProvider
 {
     /**
-     * Bootstrap the application services.
-     *
-     * @return void
+     * @return null
      */
     public function boot()
     {
         $this->setupRoute();
     }
 
+    /**
+     * @return void
+     */
     private function setupRoute()
     {
         $authMiddleware = $this->getAuthMiddleware();
@@ -31,14 +32,15 @@ class MetadataRouteProvider extends ServiceProvider
     }
 
     /**
-     * Register the application services.
-     *
      * @return void
      */
     public function register()
     {
     }
 
+    /**
+     * @return string
+     */
     private function getAuthMiddleware()
     {
         $disable = $this->isAuthDisable();

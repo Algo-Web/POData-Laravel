@@ -29,6 +29,9 @@ class LaravelHookQuery
     protected $auth;
     protected $metadataProvider;
 
+    /**
+     * @param AlgoWeb\PODataLaravel\Auth\NullAuthProvider|AuthInterface|Mockery_56_AlgoWeb_PODataLaravel_Interfaces_AuthInterface $auth
+     */
     public function __construct(AuthInterface $auth = null)
     {
         $this->auth = isset($auth) ? $auth : new NullAuthProvider();

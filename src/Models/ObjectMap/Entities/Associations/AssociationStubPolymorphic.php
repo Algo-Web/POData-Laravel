@@ -21,6 +21,8 @@ class AssociationStubPolymorphic extends AssociationStubBase
 
     /**
      * @param string $morphType
+     *
+     * @return void
      */
     public function setMorphType($morphType)
     {
@@ -28,7 +30,7 @@ class AssociationStubPolymorphic extends AssociationStubBase
     }
 
     /**
-     * @param \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase $otherStub
+     * @param AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic|AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic|AssociationStubBase $otherStub
      *
      * @return bool
      */
@@ -54,6 +56,9 @@ class AssociationStubPolymorphic extends AssociationStubBase
         return true;
     }
 
+    /**
+     * @return bool|void
+     */
     public function isKnownSide()
     {
         if (!($this->isOk())) {

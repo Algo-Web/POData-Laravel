@@ -41,6 +41,9 @@ class LaravelQuery implements IQueryProvider
     private static $touchList = [];
     private static $inBatch;
 
+    /**
+     * @param AuthInterface|Mockery_56_AlgoWeb_PODataLaravel_Interfaces_AuthInterface $auth
+     */
     public function __construct(AuthInterface $auth = null)
     {
         /* MySQLExpressionProvider();*/
@@ -57,11 +60,7 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Indicates if the QueryProvider can handle ordered paging, this means respecting order, skip, and top parameters
-     * If the query provider can not handle ordered paging, it must return the entire result set and POData will
-     * perform the ordering and paging.
-     *
-     * @return Boolean True if the query provider can handle ordered paging, false if POData should perform the paging
+     * @return bool
      */
     public function handlesOrderedPaging()
     {
@@ -69,9 +68,7 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Gets the expression provider used by to compile OData expressions into expression used by this query provider.
-     *
-     * @return \POData\Providers\Expression\IExpressionProvider
+     * @return AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider
      */
     public function getExpressionProvider()
     {
@@ -79,9 +76,7 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Gets the LaravelReadQuery instance used to handle read queries (repetitious, nyet?).
-     *
-     * @return LaravelReadQuery
+     * @return AlgoWeb\PODataLaravel\Query\LaravelReadQuery
      */
     public function getReader()
     {
@@ -109,9 +104,7 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Dig out local copy of POData-Laravel metadata provider.
-     *
-     * @return MetadataProvider
+     * @return AlgoWeb\PODataLaravel\Providers\MetadataProvider
      */
     public function getMetadataProvider()
     {
@@ -119,9 +112,7 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Dig out local copy of controller metadata mapping.
-     *
-     * @return MetadataControllerContainer
+     * @return AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer
      */
     public function getControllerContainer()
     {
@@ -131,6 +122,9 @@ class LaravelQuery implements IQueryProvider
         return $this->controllerContainer;
     }
 
+    /**
+     * @return AlgoWeb\PODataLaravel\Enums\ActionVerb[]
+     */
     public function getVerbMap()
     {
         if (0 == count($this->verbMap)) {
@@ -142,23 +136,17 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Gets collection of entities belongs to an entity set
-     * IE: http://host/EntitySet
-     *  http://host/EntitySet?$skip=10&$top=5&filter=Prop gt Value.
+     * @param Mockery_66_POData_Providers_Query_QueryType|QueryType        $queryType
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet $resourceSet
+     * @param DateTime|null                                                $filterInfo
+     * @param null                                                         $orderBy
+     * @param null                                                         $top
+     * @param null                                                         $skip
+     * @param null                                                         $skipToken
+     * @param null                                                         $eagerLoad
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|DateTime|string       $sourceEntityInstance
      *
-     * @param QueryType                $queryType            Is this is a query for a count, entities,
-     *                                                       or entities-with-count?
-     * @param ResourceSet              $resourceSet          The entity set containing the entities to fetch
-     * @param FilterInfo|null          $filterInfo           The $filter parameter of the OData query.  NULL if absent
-     * @param null|InternalOrderByInfo $orderBy              sorted order if we want to get the data in some
-     *                                                       specific order
-     * @param int|null                 $top                  number of records which need to be retrieved
-     * @param int|null                 $skip                 number of records which need to be skipped
-     * @param SkipTokenInfo|null       $skipToken            value indicating what records to skip
-     * @param string[]|null            $eagerLoad            array of relations to eager load
-     * @param Model|Relation|null      $sourceEntityInstance Starting point of query
-     *
-     * @return QueryResult
+     * @return void
      */
     public function getResourceSet(
         QueryType $queryType,
@@ -185,15 +173,11 @@ class LaravelQuery implements IQueryProvider
         );
     }
     /**
-     * Gets an entity instance from an entity set identified by a key
-     * IE: http://host/EntitySet(1L)
-     * http://host/EntitySet(KeyA=2L,KeyB='someValue').
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                                   $resourceSet
+     * @param KeyDescriptor|Mockery_55_POData_UriProcessor_ResourcePathProcessor_SegmentParser_KeyDescriptor $keyDescriptor
+     * @param mixed                                                                                          $eagerLoad
      *
-     * @param ResourceSet        $resourceSet   The entity set containing the entity to fetch
-     * @param KeyDescriptor|null $keyDescriptor The key identifying the entity to fetch
-     * @param string[]|null      $eagerLoad     array of relations to eager load
-     *
-     * @return Model|null Returns entity instance if found else null
+     * @return null
      */
     public function getResourceFromResourceSet(
         ResourceSet $resourceSet,
@@ -249,16 +233,13 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Gets a related entity instance from an entity set identified by a key
-     * IE: http://host/EntitySet(1L)/NavigationPropertyToCollection(33).
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                                   $sourceResourceSet
+     * @param Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource                                    $sourceEntityInstance
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                                   $targetResourceSet
+     * @param Mockery_53_POData_Providers_Metadata_ResourceProperty|ResourceProperty                         $targetProperty
+     * @param KeyDescriptor|Mockery_55_POData_UriProcessor_ResourcePathProcessor_SegmentParser_KeyDescriptor $keyDescriptor
      *
-     * @param ResourceSet      $sourceResourceSet    The entity set containing the source entity
-     * @param object           $sourceEntityInstance the source entity instance
-     * @param ResourceSet      $targetResourceSet    The entity set containing the entity to fetch
-     * @param ResourceProperty $targetProperty       the metadata of the target property
-     * @param KeyDescriptor    $keyDescriptor        The key identifying the entity to fetch
-     *
-     * @return Model|null Returns entity instance if found else null
+     * @return Mockery_77_AlgoWeb_PODataLaravel_Models_TestMorphTarget|void
      */
     public function getResourceFromRelatedResourceSet(
         ResourceSet $sourceResourceSet,
@@ -278,16 +259,12 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Get related resource for a resource
-     * IE: http://host/EntitySet(1L)/NavigationPropertyToSingleEntity
-     * http://host/EntitySet?$expand=NavigationPropertyToSingleEntity.
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                                                  $sourceResourceSet
+     * @param Mockery_21_AlgoWeb_PODataLaravel_Models_TestModel|Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource $sourceEntityInstance
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                                                  $targetResourceSet
+     * @param Mockery_53_POData_Providers_Metadata_ResourceProperty|ResourceProperty                                        $targetProperty
      *
-     * @param ResourceSet      $sourceResourceSet    The entity set containing the source entity
-     * @param object           $sourceEntityInstance the source entity instance
-     * @param ResourceSet      $targetResourceSet    The entity set containing the entity pointed to by the nav property
-     * @param ResourceProperty $targetProperty       The navigation property to fetch
-     *
-     * @return Model|null The related resource if found else null
+     * @return AlgoWeb\PODataLaravel\Models\TestModel|null
      */
     public function getRelatedResourceReference(
         ResourceSet $sourceResourceSet,
@@ -307,15 +284,13 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Updates a resource.
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                                   $sourceResourceSet
+     * @param AlgoWeb\PODataLaravel\Models\TestModel                                                         $sourceEntityInstance
+     * @param KeyDescriptor|Mockery_55_POData_UriProcessor_ResourcePathProcessor_SegmentParser_KeyDescriptor $keyDescriptor
+     * @param stdClass                                                                                       $data
+     * @param mixed                                                                                          $shouldUpdate
      *
-     * @param ResourceSet   $sourceResourceSet    The entity set containing the source entity
-     * @param object        $sourceEntityInstance The source entity instance
-     * @param KeyDescriptor $keyDescriptor        The key identifying the entity to fetch
-     * @param object        $data                 the New data for the entity instance
-     * @param bool          $shouldUpdate         Should undefined values be updated or reset to default
-     *
-     * @return Model|null the new resource value if it is assignable or throw exception for null
+     * @return null
      */
     public function updateResource(
         ResourceSet $sourceResourceSet,
@@ -328,12 +303,10 @@ class LaravelQuery implements IQueryProvider
         return $this->createUpdateMainWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb);
     }
     /**
-     * Delete resource from a resource set.
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet $sourceResourceSet
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|DateTime              $sourceEntityInstance
      *
-     * @param ResourceSet $sourceResourceSet
-     * @param object      $sourceEntityInstance
-     *
-     * return bool true if resources sucessfully deteled, otherwise false
+     * @return bool|null
      */
     public function deleteResource(
         ResourceSet $sourceResourceSet,
@@ -360,12 +333,11 @@ class LaravelQuery implements IQueryProvider
         throw new ODataException('Target model not successfully deleted', 422);
     }
     /**
-     * @param ResourceSet $resourceSet          The entity set containing the entity to fetch
-     * @param object      $sourceEntityInstance The source entity instance
-     * @param object      $data                 the New data for the entity instance
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                         $resourceSet
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|Mockery_54_Illuminate_Database_Eloquent_Model $sourceEntityInstance
+     * @param stdClass|string|null                                                                 $data
      *
-     * @returns Model|null                      returns the newly created model if successful,
-     *                                          or null if model creation failed.
+     * @return null
      */
     public function createResourceforResourceSet(
         ResourceSet $resourceSet,
@@ -377,14 +349,12 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * @param $sourceEntityInstance
-     * @param $data
-     * @param $class
-     * @param string $verb
+     * @param AlgoWeb\PODataLaravel\Models\TestModel $sourceEntityInstance
+     * @param null[]|stdClass|string                 $data
+     * @param string                                 $class
+     * @param string                                 $verb
      *
-     * @throws ODataException
-     * @throws InvalidOperationException
-     * @return array|mixed
+     * @return array[]|null[]|null
      */
     private function createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb)
     {
@@ -429,13 +399,11 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Puts an entity instance to entity set identified by a key.
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                                   $resourceSet
+     * @param KeyDescriptor|Mockery_55_POData_UriProcessor_ResourcePathProcessor_SegmentParser_KeyDescriptor $keyDescriptor
+     * @param array                                                                                          $data
      *
-     * @param ResourceSet   $resourceSet   The entity set containing the entity to update
-     * @param KeyDescriptor $keyDescriptor The key identifying the entity to update
-     * @param $data
-     *
-     * @return bool|null Returns result of executing query
+     * @return bool
      */
     public function putResource(
         ResourceSet $resourceSet,
@@ -447,13 +415,12 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * @param ResourceSet $sourceResourceSet
-     * @param $data
-     * @param                            $verb
-     * @param  Model|null                $source
-     * @throws InvalidOperationException
-     * @throws ODataException
-     * @return Model|null
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                               $sourceResourceSet
+     * @param stdClass|string|null                                                                       $data
+     * @param string                                                                                     $verb
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|Mockery_54_Illuminate_Database_Eloquent_Model|Model $source
+     *
+     * @return null
      */
     protected function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $data, $verb, Model $source = null)
     {
@@ -478,10 +445,11 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * @param $data
-     * @param $paramList
-     * @param  Model|null $sourceEntityInstance
-     * @return array
+     * @param false[]|null[]                               $data
+     * @param array[]                                      $paramList
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|Model $sourceEntityInstance
+     *
+     * @return AlgoWeb\PODataLaravel\Requests\TestRequest[]|int[]|null[]
      */
     protected function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance = null)
     {
@@ -506,9 +474,9 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * @param $result
-     * @throws ODataException
-     * @return array|mixed
+     * @param Illuminate\Http\JsonResponse|Mockery_64_Illuminate_Http_JsonResponse|null $result
+     *
+     * @return array[]|null[]|null
      */
     private function createUpdateDeleteProcessOutput($result)
     {
@@ -532,8 +500,9 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * @param $sourceEntityInstance
-     * @return mixed|null|\object[]
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|DateTime|Mockery_21_AlgoWeb_PODataLaravel_Models_TestModel|Mockery_54_Illuminate_Database_Eloquent_Model|Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource|string|null $sourceEntityInstance
+     *
+     * @return AlgoWeb\PODataLaravel\Models\TestModel|DateTime|Mockery_21_AlgoWeb_PODataLaravel_Models_TestModel|Mockery_54_Illuminate_Database_Eloquent_Model|Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource|string|null
      */
     private function unpackSourceEntity($sourceEntityInstance)
     {
@@ -645,8 +614,9 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Start database transaction.
-     * @param mixed $isBulk
+     * @param bool $isBulk
+     *
+     * @return void
      */
     public function startTransaction($isBulk = false)
     {
@@ -656,7 +626,7 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Commit database transaction.
+     * @return void
      */
     public function commitTransaction()
     {
@@ -672,7 +642,7 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * Abort database transaction.
+     * @return void
      */
     public function rollBackTransaction()
     {
@@ -691,6 +661,14 @@ class LaravelQuery implements IQueryProvider
         self::$touchList[] = $model;
     }
 
+    /**
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                         $resourceSet
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|Mockery_54_Illuminate_Database_Eloquent_Model $sourceEntityInstance
+     * @param stdClass|string|null                                                                 $data
+     * @param string                                                                               $verb
+     *
+     * @return null
+     */
     protected function createUpdateMainWrapper(ResourceSet $resourceSet, $sourceEntityInstance, $data, $verb)
     {
         $source = $this->unpackSourceEntity($sourceEntityInstance);

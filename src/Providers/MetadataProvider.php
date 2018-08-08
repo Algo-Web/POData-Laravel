@@ -72,6 +72,9 @@ class MetadataProvider extends MetadataBaseProvider
 
     protected $relationHolder;
 
+    /**
+     * @param Illuminate\Foundation\Application|Mockery_37_Illuminate_Contracts_Foundation_Application $app
+     */
     public function __construct($app)
     {
         parent::__construct($app);
@@ -250,11 +253,9 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * Bootstrap the application services.  Post-boot.
+     * @param bool $reset
      *
-     * @param mixed $reset
-     *
-     * @return void
+     * @return null
      */
     public function boot($reset = true)
     {
@@ -301,8 +302,6 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * Register the application services.  Boot-time only.
-     *
      * @return void
      */
     public function register()
@@ -336,7 +335,7 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * @return MetadataGubbinsHolder
+     * @return AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder
      */
     public function getRelationHolder()
     {

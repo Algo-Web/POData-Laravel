@@ -47,7 +47,7 @@ class EntityGubbins
     private $odataResourceType;
 
     /**
-     * @return ResourceEntityType
+     * @return POData\Providers\Metadata\ResourceEntityType
      */
     public function getOdataResourceType()
     {
@@ -55,7 +55,9 @@ class EntityGubbins
     }
 
     /**
-     * @param ResourceEntityType $odataType
+     * @param Mockery_13_POData_Providers_Metadata_ResourceEntityType|POData\Providers\Metadata\ResourceEntityType|ResourceEntityType $odataType
+     *
+     * @return void
      */
     public function setOdataResourceType(ResourceEntityType $odataType)
     {
@@ -76,6 +78,8 @@ class EntityGubbins
 
     /**
      * @param string $name
+     *
+     * @return void
      */
     public function setName($name)
     {
@@ -83,7 +87,7 @@ class EntityGubbins
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getClassName()
     {
@@ -92,6 +96,8 @@ class EntityGubbins
 
     /**
      * @param string $className
+     *
+     * @return void
      */
     public function setClassName($className)
     {
@@ -99,7 +105,7 @@ class EntityGubbins
     }
 
     /**
-     * @return EntityField[]
+     * @return AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField[]|array
      */
     public function getKeyFields()
     {
@@ -107,7 +113,7 @@ class EntityGubbins
     }
 
     /**
-     * @return EntityField[]
+     * @return AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField[]|array
      */
     public function getFields()
     {
@@ -115,7 +121,9 @@ class EntityGubbins
     }
 
     /**
-     * @param EntityField[] $fields
+     * @param AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField[]|DateTime[]|array $fields
+     *
+     * @return void
      */
     public function setFields(array $fields)
     {
@@ -142,7 +150,7 @@ class EntityGubbins
     }
 
     /**
-     * @return AssociationStubBase[]
+     * @return AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic[]|AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic[]|array
      */
     public function getStubs()
     {
@@ -150,7 +158,9 @@ class EntityGubbins
     }
 
     /**
-     * @param AssociationStubBase[] $stubs
+     * @param AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic[]|AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic[]|DateTime[]|array $stubs
+     *
+     * @return void
      */
     public function setStubs(array $stubs)
     {
@@ -164,8 +174,10 @@ class EntityGubbins
     }
 
     /**
-     * @param Association $association
-     * @param bool        $isFirst
+     * @param AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic|Association|Mockery_15_AlgoWeb_PODataLaravel_Models_ObjectMap_Entities_Associations_AssociationMonomorphic $association
+     * @param bool                                                                                                                                                                                           $isFirst
+     *
+     * @return void
      */
     public function addAssociation(Association $association, $isFirst = true)
     {
@@ -183,7 +195,7 @@ class EntityGubbins
     }
 
     /**
-     * @return String[]
+     * @return string[]
      */
     protected function getFieldNames()
     {
@@ -195,7 +207,7 @@ class EntityGubbins
     }
 
     /**
-     * @return String[]
+     * @return array|string[]
      */
     protected function getAssociationNames()
     {
@@ -210,7 +222,7 @@ class EntityGubbins
     }
 
     /**
-     * @return Associations\Association[]
+     * @return AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic[]|array
      */
     public function getAssociations()
     {
@@ -218,8 +230,9 @@ class EntityGubbins
     }
 
     /**
-     * @param $relName
-     * @return Association|null
+     * @param string $relName
+     *
+     * @return AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic|null
      */
     public function resolveAssociation($relName)
     {

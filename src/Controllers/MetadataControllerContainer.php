@@ -7,7 +7,9 @@ class MetadataControllerContainer
     private $metadata;
 
     /**
-     * @param array $meta
+     * @param array|array[] $meta
+     *
+     * @return void
      */
     public function setMetadata(array $meta)
     {
@@ -15,7 +17,7 @@ class MetadataControllerContainer
     }
 
     /**
-     * @return array
+     * @return array[]
      */
     public function getMetadata()
     {
@@ -23,9 +25,10 @@ class MetadataControllerContainer
     }
 
     /**
-     * @param $modelName
-     * @param $verb
-     * @return array
+     * @param string $modelName
+     * @param string $verb
+     *
+     * @return array[]
      */
     public function getMapping($modelName, $verb)
     {

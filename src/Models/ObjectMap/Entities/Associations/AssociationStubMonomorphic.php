@@ -5,7 +5,7 @@ namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 class AssociationStubMonomorphic extends AssociationStubBase
 {
     /**
-     * @param \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase $otherStub
+     * @param AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic|AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic|AssociationStubBase $otherStub
      *
      * @return bool
      */

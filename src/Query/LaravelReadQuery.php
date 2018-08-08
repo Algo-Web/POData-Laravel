@@ -24,29 +24,26 @@ class LaravelReadQuery
 {
     protected $auth;
 
+    /**
+     * @param AlgoWeb\PODataLaravel\Auth\NullAuthProvider|AuthInterface|Mockery_56_AlgoWeb_PODataLaravel_Interfaces_AuthInterface $auth
+     */
     public function __construct(AuthInterface $auth = null)
     {
         $this->auth = isset($auth) ? $auth : new NullAuthProvider();
     }
 
     /**
-     * Gets collection of entities belongs to an entity set
-     * IE: http://host/EntitySet
-     *  http://host/EntitySet?$skip=10&$top=5&filter=Prop gt Value.
+     * @param Mockery_66_POData_Providers_Query_QueryType|POData\Providers\Query\QueryType|QueryType                                                                                    $queryType
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                                                                                                              $resourceSet
+     * @param DateTime|Mockery_74_POData_UriProcessor_QueryProcessor_ExpressionParser_FilterInfo|null                                                                                   $filterInfo
+     * @param Mockery_72_POData_UriProcessor_QueryProcessor_OrderByParser_InternalOrderByInfo|null                                                                                      $orderBy
+     * @param int|null                                                                                                                                                                  $top
+     * @param int|null                                                                                                                                                                  $skip
+     * @param DateTime|Mockery_95_POData_UriProcessor_QueryProcessor_SkipTokenParser_SkipTokenInfo|null                                                                                 $skipToken
+     * @param DateTime[]|null                                                                                                                                                           $eagerLoad
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|DateTime|Mockery_21_AlgoWeb_PODataLaravel_Models_TestModel|Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource|string|null $sourceEntityInstance
      *
-     * @param QueryType                $queryType            Is this is a query for a count, entities,
-     *                                                       or entities-with-count?
-     * @param ResourceSet              $resourceSet          The entity set containing the entities to fetch
-     * @param FilterInfo|null          $filterInfo           The $filter parameter of the OData query.  NULL if absent
-     * @param null|InternalOrderByInfo $orderBy              sorted order if we want to get the data in some
-     *                                                       specific order
-     * @param int|null                 $top                  number of records which need to be retrieved
-     * @param int|null                 $skip                 number of records which need to be skipped
-     * @param SkipTokenInfo|null       $skipToken            value indicating what records to skip
-     * @param string[]|null            $eagerLoad            array of relations to eager load
-     * @param Model|Relation|null      $sourceEntityInstance Starting point of query
-     *
-     * @return QueryResult
+     * @return POData\Providers\Query\QueryResult|void|null
      */
     public function getResourceSet(
         QueryType $queryType,
@@ -208,15 +205,11 @@ class LaravelReadQuery
     }
 
     /**
-     * Gets an entity instance from an entity set identified by a key
-     * IE: http://host/EntitySet(1L)
-     * http://host/EntitySet(KeyA=2L,KeyB='someValue').
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                                   $resourceSet
+     * @param KeyDescriptor|Mockery_55_POData_UriProcessor_ResourcePathProcessor_SegmentParser_KeyDescriptor $keyDescriptor
+     * @param null                                                                                           $eagerLoad
      *
-     * @param ResourceSet        $resourceSet   The entity set containing the entity to fetch
-     * @param KeyDescriptor|null $keyDescriptor The key identifying the entity to fetch
-     * @param string[]|null      $eagerLoad     array of relations to eager load
-     *
-     * @return Model|null Returns entity instance if found else null
+     * @return null
      */
     public function getResourceFromResourceSet(
         ResourceSet $resourceSet,
@@ -228,15 +221,13 @@ class LaravelReadQuery
 
 
     /**
-     * Common method for getResourceFromRelatedResourceSet() and getResourceFromResourceSet().
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet|null                                   $resourceSet
+     * @param KeyDescriptor|Mockery_55_POData_UriProcessor_ResourcePathProcessor_SegmentParser_KeyDescriptor|null $keyDescriptor
+     * @param array|int[]                                                                                         $whereCondition
+     * @param array|null                                                                                          $eagerLoad
+     * @param Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource                                         $sourceEntityInstance
      *
-     * @param ResourceSet|null    $resourceSet
-     * @param KeyDescriptor|null  $keyDescriptor
-     * @param Model|Relation|null $sourceEntityInstance Starting point of query
-     *                                                  $param array               $whereCondition
-     * @param string[]|null       $eagerLoad            array of relations to eager load
-     *
-     * @return Model|null
+     * @return Mockery_21_AlgoWeb_PODataLaravel_Models_TestModel|Mockery_77_AlgoWeb_PODataLaravel_Models_TestMorphTarget|void|null
      */
     public function getResource(
         ResourceSet $resourceSet = null,
@@ -285,16 +276,12 @@ class LaravelReadQuery
     }
 
     /**
-     * Get related resource for a resource
-     * IE: http://host/EntitySet(1L)/NavigationPropertyToSingleEntity
-     * http://host/EntitySet?$expand=NavigationPropertyToSingleEntity.
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                                                        $sourceResourceSet
+     * @param Mockery_21_AlgoWeb_PODataLaravel_Models_TestModel|Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource|Model $sourceEntityInstance
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                                                        $targetResourceSet
+     * @param Mockery_53_POData_Providers_Metadata_ResourceProperty|ResourceProperty                                              $targetProperty
      *
-     * @param ResourceSet      $sourceResourceSet    The entity set containing the source entity
-     * @param Model            $sourceEntityInstance the source entity instance
-     * @param ResourceSet      $targetResourceSet    The entity set containing the entity pointed to by the nav property
-     * @param ResourceProperty $targetProperty       The navigation property to fetch
-     *
-     * @return Model|null The related resource if found else null
+     * @return AlgoWeb\PODataLaravel\Models\TestModel|null
      */
     public function getRelatedResourceReference(
         ResourceSet $sourceResourceSet,
@@ -320,16 +307,13 @@ class LaravelReadQuery
     }
 
     /**
-     * Gets a related entity instance from an entity set identified by a key
-     * IE: http://host/EntitySet(1L)/NavigationPropertyToCollection(33).
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                                   $sourceResourceSet
+     * @param Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource|Model                              $sourceEntityInstance
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet                                   $targetResourceSet
+     * @param Mockery_53_POData_Providers_Metadata_ResourceProperty|ResourceProperty                         $targetProperty
+     * @param KeyDescriptor|Mockery_55_POData_UriProcessor_ResourcePathProcessor_SegmentParser_KeyDescriptor $keyDescriptor
      *
-     * @param ResourceSet      $sourceResourceSet    The entity set containing the source entity
-     * @param Model            $sourceEntityInstance the source entity instance
-     * @param ResourceSet      $targetResourceSet    The entity set containing the entity to fetch
-     * @param ResourceProperty $targetProperty       the metadata of the target property
-     * @param KeyDescriptor    $keyDescriptor        The key identifying the entity to fetch
-     *
-     * @return Model|null Returns entity instance if found else null
+     * @return Mockery_77_AlgoWeb_PODataLaravel_Models_TestMorphTarget|null
      */
     public function getResourceFromRelatedResourceSet(
         ResourceSet $sourceResourceSet,
@@ -356,8 +340,9 @@ class LaravelReadQuery
 
 
     /**
-     * @param  ResourceSet $resourceSet
-     * @return mixed
+     * @param Mockery_40_POData_Providers_Metadata_ResourceSet|ResourceSet $resourceSet
+     *
+     * @return Mockery_21_AlgoWeb_PODataLaravel_Models_TestModel|Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource
      */
     protected function getSourceEntityInstance(ResourceSet $resourceSet)
     {
@@ -366,7 +351,9 @@ class LaravelReadQuery
     }
 
     /**
-     * @param Model|Relation|null $source
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|DateTime|Mockery_21_AlgoWeb_PODataLaravel_Models_TestModel|Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource|string|null $source
+     *
+     * @return void
      */
     protected function checkSourceInstance($source)
     {
@@ -376,16 +363,19 @@ class LaravelReadQuery
         }
     }
 
+    /**
+     * @return AlgoWeb\PODataLaravel\Auth\NullAuthProvider|Mockery_56_AlgoWeb_PODataLaravel_Interfaces_AuthInterface
+     */
     protected function getAuth()
     {
         return $this->auth;
     }
 
     /**
-     * @param $sourceEntityInstance
-     * @param null|mixed $checkInstance
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|Mockery_21_AlgoWeb_PODataLaravel_Models_TestModel|Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource $sourceEntityInstance
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|Mockery_21_AlgoWeb_PODataLaravel_Models_TestModel|Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource $checkInstance
      *
-     * @throws ODataException
+     * @return void
      */
     private function checkAuth($sourceEntityInstance, $checkInstance = null)
     {
@@ -400,9 +390,10 @@ class LaravelReadQuery
     }
 
     /**
-     * @param $sourceEntityInstance
-     * @param  KeyDescriptor|null        $keyDescriptor
-     * @throws InvalidOperationException
+     * @param Mockery_21_AlgoWeb_PODataLaravel_Models_TestModel|Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource $sourceEntityInstance
+     * @param KeyDescriptor|Mockery_55_POData_UriProcessor_ResourcePathProcessor_SegmentParser_KeyDescriptor|null           $keyDescriptor
+     *
+     * @return void
      */
     private function processKeyDescriptor(&$sourceEntityInstance, KeyDescriptor $keyDescriptor = null)
     {
@@ -416,8 +407,9 @@ class LaravelReadQuery
     }
 
     /**
-     * @param  string[]|null $eagerLoad
-     * @return array
+     * @param DateTime[]|array|null $eagerLoad
+     *
+     * @return array|null
      */
     private function processEagerLoadList(array $eagerLoad = null)
     {
@@ -439,7 +431,8 @@ class LaravelReadQuery
     }
 
     /**
-     * @param  string $odataProperty
+     * @param string $odataProperty
+     *
      * @return string
      */
     private function getLaravelRelationName($odataProperty)
@@ -452,6 +445,13 @@ class LaravelReadQuery
         return $laravelProperty;
     }
 
+    /**
+     * @param Mockery_95_POData_UriProcessor_QueryProcessor_SkipTokenParser_SkipTokenInfo              $skipToken
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|Mockery_21_AlgoWeb_PODataLaravel_Models_TestModel $sourceEntityInstance
+     * @param string                                                                                   $keyName
+     *
+     * @return Illuminate\Database\Eloquent\Builder|Mockery_21_AlgoWeb_PODataLaravel_Models_TestModel|null
+     */
     protected function processSkipToken($skipToken, $sourceEntityInstance, $keyName)
     {
         $parameters = [];
@@ -487,6 +487,16 @@ class LaravelReadQuery
         return $sourceEntityInstance;
     }
 
+    /**
+     * @param int                                                                                                                                                $top
+     * @param int                                                                                                                                                $skip
+     * @param Illuminate\Database\Eloquent\Builder|Mockery_21_AlgoWeb_PODataLaravel_Models_TestModel|Mockery_68_AlgoWeb_PODataLaravel_Models_TestMorphManySource $sourceEntityInstance
+     * @param bool                                                                                                                                               $nullFilter
+     * @param array                                                                                                                                              $rawLoad
+     * @param string|null                                                                                                                                        $isvalid
+     *
+     * @return int[]
+     */
     protected function applyFiltering(
         $top,
         $skip,

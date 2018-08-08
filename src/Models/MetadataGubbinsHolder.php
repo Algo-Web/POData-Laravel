@@ -15,6 +15,11 @@ class MetadataGubbinsHolder
     protected $relations = [];
     protected $knownSides = [];
 
+    /**
+     * @param AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins|EntityGubbins $entity
+     *
+     * @return void
+     */
     public function addEntity(EntityGubbins $entity)
     {
         $className = $entity->getClassName();
@@ -31,6 +36,12 @@ class MetadataGubbinsHolder
         }
     }
 
+    /**
+     * @param string $className
+     * @param string $relName
+     *
+     * @return AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic[]|AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic[]|array|void
+     */
     public function getRelationsByRelationName($className, $relName)
     {
         $this->checkClassExists($className);
@@ -58,6 +69,11 @@ class MetadataGubbinsHolder
         return $relStubs;
     }
 
+    /**
+     * @param string $className
+     *
+     * @return AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic[]|array
+     */
     public function getRelationsByClass($className)
     {
         $this->checkClassExists($className);
@@ -90,6 +106,9 @@ class MetadataGubbinsHolder
         return $associations;
     }
 
+    /**
+     * @return AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic[]|array
+     */
     public function getRelations()
     {
         $classNames = array_keys($this->relations);
@@ -155,13 +174,20 @@ class MetadataGubbinsHolder
         return $result;
     }
 
+    /**
+     * @param string $className
+     *
+     * @return bool
+     */
     public function hasClass($className)
     {
         return array_key_exists($className, $this->relations);
     }
 
     /**
-     * @param $className
+     * @param string $className
+     *
+     * @return void
      */
     protected function checkClassExists($className)
     {

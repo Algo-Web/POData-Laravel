@@ -11,7 +11,7 @@ class AssociationMonomorphic extends Association
     protected $last;
 
     /**
-     * @return AssociationStubBase
+     * @return AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic|AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic|Mockery_12_AlgoWeb_PODataLaravel_Models_ObjectMap_Entities_Associations_AssociationStubBase|null
      */
     public function getLast()
     {
@@ -19,7 +19,9 @@ class AssociationMonomorphic extends Association
     }
 
     /**
-     * @param AssociationStubBase $last
+     * @param AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic|AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic|AssociationStubBase|Mockery_12_AlgoWeb_PODataLaravel_Models_ObjectMap_Entities_Associations_AssociationStubBase $last
+     *
+     * @return void
      */
     public function setLast(AssociationStubBase $last)
     {
@@ -46,7 +48,7 @@ class AssociationMonomorphic extends Association
     }
 
     /**
-     * @return \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType
+     * @return AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType
      */
     public function getAssociationType()
     {

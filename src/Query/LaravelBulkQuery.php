@@ -34,6 +34,10 @@ class LaravelBulkQuery
     protected $query;
     protected $controllerContainer;
 
+    /**
+     * @param AlgoWeb\PODataLaravel\Models\LaravelQueryDummy|AlgoWeb\PODataLaravel\Query\LaravelQuery|LaravelQuery                $query
+     * @param AlgoWeb\PODataLaravel\Auth\NullAuthProvider|AuthInterface|Mockery_56_AlgoWeb_PODataLaravel_Interfaces_AuthInterface $auth
+     */
     public function __construct(LaravelQuery &$query, AuthInterface $auth = null)
     {
         $this->auth = isset($auth) ? $auth : new NullAuthProvider();

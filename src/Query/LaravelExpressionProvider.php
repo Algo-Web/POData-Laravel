@@ -129,9 +129,7 @@ class LaravelExpressionProvider implements IExpressionProvider
         };
     }
     /**
-     * Get the name of the iterator.
-     *
-     * @return string
+     * @return string|null
      */
     public function getIteratorName()
     {
@@ -139,9 +137,7 @@ class LaravelExpressionProvider implements IExpressionProvider
     }
 
     /**
-     * Get the resource type.
-     *
-     * @return ResourceType|null
+     * @return Mockery_41_POData_Providers_Metadata_ResourceType|null
      */
     public function getResourceType()
     {
@@ -149,10 +145,9 @@ class LaravelExpressionProvider implements IExpressionProvider
     }
 
     /**
-     * call-back for setting the resource type.
+     * @param Mockery_41_POData_Providers_Metadata_ResourceType|ResourceType $resourceType
      *
-     * @param ResourceType $resourceType The resource type on which the filter
-     *                                   is going to be applied
+     * @return void
      */
     public function setResourceType(ResourceType $resourceType)
     {
@@ -160,13 +155,11 @@ class LaravelExpressionProvider implements IExpressionProvider
         $this->resourceType = $resourceType;
     }
     /**
-     * Call-back for logical expression.
+     * @param POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\ExpressionType|int|null $expressionType
+     * @param string|null                                                                             $left
+     * @param string|null                                                                             $right
      *
-     * @param ExpressionType $expressionType The type of logical expression
-     * @param string         $left           The left expression
-     * @param string         $right          The left expression
-     *
-     * @return string
+     * @return string|null
      */
     public function onLogicalExpression($expressionType, $left, $right)
     {
@@ -181,13 +174,11 @@ class LaravelExpressionProvider implements IExpressionProvider
         }
     }
     /**
-     * Call-back for arithmetic expression.
+     * @param int|null    $expressionType
+     * @param string|null $left
+     * @param int|null    $right
      *
-     * @param ExpressionType $expressionType The type of arithmetic expression
-     * @param string         $left           The left expression
-     * @param string         $right          The left expression
-     *
-     * @return string
+     * @return string|null
      */
     public function onArithmeticExpression($expressionType, $left, $right)
     {
@@ -208,13 +199,11 @@ class LaravelExpressionProvider implements IExpressionProvider
         }
     }
     /**
-     * Call-back for relational expression.
+     * @param int|null    $expressionType
+     * @param string|null $left
+     * @param int|null    $right
      *
-     * @param ExpressionType $expressionType The type of relation expression
-     * @param string         $left           The left expression
-     * @param string         $right          The left expression
-     *
-     * @return string
+     * @return string|null
      */
     public function onRelationalExpression($expressionType, $left, $right)
     {
@@ -237,12 +226,10 @@ class LaravelExpressionProvider implements IExpressionProvider
         }
     }
     /**
-     * Call-back for unary expression.
+     * @param int|null    $expressionType
+     * @param string|null $child
      *
-     * @param ExpressionType $expressionType The type of unary expression
-     * @param string         $child          The child expression
-     *
-     * @return string
+     * @return string|null
      */
     public function onUnaryExpression($expressionType, $child)
     {
@@ -257,12 +244,10 @@ class LaravelExpressionProvider implements IExpressionProvider
         }
     }
     /**
-     * Call-back for constant expression.
+     * @param IType|POData\Providers\Metadata\Type\Boolean|POData\Providers\Metadata\Type\Byte|POData\Providers\Metadata\Type\Int16|POData\Providers\Metadata\Type\Int32|POData\Providers\Metadata\Type\Int64|POData\Providers\Metadata\Type\Null1|POData\Providers\Metadata\Type\StringType $type
+     * @param bool|int|string|null                                                                                                                                                                                                                                                           $value
      *
-     * @param IType $type  The type of constant
-     * @param mixed $value The value of the constant
-     *
-     * @return string
+     * @return int|string
      */
     public function onConstantExpression(IType $type, $value)
     {
@@ -274,9 +259,7 @@ class LaravelExpressionProvider implements IExpressionProvider
         return $value;
     }
     /**
-     * Call-back for property access expression.
-     *
-     * @param PropertyAccessExpression $expression The property access expression
+     * @param Mockery_52_POData_UriProcessor_QueryProcessor_ExpressionParser_Expressions_PropertyAccessExpression $expression
      *
      * @return string
      */
@@ -293,12 +276,10 @@ class LaravelExpressionProvider implements IExpressionProvider
         return $variable;
     }
     /**
-     * Call-back for function call expression.
+     * @param POData\UriProcessor\QueryProcessor\FunctionDescription|null $functionDescription
+     * @param int[]|string[]|null                                         $params
      *
-     * @param \POData\UriProcessor\QueryProcessor\FunctionDescription $functionDescription Description of the function
-     * @param array<string>                                           $params              Parameters to the function
-     *
-     * @return string
+     * @return string|null
      */
     public function onFunctionCallExpression($functionDescription, $params)
     {
@@ -311,11 +292,9 @@ class LaravelExpressionProvider implements IExpressionProvider
         return $this->functionDescriptionParsers[$functionDescription->name]($params);
     }
     /**
-     * To format binary expression.
-     *
-     * @param string $operator The binary operator
-     * @param string $left     The left operand
-     * @param string $right    The right operand
+     * @param string     $operator
+     * @param string     $left
+     * @param int|string $right
      *
      * @return string
      */
@@ -324,10 +303,8 @@ class LaravelExpressionProvider implements IExpressionProvider
         return self::OPEN_BRACKET . $left . ' ' . $operator . ' ' . $right . self::CLOSE_BRACKET;
     }
     /**
-     * To format unary expression.
-     *
-     * @param string $operator The unary operator
-     * @param string $child    The operand
+     * @param string $operator
+     * @param string $child
      *
      * @return string
      */
@@ -337,8 +314,9 @@ class LaravelExpressionProvider implements IExpressionProvider
     }
 
     /**
-     * @param $expressionType
-     * @return mixed
+     * @param POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\ExpressionType|int|null $expressionType
+     *
+     * @return int|null
      */
     private function unpackExpressionType($expressionType)
     {

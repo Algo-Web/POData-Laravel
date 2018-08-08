@@ -8,9 +8,7 @@ use Illuminate\Support\ServiceProvider;
 class QueryProvider extends ServiceProvider
 {
     /**
-     * Bootstrap the application services.  Post-boot.
-     *
-     * @return void
+     * @return void|null
      */
     public function boot()
     {
@@ -18,8 +16,6 @@ class QueryProvider extends ServiceProvider
     }
 
     /**
-     * Register the application services.  Boot-time only.
-     *
      * @return void
      */
     public function register()

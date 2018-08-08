@@ -52,7 +52,7 @@ class EntityField
     private $edmFieldType;
 
     /**
-     * @return \POData\Providers\Metadata\Type\TypeCode
+     * @return int
      */
     public function getEdmFieldType()
     {
@@ -60,7 +60,7 @@ class EntityField
     }
 
     /**
-     * @return \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType
+     * @return AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType
      */
     public function getPrimitiveType()
     {
@@ -68,7 +68,9 @@ class EntityField
     }
 
     /**
-     * @param \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType $primitiveType
+     * @param AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType|EntityFieldPrimitiveType $primitiveType
+     *
+     * @return void
      */
     public function setPrimitiveType(EntityFieldPrimitiveType $primitiveType)
     {
@@ -86,6 +88,8 @@ class EntityField
 
     /**
      * @param string $name
+     *
+     * @return void
      */
     public function setName($name)
     {
@@ -93,7 +97,7 @@ class EntityField
     }
 
     /**
-     * @return EntityFieldType
+     * @return AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType
      */
     public function getFieldType()
     {
@@ -101,7 +105,9 @@ class EntityField
     }
 
     /**
-     * @param EntityFieldType $fieldType
+     * @param AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType|EntityFieldType $fieldType
+     *
+     * @return void
      */
     public function setFieldType(EntityFieldType $fieldType)
     {
@@ -117,7 +123,9 @@ class EntityField
     }
 
     /**
-     * @param bool $isNullable
+     * @param bool|string $isNullable
+     *
+     * @return void
      */
     public function setIsNullable($isNullable)
     {
@@ -125,7 +133,7 @@ class EntityField
     }
 
     /**
-     * @return mixed
+     * @return DateTime|null
      */
     public function getDefaultValue()
     {
@@ -133,7 +141,9 @@ class EntityField
     }
 
     /**
-     * @param mixed $defaultValue
+     * @param DateTime|null $defaultValue
+     *
+     * @return void
      */
     public function setDefaultValue($defaultValue)
     {
@@ -149,7 +159,9 @@ class EntityField
     }
 
     /**
-     * @param bool $readOnly
+     * @param string|false $readOnly
+     *
+     * @return void
      */
     public function setReadOnly($readOnly)
     {
@@ -165,7 +177,9 @@ class EntityField
     }
 
     /**
-     * @param bool $createOnly
+     * @param string|false $createOnly
+     *
+     * @return void
      */
     public function setCreateOnly($createOnly)
     {
@@ -173,7 +187,7 @@ class EntityField
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function getIsKeyField()
     {
@@ -181,7 +195,9 @@ class EntityField
     }
 
     /**
-     * @param bool $keyField
+     * @param bool|string $keyField
+     *
+     * @return void
      */
     public function setIsKeyField($keyField)
     {
@@ -208,9 +224,9 @@ class EntityField
     ];
 
     /**
-     * @param \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType $primitiveType
+     * @param AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType|EntityFieldPrimitiveType $primitiveType
      *
-     * @return TypeCode
+     * @return int|string
      */
     private function primitiveTypeToEdmType(EntityFieldPrimitiveType $primitiveType)
     {

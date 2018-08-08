@@ -18,7 +18,9 @@ class Map
     private $associations = [];
 
     /**
-     * @param EntityGubbins $entity
+     * @param AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins|EntityGubbins $entity
+     *
+     * @return void
      */
     public function addEntity(EntityGubbins $entity)
     {
@@ -26,20 +28,27 @@ class Map
     }
 
     /**
-     * @return EntityGubbins[]
+     * @return AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins[]|array
      */
     public function getEntities()
     {
         return $this->entities;
     }
 
+    /**
+     * @param string $entityClassName
+     *
+     * @return AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins
+     */
     public function resolveEntity($entityClassName)
     {
         return array_key_exists($entityClassName, $this->entities) ? $this->entities[$entityClassName] : null;
     }
 
     /**
-     * @param EntityGubbins[] $entities
+     * @param AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins[]|array|string[] $entities
+     *
+     * @return void
      */
     public function setEntities(array $entities)
     {
@@ -55,7 +64,9 @@ class Map
     }
 
     /**
-     * @param Association[] $associations
+     * @param AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic[]|array $associations
+     *
+     * @return void
      */
     public function setAssociations(array $associations)
     {
@@ -65,7 +76,9 @@ class Map
     }
 
     /**
-     * @param Association $association
+     * @param AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic|Association|Mockery_28_AlgoWeb_PODataLaravel_Models_ObjectMap_Entities_Associations_Association $association
+     *
+     * @return void
      */
     public function addAssociation(Association $association)
     {
@@ -78,7 +91,7 @@ class Map
     }
 
     /**
-     * @return Association[]
+     * @return AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic[]|array
      */
     public function getAssociations()
     {
@@ -86,7 +99,7 @@ class Map
     }
 
     /**
-     * @return bool
+     * @return void
      */
     public function isOK()
     {
@@ -99,7 +112,9 @@ class Map
     }
 
     /**
-     * @param AssociationMonomorphic $association
+     * @param AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic|AssociationMonomorphic $association
+     *
+     * @return void
      */
     private function addAssociationMonomorphic(AssociationMonomorphic $association)
     {

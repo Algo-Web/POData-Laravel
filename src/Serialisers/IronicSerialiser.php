@@ -128,8 +128,8 @@ class IronicSerialiser implements IObjectSerialiser
     private $isBaseWritten = false;
 
     /**
-     * @param IService                $service Reference to the data service instance
-     * @param RequestDescription|null $request Type instance describing the client submitted request
+     * @param AlgoWeb\PODataLaravel\Serialisers\TestDataService|IService|Mockery_107_POData_SimpleDataService|Mockery_50_POData_IService|POData\SimpleDataService $service
+     * @param Mockery_103_POData_UriProcessor_RequestDescription|POData\UriProcessor\RequestDescription|RequestDescription|null                                   $request
      */
     public function __construct(IService $service, RequestDescription $request = null)
     {
@@ -144,11 +144,9 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Write a top level entry resource.
+     * @param POData\Providers\Query\QueryResult|QueryResult $entryObject
      *
-     * @param QueryResult $entryObject Reference to the entry object to be written
-     *
-     * @return ODataEntry|null
+     * @return POData\ObjectModel\ODataEntry|void
      */
     public function writeTopLevelElement(QueryResult $entryObject)
     {
@@ -292,11 +290,9 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Write top level feed element.
+     * @param POData\Providers\Query\QueryResult|QueryResult $entryObjects
      *
-     * @param QueryResult &$entryObjects Array of entry resources to be written
-     *
-     * @return ODataFeed
+     * @return POData\ObjectModel\ODataFeed|void
      */
     public function writeTopLevelElements(QueryResult & $entryObjects)
     {
@@ -366,11 +362,9 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Write top level url element.
+     * @param POData\Providers\Query\QueryResult|QueryResult $entryObject
      *
-     * @param QueryResult $entryObject The entry resource whose url to be written
-     *
-     * @return ODataURL
+     * @return POData\ObjectModel\ODataURL
      */
     public function writeUrlElement(QueryResult $entryObject)
     {
@@ -390,11 +384,9 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Write top level url collection.
+     * @param POData\Providers\Query\QueryResult|QueryResult $entryObjects
      *
-     * @param QueryResult $entryObjects Array of entry resources whose url to be written
-     *
-     * @return ODataURLCollection
+     * @return POData\ObjectModel\ODataURLCollection
      */
     public function writeUrlElements(QueryResult $entryObjects)
     {
@@ -431,13 +423,11 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Write top level complex resource.
+     * @param POData\Providers\Query\QueryResult|QueryResult                 $complexValue
+     * @param string                                                         $propertyName
+     * @param Mockery_41_POData_Providers_Metadata_ResourceType|ResourceType $resourceType
      *
-     * @param QueryResult  &$complexValue The complex object to be written
-     * @param string       $propertyName  The name of the complex property
-     * @param ResourceType &$resourceType Describes the type of complex object
-     *
-     * @return ODataPropertyContent
+     * @return POData\ObjectModel\ODataPropertyContent|void
      */
     public function writeTopLevelComplexObject(QueryResult & $complexValue, $propertyName, ResourceType & $resourceType)
     {
@@ -458,16 +448,11 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Write top level bag resource.
+     * @param POData\Providers\Query\QueryResult|QueryResult                 $BagValue
+     * @param string                                                         $propertyName
+     * @param Mockery_41_POData_Providers_Metadata_ResourceType|ResourceType $resourceType
      *
-     * @param QueryResult  &$BagValue     The bag object to be
-     *                                    written
-     * @param string       $propertyName  The name of the
-     *                                    bag property
-     * @param ResourceType &$resourceType Describes the type of
-     *                                    bag object
-     *
-     * @return ODataPropertyContent
+     * @return POData\ObjectModel\ODataPropertyContent|void
      */
     public function writeTopLevelBagObject(QueryResult & $BagValue, $propertyName, ResourceType & $resourceType)
     {
@@ -484,13 +469,10 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Write top level primitive value.
+     * @param POData\Providers\Query\QueryResult|QueryResult                              $primitiveValue
+     * @param Mockery_53_POData_Providers_Metadata_ResourceProperty|ResourceProperty|null $resourceProperty
      *
-     * @param  QueryResult          &$primitiveValue   The primitive value to be
-     *                                                 written
-     * @param  ResourceProperty     &$resourceProperty Resource property describing the
-     *                                                 primitive property to be written
-     * @return ODataPropertyContent
+     * @return POData\ObjectModel\ODataPropertyContent|void
      */
     public function writeTopLevelPrimitive(QueryResult & $primitiveValue, ResourceProperty & $resourceProperty = null)
     {
@@ -522,9 +504,7 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Gets reference to the request submitted by client.
-     *
-     * @return RequestDescription
+     * @return Mockery_103_POData_UriProcessor_RequestDescription|POData\UriProcessor\RequestDescription
      */
     public function getRequest()
     {
@@ -536,9 +516,9 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Sets reference to the request submitted by client.
+     * @param Mockery_103_POData_UriProcessor_RequestDescription|RequestDescription $request
      *
-     * @param RequestDescription $request
+     * @return void
      */
     public function setRequest(RequestDescription $request)
     {
@@ -547,9 +527,7 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Gets the data service instance.
-     *
-     * @return IService
+     * @return AlgoWeb\PODataLaravel\Serialisers\TestDataService|Mockery_107_POData_SimpleDataService
      */
     public function getService()
     {
@@ -557,9 +535,7 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Gets the segment stack instance.
-     *
-     * @return SegmentStack
+     * @return POData\UriProcessor\SegmentStack
      */
     public function getStack()
     {
@@ -567,15 +543,20 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Get update timestamp.
-     *
-     * @return Carbon
+     * @return Carbon\Carbon
      */
     public function getUpdated()
     {
         return $this->updated;
     }
 
+    /**
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|AlgoWeb\PODataLaravel\Models\TestMonomorphicSource|AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget|AlgoWeb\PODataLaravel\Models\TestMorphTarget|Mockery_85_AlgoWeb_PODataLaravel_Models_TestMonomorphicSource|Mockery_92_AlgoWeb_PODataLaravel_Models_TestMonomorphicTarget $entityInstance
+     * @param POData\Providers\Metadata\ResourceEntityType|ResourceType                                                                                                                                                                                                                                                             $resourceType
+     * @param string                                                                                                                                                                                                                                                                                                                $containerName
+     *
+     * @return string|null
+     */
     protected function getEntryInstanceKey($entityInstance, ResourceType $resourceType, $containerName)
     {
         $typeName = $resourceType->getName();
@@ -609,11 +590,12 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param $entryObject
-     * @param $type
-     * @param $relativeUri
-     * @param $resourceType
-     * @return array<ODataMediaLink|null|array>
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|AlgoWeb\PODataLaravel\Models\TestMonomorphicSource|AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget|AlgoWeb\PODataLaravel\Models\TestMorphTarget|Mockery_85_AlgoWeb_PODataLaravel_Models_TestMonomorphicSource|Mockery_92_AlgoWeb_PODataLaravel_Models_TestMonomorphicTarget $entryObject
+     * @param string                                                                                                                                                                                                                                                                                                                $type
+     * @param string                                                                                                                                                                                                                                                                                                                $relativeUri
+     * @param POData\Providers\Metadata\ResourceEntityType|ResourceType                                                                                                                                                                                                                                                             $resourceType
+     *
+     * @return array[]
      */
     protected function writeMediaData($entryObject, $type, $relativeUri, ResourceType $resourceType)
     {
@@ -677,10 +659,7 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Find a 'ExpandedProjectionNode' instance in the projection tree
-     * which describes the current segment.
-     *
-     * @return null|RootProjectionNode|ExpandedProjectionNode
+     * @return Mockery_104_POData_UriProcessor_QueryProcessor_ExpandProjectionParser_RootProjectionNode|POData\UriProcessor\QueryProcessor\ExpandProjectionParser\RootProjectionNode|null
      */
     protected function getCurrentExpandedProjectionNode()
     {
@@ -718,11 +697,9 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Check whether to expand a navigation property or not.
+     * @param string $navigationPropertyName
      *
-     * @param string $navigationPropertyName Name of naviagtion property in question
-     *
-     * @return bool True if the given navigation should be expanded, otherwise false
+     * @return bool
      */
     protected function shouldExpandSegment($navigationPropertyName)
     {
@@ -762,9 +739,7 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Resource set wrapper for the resource being serialized.
-     *
-     * @return ResourceSetWrapper
+     * @return POData\Providers\Metadata\ResourceSetWrapper
      */
     protected function getCurrentResourceSetWrapper()
     {
@@ -775,13 +750,9 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Get next page link from the given entity instance.
+     * @param POData\Providers\Query\QueryResult $lastObject
      *
-     * @param  mixed          &$lastObject Last object serialized to be
-     *                                     used for generating
-     *                                     $skiptoken
-     * @throws ODataException
-     * @return string         for the link for next page
+     * @return string
      */
     protected function getNextLinkUri(&$lastObject)
     {
@@ -805,13 +776,7 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Builds the string corresponding to query parameters for top level results
-     * (result set identified by the resource path) to be put in next page link.
-     *
-     * @return string|null string representing the query parameters in the URI
-     *                     query parameter format, NULL if there
-     *                     is no query parameters
-     *                     required for the next link of top level result set
+     * @return null
      */
     protected function getNextPageLinkQueryParametersForRootResourceSet()
     {
@@ -850,6 +815,9 @@ class IronicSerialiser implements IObjectSerialiser
         return $queryParameterString;
     }
 
+    /**
+     * @return void
+     */
     private function loadStackIfEmpty()
     {
         if (0 == count($this->lightStack)) {
@@ -859,12 +827,8 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Convert the given primitive value to string.
-     * Note: This method will not handle null primitive value.
-     *
-     * @param IType &$primitiveResourceType Type of the primitive property
-     *                                      whose value need to be converted
-     * @param mixed $primitiveValue         Primitive value to convert
+     * @param IType|POData\Providers\Metadata\Type\Binary|POData\Providers\Metadata\Type\Boolean|POData\Providers\Metadata\Type\DateTime|POData\Providers\Metadata\Type\Int32|POData\Providers\Metadata\Type\StringType $type
+     * @param DateTime|Illuminate\Support\Carbon|bool|int|string                                                                                                                                                        $primitiveValue
      *
      * @return string
      */
@@ -893,9 +857,10 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param $entryObject
-     * @param $nonRelProp
-     * @return ODataPropertyContent
+     * @param AlgoWeb\PODataLaravel\Models\TestModel|AlgoWeb\PODataLaravel\Models\TestMonomorphicSource|AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget|AlgoWeb\PODataLaravel\Models\TestMorphTarget|Mockery_85_AlgoWeb_PODataLaravel_Models_TestMonomorphicSource|Mockery_92_AlgoWeb_PODataLaravel_Models_TestMonomorphicTarget|Model $entryObject
+     * @param array[]                                                                                                                                                                                                                                                                                                                     $nonRelProp
+     *
+     * @return POData\ObjectModel\ODataPropertyContent
      */
     private function writePrimitiveProperties(Model $entryObject, $nonRelProp)
     {
@@ -917,11 +882,13 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param $entryObject
-     * @param $prop
-     * @param $nuLink
-     * @param $propKind
-     * @param $propName
+     * @param POData\Providers\Query\QueryResult|QueryResult $entryObject
+     * @param POData\Providers\Metadata\ResourceProperty     $prop
+     * @param POData\ObjectModel\ODataLink                   $nuLink
+     * @param int                                            $propKind
+     * @param string                                         $propName
+     *
+     * @return void
      */
     private function expandNavigationProperty(QueryResult $entryObject, $prop, $nuLink, $propKind, $propName)
     {
@@ -980,7 +947,7 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Gets the data service instance.
+     * @param IService|POData\SimpleDataService $service
      *
      * @return void
      */
@@ -992,9 +959,10 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param ResourceType $resourceType
-     * @param $result
-     * @return ODataBagContent|null
+     * @param Mockery_41_POData_Providers_Metadata_ResourceType|ResourceType                      $resourceType
+     * @param AlgoWeb\PODataLaravel\Serialisers\reusableEntityClass1[]|array|string|string[]|null $result
+     *
+     * @return POData\ObjectModel\ODataBagContent|null
      */
     protected function writeBagValue(ResourceType & $resourceType, $result)
     {
@@ -1028,10 +996,11 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param  ResourceType         $resourceType
-     * @param  object               $result
-     * @param  string|null          $propertyName
-     * @return ODataPropertyContent
+     * @param Mockery_41_POData_Providers_Metadata_ResourceType|ResourceType                                                     $resourceType
+     * @param AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget|AlgoWeb\PODataLaravel\Serialisers\reusableEntityClass1|string[] $result
+     * @param string                                                                                                             $propertyName
+     *
+     * @return POData\ObjectModel\ODataPropertyContent|null
      */
     protected function writeComplexValue(ResourceType & $resourceType, &$result, $propertyName = null)
     {
@@ -1058,7 +1027,21 @@ class IronicSerialiser implements IObjectSerialiser
             $propName = $prop->getName();
             $internalProperty = new ODataProperty();
             $internalProperty->name = $propName;
-            if (static::isMatchPrimitive($resourceKind)) {
+            if (/**
+     * @param Mockery_41_POData_Providers_Metadata_ResourceType|ResourceType                                                     $resourceType
+     * @param AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget|AlgoWeb\PODataLaravel\Serialisers\reusableEntityClass1|string[] $result
+     * @param string                                                                                                             $propertyName
+     *
+     * @return POData\ObjectModel\ODataPropertyContent|null
+     */
+    static::/**
+     * @param Mockery_41_POData_Providers_Metadata_ResourceType|ResourceType                                                     $resourceType
+     * @param AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget|AlgoWeb\PODataLaravel\Serialisers\reusableEntityClass1|string[] $result
+     * @param string                                                                                                             $propertyName
+     *
+     * @return POData\ObjectModel\ODataPropertyContent|null
+     */
+    isMatchPrimitive($resourceKind)) {
                 $iType = $prop->getInstanceType();
                 if (!$iType instanceof IType) {
                     throw new InvalidOperationException(get_class($iType));
@@ -1109,7 +1092,7 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @return array
+     * @return array|array[]
      */
     protected function getLightStack()
     {
@@ -1117,13 +1100,19 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @return ModelSerialiser
+     * @return AlgoWeb\PODataLaravel\Serialisers\ModelSerialiser
      */
     public function getModelSerialiser()
     {
         return $this->modelSerialiser;
     }
 
+    /**
+     * @param POData\Providers\Metadata\ResourceEntityType|ResourceEntityType $resourceType
+     * @param string                                                          $payloadClass
+     *
+     * @return POData\Providers\Metadata\ResourceEntityType
+     */
     protected function getConcreteTypeFromAbstractType(ResourceEntityType $resourceType, $payloadClass)
     {
         if ($resourceType->isAbstract()) {

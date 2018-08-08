@@ -17,9 +17,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
     protected $optionalVerbs = ['bulkCreate', 'bulkUpdate'];
 
     /**
-     * Bootstrap the application services.  Post-boot.
-     *
-     * @return void
+     * @return null
      */
     public function boot()
     {
@@ -76,8 +74,6 @@ class MetadataControllerProvider extends MetadataBaseProvider
     }
 
     /**
-     * Register the application services.  Boot-time only.
-     *
      * @return void
      */
     public function register()
@@ -91,8 +87,8 @@ class MetadataControllerProvider extends MetadataBaseProvider
     }
 
     /**
-     * @param $classes
-     * @throws \Exception
+     * @param string[] $classes
+     *
      * @return array
      */
     protected function getCandidateControllers($classes)
