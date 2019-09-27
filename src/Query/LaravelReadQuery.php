@@ -5,6 +5,9 @@ namespace AlgoWeb\PODataLaravel\Query;
 use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
+use AlgoWeb\PODataLaravel\Models\MetadataTrait;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
@@ -86,7 +89,9 @@ class LaravelReadQuery
             $keyName = $sourceEntityInstance->getKeyName();
             $tableName = $sourceEntityInstance->getTable();
         } elseif ($sourceEntityInstance instanceof Relation) {
-            $modelLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
+            /** @var MetadataTrait $model */
+            $model = $sourceEntityInstance->getRelated();
+            $modelLoad = $model->getEagerLoad();
             $keyName = $sourceEntityInstance->getRelated()->getKeyName();
             $tableName = $sourceEntityInstance->getRelated()->getTable();
         }
@@ -271,7 +276,9 @@ class LaravelReadQuery
         if ($sourceEntityInstance instanceof Model) {
             $modelLoad = $sourceEntityInstance->getEagerLoad();
         } elseif ($sourceEntityInstance instanceof Relation) {
-            $modelLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
+            /** @var MetadataTrait $model */
+            $model = $sourceEntityInstance->getRelated();
+            $modelLoad = $model->getEagerLoad();
         }
         if (!(isset($modelLoad))) {
             throw new InvalidOperationException('');
@@ -396,7 +403,7 @@ class LaravelReadQuery
     }
 
     /**
-     * @param $sourceEntityInstance
+     * @param Model|Relation|null $sourceEntityInstance
      * @param null|mixed $checkInstance
      *
      * @throws ODataException
@@ -414,7 +421,7 @@ class LaravelReadQuery
     }
 
     /**
-     * @param $sourceEntityInstance
+     * @param Model|Builder $sourceEntityInstance
      * @param  KeyDescriptor|null        $keyDescriptor
      * @throws InvalidOperationException
      */
@@ -468,13 +475,13 @@ class LaravelReadQuery
     }
 
     /**
-     * @param $skipToken
-     * @param $sourceEntityInstance
+     * @param SkipTokenInfo $skipToken
+     * @param Model|Builder $sourceEntityInstance
      * @param $keyName
      * @return mixed
      * @throws InvalidOperationException
      */
-    protected function processSkipToken($skipToken, $sourceEntityInstance, $keyName)
+    protected function processSkipToken(SkipTokenInfo $skipToken, $sourceEntityInstance, $keyName)
     {
         $parameters = [];
         $processed = [];
@@ -496,7 +503,7 @@ class LaravelReadQuery
             $processed[$name] = ['direction' => $line['direction'], 'value' => $line['value']];
             $sourceEntityInstance = $sourceEntityInstance
                 ->orWhere(
-                    function ($query) use ($processed) {
+                    function (Builder $query) use ($processed) {
                         foreach ($processed as $key => $proc) {
                             $query->where($key, $proc['direction'], $proc['value']);
                         }
@@ -512,7 +519,7 @@ class LaravelReadQuery
     /**
      * @param $top
      * @param $skip
-     * @param $sourceEntityInstance
+     * @param Model|Builder $sourceEntityInstance
      * @param $nullFilter
      * @param $rawLoad
      * @param callable|null $isvalid
@@ -539,14 +546,14 @@ class LaravelReadQuery
                 $msg = 'Filter closure not set';
                 throw new InvalidOperationException($msg);
             }
-            $resultSet = collect([]);
+            $resultSet = new Collection([]);
             $rawCount = 0;
             $rawTop = null === $top ? $bulkSetCount : $top;
 
             // loop thru, chunk by chunk, to reduce chances of exhausting memory
             $sourceEntityInstance->chunk(
                 5000,
-                function ($results) use ($isvalid, &$skip, &$resultSet, &$rawCount, $rawTop) {
+                function (Collection $results) use ($isvalid, &$skip, &$resultSet, &$rawCount, $rawTop) {
                     // apply filter
                     $results = $results->filter($isvalid);
                     // need to iterate through full result set to find count of items matching filter,
@@ -567,8 +574,10 @@ class LaravelReadQuery
             $resultCount = $rawCount;
         } else {
             if ($sourceEntityInstance instanceof Model) {
+                /** @var Builder $sourceEntityInstance */
                 $sourceEntityInstance = $sourceEntityInstance->getQuery();
             }
+            /** @var Collection $resultSet */
             $resultSet = $sourceEntityInstance->with($rawLoad)->get();
             $resultSet = $resultSet->filter($isvalid);
             $resultCount = $resultSet->count();
