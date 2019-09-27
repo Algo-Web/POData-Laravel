@@ -193,6 +193,7 @@ class LaravelReadQuery
         QueryType $queryType,
         ResourceSet $sourceResourceSet,
         Model $sourceEntityInstance,
+        /** @noinspection PhpUnusedParameterInspection */
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty,
         FilterInfo $filter = null,
@@ -316,6 +317,7 @@ class LaravelReadQuery
      * @throws \ReflectionException
      */
     public function getRelatedResourceReference(
+        /** @noinspection PhpUnusedParameterInspection */
         ResourceSet $sourceResourceSet,
         Model $sourceEntityInstance,
         ResourceSet $targetResourceSet,
@@ -353,6 +355,7 @@ class LaravelReadQuery
      * @throws \Exception
      */
     public function getResourceFromRelatedResourceSet(
+        /** @noinspection PhpUnusedParameterInspection */
         ResourceSet $sourceResourceSet,
         Model $sourceEntityInstance,
         ResourceSet $targetResourceSet,
