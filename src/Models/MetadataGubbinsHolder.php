@@ -8,6 +8,7 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStub
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
+use Illuminate\Support\Str;
 use POData\Common\InvalidOperationException;
 
 class MetadataGubbinsHolder
@@ -138,7 +139,7 @@ class MetadataGubbinsHolder
                     $stub = clone $this->knownSides[$knownType][$key];
                     $isMulti = ($stub->getMultiplicity()->getValue() == AssociationStubRelationType::MANY);
                     $relPolyTypeName = substr($lc->getBaseType(), strrpos($lc->getBaseType(), '\\')+1);
-                    $relPolyTypeName = str_plural($relPolyTypeName, $isMulti?2:1);
+                    $relPolyTypeName = Str::plural($relPolyTypeName, $isMulti ? 2 : 1);
                     $stub->setRelationName($stub->getRelationName() . '_' . $relPolyTypeName);
                     $assoc = new AssociationMonomorphic();
                     $first = -1 === $stub->compare($lc);
