@@ -22,7 +22,7 @@ class ModelSerialiser
     /**
      * Serialise needed bits of supplied model, taking fast path where possible.
      *
-     * @param  $model
+     * @param Model|mixed $model
      *
      * @return mixed
      */
