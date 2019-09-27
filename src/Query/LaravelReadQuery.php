@@ -47,6 +47,10 @@ class LaravelReadQuery
      * @param Model|Relation|null      $sourceEntityInstance Starting point of query
      *
      * @return QueryResult
+     * @throws InvalidArgumentException
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     * @throws ODataException
      */
     public function getResourceSet(
         QueryType $queryType,
@@ -176,6 +180,9 @@ class LaravelReadQuery
      * @param SkipTokenInfo|null $skipToken            value indicating what records to skip
      *
      * @return QueryResult
+     * @throws InvalidOperationException
+     * @throws ODataException
+     * @throws \ReflectionException
      */
     public function getRelatedResourceSet(
         QueryType $queryType,
@@ -217,6 +224,7 @@ class LaravelReadQuery
      * @param string[]|null      $eagerLoad     array of relations to eager load
      *
      * @return Model|null Returns entity instance if found else null
+     * @throws \Exception;
      */
     public function getResourceFromResourceSet(
         ResourceSet $resourceSet,
@@ -233,10 +241,11 @@ class LaravelReadQuery
      * @param ResourceSet|null    $resourceSet
      * @param KeyDescriptor|null  $keyDescriptor
      * @param Model|Relation|null $sourceEntityInstance Starting point of query
-     *                                                  $param array               $whereCondition
+     * @param array               $whereCondition
      * @param string[]|null       $eagerLoad            array of relations to eager load
      *
      * @return Model|null
+     * @throws \Exception
      */
     public function getResource(
         ResourceSet $resourceSet = null,
@@ -295,6 +304,9 @@ class LaravelReadQuery
      * @param ResourceProperty $targetProperty       The navigation property to fetch
      *
      * @return Model|null The related resource if found else null
+     * @throws ODataException
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     public function getRelatedResourceReference(
         ResourceSet $sourceResourceSet,
@@ -330,6 +342,8 @@ class LaravelReadQuery
      * @param KeyDescriptor    $keyDescriptor        The key identifying the entity to fetch
      *
      * @return Model|null Returns entity instance if found else null
+     * @throws InvalidOperationException
+     * @throws \Exception
      */
     public function getResourceFromRelatedResourceSet(
         ResourceSet $sourceResourceSet,
@@ -354,10 +368,10 @@ class LaravelReadQuery
         return $result;
     }
 
-
     /**
      * @param  ResourceSet $resourceSet
      * @return mixed
+     * @throws \ReflectionException
      */
     protected function getSourceEntityInstance(ResourceSet $resourceSet)
     {
@@ -418,6 +432,7 @@ class LaravelReadQuery
     /**
      * @param  string[]|null $eagerLoad
      * @return array
+     * @throws InvalidOperationException
      */
     private function processEagerLoadList(array $eagerLoad = null)
     {
@@ -452,6 +467,13 @@ class LaravelReadQuery
         return $laravelProperty;
     }
 
+    /**
+     * @param $skipToken
+     * @param $sourceEntityInstance
+     * @param $keyName
+     * @return mixed
+     * @throws InvalidOperationException
+     */
     protected function processSkipToken($skipToken, $sourceEntityInstance, $keyName)
     {
         $parameters = [];
@@ -487,6 +509,16 @@ class LaravelReadQuery
         return $sourceEntityInstance;
     }
 
+    /**
+     * @param $top
+     * @param $skip
+     * @param $sourceEntityInstance
+     * @param $nullFilter
+     * @param $rawLoad
+     * @param callable|null $isvalid
+     * @return array
+     * @throws InvalidOperationException
+     */
     protected function applyFiltering(
         $top,
         $skip,
