@@ -122,7 +122,7 @@ class LaravelReadQuery
 
         // throttle up for trench run
         if (null != $skipToken) {
-            $sourceEntityInstance = $this->processSkipToken($skipToken, $sourceEntityInstance, $keyName);
+            $sourceEntityInstance = $this->processSkipToken($skipToken, $sourceEntityInstance);
         }
 
         if (!isset($skip)) {
@@ -266,7 +266,6 @@ class LaravelReadQuery
         }
 
         $this->checkSourceInstance($sourceEntityInstance);
-        $rawLoad = $this->processEagerLoadList($eagerLoad);
 
         if (null == $sourceEntityInstance) {
             $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
@@ -290,7 +289,6 @@ class LaravelReadQuery
             $sourceEntityInstance = $sourceEntityInstance->where($fieldName, $fieldValue);
         }
 
-        $rawLoad = array_values(array_unique(array_merge($rawLoad, $modelLoad)));
         $sourceEntityInstance = $sourceEntityInstance->get();
         $sourceCount = $sourceEntityInstance->count();
         if (0 == $sourceCount) {
@@ -480,11 +478,10 @@ class LaravelReadQuery
     /**
      * @param SkipTokenInfo $skipToken
      * @param Model|Builder $sourceEntityInstance
-     * @param $keyName
      * @return mixed
      * @throws InvalidOperationException
      */
-    protected function processSkipToken(SkipTokenInfo $skipToken, $sourceEntityInstance, $keyName)
+    protected function processSkipToken(SkipTokenInfo $skipToken, $sourceEntityInstance)
     {
         $parameters = [];
         $processed = [];

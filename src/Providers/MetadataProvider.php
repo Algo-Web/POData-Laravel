@@ -306,10 +306,10 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function register()
     {
-        $this->app->singleton('metadata', function ($app) {
+        $this->app->singleton('metadata', function () {
             return new SimpleMetadataProvider('Data', self::$metaNAMESPACE);
         });
-        $this->app->singleton('objectmap', function ($app) {
+        $this->app->singleton('objectmap', function () {
             return new Map();
         });
     }

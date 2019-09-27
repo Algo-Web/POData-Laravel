@@ -84,7 +84,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
     {
         $this->app->singleton(
             'metadataControllers',
-            function ($app) {
+            function () {
                 return new MetadataControllerContainer();
             }
         );
