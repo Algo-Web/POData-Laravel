@@ -236,7 +236,7 @@ class LaravelBulkQuery
         // dig up target class name
         $type = $sourceResourceSet->getResourceType()->getInstanceType();
         if (!($type instanceof \ReflectionClass)) {
-            $msg = get_class($type);
+            $msg = null == $type ? 'Null' : get_class($type);
             throw new InvalidOperationException($msg);
         }
         $modelName = $type->getName();

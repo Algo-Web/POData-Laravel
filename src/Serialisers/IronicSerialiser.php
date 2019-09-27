@@ -787,6 +787,9 @@ class IronicSerialiser implements IObjectSerialiser
     {
         $currentExpandedProjectionNode = $this->getCurrentExpandedProjectionNode();
         $internalOrderByInfo = $currentExpandedProjectionNode->getInternalOrderByInfo();
+        if (null === $internalOrderByInfo) {
+            throw new InvalidOperationException('Null');
+        }
         if (!$internalOrderByInfo instanceof InternalOrderByInfo) {
             throw new InvalidOperationException(get_class($internalOrderByInfo));
         }
