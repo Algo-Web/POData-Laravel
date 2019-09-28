@@ -271,7 +271,7 @@ class MetadataProvider extends MetadataBaseProvider
                 $odataEntity,
                 $field->getName(),
                 $field->getEdmFieldType(),
-                $field->getFieldType() == EntityFieldType::PRIMITIVE_BAG(),
+                $field->getFieldType()->getValue() == EntityFieldType::PRIMITIVE_BAG()->getValue(),
                 $default,
                 $field->getIsNullable()
             );

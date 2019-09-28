@@ -340,7 +340,7 @@ class IronicSerialiser implements IObjectSerialiser
         $odata->baseURI = $this->isBaseWritten ? null : $this->absoluteServiceUriWithSlash;
         $this->isBaseWritten = true;
 
-        if ($this->getRequest()->queryType == QueryType::ENTITIES_WITH_COUNT()) {
+        if ($this->getRequest()->queryType->getValue() == QueryType::ENTITIES_WITH_COUNT()->getValue()) {
             $odata->rowCount = $this->getRequest()->getCountValue();
         }
         foreach ($res as $entry) {
@@ -436,7 +436,7 @@ class IronicSerialiser implements IObjectSerialiser
             }
         }
 
-        if ($this->getRequest()->queryType == QueryType::ENTITIES_WITH_COUNT()) {
+        if ($this->getRequest()->queryType->getValue() == QueryType::ENTITIES_WITH_COUNT()->getValue()) {
             $urls->count = $this->getRequest()->getCountValue();
         }
 
@@ -1057,7 +1057,8 @@ class IronicSerialiser implements IObjectSerialiser
             throw new InvalidOperationException('Bag parameter must be null or array');
         }
         $typeKind = $resourceType->getResourceTypeKind();
-        if (!(ResourceTypeKind::PRIMITIVE() == $typeKind || ResourceTypeKind::COMPLEX() == $typeKind)) {
+        $kVal = $typeKind->getValue();
+        if (!(ResourceTypeKind::PRIMITIVE()->getValue() == $kVal || ResourceTypeKind::COMPLEX()->getValue() == $kVal)) {
             $msg = '$bagItemResourceTypeKind != ResourceTypeKind::PRIMITIVE'
                    .' && $bagItemResourceTypeKind != ResourceTypeKind::COMPLEX';
             throw new InvalidOperationException($msg);
@@ -1068,13 +1069,13 @@ class IronicSerialiser implements IObjectSerialiser
         $bag = new ODataBagContent();
         foreach ($result as $value) {
             if (isset($value)) {
-                if (ResourceTypeKind::PRIMITIVE() == $typeKind) {
+                if (ResourceTypeKind::PRIMITIVE()->getValue() == $kVal) {
                     $instance = $resourceType->getInstanceType();
                     if (!$instance instanceof IType) {
                         throw new InvalidOperationException(get_class($instance));
                     }
                     $bag->propertyContents[] = $this->primitiveToString($instance, $value);
-                } elseif (ResourceTypeKind::COMPLEX() == $typeKind) {
+                } elseif (ResourceTypeKind::COMPLEX()->getValue() == $kVal) {
                     $bag->propertyContents[] = $this->writeComplexValue($resourceType, $value);
                 }
             }

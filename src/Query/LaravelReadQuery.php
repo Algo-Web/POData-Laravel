@@ -146,13 +146,14 @@ class LaravelReadQuery
             $resultSet = $resultSet->take($top);
         }
 
-        if (QueryType::ENTITIES() == $queryType || QueryType::ENTITIES_WITH_COUNT() == $queryType) {
+        $qVal = $queryType->getValue();
+        if (QueryType::ENTITIES()->getValue() == $qVal || QueryType::ENTITIES_WITH_COUNT()->getValue() == $qVal) {
             $result->results = [];
             foreach ($resultSet as $res) {
                 $result->results[] = $res;
             }
         }
-        if (QueryType::COUNT() == $queryType || QueryType::ENTITIES_WITH_COUNT() == $queryType) {
+        if (QueryType::COUNT()->getValue() == $qVal || QueryType::ENTITIES_WITH_COUNT()->getValue() == $qVal) {
             $result->count = $resultCount;
         }
         $hazMore = $bulkSetCount > $skip+count($resultSet);
