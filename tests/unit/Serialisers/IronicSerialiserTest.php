@@ -884,7 +884,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
         $ironic->shouldReceive('getCurrentExpandedProjectionNode')->andReturn($node)->once();
 
-        $expected = IronicSerialiser::class;
+        $expected = "Null";
         $actual = null;
 
         try {
