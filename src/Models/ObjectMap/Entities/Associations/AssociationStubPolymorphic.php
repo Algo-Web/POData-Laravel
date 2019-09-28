@@ -65,4 +65,12 @@ class AssociationStubPolymorphic extends AssociationStubBase
         }
         return null === $this->targType;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function morphicType()
+    {
+        return "polymorphic";
+    }
 }

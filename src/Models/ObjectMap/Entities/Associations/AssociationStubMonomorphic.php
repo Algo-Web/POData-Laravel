@@ -26,4 +26,12 @@ class AssociationStubMonomorphic extends AssociationStubBase
                && ($this->getForeignField() === $otherStub->getKeyField())
                && ($this->getKeyField() === $otherStub->getForeignField());
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function morphicType()
+    {
+        return "monomorphic";
+    }
 }

@@ -99,17 +99,10 @@ abstract class AssociationStubBase
 
     public function isCompatible(AssociationStubBase $otherStub)
     {
-        $thisPoly = $this instanceof AssociationStubPolymorphic;
-        $thatPoly = $otherStub instanceof AssociationStubPolymorphic;
-        $thisMono = $this instanceof AssociationStubMonomorphic;
-        $thatMono = $otherStub instanceof AssociationStubMonomorphic;
+        if ($this->morphicType() != $otherStub->morphicType()) {
+            return false;
+        }
 
-        if ($thisPoly && $thatMono) {
-            return false;
-        }
-        if ($thisMono && $thatPoly) {
-            return false;
-        }
         if (!$this->isOk()) {
             return false;
         }
@@ -246,4 +239,11 @@ abstract class AssociationStubBase
         $methodComp = strcmp($thisMethod, $otherMethod);
         return 0 === $methodComp ? 0 : $methodComp / abs($methodComp);
     }
+
+    /**
+     * Return what type of stub this is - polymorphic, monomorphic, or something else
+     *
+     * @return string
+     */
+    abstract public function morphicType();
 }

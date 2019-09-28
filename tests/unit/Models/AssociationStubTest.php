@@ -44,8 +44,10 @@ class AssociationStubTest extends TestCase
         $foo = m::mock(AssociationStubMonomorphic::class);
         $foo->shouldReceive('isOk')->andReturn(false)->once();
         $foo->shouldReceive('isCompatible')->passthru()->once();
+        $foo->shouldReceive('morphicType')->passthru();
         $other = m::mock(AssociationStubMonomorphic::class);
         $other->shouldReceive('isOk')->andReturn(false)->never();
+        $other->shouldReceive('morphicType')->passthru();
 
         $this->assertFalse($foo->isCompatible($other));
     }
@@ -55,8 +57,10 @@ class AssociationStubTest extends TestCase
         $foo = m::mock(AssociationStubPolymorphic::class);
         $foo->shouldReceive('isOk')->andReturn(true)->once();
         $foo->shouldReceive('isCompatible')->passthru()->once();
+        $foo->shouldReceive('morphicType')->passthru();
         $other = m::mock(AssociationStubPolymorphic::class);
         $other->shouldReceive('isOk')->andReturn(false)->once();
+        $other->shouldReceive('morphicType')->passthru();
 
         $this->assertFalse($foo->isCompatible($other));
     }
