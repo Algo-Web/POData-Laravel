@@ -5,6 +5,9 @@ namespace AlgoWeb\PODataLaravel\Query;
 use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
+use AlgoWeb\PODataLaravel\Models\MetadataTrait;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
@@ -47,6 +50,10 @@ class LaravelReadQuery
      * @param Model|Relation|null      $sourceEntityInstance Starting point of query
      *
      * @return QueryResult
+     * @throws InvalidArgumentException
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     * @throws ODataException
      */
     public function getResourceSet(
         QueryType $queryType,
@@ -82,7 +89,9 @@ class LaravelReadQuery
             $keyName = $sourceEntityInstance->getKeyName();
             $tableName = $sourceEntityInstance->getTable();
         } elseif ($sourceEntityInstance instanceof Relation) {
-            $modelLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
+            /** @var MetadataTrait $model */
+            $model = $sourceEntityInstance->getRelated();
+            $modelLoad = $model->getEagerLoad();
             $keyName = $sourceEntityInstance->getRelated()->getKeyName();
             $tableName = $sourceEntityInstance->getRelated()->getTable();
         }
@@ -113,7 +122,7 @@ class LaravelReadQuery
 
         // throttle up for trench run
         if (null != $skipToken) {
-            $sourceEntityInstance = $this->processSkipToken($skipToken, $sourceEntityInstance, $keyName);
+            $sourceEntityInstance = $this->processSkipToken($skipToken, $sourceEntityInstance);
         }
 
         if (!isset($skip)) {
@@ -176,11 +185,15 @@ class LaravelReadQuery
      * @param SkipTokenInfo|null $skipToken            value indicating what records to skip
      *
      * @return QueryResult
+     * @throws InvalidOperationException
+     * @throws ODataException
+     * @throws \ReflectionException
      */
     public function getRelatedResourceSet(
         QueryType $queryType,
         ResourceSet $sourceResourceSet,
         Model $sourceEntityInstance,
+        /** @noinspection PhpUnusedParameterInspection */
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty,
         FilterInfo $filter = null,
@@ -217,6 +230,7 @@ class LaravelReadQuery
      * @param string[]|null      $eagerLoad     array of relations to eager load
      *
      * @return Model|null Returns entity instance if found else null
+     * @throws \Exception;
      */
     public function getResourceFromResourceSet(
         ResourceSet $resourceSet,
@@ -233,10 +247,11 @@ class LaravelReadQuery
      * @param ResourceSet|null    $resourceSet
      * @param KeyDescriptor|null  $keyDescriptor
      * @param Model|Relation|null $sourceEntityInstance Starting point of query
-     *                                                  $param array               $whereCondition
+     * @param array               $whereCondition
      * @param string[]|null       $eagerLoad            array of relations to eager load
      *
      * @return Model|null
+     * @throws \Exception
      */
     public function getResource(
         ResourceSet $resourceSet = null,
@@ -251,10 +266,9 @@ class LaravelReadQuery
         }
 
         $this->checkSourceInstance($sourceEntityInstance);
-        $rawLoad = $this->processEagerLoadList($eagerLoad);
 
         if (null == $sourceEntityInstance) {
-            $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
+            $sourceEntityInstance = $this->getSourceEntityInstance(/** @scrutinizer ignore-type */$resourceSet);
         }
 
         $this->checkAuth($sourceEntityInstance);
@@ -262,7 +276,9 @@ class LaravelReadQuery
         if ($sourceEntityInstance instanceof Model) {
             $modelLoad = $sourceEntityInstance->getEagerLoad();
         } elseif ($sourceEntityInstance instanceof Relation) {
-            $modelLoad = $sourceEntityInstance->getRelated()->getEagerLoad();
+            /** @var MetadataTrait $model */
+            $model = $sourceEntityInstance->getRelated();
+            $modelLoad = $model->getEagerLoad();
         }
         if (!(isset($modelLoad))) {
             throw new InvalidOperationException('');
@@ -273,7 +289,6 @@ class LaravelReadQuery
             $sourceEntityInstance = $sourceEntityInstance->where($fieldName, $fieldValue);
         }
 
-        $rawLoad = array_values(array_unique(array_merge($rawLoad, $modelLoad)));
         $sourceEntityInstance = $sourceEntityInstance->get();
         $sourceCount = $sourceEntityInstance->count();
         if (0 == $sourceCount) {
@@ -295,8 +310,12 @@ class LaravelReadQuery
      * @param ResourceProperty $targetProperty       The navigation property to fetch
      *
      * @return Model|null The related resource if found else null
+     * @throws ODataException
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     public function getRelatedResourceReference(
+        /** @noinspection PhpUnusedParameterInspection */
         ResourceSet $sourceResourceSet,
         Model $sourceEntityInstance,
         ResourceSet $targetResourceSet,
@@ -330,8 +349,11 @@ class LaravelReadQuery
      * @param KeyDescriptor    $keyDescriptor        The key identifying the entity to fetch
      *
      * @return Model|null Returns entity instance if found else null
+     * @throws InvalidOperationException
+     * @throws \Exception
      */
     public function getResourceFromRelatedResourceSet(
+        /** @noinspection PhpUnusedParameterInspection */
         ResourceSet $sourceResourceSet,
         Model $sourceEntityInstance,
         ResourceSet $targetResourceSet,
@@ -354,10 +376,10 @@ class LaravelReadQuery
         return $result;
     }
 
-
     /**
      * @param  ResourceSet $resourceSet
      * @return mixed
+     * @throws \ReflectionException
      */
     protected function getSourceEntityInstance(ResourceSet $resourceSet)
     {
@@ -382,7 +404,7 @@ class LaravelReadQuery
     }
 
     /**
-     * @param $sourceEntityInstance
+     * @param Model|Relation|null $sourceEntityInstance
      * @param null|mixed $checkInstance
      *
      * @throws ODataException
@@ -400,7 +422,7 @@ class LaravelReadQuery
     }
 
     /**
-     * @param $sourceEntityInstance
+     * @param Model|Builder $sourceEntityInstance
      * @param  KeyDescriptor|null        $keyDescriptor
      * @throws InvalidOperationException
      */
@@ -418,6 +440,7 @@ class LaravelReadQuery
     /**
      * @param  string[]|null $eagerLoad
      * @return array
+     * @throws InvalidOperationException
      */
     private function processEagerLoadList(array $eagerLoad = null)
     {
@@ -452,7 +475,13 @@ class LaravelReadQuery
         return $laravelProperty;
     }
 
-    protected function processSkipToken($skipToken, $sourceEntityInstance, $keyName)
+    /**
+     * @param SkipTokenInfo $skipToken
+     * @param Model|Builder $sourceEntityInstance
+     * @return mixed
+     * @throws InvalidOperationException
+     */
+    protected function processSkipToken(SkipTokenInfo $skipToken, $sourceEntityInstance)
     {
         $parameters = [];
         $processed = [];
@@ -474,7 +503,7 @@ class LaravelReadQuery
             $processed[$name] = ['direction' => $line['direction'], 'value' => $line['value']];
             $sourceEntityInstance = $sourceEntityInstance
                 ->orWhere(
-                    function ($query) use ($processed) {
+                    function (Builder $query) use ($processed) {
                         foreach ($processed as $key => $proc) {
                             $query->where($key, $proc['direction'], $proc['value']);
                         }
@@ -487,6 +516,16 @@ class LaravelReadQuery
         return $sourceEntityInstance;
     }
 
+    /**
+     * @param $top
+     * @param $skip
+     * @param Model|Builder $sourceEntityInstance
+     * @param $nullFilter
+     * @param $rawLoad
+     * @param callable|null $isvalid
+     * @return array
+     * @throws InvalidOperationException
+     */
     protected function applyFiltering(
         $top,
         $skip,
@@ -507,14 +546,14 @@ class LaravelReadQuery
                 $msg = 'Filter closure not set';
                 throw new InvalidOperationException($msg);
             }
-            $resultSet = collect([]);
+            $resultSet = new Collection([]);
             $rawCount = 0;
             $rawTop = null === $top ? $bulkSetCount : $top;
 
             // loop thru, chunk by chunk, to reduce chances of exhausting memory
             $sourceEntityInstance->chunk(
                 5000,
-                function ($results) use ($isvalid, &$skip, &$resultSet, &$rawCount, $rawTop) {
+                function (Collection $results) use ($isvalid, &$skip, &$resultSet, &$rawCount, $rawTop) {
                     // apply filter
                     $results = $results->filter($isvalid);
                     // need to iterate through full result set to find count of items matching filter,
@@ -535,8 +574,10 @@ class LaravelReadQuery
             $resultCount = $rawCount;
         } else {
             if ($sourceEntityInstance instanceof Model) {
+                /** @var Builder $sourceEntityInstance */
                 $sourceEntityInstance = $sourceEntityInstance->getQuery();
             }
+            /** @var Collection $resultSet */
             $resultSet = $sourceEntityInstance->with($rawLoad)->get();
             $resultSet = $resultSet->filter($isvalid);
             $resultCount = $resultSet->count();

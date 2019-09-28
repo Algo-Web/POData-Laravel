@@ -130,6 +130,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * @param IService                $service Reference to the data service instance
      * @param RequestDescription|null $request Type instance describing the client submitted request
+     * @throws \Exception
      */
     public function __construct(IService $service, RequestDescription $request = null)
     {
@@ -149,6 +150,9 @@ class IronicSerialiser implements IObjectSerialiser
      * @param QueryResult $entryObject Reference to the entry object to be written
      *
      * @return ODataEntry|null
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     * @throws ODataException
      */
     public function writeTopLevelElement(QueryResult $entryObject)
     {
@@ -201,7 +205,9 @@ class IronicSerialiser implements IObjectSerialiser
         }
         unset($relProp);
         unset($nonRelProp);
+        /** @var ResourceProperty[] $relProp */
         $relProp = $this->propertiesCache[$targClass]['rel'];
+        /** @var ResourceProperty[] $nonRelProp */
         $nonRelProp = $this->propertiesCache[$targClass]['nonRel'];
 
         $resourceSet = $resourceType->getCustomState();
@@ -297,6 +303,9 @@ class IronicSerialiser implements IObjectSerialiser
      * @param QueryResult &$entryObjects Array of entry resources to be written
      *
      * @return ODataFeed
+     * @throws InvalidOperationException
+     * @throws ODataException
+     * @throws \ReflectionException
      */
     public function writeTopLevelElements(QueryResult & $entryObjects)
     {
@@ -371,6 +380,8 @@ class IronicSerialiser implements IObjectSerialiser
      * @param QueryResult $entryObject The entry resource whose url to be written
      *
      * @return ODataURL
+     * @throws InvalidOperationException
+     * @throws ODataException
      */
     public function writeUrlElement(QueryResult $entryObject)
     {
@@ -395,6 +406,8 @@ class IronicSerialiser implements IObjectSerialiser
      * @param QueryResult $entryObjects Array of entry resources whose url to be written
      *
      * @return ODataURLCollection
+     * @throws InvalidOperationException
+     * @throws ODataException
      */
     public function writeUrlElements(QueryResult $entryObjects)
     {
@@ -438,6 +451,8 @@ class IronicSerialiser implements IObjectSerialiser
      * @param ResourceType &$resourceType Describes the type of complex object
      *
      * @return ODataPropertyContent
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     public function writeTopLevelComplexObject(QueryResult & $complexValue, $propertyName, ResourceType & $resourceType)
     {
@@ -468,6 +483,8 @@ class IronicSerialiser implements IObjectSerialiser
      *                                    bag object
      *
      * @return ODataPropertyContent
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     public function writeTopLevelBagObject(QueryResult & $BagValue, $propertyName, ResourceType & $resourceType)
     {
@@ -491,6 +508,8 @@ class IronicSerialiser implements IObjectSerialiser
      * @param  ResourceProperty     &$resourceProperty Resource property describing the
      *                                                 primitive property to be written
      * @return ODataPropertyContent
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     public function writeTopLevelPrimitive(QueryResult & $primitiveValue, ResourceProperty & $resourceProperty = null)
     {
@@ -525,6 +544,7 @@ class IronicSerialiser implements IObjectSerialiser
      * Gets reference to the request submitted by client.
      *
      * @return RequestDescription
+     * @throws InvalidOperationException
      */
     public function getRequest()
     {
@@ -576,6 +596,14 @@ class IronicSerialiser implements IObjectSerialiser
         return $this->updated;
     }
 
+    /**
+     * @param Model $entityInstance
+     * @param ResourceType $resourceType
+     * @param string $containerName
+     * @return string
+     * @throws InvalidOperationException
+     * @throws ODataException
+     */
     protected function getEntryInstanceKey($entityInstance, ResourceType $resourceType, $containerName)
     {
         $typeName = $resourceType->getName();
@@ -612,8 +640,9 @@ class IronicSerialiser implements IObjectSerialiser
      * @param $entryObject
      * @param $type
      * @param $relativeUri
-     * @param $resourceType
+     * @param ResourceType $resourceType
      * @return array<ODataMediaLink|null|array>
+     * @throws InvalidOperationException
      */
     protected function writeMediaData($entryObject, $type, $relativeUri, ResourceType $resourceType)
     {
@@ -665,6 +694,7 @@ class IronicSerialiser implements IObjectSerialiser
      *                                                        the current segment should be serialized, If it returns
      *                                                        non-null only the properties described by the returned
      *                                                        projection segments should be serialized
+     * @throws InvalidOperationException
      */
     protected function getProjectionNodes()
     {
@@ -681,6 +711,7 @@ class IronicSerialiser implements IObjectSerialiser
      * which describes the current segment.
      *
      * @return null|RootProjectionNode|ExpandedProjectionNode
+     * @throws InvalidOperationException
      */
     protected function getCurrentExpandedProjectionNode()
     {
@@ -723,6 +754,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @param string $navigationPropertyName Name of naviagtion property in question
      *
      * @return bool True if the given navigation should be expanded, otherwise false
+     * @throws InvalidOperationException
      */
     protected function shouldExpandSegment($navigationPropertyName)
     {
@@ -744,6 +776,7 @@ class IronicSerialiser implements IObjectSerialiser
      *                            resource set
      *
      * @return bool true if the feed must have a next page link
+     * @throws InvalidOperationException
      */
     protected function needNextPageLink($resultSetCount)
     {
@@ -765,6 +798,7 @@ class IronicSerialiser implements IObjectSerialiser
      * Resource set wrapper for the resource being serialized.
      *
      * @return ResourceSetWrapper
+     * @throws InvalidOperationException
      */
     protected function getCurrentResourceSetWrapper()
     {
@@ -782,11 +816,15 @@ class IronicSerialiser implements IObjectSerialiser
      *                                     $skiptoken
      * @throws ODataException
      * @return string         for the link for next page
+     * @throws InvalidOperationException
      */
     protected function getNextLinkUri(&$lastObject)
     {
         $currentExpandedProjectionNode = $this->getCurrentExpandedProjectionNode();
         $internalOrderByInfo = $currentExpandedProjectionNode->getInternalOrderByInfo();
+        if (null === $internalOrderByInfo) {
+            throw new InvalidOperationException('Null');
+        }
         if (!$internalOrderByInfo instanceof InternalOrderByInfo) {
             throw new InvalidOperationException(get_class($internalOrderByInfo));
         }
@@ -812,6 +850,7 @@ class IronicSerialiser implements IObjectSerialiser
      *                     query parameter format, NULL if there
      *                     is no query parameters
      *                     required for the next link of top level result set
+     * @throws InvalidOperationException
      */
     protected function getNextPageLinkQueryParametersForRootResourceSet()
     {
@@ -850,6 +889,9 @@ class IronicSerialiser implements IObjectSerialiser
         return $queryParameterString;
     }
 
+    /**
+     * @throws InvalidOperationException
+     */
     private function loadStackIfEmpty()
     {
         if (0 == count($this->lightStack)) {
@@ -862,8 +904,7 @@ class IronicSerialiser implements IObjectSerialiser
      * Convert the given primitive value to string.
      * Note: This method will not handle null primitive value.
      *
-     * @param IType &$primitiveResourceType Type of the primitive property
-     *                                      whose value need to be converted
+     * @param IType &$type                  Type of the primitive property needing conversion
      * @param mixed $primitiveValue         Primitive value to convert
      *
      * @return string
@@ -896,6 +937,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @param $entryObject
      * @param $nonRelProp
      * @return ODataPropertyContent
+     * @throws InvalidOperationException
      */
     private function writePrimitiveProperties(Model $entryObject, $nonRelProp)
     {
@@ -907,24 +949,34 @@ class IronicSerialiser implements IObjectSerialiser
             }
             $corn = strval($corn);
             $rType = $nonRelProp[$corn]['type'];
+            /** @var ResourceProperty $nrp */
+            $nrp = $nonRelProp[$corn]['prop'];
             $subProp = new ODataProperty();
             $subProp->name = $corn;
             $subProp->value = isset($flake) ? $this->primitiveToString($rType, $flake) : null;
-            $subProp->typeName = $nonRelProp[$corn]['prop']->getResourceType()->getFullName();
+            $subProp->typeName = $nrp->getResourceType()->getFullName();
             $propertyContent->properties[$corn] = $subProp;
         }
         return $propertyContent;
     }
 
     /**
-     * @param $entryObject
-     * @param $prop
+     * @param QueryResult $entryObject
+     * @param ResourceProperty $prop
      * @param $nuLink
      * @param $propKind
      * @param $propName
+     * @throws InvalidOperationException
+     * @throws ODataException
+     * @throws \ReflectionException
      */
-    private function expandNavigationProperty(QueryResult $entryObject, $prop, $nuLink, $propKind, $propName)
-    {
+    private function expandNavigationProperty(
+        QueryResult $entryObject,
+        ResourceProperty $prop,
+        $nuLink,
+        $propKind,
+        $propName
+    ) {
         $nextName = $prop->getResourceType()->getName();
         $nuLink->isExpanded = true;
         $value = $entryObject->results->$propName;
@@ -982,6 +1034,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Gets the data service instance.
      *
+     * @param IService $service
      * @return void
      */
     public function setService(IService $service)
@@ -995,6 +1048,8 @@ class IronicSerialiser implements IObjectSerialiser
      * @param ResourceType $resourceType
      * @param $result
      * @return ODataBagContent|null
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     protected function writeBagValue(ResourceType & $resourceType, $result)
     {
@@ -1032,6 +1087,8 @@ class IronicSerialiser implements IObjectSerialiser
      * @param  object               $result
      * @param  string|null          $propertyName
      * @return ODataPropertyContent
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     protected function writeComplexValue(ResourceType & $resourceType, &$result, $propertyName = null)
     {
@@ -1124,6 +1181,13 @@ class IronicSerialiser implements IObjectSerialiser
         return $this->modelSerialiser;
     }
 
+    /**
+     * @param ResourceEntityType $resourceType
+     * @param $payloadClass
+     * @return ResourceEntityType|ResourceType
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     */
     protected function getConcreteTypeFromAbstractType(ResourceEntityType $resourceType, $payloadClass)
     {
         if ($resourceType->isAbstract()) {

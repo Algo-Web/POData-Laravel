@@ -122,6 +122,7 @@ class LaravelQuery implements IQueryProvider
      * Dig out local copy of controller metadata mapping.
      *
      * @return MetadataControllerContainer
+     * @throws InvalidOperationException
      */
     public function getControllerContainer()
     {
@@ -159,6 +160,9 @@ class LaravelQuery implements IQueryProvider
      * @param Model|Relation|null      $sourceEntityInstance Starting point of query
      *
      * @return QueryResult
+     * @throws InvalidOperationException
+     * @throws ODataException
+     * @throws \ReflectionException
      */
     public function getResourceSet(
         QueryType $queryType,
@@ -171,6 +175,7 @@ class LaravelQuery implements IQueryProvider
         array $eagerLoad = null,
         $sourceEntityInstance = null
     ) {
+        /** @var Model|Relation|null $source */
         $source = $this->unpackSourceEntity($sourceEntityInstance);
         return $this->getReader()->getResourceSet(
             $queryType,
@@ -194,6 +199,7 @@ class LaravelQuery implements IQueryProvider
      * @param string[]|null      $eagerLoad     array of relations to eager load
      *
      * @return Model|null Returns entity instance if found else null
+     * @throws \Exception
      */
     public function getResourceFromResourceSet(
         ResourceSet $resourceSet,
@@ -220,6 +226,7 @@ class LaravelQuery implements IQueryProvider
      * @param SkipTokenInfo|null $skipToken            value indicating what records to skip
      *
      * @return QueryResult
+     * @throws \Exception
      */
     public function getRelatedResourceSet(
         QueryType $queryType,
@@ -259,6 +266,7 @@ class LaravelQuery implements IQueryProvider
      * @param KeyDescriptor    $keyDescriptor        The key identifying the entity to fetch
      *
      * @return Model|null Returns entity instance if found else null
+     * @throws \Exception
      */
     public function getResourceFromRelatedResourceSet(
         ResourceSet $sourceResourceSet,
@@ -288,6 +296,7 @@ class LaravelQuery implements IQueryProvider
      * @param ResourceProperty $targetProperty       The navigation property to fetch
      *
      * @return Model|null The related resource if found else null
+     * @throws \Exception
      */
     public function getRelatedResourceReference(
         ResourceSet $sourceResourceSet,
@@ -316,6 +325,7 @@ class LaravelQuery implements IQueryProvider
      * @param bool          $shouldUpdate         Should undefined values be updated or reset to default
      *
      * @return Model|null the new resource value if it is assignable or throw exception for null
+     * @throws \Exception
      */
     public function updateResource(
         ResourceSet $sourceResourceSet,
@@ -333,7 +343,8 @@ class LaravelQuery implements IQueryProvider
      * @param ResourceSet $sourceResourceSet
      * @param object      $sourceEntityInstance
      *
-     * return bool true if resources sucessfully deteled, otherwise false
+     * @return bool true if resources sucessfully deteled, otherwise false
+     * @throws \Exception
      */
     public function deleteResource(
         ResourceSet $sourceResourceSet,
@@ -364,8 +375,9 @@ class LaravelQuery implements IQueryProvider
      * @param object      $sourceEntityInstance The source entity instance
      * @param object      $data                 the New data for the entity instance
      *
-     * @returns Model|null                      returns the newly created model if successful,
+     * @return Model|null                       returns the newly created model if successful,
      *                                          or null if model creation failed.
+     * @throws \Exception
      */
     public function createResourceforResourceSet(
         ResourceSet $resourceSet,
@@ -453,6 +465,7 @@ class LaravelQuery implements IQueryProvider
      * @param  Model|null                $source
      * @throws InvalidOperationException
      * @throws ODataException
+     * @throws \Exception
      * @return Model|null
      */
     protected function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $data, $verb, Model $source = null)
@@ -480,10 +493,10 @@ class LaravelQuery implements IQueryProvider
     /**
      * @param $data
      * @param $paramList
-     * @param  Model|null $sourceEntityInstance
+     * @param Model|null $sourceEntityInstance
      * @return array
      */
-    protected function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance = null)
+    protected function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance)
     {
         $parms = [];
 
@@ -552,6 +565,8 @@ class LaravelQuery implements IQueryProvider
      * @param object[]    $data              The new data for the entity instance
      *
      * @return object[] returns the newly created model if successful, or throws an exception if model creation failed
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      * @throw  \Exception
      */
     public function createBulkResourceforResourceSet(
@@ -572,6 +587,7 @@ class LaravelQuery implements IQueryProvider
      *
      * @return object[] the new resource value if it is assignable, or throw exception for null
      * @throw  \Exception
+     * @throws InvalidOperationException
      */
     public function updateBulkResource(
         ResourceSet $sourceResourceSet,
@@ -600,6 +616,7 @@ class LaravelQuery implements IQueryProvider
      * @param $navPropName
      *
      * @return bool
+     * @throws InvalidOperationException
      */
     public function hookSingleModel(
         ResourceSet $sourceResourceSet,
@@ -627,6 +644,7 @@ class LaravelQuery implements IQueryProvider
      * @param $navPropName
      *
      * @return bool
+     * @throws InvalidOperationException
      */
     public function unhookSingleModel(
         ResourceSet $sourceResourceSet,
@@ -646,6 +664,7 @@ class LaravelQuery implements IQueryProvider
 
     /**
      * Start database transaction.
+     * @param bool $isBulk
      */
     public function startTransaction($isBulk = false)
     {
@@ -690,12 +709,24 @@ class LaravelQuery implements IQueryProvider
         self::$touchList[] = $model;
     }
 
+    /**
+     * @param ResourceSet $resourceSet
+     * @param Model|Relation|null $sourceEntityInstance
+     * @param mixed $data
+     * @param mixed $verb
+     * @return Model|null
+     * @throws InvalidOperationException
+     * @throws ODataException
+     */
     protected function createUpdateMainWrapper(ResourceSet $resourceSet, $sourceEntityInstance, $data, $verb)
     {
+        /** @var Model|null $source */
         $source = $this->unpackSourceEntity($sourceEntityInstance);
 
         $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source);
-        self::queueModel($result);
+        if (null !== $result) {
+            self::queueModel($result);
+        }
         return $result;
     }
 }

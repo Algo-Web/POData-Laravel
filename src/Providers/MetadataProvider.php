@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema as Schema;
 use Illuminate\Support\Str;
 use POData\Common\InvalidOperationException;
+use POData\Providers\Metadata\IMetadataProvider;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceStreamInfo;
@@ -79,11 +81,20 @@ class MetadataProvider extends MetadataBaseProvider
         self::$isBooted = false;
     }
 
+    /**
+     * @param array $modelNames
+     * @return Map
+     * @throws InvalidOperationException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \ReflectionException
+     */
     private function extract(array $modelNames)
     {
+        /** @var Map $objectMap */
         $objectMap = App::make('objectmap');
         foreach ($modelNames as $modelName) {
             try {
+                /** @var MetadataTrait $modelInstance */
                 $modelInstance = App::make($modelName);
             } catch (BindingResolutionException $e) {
                 // if we can't instantiate modelName for whatever reason, move on
@@ -103,8 +114,14 @@ class MetadataProvider extends MetadataBaseProvider
         return $objectMap;
     }
 
+    /**
+     * @param Map $objectMap
+     * @return Map
+     * @throws InvalidOperationException
+     */
     private function unify(Map $objectMap)
     {
+        /** @var MetadataGubbinsHolder $mgh */
         $mgh = $this->getRelationHolder();
         foreach ($objectMap->getEntities() as $entity) {
             $mgh->addEntity($entity);
@@ -126,8 +143,14 @@ class MetadataProvider extends MetadataBaseProvider
         }
     }
 
+    /**
+     * @param Map $objectModel
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     */
     private function implement(Map $objectModel)
     {
+        /** @var SimpleMetadataProvider $meta */
         $meta = App::make('metadata');
         $namespace = $meta->getContainerNamespace().'.';
 
@@ -170,8 +193,14 @@ class MetadataProvider extends MetadataBaseProvider
         }
     }
 
+    /**
+     * @param Map $objectModel
+     * @param AssociationMonomorphic $associationUnderHammer
+     * @throws InvalidOperationException
+     */
     private function implementAssociationsMonomorphic(Map $objectModel, AssociationMonomorphic $associationUnderHammer)
     {
+        /** @var SimpleMetadataProvider $meta */
         $meta = App::make('metadata');
         $first = $associationUnderHammer->getFirst();
         $last = $associationUnderHammer->getLast();
@@ -212,8 +241,13 @@ class MetadataProvider extends MetadataBaseProvider
         }
     }
 
+    /**
+     * @param EntityGubbins $unifiedEntity
+     * @throws InvalidOperationException
+     */
     private function implementProperties(EntityGubbins $unifiedEntity)
     {
+        /** @var SimpleMetadataProvider $meta */
         $meta = App::make('metadata');
         $odataEntity = $unifiedEntity->getOdataResourceType();
         $keyFields = $unifiedEntity->getKeyFields();
@@ -254,6 +288,9 @@ class MetadataProvider extends MetadataBaseProvider
      * @param mixed $reset
      *
      * @return void
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function boot($reset = true)
     {
@@ -306,10 +343,10 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function register()
     {
-        $this->app->singleton('metadata', function ($app) {
+        $this->app->singleton('metadata', function () {
             return new SimpleMetadataProvider('Data', self::$metaNAMESPACE);
         });
-        $this->app->singleton('objectmap', function ($app) {
+        $this->app->singleton('objectmap', function () {
             return new Map();
         });
     }
@@ -358,6 +395,7 @@ class MetadataProvider extends MetadataBaseProvider
      * @param $propName
      * @return null|string
      * @internal param Model $target
+     * @throws InvalidOperationException
      */
     public function resolveReverseProperty(Model $source, $propName)
     {

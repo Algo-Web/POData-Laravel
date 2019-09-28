@@ -22,9 +22,10 @@ class ModelSerialiser
     /**
      * Serialise needed bits of supplied model, taking fast path where possible.
      *
-     * @param  $model
+     * @param Model|mixed $model
      *
      * @return mixed
+     * @throws InvalidOperationException
      */
     public function bulkSerialise($model)
     {
@@ -41,7 +42,9 @@ class ModelSerialiser
         // dig up getter list - we only care about the mutators that end up in metadata
         if (!isset(self::$mutatorCache[$class])) {
             $getterz = [];
+            /** @var array $datez */
             $datez = $model->getDates();
+            /** @var array $castz */
             $castz = $model->retrieveCasts();
             foreach ($keys as $key) {
                 if ($model->hasGetMutator($key) || in_array($key, $datez) || array_key_exists($key, $castz)) {

@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Mockery\Mock;
 use POData\Common\InvalidOperationException;
+use POData\Providers\Metadata\Type\IType;
 
 trait MetadataTrait
 {
@@ -33,8 +34,11 @@ trait MetadataTrait
     protected static $tableData = [];
     protected static $dontCastTypes = ['object', 'array', 'collection', 'int'];
 
-    /*
+    /**
      * Retrieve and assemble this model's metadata for OData packaging
+     * @return array
+     * @throws InvalidOperationException
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function metadata()
     {
@@ -58,7 +62,9 @@ trait MetadataTrait
             return self::$tableData = [];
         }
 
+        /** @var array $columns */
         $columns = $this->getTableColumns();
+        /** @var array $mask */
         $mask = $this->metadataMask();
         $columns = array_intersect($columns, $mask);
 
@@ -66,6 +72,7 @@ trait MetadataTrait
 
         $rawFoo = $this->getTableDoctrineColumns();
         $foo = [];
+        /** @var array $getters */
         $getters = $this->collectGetters();
         $getters = array_intersect($getters, $mask);
         $casts = $this->retrieveCasts();
@@ -81,6 +88,7 @@ trait MetadataTrait
             $rawColumn = $foo[strtolower($column)];
             $nullable = !($rawColumn->getNotNull());
             $fillable = in_array($column, $this->getFillable());
+            /** @var IType $rawType */
             $rawType = $rawColumn->getType();
             $type = $rawType->getName();
             $default = $this->$column;
@@ -153,6 +161,8 @@ trait MetadataTrait
      * Get model's relationships.
      *
      * @return array
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     public function getRelationships()
     {
@@ -204,6 +214,8 @@ trait MetadataTrait
      * @param bool $biDir
      *
      * @return array
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     protected function getRelationshipsFromMethods($biDir = false)
     {
@@ -394,6 +406,7 @@ trait MetadataTrait
      * @param mixed $condition
      *
      * @return array
+     * @throws InvalidOperationException
      */
     private function polyglotKeyMethodNames($foo, $condition = false)
     {
@@ -438,6 +451,12 @@ trait MetadataTrait
         return [$fkMethodName, $rkMethodName];
     }
 
+    /**
+     * @param Model|Relation $foo
+     * @param bool $condition
+     * @return array
+     * @throws InvalidOperationException
+     */
     private function polyglotKeyMethodBackupNames($foo, $condition = false)
     {
         $fkList = ['getForeignKey', 'getForeignKeyName', 'getQualifiedFarKeyName'];
@@ -495,9 +514,9 @@ trait MetadataTrait
      * @param             $property
      * @param             $last
      * @param             $mult
-     * @param             $targ
      * @param string|null $targ
-     * @param null|mixed  $type
+     * @param mixed|null  $type
+     * @param mixed|null  $through
      */
     private function addRelationsHook(&$hooks, $first, $property, $last, $mult, $targ, $type = null, $through = null)
     {
@@ -519,9 +538,14 @@ trait MetadataTrait
     /**
      * @param $rels
      * @param $hooks
+     * @throws InvalidOperationException
      */
     private function getRelationshipsHasMany($rels, &$hooks)
     {
+        /**
+         * @var string $property
+         * @var Relation $foo
+         */
         foreach ($rels['HasMany'] as $property => $foo) {
             if ($foo instanceof MorphMany || $foo instanceof MorphToMany) {
                 continue;
@@ -550,9 +574,14 @@ trait MetadataTrait
     /**
      * @param $rels
      * @param $hooks
+     * @throws InvalidOperationException
      */
     private function getRelationshipsHasOne($rels, &$hooks)
     {
+        /**
+         * @var string $property
+         * @var Relation $foo
+         */
         foreach ($rels['HasOne'] as $property => $foo) {
             if ($foo instanceof MorphOne) {
                 continue;
@@ -579,9 +608,14 @@ trait MetadataTrait
     /**
      * @param $rels
      * @param $hooks
+     * @throws InvalidOperationException
      */
     private function getRelationshipsKnownPolyMorph($rels, &$hooks)
     {
+        /**
+         * @var string $property
+         * @var Relation $foo
+         */
         foreach ($rels['KnownPolyMorphSide'] as $property => $foo) {
             $isMany = $foo instanceof MorphToMany;
             $targ = get_class($foo->getRelated());
@@ -606,9 +640,14 @@ trait MetadataTrait
     /**
      * @param $rels
      * @param $hooks
+     * @throws InvalidOperationException
      */
     private function getRelationshipsUnknownPolyMorph($rels, &$hooks)
     {
+        /**
+         * @var string $property
+         * @var Relation $foo
+         */
         foreach ($rels['UnknownPolyMorphSide'] as $property => $foo) {
             $isMany = $foo instanceof MorphToMany;
             $targ = get_class($foo->getRelated());
@@ -661,8 +700,11 @@ trait MetadataTrait
         $this->loadEagerRelations = array_map('strval', $relations);
     }
 
-    /*
+    /**
      * Is this model the known side of at least one polymorphic relation?
+     *
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     public function isKnownPolymorphSide()
     {
@@ -672,8 +714,11 @@ trait MetadataTrait
         return !empty($rels['KnownPolyMorphSide']);
     }
 
-    /*
+    /**
      * Is this model on the unknown side of at least one polymorphic relation?
+     *
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     public function isUnknownPolymorphSide()
     {
@@ -687,6 +732,10 @@ trait MetadataTrait
      * Extract entity gubbins detail for later downstream use.
      *
      * @return EntityGubbins
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Exception
      */
     public function extractGubbins()
     {
@@ -789,6 +838,7 @@ trait MetadataTrait
      * Get Doctrine columns for selected table
      *
      * @return array
+     * @throws \Doctrine\DBAL\DBALException
      */
     protected function getTableDoctrineColumns()
     {
@@ -810,7 +860,9 @@ trait MetadataTrait
     }
 
     /**
+     * @param Relation $foo
      * @return array|null
+     * @throws InvalidOperationException
      */
     private function getRelationsHasManyKeyNames($foo)
     {

@@ -344,7 +344,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $result = $foo->getRelations();
         $this->assertEquals(2, count($result));
         $this->assertTrue($result[0] instanceof AssociationMonomorphic, get_class($result[0]));
-        $this->assertEquals(1, count($result[0]->getLast()));
+        $this->assertTrue($result[0]->getLast() instanceof AssociationStubPolymorphic, get_class($result[0]->getLast()));
     }
 
     public function testGetGubbinsIncludingHasManyThroughRelation()

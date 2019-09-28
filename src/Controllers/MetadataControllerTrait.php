@@ -33,6 +33,14 @@ trait MetadataControllerTrait
      * @return null|array
      * @throws \Exception
      */
+    /**
+     * @param $modelName
+     * @param $crudVerb
+     * @return array
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     * @throws \Exception
+     */
     public function getMethodName($modelName, $crudVerb)
     {
         // enforce we're actually hooked up to a controller
@@ -83,6 +91,12 @@ trait MetadataControllerTrait
         return ['method' => $result, 'controller' => $class, 'parameters' => $parmArray];
     }
 
+    /**
+     * @return array
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     * @throws \Exception
+     */
     public function getMappings()
     {
         // enforce we're actually hooked up to a controller
@@ -139,6 +153,8 @@ trait MetadataControllerTrait
     /**
      * @param $result
      * @return array
+     *
+     * @throws \ReflectionException
      */
     protected function getParameterNames($result)
     {

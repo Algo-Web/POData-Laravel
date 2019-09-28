@@ -20,6 +20,8 @@ class MetadataControllerProvider extends MetadataBaseProvider
      * Bootstrap the application services.  Post-boot.
      *
      * @return void
+     * @throws InvalidOperationException
+     * @throws \Exception
      */
     public function boot()
     {
@@ -35,6 +37,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
             }
         }
 
+        /** @var MetadataControllerContainer $meta */
         $meta = App::make('metadataControllers');
 
         $classes = $this->getClassMap();
@@ -84,7 +87,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
     {
         $this->app->singleton(
             'metadataControllers',
-            function ($app) {
+            function () {
                 return new MetadataControllerContainer();
             }
         );
