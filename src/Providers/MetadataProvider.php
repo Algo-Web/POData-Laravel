@@ -3,6 +3,7 @@
 namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema as Schema;
 use Illuminate\Support\Str;
 use POData\Common\InvalidOperationException;
+use POData\Providers\Metadata\IMetadataProvider;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceStreamInfo;
@@ -81,9 +83,11 @@ class MetadataProvider extends MetadataBaseProvider
 
     private function extract(array $modelNames)
     {
+        /** @var Map $objectMap */
         $objectMap = App::make('objectmap');
         foreach ($modelNames as $modelName) {
             try {
+                /** @var MetadataTrait $modelInstance */
                 $modelInstance = App::make($modelName);
             } catch (BindingResolutionException $e) {
                 // if we can't instantiate modelName for whatever reason, move on
@@ -105,6 +109,7 @@ class MetadataProvider extends MetadataBaseProvider
 
     private function unify(Map $objectMap)
     {
+        /** @var MetadataGubbinsHolder $mgh */
         $mgh = $this->getRelationHolder();
         foreach ($objectMap->getEntities() as $entity) {
             $mgh->addEntity($entity);
@@ -128,6 +133,7 @@ class MetadataProvider extends MetadataBaseProvider
 
     private function implement(Map $objectModel)
     {
+        /** @var SimpleMetadataProvider $meta */
         $meta = App::make('metadata');
         $namespace = $meta->getContainerNamespace().'.';
 
@@ -172,6 +178,7 @@ class MetadataProvider extends MetadataBaseProvider
 
     private function implementAssociationsMonomorphic(Map $objectModel, AssociationMonomorphic $associationUnderHammer)
     {
+        /** @var SimpleMetadataProvider $meta */
         $meta = App::make('metadata');
         $first = $associationUnderHammer->getFirst();
         $last = $associationUnderHammer->getLast();
@@ -214,6 +221,7 @@ class MetadataProvider extends MetadataBaseProvider
 
     private function implementProperties(EntityGubbins $unifiedEntity)
     {
+        /** @var SimpleMetadataProvider $meta */
         $meta = App::make('metadata');
         $odataEntity = $unifiedEntity->getOdataResourceType();
         $keyFields = $unifiedEntity->getKeyFields();

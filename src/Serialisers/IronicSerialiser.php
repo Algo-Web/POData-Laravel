@@ -201,7 +201,9 @@ class IronicSerialiser implements IObjectSerialiser
         }
         unset($relProp);
         unset($nonRelProp);
+        /** @var ResourceProperty[] $relProp */
         $relProp = $this->propertiesCache[$targClass]['rel'];
+        /** @var ResourceProperty[] $nonRelProp */
         $nonRelProp = $this->propertiesCache[$targClass]['nonRel'];
 
         $resourceSet = $resourceType->getCustomState();
@@ -910,10 +912,12 @@ class IronicSerialiser implements IObjectSerialiser
             }
             $corn = strval($corn);
             $rType = $nonRelProp[$corn]['type'];
+            /** @var ResourceProperty $nrp */
+            $nrp = $nonRelProp[$corn]['prop'];
             $subProp = new ODataProperty();
             $subProp->name = $corn;
             $subProp->value = isset($flake) ? $this->primitiveToString($rType, $flake) : null;
-            $subProp->typeName = $nonRelProp[$corn]['prop']->getResourceType()->getFullName();
+            $subProp->typeName = $nrp->getResourceType()->getFullName();
             $propertyContent->properties[$corn] = $subProp;
         }
         return $propertyContent;
@@ -926,8 +930,13 @@ class IronicSerialiser implements IObjectSerialiser
      * @param $propKind
      * @param $propName
      */
-    private function expandNavigationProperty(QueryResult $entryObject, $prop, $nuLink, $propKind, $propName)
-    {
+    private function expandNavigationProperty(
+        QueryResult $entryObject,
+        ResourceProperty $prop,
+        $nuLink,
+        $propKind,
+        $propName
+    ) {
         $nextName = $prop->getResourceType()->getName();
         $nuLink->isExpanded = true;
         $value = $entryObject->results->$propName;

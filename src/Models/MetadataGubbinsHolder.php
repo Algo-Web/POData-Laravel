@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
@@ -42,6 +43,7 @@ class MetadataGubbinsHolder
             $msg = 'Relation ' . $relName . ' not registered on ' . $className;
             throw new \InvalidArgumentException($msg);
         }
+        /** @var AssociationStubBase $stub */
         $stub = $rels->getStubs()[$relName];
         $targType = $stub->getTargType();
         if (!array_key_exists($targType, $this->relations)) {
@@ -122,7 +124,9 @@ class MetadataGubbinsHolder
             }
             // monomorphic associations are dealt with, now for the polymorphic associations - they're a mite trickier
             $firstKnown = $assoc->getFirst()->isKnownSide();
+            /** @var AssociationStubPolymorphic $known */
             $known = $firstKnown ? $assoc->getFirst() : $assoc->getLast();
+            /** @var AssociationStubPolymorphic $unknown */
             $unknown = $firstKnown ? $assoc->getLast() : $assoc->getFirst();
             $className = $known->getBaseType();
             $relName = $known->getRelationName();
@@ -131,11 +135,13 @@ class MetadataGubbinsHolder
 
         foreach ($this->knownSides as $knownType => $knownDeets) {
             foreach (array_keys($knownDeets) as $key) {
+                /** @var AssociationStubPolymorphic[] $lastCandidates */
                 $lastCandidates = $unknowns[$knownType][$key];
                 if (0 == count($lastCandidates)) {
                     continue;
                 }
                 foreach ($lastCandidates as $lc) {
+                    /** @var AssociationStubPolymorphic $stub */
                     $stub = clone $this->knownSides[$knownType][$key];
                     $isMulti = ($stub->getMultiplicity()->getValue() == AssociationStubRelationType::MANY);
                     $relPolyTypeName = substr($lc->getBaseType(), strrpos($lc->getBaseType(), '\\')+1);

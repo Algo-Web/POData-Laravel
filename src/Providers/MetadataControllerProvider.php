@@ -35,6 +35,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
             }
         }
 
+        /** @var MetadataControllerContainer $meta */
         $meta = App::make('metadataControllers');
 
         $classes = $this->getClassMap();

@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Mockery\Mock;
 use POData\Common\InvalidOperationException;
+use POData\Providers\Metadata\Type\IType;
 
 trait MetadataTrait
 {
@@ -81,6 +82,7 @@ trait MetadataTrait
             $rawColumn = $foo[strtolower($column)];
             $nullable = !($rawColumn->getNotNull());
             $fillable = in_array($column, $this->getFillable());
+            /** @var IType $rawType */
             $rawType = $rawColumn->getType();
             $type = $rawType->getName();
             $default = $this->$column;
@@ -522,6 +524,10 @@ trait MetadataTrait
      */
     private function getRelationshipsHasMany($rels, &$hooks)
     {
+        /**
+         * @var string $property
+         * @var Relation $foo
+         */
         foreach ($rels['HasMany'] as $property => $foo) {
             if ($foo instanceof MorphMany || $foo instanceof MorphToMany) {
                 continue;
@@ -553,6 +559,10 @@ trait MetadataTrait
      */
     private function getRelationshipsHasOne($rels, &$hooks)
     {
+        /**
+         * @var string $property
+         * @var Relation $foo
+         */
         foreach ($rels['HasOne'] as $property => $foo) {
             if ($foo instanceof MorphOne) {
                 continue;
@@ -582,6 +592,10 @@ trait MetadataTrait
      */
     private function getRelationshipsKnownPolyMorph($rels, &$hooks)
     {
+        /**
+         * @var string $property
+         * @var Relation $foo
+         */
         foreach ($rels['KnownPolyMorphSide'] as $property => $foo) {
             $isMany = $foo instanceof MorphToMany;
             $targ = get_class($foo->getRelated());
@@ -609,6 +623,10 @@ trait MetadataTrait
      */
     private function getRelationshipsUnknownPolyMorph($rels, &$hooks)
     {
+        /**
+         * @var string $property
+         * @var Relation $foo
+         */
         foreach ($rels['UnknownPolyMorphSide'] as $property => $foo) {
             $isMany = $foo instanceof MorphToMany;
             $targ = get_class($foo->getRelated());
