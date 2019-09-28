@@ -12,26 +12,26 @@ abstract class AssociationStubBase
     /**
      * Foreign key field of this end of relation.
      *
-     * @var string
+     * @var string|null
      */
     protected $keyField;
 
     /**
      * Foreign key field of imtermate relation.
      *
-     * @var string
+     * @var string|null
      */
     protected $throughField;
 
     /**
      * Foreign key field of other end of relation.
      *
-     * @var string
+     * @var string|null
      */
     protected $foreignField;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $relationName;
 
@@ -45,7 +45,7 @@ abstract class AssociationStubBase
     /**
      * Base type this relation is attached to.
      *
-     * @var string
+     * @var string|null
      */
     protected $baseType;
 
@@ -62,7 +62,7 @@ abstract class AssociationStubBase
      */
     public function setRelationName($relationName)
     {
-        $this->relationName = $relationName;
+        $this->relationName = $this->checkStringInput($relationName) ? $relationName : $this->relationName;
     }
 
     /**
@@ -94,7 +94,7 @@ abstract class AssociationStubBase
      */
     public function setKeyField($keyField)
     {
-        $this->keyField = $keyField;
+        $this->keyField = $this->checkStringInput($keyField) ? $keyField : $this->keyField;
     }
 
     public function isCompatible(AssociationStubBase $otherStub)
@@ -123,16 +123,13 @@ abstract class AssociationStubBase
         if (null === $this->multiplicity) {
             return false;
         }
-        $relName = $this->relationName;
-        if (null === $relName || !is_string($relName) || empty($relName)) {
+        if (null === $this->relationName) {
             return false;
         }
-        $keyField = $this->keyField;
-        if (null === $keyField || !is_string($keyField) || empty($keyField)) {
+        if (null === $this->keyField) {
             return false;
         }
-        $baseType = $this->baseType;
-        if (null === $baseType || !is_string($baseType) || empty($baseType)) {
+        if (null === $this->baseType) {
             return false;
         }
         $targType = $this->targType;
@@ -178,7 +175,7 @@ abstract class AssociationStubBase
      */
     public function setBaseType($baseType)
     {
-        $this->baseType = $baseType;
+        $this->baseType = $this->checkStringInput($baseType) ? $baseType : $this->baseType;
     }
 
     /**
@@ -246,4 +243,16 @@ abstract class AssociationStubBase
      * @return string
      */
     abstract public function morphicType();
+
+    /**
+     * @param $input
+     * @return bool
+     */
+    private function checkStringInput($input)
+    {
+        if (null === $input || !is_string($input) || empty($input)) {
+            return false;
+        }
+        return true;
+    }
 }
