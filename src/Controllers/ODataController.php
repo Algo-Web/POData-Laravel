@@ -20,6 +20,8 @@ class ODataController extends BaseController
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
+     *
+     * @throws \Exception
      */
     public function index(Request $request)
     {

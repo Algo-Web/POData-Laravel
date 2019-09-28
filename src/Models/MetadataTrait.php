@@ -155,6 +155,8 @@ trait MetadataTrait
      * Get model's relationships.
      *
      * @return array
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     public function getRelationships()
     {
@@ -206,6 +208,8 @@ trait MetadataTrait
      * @param bool $biDir
      *
      * @return array
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     protected function getRelationshipsFromMethods($biDir = false)
     {
@@ -396,6 +400,7 @@ trait MetadataTrait
      * @param mixed $condition
      *
      * @return array
+     * @throws InvalidOperationException
      */
     private function polyglotKeyMethodNames($foo, $condition = false)
     {
@@ -521,6 +526,7 @@ trait MetadataTrait
     /**
      * @param $rels
      * @param $hooks
+     * @throws InvalidOperationException
      */
     private function getRelationshipsHasMany($rels, &$hooks)
     {
@@ -556,6 +562,7 @@ trait MetadataTrait
     /**
      * @param $rels
      * @param $hooks
+     * @throws InvalidOperationException
      */
     private function getRelationshipsHasOne($rels, &$hooks)
     {
@@ -589,6 +596,7 @@ trait MetadataTrait
     /**
      * @param $rels
      * @param $hooks
+     * @throws InvalidOperationException
      */
     private function getRelationshipsKnownPolyMorph($rels, &$hooks)
     {
@@ -620,6 +628,7 @@ trait MetadataTrait
     /**
      * @param $rels
      * @param $hooks
+     * @throws InvalidOperationException
      */
     private function getRelationshipsUnknownPolyMorph($rels, &$hooks)
     {
@@ -690,7 +699,7 @@ trait MetadataTrait
         return !empty($rels['KnownPolyMorphSide']);
     }
 
-    /*
+    /**
      * Is this model on the unknown side of at least one polymorphic relation?
      */
     public function isUnknownPolymorphSide()
@@ -705,6 +714,9 @@ trait MetadataTrait
      * Extract entity gubbins detail for later downstream use.
      *
      * @return EntityGubbins
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function extractGubbins()
     {
@@ -807,6 +819,7 @@ trait MetadataTrait
      * Get Doctrine columns for selected table
      *
      * @return array
+     * @throws \Doctrine\DBAL\DBALException
      */
     protected function getTableDoctrineColumns()
     {
@@ -829,6 +842,7 @@ trait MetadataTrait
 
     /**
      * @return array|null
+     * @throws InvalidOperationException
      */
     private function getRelationsHasManyKeyNames($foo)
     {

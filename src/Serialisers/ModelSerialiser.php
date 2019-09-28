@@ -25,6 +25,7 @@ class ModelSerialiser
      * @param Model|mixed $model
      *
      * @return mixed
+     * @throws InvalidOperationException
      */
     public function bulkSerialise($model)
     {

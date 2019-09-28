@@ -116,6 +116,7 @@ class EntityGubbins
 
     /**
      * @param EntityField[] $fields
+     * @throws \Exception
      */
     public function setFields(array $fields)
     {
@@ -151,6 +152,7 @@ class EntityGubbins
 
     /**
      * @param AssociationStubBase[] $stubs
+     * @throws \Exception
      */
     public function setStubs(array $stubs)
     {
@@ -166,6 +168,7 @@ class EntityGubbins
     /**
      * @param Association $association
      * @param bool        $isFirst
+     * @throws InvalidOperationException
      */
     public function addAssociation(Association $association, $isFirst = true)
     {

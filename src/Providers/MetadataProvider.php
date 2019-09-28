@@ -219,6 +219,10 @@ class MetadataProvider extends MetadataBaseProvider
         }
     }
 
+    /**
+     * @param EntityGubbins $unifiedEntity
+     * @throws InvalidOperationException
+     */
     private function implementProperties(EntityGubbins $unifiedEntity)
     {
         /** @var SimpleMetadataProvider $meta */
@@ -262,6 +266,9 @@ class MetadataProvider extends MetadataBaseProvider
      * @param mixed $reset
      *
      * @return void
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function boot($reset = true)
     {
@@ -366,6 +373,7 @@ class MetadataProvider extends MetadataBaseProvider
      * @param $propName
      * @return null|string
      * @internal param Model $target
+     * @throws InvalidOperationException
      */
     public function resolveReverseProperty(Model $source, $propName)
     {

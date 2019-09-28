@@ -139,6 +139,8 @@ trait MetadataControllerTrait
     /**
      * @param $result
      * @return array
+     *
+     * @throws \ReflectionException
      */
     protected function getParameterNames($result)
     {

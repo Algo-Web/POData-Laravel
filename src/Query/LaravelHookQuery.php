@@ -45,6 +45,8 @@ class LaravelHookQuery
      * @param $navPropName
      *
      * @return bool
+     *
+     * @throws InvalidOperationException
      */
     public function hookSingleModel(
         ResourceSet $sourceResourceSet,
@@ -80,6 +82,7 @@ class LaravelHookQuery
      * @param $navPropName
      *
      * @return bool
+     * @throws InvalidOperationException
      */
     public function unhookSingleModel(
         ResourceSet $sourceResourceSet,
@@ -131,6 +134,7 @@ class LaravelHookQuery
      * @param $targetEntityInstance
      * @param $navPropName
      * @throws \InvalidArgumentException
+     * @throws InvalidOperationException
      * @return Relation
      */
     protected function isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName)

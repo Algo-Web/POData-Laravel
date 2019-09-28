@@ -42,15 +42,16 @@ class LaravelBulkQuery
         $this->controllerContainer = App::make('metadataControllers');
     }
 
-
     /**
      * Create multiple new resources in a resource set.
      *
      * @param ResourceSet $sourceResourceSet The entity set containing the entity to fetch
-     * @param object[]    $data              The new data for the entity instance
+     * @param object[] $data The new data for the entity instance
      *
      * @return object[] returns the newly created model if successful, or throws an exception if model creation failed
      * @throw  \Exception
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     public function createBulkResourceforResourceSet(
         ResourceSet $sourceResourceSet,
@@ -93,7 +94,8 @@ class LaravelBulkQuery
      * @param bool            $shouldUpdate         Should undefined values be updated or reset to default
      *
      * @return object[] the new resource value if it is assignable, or throw exception for null
-     * @throw  \Exception
+     * @throws \Exception
+     * @throws InvalidOperationException
      */
     public function updateBulkResource(
         ResourceSet $sourceResourceSet,
@@ -144,6 +146,9 @@ class LaravelBulkQuery
      * @param $paramList
      * @param array                $data
      * @param KeyDescriptor[]|null $keyDescriptors
+     * @return array
+     *
+     * @throws InvalidOperationException
      */
     protected function prepareBulkRequestInput($paramList, array $data, array $keyDescriptors = null)
     {
@@ -184,11 +189,13 @@ class LaravelBulkQuery
 
     /**
      * @param ResourceSet $sourceResourceSet
-     * @param array       $data
+     * @param array $data
      * @param $mapping
      * @param $pastVerb
      * @param  KeyDescriptor[]|null $keyDescriptor
      * @throws ODataException
+     * @throws \ReflectionException
+     * @throws InvalidOperationException
      * @return array
      */
     protected function processBulkCustom(
@@ -230,6 +237,8 @@ class LaravelBulkQuery
      * @param ResourceSet $sourceResourceSet
      * @param $verbName
      * @return array|null
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     protected function getOptionalVerbMapping(ResourceSet $sourceResourceSet, $verbName)
     {
@@ -252,6 +261,7 @@ class LaravelBulkQuery
      * Dig out local copy of controller metadata mapping.
      *
      * @return MetadataControllerContainer
+     * @throws InvalidOperationException
      */
     public function getControllerContainer()
     {

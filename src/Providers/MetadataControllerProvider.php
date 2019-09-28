@@ -20,6 +20,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
      * Bootstrap the application services.  Post-boot.
      *
      * @return void
+     * @throws InvalidOperationException
      */
     public function boot()
     {
