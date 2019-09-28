@@ -2,8 +2,6 @@
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
-use POData\Common\InvalidOperationException;
-
 abstract class AssociationStubBase
 {
     /**

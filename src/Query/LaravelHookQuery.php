@@ -3,7 +3,6 @@
 namespace AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
-use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Database\Eloquent\Model;
@@ -13,16 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
-use POData\Common\ODataException;
-use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
-use POData\Providers\Query\QueryResult;
-use POData\Providers\Query\QueryType;
-use POData\UriProcessor\QueryProcessor\ExpressionParser\FilterInfo;
-use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
-use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
-use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
-use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 class LaravelHookQuery
 {

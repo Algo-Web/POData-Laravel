@@ -4,7 +4,6 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
-use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType;
@@ -18,9 +17,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema as Schema;
 use Illuminate\Support\Str;
 use POData\Common\InvalidOperationException;
-use POData\Providers\Metadata\IMetadataProvider;
-use POData\Providers\Metadata\ResourceEntityType;
-use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceStreamInfo;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Metadata\Type\TypeCode;
