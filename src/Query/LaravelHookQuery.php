@@ -29,9 +29,9 @@ class LaravelHookQuery
      * Attaches child model to parent model.
      *
      * @param ResourceSet $sourceResourceSet
-     * @param object      $sourceEntityInstance
+     * @param Model       $sourceEntityInstance
      * @param ResourceSet $targetResourceSet
-     * @param object      $targetEntityInstance
+     * @param Model       $targetEntityInstance
      * @param $navPropName
      *
      * @return bool
@@ -66,9 +66,9 @@ class LaravelHookQuery
      * Removes child model from parent model.
      *
      * @param ResourceSet $sourceResourceSet
-     * @param object      $sourceEntityInstance
+     * @param Model       $sourceEntityInstance
      * @param ResourceSet $targetResourceSet
-     * @param object      $targetEntityInstance
+     * @param Model       $targetEntityInstance
      * @param $navPropName
      *
      * @return bool

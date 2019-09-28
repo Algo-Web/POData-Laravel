@@ -173,6 +173,7 @@ class IronicSerialiser implements IObjectSerialiser
         $stackCount = count($this->lightStack);
         $topOfStack = $this->lightStack[$stackCount-1];
         $payloadClass = get_class($entryObject->results);
+        /** @var ResourceEntityType $resourceType */
         $resourceType = $this->getService()->getProvidersWrapper()->resolveResourceType($topOfStack['type']);
 
         // need gubbinz to unpack an abstract resource type
@@ -182,8 +183,11 @@ class IronicSerialiser implements IObjectSerialiser
         if (!$resourceType instanceof ResourceEntityType) {
             throw new InvalidOperationException(get_class($resourceType));
         }
+
+        /** @var Model $res */
+        $res = $entryObject->results;
         $targClass = $resourceType->getInstanceType()->getName();
-        if (!($entryObject->results instanceof $targClass)) {
+        if (!($res instanceof $targClass)) {
             $msg = 'Object being serialised not instance of expected class, '
                    . $targClass . ', is actually ' . $payloadClass;
             throw new InvalidOperationException($msg);
@@ -218,20 +222,20 @@ class IronicSerialiser implements IObjectSerialiser
         $type = $resourceType->getFullName();
 
         $relativeUri = $this->getEntryInstanceKey(
-            $entryObject->results,
+            $res,
             $resourceType,
             $resourceSet->getName()
         );
         $absoluteUri = rtrim($this->absoluteServiceUri, '/') . '/' . $relativeUri;
 
         list($mediaLink, $mediaLinks) = $this->writeMediaData(
-            $entryObject->results,
+            $res,
             $type,
             $relativeUri,
             $resourceType
         );
 
-        $propertyContent = $this->writePrimitiveProperties($entryObject->results, $nonRelProp);
+        $propertyContent = $this->writePrimitiveProperties($res, $nonRelProp);
 
         $links = [];
         foreach ($relProp as $prop) {
@@ -386,10 +390,12 @@ class IronicSerialiser implements IObjectSerialiser
     public function writeUrlElement(QueryResult $entryObject)
     {
         $url = new ODataURL();
-        if (null !== $entryObject->results) {
+        /** @var Model|null $res */
+        $res = $entryObject->results;
+        if (null !== $res) {
             $currentResourceType = $this->getCurrentResourceSetWrapper()->getResourceType();
             $relativeUri = $this->getEntryInstanceKey(
-                $entryObject->results,
+                $res,
                 $currentResourceType,
                 $this->getCurrentResourceSetWrapper()->getName()
             );

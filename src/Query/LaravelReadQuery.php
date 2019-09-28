@@ -409,7 +409,7 @@ class LaravelReadQuery
                 : $sourceEntityInstance instanceof Model ? $sourceEntityInstance
                     : $sourceEntityInstance instanceof Relation ? $sourceEntityInstance
                         : null;
-        if (!$this->getAuth()->canAuth(ActionVerb::READ(), get_class($sourceEntityInstance), $check)) {
+        if (!$this->getAuth()->canAuth(ActionVerb::READ(), $sourceEntityInstance, $check)) {
             throw new ODataException('Access denied', 403);
         }
     }

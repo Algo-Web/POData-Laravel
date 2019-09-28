@@ -6,6 +6,8 @@ use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
@@ -75,7 +77,7 @@ class LaravelBulkQuery
      * Updates a group of resources in a resource set.
      *
      * @param ResourceSet     $sourceResourceSet    The entity set containing the source entity
-     * @param object          $sourceEntityInstance The source entity instance
+     * @param Model|Relation  $sourceEntityInstance The source entity instance
      * @param KeyDescriptor[] $keyDescriptor        The key identifying the entity to fetch
      * @param object[]        $data                 The new data for the entity instances
      * @param bool            $shouldUpdate         Should undefined values be updated or reset to default
