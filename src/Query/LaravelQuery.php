@@ -404,11 +404,11 @@ class LaravelQuery implements IQueryProvider
         $map = $raw->getMetadata();
 
         if (!array_key_exists($class, $map)) {
-            throw new \POData\Common\InvalidOperationException('Controller mapping missing for class ' . $class . '.');
+            throw new InvalidOperationException('Controller mapping missing for class ' . $class . '.');
         }
         $goal = $raw->getMapping($class, $verb);
         if (null == $goal) {
-            throw new \POData\Common\InvalidOperationException(
+            throw new InvalidOperationException(
                 'Controller mapping missing for ' . $verb . ' verb on class ' . $class . '.'
             );
         }
@@ -423,7 +423,7 @@ class LaravelQuery implements IQueryProvider
             $arrayData = $data;
         }
         if (!is_array($arrayData)) {
-            throw \POData\Common\ODataException::createPreConditionFailedError(
+            throw ODataException::createPreConditionFailedError(
                 'Data not resolvable to key-value array.'
             );
         }

@@ -360,7 +360,7 @@ class MetadataProvider extends MetadataBaseProvider
         $ends = [];
         $startName = $this->getAppNamespace();
         foreach ($classes as $name) {
-            if (\Illuminate\Support\Str::startsWith($name, $startName)) {
+            if (Str::startsWith($name, $startName)) {
                 if (in_array('AlgoWeb\\PODataLaravel\\Models\\MetadataTrait', class_uses($name))) {
                     if (is_subclass_of($name, '\\Illuminate\\Database\\Eloquent\\Model')) {
                         $ends[] = $name;
