@@ -58,22 +58,14 @@ class LaravelReadQuery
     public function getResourceSet(
         QueryType $queryType,
         ResourceSet $resourceSet,
-        $filterInfo = null,
+        FilterInfo $filterInfo = null,
         $orderBy = null,
         $top = null,
         $skip = null,
-        $skipToken = null,
+        SkipTokenInfo $skipToken = null,
         array $eagerLoad = null,
         $sourceEntityInstance = null
     ) {
-        if (null != $filterInfo && !($filterInfo instanceof FilterInfo)) {
-            $msg = 'Filter info must be either null or instance of FilterInfo.';
-            throw new InvalidArgumentException($msg);
-        }
-        if (null != $skipToken && !($skipToken instanceof SkipTokenInfo)) {
-            $msg = 'Skip token must be either null or instance of SkipTokenInfo.';
-            throw new InvalidArgumentException($msg);
-        }
         $rawLoad = $this->processEagerLoadList($eagerLoad);
         $modelLoad = [];
 
