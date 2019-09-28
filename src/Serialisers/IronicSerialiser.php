@@ -889,6 +889,9 @@ class IronicSerialiser implements IObjectSerialiser
         return $queryParameterString;
     }
 
+    /**
+     * @throws InvalidOperationException
+     */
     private function loadStackIfEmpty()
     {
         if (0 == count($this->lightStack)) {
@@ -901,8 +904,7 @@ class IronicSerialiser implements IObjectSerialiser
      * Convert the given primitive value to string.
      * Note: This method will not handle null primitive value.
      *
-     * @param IType &$primitiveResourceType Type of the primitive property
-     *                                      whose value need to be converted
+     * @param IType &$type                  Type of the primitive property needing conversion
      * @param mixed $primitiveValue         Primitive value to convert
      *
      * @return string
@@ -1032,6 +1034,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Gets the data service instance.
      *
+     * @param IService $service
      * @return void
      */
     public function setService(IService $service)
@@ -1178,6 +1181,13 @@ class IronicSerialiser implements IObjectSerialiser
         return $this->modelSerialiser;
     }
 
+    /**
+     * @param ResourceEntityType $resourceType
+     * @param $payloadClass
+     * @return ResourceEntityType|ResourceType
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     */
     protected function getConcreteTypeFromAbstractType(ResourceEntityType $resourceType, $payloadClass)
     {
         if ($resourceType->isAbstract()) {

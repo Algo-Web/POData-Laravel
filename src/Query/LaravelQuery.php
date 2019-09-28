@@ -343,7 +343,7 @@ class LaravelQuery implements IQueryProvider
      * @param ResourceSet $sourceResourceSet
      * @param object      $sourceEntityInstance
      *
-     * return bool true if resources sucessfully deteled, otherwise false
+     * @return bool true if resources sucessfully deteled, otherwise false
      * @throws \Exception
      */
     public function deleteResource(
@@ -375,7 +375,7 @@ class LaravelQuery implements IQueryProvider
      * @param object      $sourceEntityInstance The source entity instance
      * @param object      $data                 the New data for the entity instance
      *
-     * @returns Model|null                      returns the newly created model if successful,
+     * @return Model|null                       returns the newly created model if successful,
      *                                          or null if model creation failed.
      * @throws \Exception
      */
@@ -664,6 +664,7 @@ class LaravelQuery implements IQueryProvider
 
     /**
      * Start database transaction.
+     * @param bool $isBulk
      */
     public function startTransaction($isBulk = false)
     {
@@ -708,6 +709,15 @@ class LaravelQuery implements IQueryProvider
         self::$touchList[] = $model;
     }
 
+    /**
+     * @param ResourceSet $resourceSet
+     * @param Model|Relation|null $sourceEntityInstance
+     * @param mixed $data
+     * @param mixed $verb
+     * @return Model|null
+     * @throws InvalidOperationException
+     * @throws ODataException
+     */
     protected function createUpdateMainWrapper(ResourceSet $resourceSet, $sourceEntityInstance, $data, $verb)
     {
         /** @var Model|null $source */

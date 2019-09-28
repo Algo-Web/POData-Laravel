@@ -54,6 +54,10 @@ class AssociationStubPolymorphic extends AssociationStubBase
         return true;
     }
 
+    /**
+     * @return bool
+     * @throws InvalidOperationException
+     */
     public function isKnownSide()
     {
         if (!($this->isOk())) {

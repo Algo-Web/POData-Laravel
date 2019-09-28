@@ -81,6 +81,13 @@ class MetadataProvider extends MetadataBaseProvider
         self::$isBooted = false;
     }
 
+    /**
+     * @param array $modelNames
+     * @return Map
+     * @throws InvalidOperationException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \ReflectionException
+     */
     private function extract(array $modelNames)
     {
         /** @var Map $objectMap */
@@ -107,6 +114,11 @@ class MetadataProvider extends MetadataBaseProvider
         return $objectMap;
     }
 
+    /**
+     * @param Map $objectMap
+     * @return Map
+     * @throws InvalidOperationException
+     */
     private function unify(Map $objectMap)
     {
         /** @var MetadataGubbinsHolder $mgh */
@@ -131,6 +143,11 @@ class MetadataProvider extends MetadataBaseProvider
         }
     }
 
+    /**
+     * @param Map $objectModel
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     */
     private function implement(Map $objectModel)
     {
         /** @var SimpleMetadataProvider $meta */
@@ -176,6 +193,11 @@ class MetadataProvider extends MetadataBaseProvider
         }
     }
 
+    /**
+     * @param Map $objectModel
+     * @param AssociationMonomorphic $associationUnderHammer
+     * @throws InvalidOperationException
+     */
     private function implementAssociationsMonomorphic(Map $objectModel, AssociationMonomorphic $associationUnderHammer)
     {
         /** @var SimpleMetadataProvider $meta */

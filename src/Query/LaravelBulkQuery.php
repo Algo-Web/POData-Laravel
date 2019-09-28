@@ -49,7 +49,7 @@ class LaravelBulkQuery
      * @param object[] $data The new data for the entity instance
      *
      * @return object[] returns the newly created model if successful, or throws an exception if model creation failed
-     * @throw  \Exception
+     * @throws \Exception
      * @throws InvalidOperationException
      * @throws \ReflectionException
      */

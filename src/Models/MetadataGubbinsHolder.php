@@ -17,6 +17,12 @@ class MetadataGubbinsHolder
     protected $relations = [];
     protected $knownSides = [];
 
+    /**
+     * Add entity to holder
+     *
+     * @param EntityGubbins $entity
+     * @throws InvalidOperationException
+     */
     public function addEntity(EntityGubbins $entity)
     {
         $className = $entity->getClassName();
@@ -61,6 +67,11 @@ class MetadataGubbinsHolder
         return $relStubs;
     }
 
+    /**
+     * @param string $className
+     * @return array
+     * @throws InvalidOperationException
+     */
     public function getRelationsByClass($className)
     {
         $this->checkClassExists($className);
@@ -93,6 +104,10 @@ class MetadataGubbinsHolder
         return $associations;
     }
 
+    /**
+     * @return array
+     * @throws InvalidOperationException
+     */
     public function getRelations()
     {
         $classNames = array_keys($this->relations);

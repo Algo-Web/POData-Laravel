@@ -34,8 +34,11 @@ trait MetadataTrait
     protected static $tableData = [];
     protected static $dontCastTypes = ['object', 'array', 'collection', 'int'];
 
-    /*
+    /**
      * Retrieve and assemble this model's metadata for OData packaging
+     * @return array
+     * @throws InvalidOperationException
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function metadata()
     {
@@ -448,6 +451,12 @@ trait MetadataTrait
         return [$fkMethodName, $rkMethodName];
     }
 
+    /**
+     * @param Model|Relation $foo
+     * @param bool $condition
+     * @return array
+     * @throws InvalidOperationException
+     */
     private function polyglotKeyMethodBackupNames($foo, $condition = false)
     {
         $fkList = ['getForeignKey', 'getForeignKeyName', 'getQualifiedFarKeyName'];
@@ -505,9 +514,9 @@ trait MetadataTrait
      * @param             $property
      * @param             $last
      * @param             $mult
-     * @param             $targ
      * @param string|null $targ
-     * @param null|mixed  $type
+     * @param mixed|null  $type
+     * @param mixed|null  $through
      */
     private function addRelationsHook(&$hooks, $first, $property, $last, $mult, $targ, $type = null, $through = null)
     {
@@ -691,8 +700,11 @@ trait MetadataTrait
         $this->loadEagerRelations = array_map('strval', $relations);
     }
 
-    /*
+    /**
      * Is this model the known side of at least one polymorphic relation?
+     *
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     public function isKnownPolymorphSide()
     {
@@ -704,6 +716,9 @@ trait MetadataTrait
 
     /**
      * Is this model on the unknown side of at least one polymorphic relation?
+     *
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     public function isUnknownPolymorphSide()
     {
@@ -720,6 +735,7 @@ trait MetadataTrait
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @throws \Doctrine\DBAL\DBALException
+     * @throws \Exception
      */
     public function extractGubbins()
     {
@@ -844,6 +860,7 @@ trait MetadataTrait
     }
 
     /**
+     * @param Relation $foo
      * @return array|null
      * @throws InvalidOperationException
      */

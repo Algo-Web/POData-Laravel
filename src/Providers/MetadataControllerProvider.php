@@ -21,6 +21,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
      *
      * @return void
      * @throws InvalidOperationException
+     * @throws \Exception
      */
     public function boot()
     {

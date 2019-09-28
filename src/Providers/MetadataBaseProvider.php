@@ -39,7 +39,6 @@ abstract class MetadataBaseProvider extends ServiceProvider
     }
 
     /**
-     * @param $classMap
      * @return array
      */
     protected function getClassMap()
