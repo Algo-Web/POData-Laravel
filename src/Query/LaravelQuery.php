@@ -175,6 +175,7 @@ class LaravelQuery implements IQueryProvider
         array $eagerLoad = null,
         $sourceEntityInstance = null
     ) {
+        /** @var Model|Relation|null $source */
         $source = $this->unpackSourceEntity($sourceEntityInstance);
         return $this->getReader()->getResourceSet(
             $queryType,
@@ -492,10 +493,10 @@ class LaravelQuery implements IQueryProvider
     /**
      * @param $data
      * @param $paramList
-     * @param  Model|null $sourceEntityInstance
+     * @param Model|null $sourceEntityInstance
      * @return array
      */
-    protected function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance = null)
+    protected function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance)
     {
         $parms = [];
 
@@ -709,10 +710,13 @@ class LaravelQuery implements IQueryProvider
 
     protected function createUpdateMainWrapper(ResourceSet $resourceSet, $sourceEntityInstance, $data, $verb)
     {
+        /** @var Model|null $source */
         $source = $this->unpackSourceEntity($sourceEntityInstance);
 
         $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source);
-        self::queueModel($result);
+        if (null !== $result) {
+            self::queueModel($result);
+        }
         return $result;
     }
 }

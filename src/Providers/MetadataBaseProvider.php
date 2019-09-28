@@ -29,7 +29,8 @@ abstract class MetadataBaseProvider extends ServiceProvider
             $hasCache = isset($hasCache) ? boolval($hasCache) : false;
             if (!$hasCache) {
                 $cacheTime = env('APP_METADATA_CACHE_DURATION', null);
-                $cacheTime = !is_numeric($cacheTime) ? 10 : abs($cacheTime);
+                /** @var int $cacheTime */
+                $cacheTime = !is_numeric($cacheTime) ? 10 : intval(abs($cacheTime));
                 Cache::put($key, $meta, $cacheTime);
             }
         } else {

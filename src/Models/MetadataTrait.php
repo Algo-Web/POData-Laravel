@@ -59,7 +59,9 @@ trait MetadataTrait
             return self::$tableData = [];
         }
 
+        /** @var array $columns */
         $columns = $this->getTableColumns();
+        /** @var array $mask */
         $mask = $this->metadataMask();
         $columns = array_intersect($columns, $mask);
 
@@ -67,6 +69,7 @@ trait MetadataTrait
 
         $rawFoo = $this->getTableDoctrineColumns();
         $foo = [];
+        /** @var array $getters */
         $getters = $this->collectGetters();
         $getters = array_intersect($getters, $mask);
         $casts = $this->retrieveCasts();

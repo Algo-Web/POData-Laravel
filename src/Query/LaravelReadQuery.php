@@ -268,7 +268,7 @@ class LaravelReadQuery
         $this->checkSourceInstance($sourceEntityInstance);
 
         if (null == $sourceEntityInstance) {
-            $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
+            $sourceEntityInstance = $this->getSourceEntityInstance(/** @scrutinizer ignore-type */$resourceSet);
         }
 
         $this->checkAuth($sourceEntityInstance);
