@@ -4,28 +4,17 @@ namespace AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
-use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
-use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
-use POData\Providers\Query\QueryResult;
-use POData\Providers\Query\QueryType;
-use POData\UriProcessor\QueryProcessor\ExpressionParser\FilterInfo;
-use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
-use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
-use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 class LaravelBulkQuery
 {
@@ -88,7 +77,7 @@ class LaravelBulkQuery
      * Updates a group of resources in a resource set.
      *
      * @param ResourceSet     $sourceResourceSet    The entity set containing the source entity
-     * @param object          $sourceEntityInstance The source entity instance
+     * @param Model|Relation  $sourceEntityInstance The source entity instance
      * @param KeyDescriptor[] $keyDescriptor        The key identifying the entity to fetch
      * @param object[]        $data                 The new data for the entity instances
      * @param bool            $shouldUpdate         Should undefined values be updated or reset to default

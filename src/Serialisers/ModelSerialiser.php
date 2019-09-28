@@ -2,7 +2,6 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
-use AlgoWeb\PODataLaravel\Query\LaravelReadQuery;
 use Illuminate\Database\Eloquent\Model;
 use POData\Common\InvalidOperationException;
 

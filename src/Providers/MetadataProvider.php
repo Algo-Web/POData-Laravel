@@ -4,7 +4,6 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
-use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType;
@@ -18,9 +17,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema as Schema;
 use Illuminate\Support\Str;
 use POData\Common\InvalidOperationException;
-use POData\Providers\Metadata\IMetadataProvider;
-use POData\Providers\Metadata\ResourceEntityType;
-use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceStreamInfo;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Metadata\Type\TypeCode;
@@ -275,7 +271,7 @@ class MetadataProvider extends MetadataBaseProvider
                 $odataEntity,
                 $field->getName(),
                 $field->getEdmFieldType(),
-                $field->getFieldType() == EntityFieldType::PRIMITIVE_BAG(),
+                $field->getFieldType()->getValue() == EntityFieldType::PRIMITIVE_BAG()->getValue(),
                 $default,
                 $field->getIsNullable()
             );
@@ -360,7 +356,7 @@ class MetadataProvider extends MetadataBaseProvider
         $ends = [];
         $startName = $this->getAppNamespace();
         foreach ($classes as $name) {
-            if (\Illuminate\Support\Str::startsWith($name, $startName)) {
+            if (Str::startsWith($name, $startName)) {
                 if (in_array('AlgoWeb\\PODataLaravel\\Models\\MetadataTrait', class_uses($name))) {
                     if (is_subclass_of($name, '\\Illuminate\\Database\\Eloquent\\Model')) {
                         $ends[] = $name;

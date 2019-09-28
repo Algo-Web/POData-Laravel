@@ -8,9 +8,6 @@ use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
@@ -318,11 +315,11 @@ class LaravelQuery implements IQueryProvider
     /**
      * Updates a resource.
      *
-     * @param ResourceSet   $sourceResourceSet    The entity set containing the source entity
-     * @param object        $sourceEntityInstance The source entity instance
-     * @param KeyDescriptor $keyDescriptor        The key identifying the entity to fetch
-     * @param object        $data                 the New data for the entity instance
-     * @param bool          $shouldUpdate         Should undefined values be updated or reset to default
+     * @param ResourceSet       $sourceResourceSet    The entity set containing the source entity
+     * @param Model|Relation    $sourceEntityInstance The source entity instance
+     * @param KeyDescriptor     $keyDescriptor        The key identifying the entity to fetch
+     * @param object            $data                 the New data for the entity instance
+     * @param bool              $shouldUpdate         Should undefined values be updated or reset to default
      *
      * @return Model|null the new resource value if it is assignable or throw exception for null
      * @throws \Exception
@@ -371,12 +368,12 @@ class LaravelQuery implements IQueryProvider
         throw new ODataException('Target model not successfully deleted', 422);
     }
     /**
-     * @param ResourceSet $resourceSet          The entity set containing the entity to fetch
-     * @param object      $sourceEntityInstance The source entity instance
-     * @param object      $data                 the New data for the entity instance
+     * @param ResourceSet     $resourceSet          The entity set containing the entity to fetch
+     * @param Model|Relation  $sourceEntityInstance The source entity instance
+     * @param object          $data                 the New data for the entity instance
      *
-     * @return Model|null                       returns the newly created model if successful,
-     *                                          or null if model creation failed.
+     * @return Model|null                           returns the newly created model if successful,
+     *                                              or null if model creation failed.
      * @throws \Exception
      */
     public function createResourceforResourceSet(
@@ -404,11 +401,11 @@ class LaravelQuery implements IQueryProvider
         $map = $raw->getMetadata();
 
         if (!array_key_exists($class, $map)) {
-            throw new \POData\Common\InvalidOperationException('Controller mapping missing for class ' . $class . '.');
+            throw new InvalidOperationException('Controller mapping missing for class ' . $class . '.');
         }
         $goal = $raw->getMapping($class, $verb);
         if (null == $goal) {
-            throw new \POData\Common\InvalidOperationException(
+            throw new InvalidOperationException(
                 'Controller mapping missing for ' . $verb . ' verb on class ' . $class . '.'
             );
         }
@@ -423,7 +420,7 @@ class LaravelQuery implements IQueryProvider
             $arrayData = $data;
         }
         if (!is_array($arrayData)) {
-            throw \POData\Common\ODataException::createPreConditionFailedError(
+            throw ODataException::createPreConditionFailedError(
                 'Data not resolvable to key-value array.'
             );
         }
@@ -580,7 +577,7 @@ class LaravelQuery implements IQueryProvider
      * Updates a group of resources in a resource set.
      *
      * @param ResourceSet     $sourceResourceSet    The entity set containing the source entity
-     * @param object          $sourceEntityInstance The source entity instance
+     * @param Model|Relation  $sourceEntityInstance The source entity instance
      * @param KeyDescriptor[] $keyDescriptor        The key identifying the entity to fetch
      * @param object[]        $data                 The new data for the entity instances
      * @param bool            $shouldUpdate         Should undefined values be updated or reset to default
@@ -610,9 +607,9 @@ class LaravelQuery implements IQueryProvider
      * Attaches child model to parent model.
      *
      * @param ResourceSet $sourceResourceSet
-     * @param object      $sourceEntityInstance
+     * @param Model       $sourceEntityInstance
      * @param ResourceSet $targetResourceSet
-     * @param object      $targetEntityInstance
+     * @param Model       $targetEntityInstance
      * @param $navPropName
      *
      * @return bool
@@ -638,9 +635,9 @@ class LaravelQuery implements IQueryProvider
      * Removes child model from parent model.
      *
      * @param ResourceSet $sourceResourceSet
-     * @param object      $sourceEntityInstance
+     * @param Model       $sourceEntityInstance
      * @param ResourceSet $targetResourceSet
-     * @param object      $targetEntityInstance
+     * @param Model       $targetEntityInstance
      * @param $navPropName
      *
      * @return bool

@@ -26,21 +26,14 @@ class LaravelReadQueryTest extends TestCase
 {
     public function testBadSkipToken()
     {
-        $expected = 'Skip token must be either null or instance of SkipTokenInfo.';
-        $actual = null;
-
         $query = m::mock(QueryType::class);
         $resource = m::mock(ResourceSet::class);
         $skipToken = new \DateTime();
 
         $foo = new LaravelReadQuery();
 
-        try {
-            $foo->getResourceSet($query, $resource, null, null, null, null, $skipToken);
-        } catch (\InvalidArgumentException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
+        $this->expectException(\TypeError::class);
+        $foo->getResourceSet($query, $resource, null, null, null, null, $skipToken);
     }
 
     public function testBadEagerLoad()

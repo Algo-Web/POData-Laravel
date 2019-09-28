@@ -598,7 +598,7 @@ class LaravelQueryBulkTest extends TestCase
 
         $foo = m::mock(LaravelBulkQueryDummy::class)->makePartial();
 
-        $expected = LaravelBulkQuery::class;
+        $expected = "Null";
         $actual = null;
 
         try {

@@ -2,8 +2,6 @@
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
-use POData\Common\InvalidOperationException;
-
 abstract class AssociationStubBase
 {
     /**
@@ -14,26 +12,26 @@ abstract class AssociationStubBase
     /**
      * Foreign key field of this end of relation.
      *
-     * @var string
+     * @var string|null
      */
     protected $keyField;
 
     /**
      * Foreign key field of imtermate relation.
      *
-     * @var string
+     * @var string|null
      */
     protected $throughField;
 
     /**
      * Foreign key field of other end of relation.
      *
-     * @var string
+     * @var string|null
      */
     protected $foreignField;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $relationName;
 
@@ -47,7 +45,7 @@ abstract class AssociationStubBase
     /**
      * Base type this relation is attached to.
      *
-     * @var string
+     * @var string|null
      */
     protected $baseType;
 
@@ -64,7 +62,7 @@ abstract class AssociationStubBase
      */
     public function setRelationName($relationName)
     {
-        $this->relationName = $relationName;
+        $this->relationName = $this->checkStringInput($relationName) ? $relationName : $this->relationName;
     }
 
     /**
@@ -96,22 +94,15 @@ abstract class AssociationStubBase
      */
     public function setKeyField($keyField)
     {
-        $this->keyField = $keyField;
+        $this->keyField = $this->checkStringInput($keyField) ? $keyField : $this->keyField;
     }
 
     public function isCompatible(AssociationStubBase $otherStub)
     {
-        $thisPoly = $this instanceof AssociationStubPolymorphic;
-        $thatPoly = $otherStub instanceof AssociationStubPolymorphic;
-        $thisMono = $this instanceof AssociationStubMonomorphic;
-        $thatMono = $otherStub instanceof AssociationStubMonomorphic;
+        if ($this->morphicType() != $otherStub->morphicType()) {
+            return false;
+        }
 
-        if ($thisPoly && $thatMono) {
-            return false;
-        }
-        if ($thisMono && $thatPoly) {
-            return false;
-        }
         if (!$this->isOk()) {
             return false;
         }
@@ -120,7 +111,8 @@ abstract class AssociationStubBase
         }
         $thisMult = $this->getMultiplicity();
         $thatMult = $otherStub->getMultiplicity();
-        return (AssociationStubRelationType::MANY() == $thisMult || $thisMult != $thatMult);
+        return (AssociationStubRelationType::MANY()->getValue() == $thisMult->getValue()
+                || $thisMult->getValue() != $thatMult->getValue());
     }
 
     /**
@@ -131,16 +123,13 @@ abstract class AssociationStubBase
         if (null === $this->multiplicity) {
             return false;
         }
-        $relName = $this->relationName;
-        if (null === $relName || !is_string($relName) || empty($relName)) {
+        if (null === $this->relationName) {
             return false;
         }
-        $keyField = $this->keyField;
-        if (null === $keyField || !is_string($keyField) || empty($keyField)) {
+        if (null === $this->keyField) {
             return false;
         }
-        $baseType = $this->baseType;
-        if (null === $baseType || !is_string($baseType) || empty($baseType)) {
+        if (null === $this->baseType) {
             return false;
         }
         $targType = $this->targType;
@@ -186,7 +175,7 @@ abstract class AssociationStubBase
      */
     public function setBaseType($baseType)
     {
-        $this->baseType = $baseType;
+        $this->baseType = $this->checkStringInput($baseType) ? $baseType : $this->baseType;
     }
 
     /**
@@ -246,5 +235,24 @@ abstract class AssociationStubBase
         $otherMethod = $other->getRelationName();
         $methodComp = strcmp($thisMethod, $otherMethod);
         return 0 === $methodComp ? 0 : $methodComp / abs($methodComp);
+    }
+
+    /**
+     * Return what type of stub this is - polymorphic, monomorphic, or something else
+     *
+     * @return string
+     */
+    abstract public function morphicType();
+
+    /**
+     * @param $input
+     * @return bool
+     */
+    private function checkStringInput($input)
+    {
+        if (null === $input || !is_string($input) || empty($input)) {
+            return false;
+        }
+        return true;
     }
 }

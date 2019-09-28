@@ -58,22 +58,14 @@ class LaravelReadQuery
     public function getResourceSet(
         QueryType $queryType,
         ResourceSet $resourceSet,
-        $filterInfo = null,
+        FilterInfo $filterInfo = null,
         $orderBy = null,
         $top = null,
         $skip = null,
-        $skipToken = null,
+        SkipTokenInfo $skipToken = null,
         array $eagerLoad = null,
         $sourceEntityInstance = null
     ) {
-        if (null != $filterInfo && !($filterInfo instanceof FilterInfo)) {
-            $msg = 'Filter info must be either null or instance of FilterInfo.';
-            throw new InvalidArgumentException($msg);
-        }
-        if (null != $skipToken && !($skipToken instanceof SkipTokenInfo)) {
-            $msg = 'Skip token must be either null or instance of SkipTokenInfo.';
-            throw new InvalidArgumentException($msg);
-        }
         $rawLoad = $this->processEagerLoadList($eagerLoad);
         $modelLoad = [];
 
@@ -154,13 +146,14 @@ class LaravelReadQuery
             $resultSet = $resultSet->take($top);
         }
 
-        if (QueryType::ENTITIES() == $queryType || QueryType::ENTITIES_WITH_COUNT() == $queryType) {
+        $qVal = $queryType->getValue();
+        if (QueryType::ENTITIES()->getValue() == $qVal || QueryType::ENTITIES_WITH_COUNT()->getValue() == $qVal) {
             $result->results = [];
             foreach ($resultSet as $res) {
                 $result->results[] = $res;
             }
         }
-        if (QueryType::COUNT() == $queryType || QueryType::ENTITIES_WITH_COUNT() == $queryType) {
+        if (QueryType::COUNT()->getValue() == $qVal || QueryType::ENTITIES_WITH_COUNT()->getValue() == $qVal) {
             $result->count = $resultCount;
         }
         $hazMore = $bulkSetCount > $skip+count($resultSet);
@@ -416,7 +409,7 @@ class LaravelReadQuery
                 : $sourceEntityInstance instanceof Model ? $sourceEntityInstance
                     : $sourceEntityInstance instanceof Relation ? $sourceEntityInstance
                         : null;
-        if (!$this->getAuth()->canAuth(ActionVerb::READ(), get_class($sourceEntityInstance), $check)) {
+        if (!$this->getAuth()->canAuth(ActionVerb::READ(), $sourceEntityInstance, $check)) {
             throw new ODataException('Access denied', 403);
         }
     }

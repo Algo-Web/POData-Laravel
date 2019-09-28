@@ -126,15 +126,8 @@ class LaravelQueryTest extends TestCase
 
         $foo = new LaravelQuery();
 
-        $expected = 'Filter info must be either null or instance of FilterInfo.';
-        $actual = null;
-
-        try {
-            $foo->getResourceSet($query, $resourceSet, $filter);
-        } catch (InvalidArgumentException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
+        $this->expectException(\TypeError::class);
+        $foo->getResourceSet($query, $resourceSet, $filter);
     }
 
     public function testGetResourceSetBadSourceInstanceButStillObject()
