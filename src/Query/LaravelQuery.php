@@ -32,7 +32,6 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     protected $bulk;
     public $queryProviderClassName;
     private $verbMap = [];
-    protected $metadataProvider;
     protected $controllerContainer;
     private static $touchList = [];
     private static $inBatch;
@@ -46,7 +45,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         $this->reader = new LaravelReadQuery($this->getAuth());
         $this->modelHook = new LaravelHookQuery($this->getAuth());
         $this->bulk = new LaravelBulkQuery($this, $this->getAuth());
-        $this->metadataProvider = new MetadataProvider(App::make('app'));
+
         $this->controllerContainer = App::make('metadataControllers');
         self::$touchList = [];
         self::$inBatch = false;
@@ -102,16 +101,6 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     public function getBulk()
     {
         return $this->bulk;
-    }
-
-    /**
-     * Dig out local copy of POData-Laravel metadata provider.
-     *
-     * @return MetadataProvider
-     */
-    public function getMetadataProvider()
-    {
-        return $this->metadataProvider;
     }
 
     /**

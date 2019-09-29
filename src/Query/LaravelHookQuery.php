@@ -16,12 +16,9 @@ use POData\Providers\Metadata\ResourceSet;
 
 class LaravelHookQuery extends LaravelBaseQuery
 {
-    protected $metadataProvider;
-
     public function __construct(AuthInterface $auth = null)
     {
         parent::__construct($auth);
-        $this->metadataProvider = new MetadataProvider(App::make('app'));
     }
 
     /**
@@ -143,15 +140,5 @@ class LaravelHookQuery extends LaravelBaseQuery
             throw new \InvalidArgumentException($msg);
         }
         return $relation;
-    }
-
-    /**
-     * Dig out local copy of POData-Laravel metadata provider.
-     *
-     * @return MetadataProvider
-     */
-    public function getMetadataProvider()
-    {
-        return $this->metadataProvider;
     }
 }
