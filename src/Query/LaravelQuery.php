@@ -310,26 +310,9 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         ResourceSet $sourceResourceSet,
         $sourceEntityInstance
     ) {
-        $source = $this->unpackSourceEntity($sourceEntityInstance);
-
-        $verb = 'delete';
-        if (!($source instanceof Model)) {
-            throw new InvalidArgumentException('Source entity must be an Eloquent model.');
-        }
-
-        $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
-        $id = $source->getKey();
-        $name = $source->getKeyName();
-        $data = [$name => $id];
-
-        $data = $this->getWriter()->createUpdateDeleteCore($source, $data, $class, $verb);
-
-        $success = isset($data['id']);
-        if ($success) {
-            return true;
-        }
-        throw new ODataException('Target model not successfully deleted', 422);
+        return $this->getWriter()->deleteResource($sourceResourceSet, $sourceEntityInstance);
     }
+
     /**
      * @param ResourceSet     $resourceSet          The entity set containing the entity to fetch
      * @param Model|Relation  $sourceEntityInstance The source entity instance

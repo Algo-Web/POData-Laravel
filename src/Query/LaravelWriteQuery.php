@@ -9,10 +9,12 @@
 namespace AlgoWeb\PODataLaravel\Query;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
 use POData\Providers\Metadata\ResourceSet;
+use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 class LaravelWriteQuery extends LaravelBaseQuery
 {
@@ -156,5 +158,39 @@ class LaravelWriteQuery extends LaravelBaseQuery
         $result = call_user_func_array(array($controller, $method), $parms);
 
         return $this->createUpdateDeleteProcessOutput($result);
+    }
+
+    /**
+     * Delete resource from a resource set.
+     *
+     * @param ResourceSet $sourceResourceSet
+     * @param object      $sourceEntityInstance
+     *
+     * @return bool true if resources sucessfully deteled, otherwise false
+     * @throws \Exception
+     */
+    public function deleteResource(
+        ResourceSet $sourceResourceSet,
+        $sourceEntityInstance
+    ) {
+        $source = $this->unpackSourceEntity($sourceEntityInstance);
+
+        $verb = 'delete';
+        if (!($source instanceof Model)) {
+            throw new InvalidArgumentException('Source entity must be an Eloquent model.');
+        }
+
+        $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
+        $id = $source->getKey();
+        $name = $source->getKeyName();
+        $data = [$name => $id];
+
+        $data = $this->createUpdateDeleteCore($source, $data, $class, $verb);
+
+        $success = isset($data['id']);
+        if ($success) {
+            return true;
+        }
+        throw new ODataException('Target model not successfully deleted', 422);
     }
 }
