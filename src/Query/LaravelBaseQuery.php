@@ -14,6 +14,7 @@ use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
+use POData\Providers\Query\QueryResult;
 
 abstract class LaravelBaseQuery
 {
@@ -58,5 +59,19 @@ abstract class LaravelBaseQuery
     protected function getAuth()
     {
         return $this->auth;
+    }
+
+    /**
+     * @param $sourceEntityInstance
+     * @return mixed|null|\object[]
+     */
+    protected function unpackSourceEntity($sourceEntityInstance)
+    {
+        if ($sourceEntityInstance instanceof QueryResult) {
+            $source = $sourceEntityInstance->results;
+            $source = (is_array($source)) ? $source[0] : $source;
+            return $source;
+        }
+        return $sourceEntityInstance;
     }
 }

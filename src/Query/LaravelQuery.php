@@ -514,20 +514,6 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     }
 
     /**
-     * @param $sourceEntityInstance
-     * @return mixed|null|\object[]
-     */
-    private function unpackSourceEntity($sourceEntityInstance)
-    {
-        if ($sourceEntityInstance instanceof QueryResult) {
-            $source = $sourceEntityInstance->results;
-            $source = (is_array($source)) ? $source[0] : $source;
-            return $source;
-        }
-        return $sourceEntityInstance;
-    }
-
-    /**
      * Create multiple new resources in a resource set.
      *
      * @param ResourceSet $sourceResourceSet The entity set containing the entity to fetch
