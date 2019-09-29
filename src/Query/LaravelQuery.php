@@ -30,6 +30,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     protected $reader;
     protected $modelHook;
     protected $bulk;
+    protected $writer;
     public $queryProviderClassName;
     private $verbMap = [];
     private static $touchList = [];
@@ -44,6 +45,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         $this->reader = new LaravelReadQuery($this->getAuth());
         $this->modelHook = new LaravelHookQuery($this->getAuth());
         $this->bulk = new LaravelBulkQuery($this, $this->getAuth());
+        $this->writer = new LaravelWriteQuery($this->getAuth());
 
         self::$touchList = [];
         self::$inBatch = false;
