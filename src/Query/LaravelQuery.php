@@ -295,7 +295,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         $shouldUpdate = false
     ) {
         $verb = 'update';
-        return $this->createUpdateMainWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb);
+        return $this->getWriter()->createUpdateMainWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb);
     }
     /**
      * Delete resource from a resource set.
@@ -328,7 +328,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         $data
     ) {
         $verb = 'create';
-        return $this->createUpdateMainWrapper($resourceSet, $sourceEntityInstance, $data, $verb);
+        return $this->getWriter()->createUpdateMainWrapper($resourceSet, $sourceEntityInstance, $data, $verb);
     }
 
     /**
@@ -498,27 +498,6 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         }
         // if we are in a batch, add to queue to process on transaction commit
         self::$touchList[] = $model;
-    }
-
-    /**
-     * @param ResourceSet $resourceSet
-     * @param Model|Relation|null $sourceEntityInstance
-     * @param mixed $data
-     * @param mixed $verb
-     * @return Model|null
-     * @throws InvalidOperationException
-     * @throws ODataException
-     */
-    protected function createUpdateMainWrapper(ResourceSet $resourceSet, $sourceEntityInstance, $data, $verb)
-    {
-        /** @var Model|null $source */
-        $source = $this->unpackSourceEntity($sourceEntityInstance);
-
-        $result = $this->getWriter()->createUpdateCoreWrapper($resourceSet, $data, $verb, $source);
-        if (null !== $result) {
-            self::queueModel($result);
-        }
-        return $result;
     }
 
     /**

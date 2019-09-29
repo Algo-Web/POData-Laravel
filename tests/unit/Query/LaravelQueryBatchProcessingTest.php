@@ -84,8 +84,11 @@ class LaravelQueryBatchProcessingTest extends TestCase
         $rSet = m::mock(ResourceSet::class);
         $keyDesc = m::mock(KeyDescriptor::class);
 
+        $writer = m::mock(LaravelWriteQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $writer->shouldReceive('createUpdateCoreWrapper')->andReturn($model);
+
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getWriter->createUpdateCoreWrapper')->andReturn($model);
+        $foo->shouldReceive('getWriter')->andReturn($writer);
 
         $foo->startTransaction(true);
         $foo->updateResource($rSet, $model, $keyDesc, new \stdClass);
@@ -103,8 +106,11 @@ class LaravelQueryBatchProcessingTest extends TestCase
 
         $rSet = m::mock(ResourceSet::class);
 
+        $writer = m::mock(LaravelWriteQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $writer->shouldReceive('createUpdateCoreWrapper')->andReturn($model);
+
         $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getWriter->createUpdateCoreWrapper')->andReturn($model);
+        $foo->shouldReceive('getWriter')->andReturn($writer);
 
         $foo->startTransaction(true);
         $foo->createResourceforResourceSet($rSet, $model, new \stdClass);

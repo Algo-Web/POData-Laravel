@@ -193,4 +193,26 @@ class LaravelWriteQuery extends LaravelBaseQuery
         }
         throw new ODataException('Target model not successfully deleted', 422);
     }
+
+
+    /**
+     * @param ResourceSet $resourceSet
+     * @param Model|Relation|null $sourceEntityInstance
+     * @param mixed $data
+     * @param mixed $verb
+     * @return Model|null
+     * @throws InvalidOperationException
+     * @throws ODataException
+     */
+    public function createUpdateMainWrapper(ResourceSet $resourceSet, $sourceEntityInstance, $data, $verb)
+    {
+        /** @var Model|null $source */
+        $source = $this->unpackSourceEntity($sourceEntityInstance);
+
+        $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source);
+        if (null !== $result) {
+            LaravelQuery::queueModel($result);
+        }
+        return $result;
+    }
 }
