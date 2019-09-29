@@ -403,7 +403,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         $method = $goal['method'];
         $paramList = $goal['parameters'];
         $controller = App::make($controlClass);
-        $parms = $this->createUpdateDeleteProcessInput($arrayData, $paramList, $sourceEntityInstance);
+        $parms = $this->getWriter()->createUpdateDeleteProcessInput($arrayData, $paramList, $sourceEntityInstance);
         unset($data);
 
         $result = call_user_func_array(array($controller, $method), $parms);
@@ -459,34 +459,6 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
             }
         }
         throw new ODataException('Target model not successfully ' . $lastWord, 422);
-    }
-
-    /**
-     * @param $data
-     * @param $paramList
-     * @param Model|null $sourceEntityInstance
-     * @return array
-     */
-    protected function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance)
-    {
-        $parms = [];
-
-        foreach ($paramList as $spec) {
-            $varType = isset($spec['type']) ? $spec['type'] : null;
-            $varName = $spec['name'];
-            if (null == $varType) {
-                $parms[] = ('id' == $varName) ? $sourceEntityInstance->getKey() : $sourceEntityInstance->$varName;
-                continue;
-            }
-            // TODO: Give this smarts and actively pick up instantiation details
-            $var = new $varType();
-            if ($spec['isRequest']) {
-                $var->setMethod('POST');
-                $var->request = new \Symfony\Component\HttpFoundation\ParameterBag($data);
-            }
-            $parms[] = $var;
-        }
-        return $parms;
     }
 
     /**
@@ -685,5 +657,13 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
             self::queueModel($result);
         }
         return $result;
+    }
+
+    /**
+     * @return LaravelWriteQuery
+     */
+    public function getWriter()
+    {
+        return $this->writer;
     }
 }
