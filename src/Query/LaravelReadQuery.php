@@ -2,9 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
-use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
-use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -23,15 +21,8 @@ use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 
-class LaravelReadQuery
+class LaravelReadQuery extends LaravelBaseQuery
 {
-    protected $auth;
-
-    public function __construct(AuthInterface $auth = null)
-    {
-        $this->auth = isset($auth) ? $auth : new NullAuthProvider();
-    }
-
     /**
      * Gets collection of entities belongs to an entity set
      * IE: http://host/EntitySet
@@ -67,26 +58,15 @@ class LaravelReadQuery
         $sourceEntityInstance = null
     ) {
         $rawLoad = $this->processEagerLoadList($eagerLoad);
-        $modelLoad = [];
 
-        $this->checkSourceInstance($sourceEntityInstance);
-        if (null == $sourceEntityInstance) {
-            $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
-        }
+        $sourceEntityInstance = $this->checkSourceInstance($sourceEntityInstance, $resourceSet);
 
-        $keyName = null;
-        $tableName = null;
-        if ($sourceEntityInstance instanceof Model) {
-            $modelLoad = $sourceEntityInstance->getEagerLoad();
-            $keyName = $sourceEntityInstance->getKeyName();
-            $tableName = $sourceEntityInstance->getTable();
-        } elseif ($sourceEntityInstance instanceof Relation) {
-            /** @var MetadataTrait $model */
-            $model = $sourceEntityInstance->getRelated();
-            $modelLoad = $model->getEagerLoad();
-            $keyName = $sourceEntityInstance->getRelated()->getKeyName();
-            $tableName = $sourceEntityInstance->getRelated()->getTable();
-        }
+        /** @var MetadataTrait $model */
+        $model = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : $sourceEntityInstance->getRelated();
+        $modelLoad = $model->getEagerLoad();
+        $keyName = $model->getKeyName();
+        $tableName = $model->getTable();
+
         if (null === $keyName) {
             throw new InvalidOperationException('Key name not retrieved');
         }
@@ -258,11 +238,7 @@ class LaravelReadQuery
             throw new \Exception($msg);
         }
 
-        $this->checkSourceInstance($sourceEntityInstance);
-
-        if (null == $sourceEntityInstance) {
-            $sourceEntityInstance = $this->getSourceEntityInstance(/** @scrutinizer ignore-type */$resourceSet);
-        }
+        $sourceEntityInstance = $this->checkSourceInstance($sourceEntityInstance, $resourceSet);
 
         $this->checkAuth($sourceEntityInstance);
         $modelLoad = null;
@@ -277,7 +253,7 @@ class LaravelReadQuery
             throw new InvalidOperationException('');
         }
 
-        $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
+        $this->processKeyDescriptor(/** @scrutinizer ignore-type */$sourceEntityInstance, $keyDescriptor);
         foreach ($whereCondition as $fieldName => $fieldValue) {
             $sourceEntityInstance = $sourceEntityInstance->where($fieldName, $fieldValue);
         }
@@ -382,18 +358,22 @@ class LaravelReadQuery
 
     /**
      * @param Model|Relation|null $source
+     * @param ResourceSet|null $resourceSet
+     * @return Model|Relation|mixed|null
+     * @throws \ReflectionException
      */
-    protected function checkSourceInstance($source)
+    protected function checkSourceInstance($source, ResourceSet $resourceSet = null)
     {
         if (!(null == $source || $source instanceof Model || $source instanceof Relation)) {
             $msg = 'Source entity instance must be null, a model, or a relation.';
             throw new InvalidArgumentException($msg);
         }
-    }
 
-    protected function getAuth()
-    {
-        return $this->auth;
+        if (null == $source) {
+            $source = $this->getSourceEntityInstance(/** @scrutinizer ignore-type */$resourceSet);
+        }
+
+        return $source;
     }
 
     /**

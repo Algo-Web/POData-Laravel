@@ -24,31 +24,28 @@ use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 
-class LaravelQuery implements IQueryProvider
+class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
 {
     protected $expression;
-    protected $auth;
     protected $reader;
     protected $modelHook;
     protected $bulk;
+    protected $writer;
     public $queryProviderClassName;
-    private $verbMap = [];
-    protected $metadataProvider;
-    protected $controllerContainer;
     private static $touchList = [];
     private static $inBatch;
 
     public function __construct(AuthInterface $auth = null)
     {
+        parent::__construct($auth);
         /* MySQLExpressionProvider();*/
         $this->expression = new LaravelExpressionProvider(); //PHPExpressionProvider('expression');
         $this->queryProviderClassName = get_class($this);
-        $this->auth = isset($auth) ? $auth : new NullAuthProvider();
-        $this->reader = new LaravelReadQuery($this->auth);
-        $this->modelHook = new LaravelHookQuery($this->auth);
-        $this->bulk = new LaravelBulkQuery($this, $this->auth);
-        $this->metadataProvider = new MetadataProvider(App::make('app'));
-        $this->controllerContainer = App::make('metadataControllers');
+        $this->reader = new LaravelReadQuery($this->getAuth());
+        $this->modelHook = new LaravelHookQuery($this->getAuth());
+        $this->bulk = new LaravelBulkQuery($this, $this->getAuth());
+        $this->writer = new LaravelWriteQuery($this->getAuth());
+
         self::$touchList = [];
         self::$inBatch = false;
     }
@@ -103,40 +100,6 @@ class LaravelQuery implements IQueryProvider
     public function getBulk()
     {
         return $this->bulk;
-    }
-
-    /**
-     * Dig out local copy of POData-Laravel metadata provider.
-     *
-     * @return MetadataProvider
-     */
-    public function getMetadataProvider()
-    {
-        return $this->metadataProvider;
-    }
-
-    /**
-     * Dig out local copy of controller metadata mapping.
-     *
-     * @return MetadataControllerContainer
-     * @throws InvalidOperationException
-     */
-    public function getControllerContainer()
-    {
-        if (null === $this->controllerContainer) {
-            throw new InvalidOperationException('Controller container must not be null');
-        }
-        return $this->controllerContainer;
-    }
-
-    public function getVerbMap()
-    {
-        if (0 == count($this->verbMap)) {
-            $this->verbMap['create'] = ActionVerb::CREATE();
-            $this->verbMap['update'] = ActionVerb::UPDATE();
-            $this->verbMap['delete'] = ActionVerb::DELETE();
-        }
-        return $this->verbMap;
     }
 
     /**
@@ -331,9 +294,15 @@ class LaravelQuery implements IQueryProvider
         $data,
         $shouldUpdate = false
     ) {
-        $verb = 'update';
-        return $this->createUpdateMainWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb);
+        return $this->getWriter()->updateResource(
+            $sourceResourceSet,
+            $sourceEntityInstance,
+            $keyDescriptor,
+            $data,
+            $shouldUpdate
+        );
     }
+
     /**
      * Delete resource from a resource set.
      *
@@ -347,26 +316,9 @@ class LaravelQuery implements IQueryProvider
         ResourceSet $sourceResourceSet,
         $sourceEntityInstance
     ) {
-        $source = $this->unpackSourceEntity($sourceEntityInstance);
-
-        $verb = 'delete';
-        if (!($source instanceof Model)) {
-            throw new InvalidArgumentException('Source entity must be an Eloquent model.');
-        }
-
-        $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
-        $id = $source->getKey();
-        $name = $source->getKeyName();
-        $data = [$name => $id];
-
-        $data = $this->createUpdateDeleteCore($source, $data, $class, $verb);
-
-        $success = isset($data['id']);
-        if ($success) {
-            return true;
-        }
-        throw new ODataException('Target model not successfully deleted', 422);
+        return $this->getWriter()->deleteResource($sourceResourceSet, $sourceEntityInstance);
     }
+
     /**
      * @param ResourceSet     $resourceSet          The entity set containing the entity to fetch
      * @param Model|Relation  $sourceEntityInstance The source entity instance
@@ -381,60 +333,7 @@ class LaravelQuery implements IQueryProvider
         $sourceEntityInstance,
         $data
     ) {
-        $verb = 'create';
-        return $this->createUpdateMainWrapper($resourceSet, $sourceEntityInstance, $data, $verb);
-    }
-
-    /**
-     * @param $sourceEntityInstance
-     * @param $data
-     * @param $class
-     * @param string $verb
-     *
-     * @throws ODataException
-     * @throws InvalidOperationException
-     * @return array|mixed
-     */
-    private function createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb)
-    {
-        $raw = App::make('metadataControllers');
-        $map = $raw->getMetadata();
-
-        if (!array_key_exists($class, $map)) {
-            throw new InvalidOperationException('Controller mapping missing for class ' . $class . '.');
-        }
-        $goal = $raw->getMapping($class, $verb);
-        if (null == $goal) {
-            throw new InvalidOperationException(
-                'Controller mapping missing for ' . $verb . ' verb on class ' . $class . '.'
-            );
-        }
-
-        if (null === $data) {
-            $msg = 'Data must not be null';
-            throw new InvalidOperationException($msg);
-        }
-        if (is_object($data)) {
-            $arrayData = (array) $data;
-        } else {
-            $arrayData = $data;
-        }
-        if (!is_array($arrayData)) {
-            throw ODataException::createPreConditionFailedError(
-                'Data not resolvable to key-value array.'
-            );
-        }
-
-        $controlClass = $goal['controller'];
-        $method = $goal['method'];
-        $paramList = $goal['parameters'];
-        $controller = App::make($controlClass);
-        $parms = $this->createUpdateDeleteProcessInput($arrayData, $paramList, $sourceEntityInstance);
-        unset($data);
-
-        $result = call_user_func_array(array($controller, $method), $parms);
-
-        return $this->createUpdateDeleteProcessOutput($result);
+        return $this->getWriter()->createResourceforResourceSet($resourceSet, $sourceEntityInstance, $data);
     }
 
     /**
@@ -451,108 +350,7 @@ class LaravelQuery implements IQueryProvider
         KeyDescriptor $keyDescriptor,
         $data
     ) {
-        // TODO: Implement putResource() method.
-        return true;
-    }
-
-    /**
-     * @param ResourceSet $sourceResourceSet
-     * @param $data
-     * @param                            $verb
-     * @param  Model|null                $source
-     * @throws InvalidOperationException
-     * @throws ODataException
-     * @throws \Exception
-     * @return Model|null
-     */
-    protected function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $data, $verb, Model $source = null)
-    {
-        $lastWord = 'update' == $verb ? 'updated' : 'created';
-        $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
-        if (!$this->auth->canAuth($this->getVerbMap()[$verb], $class, $source)) {
-            throw new ODataException('Access denied', 403);
-        }
-
-        $payload = $this->createUpdateDeleteCore($source, $data, $class, $verb);
-
-        $success = isset($payload['id']);
-
-        if ($success) {
-            try {
-                return $class::findOrFail($payload['id']);
-            } catch (\Exception $e) {
-                throw new ODataException($e->getMessage(), 500);
-            }
-        }
-        throw new ODataException('Target model not successfully ' . $lastWord, 422);
-    }
-
-    /**
-     * @param $data
-     * @param $paramList
-     * @param Model|null $sourceEntityInstance
-     * @return array
-     */
-    protected function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance)
-    {
-        $parms = [];
-
-        foreach ($paramList as $spec) {
-            $varType = isset($spec['type']) ? $spec['type'] : null;
-            $varName = $spec['name'];
-            if (null == $varType) {
-                $parms[] = ('id' == $varName) ? $sourceEntityInstance->getKey() : $sourceEntityInstance->$varName;
-                continue;
-            }
-            // TODO: Give this smarts and actively pick up instantiation details
-            $var = new $varType();
-            if ($spec['isRequest']) {
-                $var->setMethod('POST');
-                $var->request = new \Symfony\Component\HttpFoundation\ParameterBag($data);
-            }
-            $parms[] = $var;
-        }
-        return $parms;
-    }
-
-    /**
-     * @param $result
-     * @throws ODataException
-     * @return array|mixed
-     */
-    private function createUpdateDeleteProcessOutput($result)
-    {
-        if (!($result instanceof \Illuminate\Http\JsonResponse)) {
-            throw ODataException::createInternalServerError('Controller response not well-formed json.');
-        }
-        $outData = $result->getData();
-        if (is_object($outData)) {
-            $outData = (array) $outData;
-        }
-
-        if (!is_array($outData)) {
-            throw ODataException::createInternalServerError('Controller response does not have an array.');
-        }
-        if (!(key_exists('id', $outData) && key_exists('status', $outData) && key_exists('errors', $outData))) {
-            throw ODataException::createInternalServerError(
-                'Controller response array missing at least one of id, status and/or errors fields.'
-            );
-        }
-        return $outData;
-    }
-
-    /**
-     * @param $sourceEntityInstance
-     * @return mixed|null|\object[]
-     */
-    private function unpackSourceEntity($sourceEntityInstance)
-    {
-        if ($sourceEntityInstance instanceof QueryResult) {
-            $source = $sourceEntityInstance->results;
-            $source = (is_array($source)) ? $source[0] : $source;
-            return $source;
-        }
-        return $sourceEntityInstance;
+        return $this->getWriter()->putResource($resourceSet, $keyDescriptor, $data);
     }
 
     /**
@@ -707,23 +505,10 @@ class LaravelQuery implements IQueryProvider
     }
 
     /**
-     * @param ResourceSet $resourceSet
-     * @param Model|Relation|null $sourceEntityInstance
-     * @param mixed $data
-     * @param mixed $verb
-     * @return Model|null
-     * @throws InvalidOperationException
-     * @throws ODataException
+     * @return LaravelWriteQuery
      */
-    protected function createUpdateMainWrapper(ResourceSet $resourceSet, $sourceEntityInstance, $data, $verb)
+    public function getWriter()
     {
-        /** @var Model|null $source */
-        $source = $this->unpackSourceEntity($sourceEntityInstance);
-
-        $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source);
-        if (null !== $result) {
-            self::queueModel($result);
-        }
-        return $result;
+        return $this->writer;
     }
 }

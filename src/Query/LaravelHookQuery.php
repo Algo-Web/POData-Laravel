@@ -14,17 +14,8 @@ use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceSet;
 
-class LaravelHookQuery
+class LaravelHookQuery extends LaravelBaseQuery
 {
-    protected $auth;
-    protected $metadataProvider;
-
-    public function __construct(AuthInterface $auth = null)
-    {
-        $this->auth = isset($auth) ? $auth : new NullAuthProvider();
-        $this->metadataProvider = new MetadataProvider(App::make('app'));
-    }
-
     /**
      * Attaches child model to parent model.
      *
@@ -144,15 +135,5 @@ class LaravelHookQuery
             throw new \InvalidArgumentException($msg);
         }
         return $relation;
-    }
-
-    /**
-     * Dig out local copy of POData-Laravel metadata provider.
-     *
-     * @return MetadataProvider
-     */
-    public function getMetadataProvider()
-    {
-        return $this->metadataProvider;
     }
 }
