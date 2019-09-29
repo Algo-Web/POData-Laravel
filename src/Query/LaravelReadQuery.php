@@ -2,9 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Query;
 
-use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
-use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -255,7 +253,7 @@ class LaravelReadQuery extends LaravelBaseQuery
             throw new InvalidOperationException('');
         }
 
-        $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
+        $this->processKeyDescriptor(/** @scrutinizer ignore-type */$sourceEntityInstance, $keyDescriptor);
         foreach ($whereCondition as $fieldName => $fieldValue) {
             $sourceEntityInstance = $sourceEntityInstance->where($fieldName, $fieldValue);
         }
@@ -372,7 +370,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         }
 
         if (null == $source) {
-            $source = $this->getSourceEntityInstance($resourceSet);
+            $source = $this->getSourceEntityInstance(/** @scrutinizer ignore-type */$resourceSet);
         }
 
         return $source;
