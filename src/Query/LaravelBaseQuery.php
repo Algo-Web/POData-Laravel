@@ -10,6 +10,7 @@ namespace AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
+use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Support\Facades\App;
@@ -24,6 +25,7 @@ abstract class LaravelBaseQuery
     protected $metadataProvider;
     /** @var MetadataControllerContainer */
     protected $controllerContainer;
+    protected $verbMap = [];
 
     public function __construct(AuthInterface $auth = null)
     {
@@ -54,6 +56,16 @@ abstract class LaravelBaseQuery
             throw new InvalidOperationException('Controller container must not be null');
         }
         return $this->controllerContainer;
+    }
+
+    public function getVerbMap()
+    {
+        if (0 == count($this->verbMap)) {
+            $this->verbMap['create'] = ActionVerb::CREATE();
+            $this->verbMap['update'] = ActionVerb::UPDATE();
+            $this->verbMap['delete'] = ActionVerb::DELETE();
+        }
+        return $this->verbMap;
     }
 
     protected function getAuth()
