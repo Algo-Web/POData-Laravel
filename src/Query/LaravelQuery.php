@@ -43,9 +43,9 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         /* MySQLExpressionProvider();*/
         $this->expression = new LaravelExpressionProvider(); //PHPExpressionProvider('expression');
         $this->queryProviderClassName = get_class($this);
-        $this->reader = new LaravelReadQuery($this->auth);
-        $this->modelHook = new LaravelHookQuery($this->auth);
-        $this->bulk = new LaravelBulkQuery($this, $this->auth);
+        $this->reader = new LaravelReadQuery($this->getAuth());
+        $this->modelHook = new LaravelHookQuery($this->getAuth());
+        $this->bulk = new LaravelBulkQuery($this, $this->getAuth());
         $this->metadataProvider = new MetadataProvider(App::make('app'));
         $this->controllerContainer = App::make('metadataControllers');
         self::$touchList = [];
@@ -468,7 +468,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     {
         $lastWord = 'update' == $verb ? 'updated' : 'created';
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
-        if (!$this->auth->canAuth($this->getVerbMap()[$verb], $class, $source)) {
+        if (!$this->getAuth()->canAuth($this->getVerbMap()[$verb], $class, $source)) {
             throw new ODataException('Access denied', 403);
         }
 

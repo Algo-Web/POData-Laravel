@@ -389,11 +389,6 @@ class LaravelReadQuery extends LaravelBaseQuery
         }
     }
 
-    protected function getAuth()
-    {
-        return $this->auth;
-    }
-
     /**
      * @param Model|Relation|null $sourceEntityInstance
      * @param null|mixed $checkInstance

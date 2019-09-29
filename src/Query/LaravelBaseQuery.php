@@ -20,4 +20,9 @@ abstract class LaravelBaseQuery
     {
         $this->auth = isset($auth) ? $auth : new NullAuthProvider();
     }
+
+    protected function getAuth()
+    {
+        return $this->auth;
+    }
 }
