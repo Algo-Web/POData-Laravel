@@ -294,9 +294,15 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         $data,
         $shouldUpdate = false
     ) {
-        $verb = 'update';
-        return $this->getWriter()->createUpdateMainWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb);
+        return $this->getWriter()->updateResource(
+            $sourceResourceSet,
+            $sourceEntityInstance,
+            $keyDescriptor,
+            $data,
+            $shouldUpdate
+        );
     }
+
     /**
      * Delete resource from a resource set.
      *
@@ -327,8 +333,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         $sourceEntityInstance,
         $data
     ) {
-        $verb = 'create';
-        return $this->getWriter()->createUpdateMainWrapper($resourceSet, $sourceEntityInstance, $data, $verb);
+        return $this->getWriter()->createResourceforResourceSet($resourceSet, $sourceEntityInstance, $data);
     }
 
     /**
@@ -345,8 +350,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         KeyDescriptor $keyDescriptor,
         $data
     ) {
-        // TODO: Implement putResource() method.
-        return true;
+        return $this->getWriter()->putResource($resourceSet, $keyDescriptor, $data);
     }
 
     /**

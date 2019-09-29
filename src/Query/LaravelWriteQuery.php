@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
 use POData\Providers\Metadata\ResourceSet;
+use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 class LaravelWriteQuery extends LaravelBaseQuery
@@ -192,6 +193,65 @@ class LaravelWriteQuery extends LaravelBaseQuery
             return true;
         }
         throw new ODataException('Target model not successfully deleted', 422);
+    }
+
+    /**
+     * @param ResourceSet     $resourceSet          The entity set containing the entity to fetch
+     * @param Model|Relation  $sourceEntityInstance The source entity instance
+     * @param object          $data                 the New data for the entity instance
+     *
+     * @return Model|null                           returns the newly created model if successful,
+     *                                              or null if model creation failed.
+     * @throws \Exception
+     */
+    public function createResourceforResourceSet(
+        ResourceSet $resourceSet,
+        $sourceEntityInstance,
+        $data
+    ) {
+        $verb = 'create';
+        return $this->createUpdateMainWrapper($resourceSet, $sourceEntityInstance, $data, $verb);
+    }
+
+    /**
+     * Updates a resource.
+     *
+     * @param ResourceSet       $sourceResourceSet    The entity set containing the source entity
+     * @param Model|Relation    $sourceEntityInstance The source entity instance
+     * @param KeyDescriptor     $keyDescriptor        The key identifying the entity to fetch
+     * @param object            $data                 the New data for the entity instance
+     * @param bool              $shouldUpdate         Should undefined values be updated or reset to default
+     *
+     * @return Model|null the new resource value if it is assignable or throw exception for null
+     * @throws \Exception
+     */
+    public function updateResource(
+        ResourceSet $sourceResourceSet,
+        $sourceEntityInstance,
+        KeyDescriptor $keyDescriptor,
+        $data,
+        $shouldUpdate = false
+    ) {
+        $verb = 'update';
+        return $this->createUpdateMainWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb);
+    }
+
+    /**
+     * Puts an entity instance to entity set identified by a key.
+     *
+     * @param ResourceSet   $resourceSet   The entity set containing the entity to update
+     * @param KeyDescriptor $keyDescriptor The key identifying the entity to update
+     * @param $data
+     *
+     * @return bool|null Returns result of executing query
+     */
+    public function putResource(
+        ResourceSet $resourceSet,
+        KeyDescriptor $keyDescriptor,
+        $data
+    ) {
+        // TODO: Implement putResource() method.
+        return true;
     }
 
 
