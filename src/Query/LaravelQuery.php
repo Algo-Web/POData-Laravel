@@ -27,7 +27,6 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
 {
     protected $expression;
-    protected $auth;
     protected $reader;
     protected $modelHook;
     protected $bulk;
@@ -40,10 +39,10 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
 
     public function __construct(AuthInterface $auth = null)
     {
+        parent::__construct($auth);
         /* MySQLExpressionProvider();*/
         $this->expression = new LaravelExpressionProvider(); //PHPExpressionProvider('expression');
         $this->queryProviderClassName = get_class($this);
-        $this->auth = isset($auth) ? $auth : new NullAuthProvider();
         $this->reader = new LaravelReadQuery($this->auth);
         $this->modelHook = new LaravelHookQuery($this->auth);
         $this->bulk = new LaravelBulkQuery($this, $this->auth);

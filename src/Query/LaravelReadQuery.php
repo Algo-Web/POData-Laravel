@@ -25,11 +25,9 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 class LaravelReadQuery extends LaravelBaseQuery
 {
-    protected $auth;
-
     public function __construct(AuthInterface $auth = null)
     {
-        $this->auth = isset($auth) ? $auth : new NullAuthProvider();
+        parent::__construct($auth);
     }
 
     /**

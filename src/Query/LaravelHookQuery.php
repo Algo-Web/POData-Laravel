@@ -16,12 +16,11 @@ use POData\Providers\Metadata\ResourceSet;
 
 class LaravelHookQuery extends LaravelBaseQuery
 {
-    protected $auth;
     protected $metadataProvider;
 
     public function __construct(AuthInterface $auth = null)
     {
-        $this->auth = isset($auth) ? $auth : new NullAuthProvider();
+        parent::__construct($auth);
         $this->metadataProvider = new MetadataProvider(App::make('app'));
     }
 
