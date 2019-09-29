@@ -25,11 +25,6 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 class LaravelReadQuery extends LaravelBaseQuery
 {
-    public function __construct(AuthInterface $auth = null)
-    {
-        parent::__construct($auth);
-    }
-
     /**
      * Gets collection of entities belongs to an entity set
      * IE: http://host/EntitySet

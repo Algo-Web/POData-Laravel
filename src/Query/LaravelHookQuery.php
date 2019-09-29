@@ -16,11 +16,6 @@ use POData\Providers\Metadata\ResourceSet;
 
 class LaravelHookQuery extends LaravelBaseQuery
 {
-    public function __construct(AuthInterface $auth = null)
-    {
-        parent::__construct($auth);
-    }
-
     /**
      * Attaches child model to parent model.
      *
