@@ -9,20 +9,26 @@
 namespace AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
+use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Support\Facades\App;
+use POData\Common\InvalidOperationException;
 
 abstract class LaravelBaseQuery
 {
     /** @var AuthInterface */
     protected $auth;
+    /** @var MetadataProvider */
     protected $metadataProvider;
+    /** @var MetadataControllerContainer */
+    protected $controllerContainer;
 
     public function __construct(AuthInterface $auth = null)
     {
         $this->auth = isset($auth) ? $auth : new NullAuthProvider();
         $this->metadataProvider = new MetadataProvider(App::make('app'));
+        $this->controllerContainer = App::make('metadataControllers');
     }
 
     /**
@@ -33,6 +39,20 @@ abstract class LaravelBaseQuery
     public function getMetadataProvider()
     {
         return $this->metadataProvider;
+    }
+
+    /**
+     * Dig out local copy of controller metadata mapping.
+     *
+     * @return MetadataControllerContainer
+     * @throws InvalidOperationException
+     */
+    public function getControllerContainer()
+    {
+        if (null === $this->controllerContainer) {
+            throw new InvalidOperationException('Controller container must not be null');
+        }
+        return $this->controllerContainer;
     }
 
     protected function getAuth()

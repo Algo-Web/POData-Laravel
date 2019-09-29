@@ -32,7 +32,6 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     protected $bulk;
     public $queryProviderClassName;
     private $verbMap = [];
-    protected $controllerContainer;
     private static $touchList = [];
     private static $inBatch;
 
@@ -46,7 +45,6 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         $this->modelHook = new LaravelHookQuery($this->getAuth());
         $this->bulk = new LaravelBulkQuery($this, $this->getAuth());
 
-        $this->controllerContainer = App::make('metadataControllers');
         self::$touchList = [];
         self::$inBatch = false;
     }
@@ -101,20 +99,6 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     public function getBulk()
     {
         return $this->bulk;
-    }
-
-    /**
-     * Dig out local copy of controller metadata mapping.
-     *
-     * @return MetadataControllerContainer
-     * @throws InvalidOperationException
-     */
-    public function getControllerContainer()
-    {
-        if (null === $this->controllerContainer) {
-            throw new InvalidOperationException('Controller container must not be null');
-        }
-        return $this->controllerContainer;
     }
 
     public function getVerbMap()
@@ -385,7 +369,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      */
     private function createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb)
     {
-        $raw = App::make('metadataControllers');
+        $raw = $this->getControllerContainer();
         $map = $raw->getMetadata();
 
         if (!array_key_exists($class, $map)) {
