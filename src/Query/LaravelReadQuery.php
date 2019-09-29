@@ -23,7 +23,7 @@ use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 
-class LaravelReadQuery
+class LaravelReadQuery extends LaravelBaseQuery
 {
     protected $auth;
 

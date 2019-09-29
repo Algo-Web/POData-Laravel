@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceSet;
 
-class LaravelHookQuery
+class LaravelHookQuery extends LaravelBaseQuery
 {
     protected $auth;
     protected $metadataProvider;

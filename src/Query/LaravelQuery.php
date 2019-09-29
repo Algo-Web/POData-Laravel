@@ -24,7 +24,7 @@ use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 
-class LaravelQuery implements IQueryProvider
+class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
 {
     protected $expression;
     protected $auth;
