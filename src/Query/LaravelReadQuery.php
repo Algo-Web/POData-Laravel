@@ -61,10 +61,7 @@ class LaravelReadQuery extends LaravelBaseQuery
     ) {
         $rawLoad = $this->processEagerLoadList($eagerLoad);
 
-        $this->checkSourceInstance($sourceEntityInstance);
-        if (null == $sourceEntityInstance) {
-            $sourceEntityInstance = $this->getSourceEntityInstance($resourceSet);
-        }
+        $sourceEntityInstance = $this->checkSourceInstance($sourceEntityInstance, $resourceSet);
 
         /** @var MetadataTrait $model */
         $model = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : $sourceEntityInstance->getRelated();
@@ -243,11 +240,7 @@ class LaravelReadQuery extends LaravelBaseQuery
             throw new \Exception($msg);
         }
 
-        $this->checkSourceInstance($sourceEntityInstance);
-
-        if (null == $sourceEntityInstance) {
-            $sourceEntityInstance = $this->getSourceEntityInstance(/** @scrutinizer ignore-type */$resourceSet);
-        }
+        $sourceEntityInstance = $this->checkSourceInstance($sourceEntityInstance, $resourceSet);
 
         $this->checkAuth($sourceEntityInstance);
         $modelLoad = null;
@@ -367,13 +360,22 @@ class LaravelReadQuery extends LaravelBaseQuery
 
     /**
      * @param Model|Relation|null $source
+     * @param ResourceSet|null $resourceSet
+     * @return Model|Relation|mixed|null
+     * @throws \ReflectionException
      */
-    protected function checkSourceInstance($source)
+    protected function checkSourceInstance($source, ResourceSet $resourceSet = null)
     {
         if (!(null == $source || $source instanceof Model || $source instanceof Relation)) {
             $msg = 'Source entity instance must be null, a model, or a relation.';
             throw new InvalidArgumentException($msg);
         }
+
+        if (null == $source) {
+            $source = $this->getSourceEntityInstance($resourceSet);
+        }
+
+        return $source;
     }
 
     /**
