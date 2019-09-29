@@ -69,17 +69,12 @@ class LaravelReadQuery extends LaravelBaseQuery
 
         $keyName = null;
         $tableName = null;
-        if ($sourceEntityInstance instanceof Model) {
-            $modelLoad = $sourceEntityInstance->getEagerLoad();
-            $keyName = $sourceEntityInstance->getKeyName();
-            $tableName = $sourceEntityInstance->getTable();
-        } elseif ($sourceEntityInstance instanceof Relation) {
-            /** @var MetadataTrait $model */
-            $model = $sourceEntityInstance->getRelated();
-            $modelLoad = $model->getEagerLoad();
-            $keyName = $sourceEntityInstance->getRelated()->getKeyName();
-            $tableName = $sourceEntityInstance->getRelated()->getTable();
-        }
+        /** @var MetadataTrait $model */
+        $model = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : $sourceEntityInstance->getRelated();
+        $modelLoad = $model->getEagerLoad();
+        $keyName = $model->getKeyName();
+        $tableName = $model->getTable();
+
         if (null === $keyName) {
             throw new InvalidOperationException('Key name not retrieved');
         }
