@@ -27,7 +27,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @param Model|null $sourceEntityInstance
      * @return array
      */
-    public function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance)
+    protected function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance)
     {
         $parms = [];
 
@@ -55,7 +55,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @throws ODataException
      * @return array|mixed
      */
-    public function createUpdateDeleteProcessOutput($result)
+    protected function createUpdateDeleteProcessOutput($result)
     {
         if (!($result instanceof \Illuminate\Http\JsonResponse)) {
             throw ODataException::createInternalServerError('Controller response not well-formed json.');
@@ -86,7 +86,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @throws \Exception
      * @return Model|null
      */
-    public function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $data, $verb, Model $source = null)
+    protected function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $data, $verb, Model $source = null)
     {
         $lastWord = 'update' == $verb ? 'updated' : 'created';
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
@@ -119,7 +119,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @throws InvalidOperationException
      * @return array|mixed
      */
-    public function createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb)
+    protected function createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb)
     {
         $raw = $this->getControllerContainer();
         $map = $raw->getMetadata();
@@ -264,7 +264,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @throws InvalidOperationException
      * @throws ODataException
      */
-    public function createUpdateMainWrapper(ResourceSet $resourceSet, $sourceEntityInstance, $data, $verb)
+    protected function createUpdateMainWrapper(ResourceSet $resourceSet, $sourceEntityInstance, $data, $verb)
     {
         /** @var Model|null $source */
         $source = $this->unpackSourceEntity($sourceEntityInstance);
