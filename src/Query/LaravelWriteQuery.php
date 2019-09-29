@@ -9,6 +9,7 @@
 namespace AlgoWeb\PODataLaravel\Query;
 
 use Illuminate\Database\Eloquent\Model;
+use POData\Common\ODataException;
 
 class LaravelWriteQuery extends LaravelBaseQuery
 {
@@ -40,5 +41,32 @@ class LaravelWriteQuery extends LaravelBaseQuery
             $parms[] = $var;
         }
         return $parms;
+    }
+
+
+    /**
+     * @param $result
+     * @throws ODataException
+     * @return array|mixed
+     */
+    public function createUpdateDeleteProcessOutput($result)
+    {
+        if (!($result instanceof \Illuminate\Http\JsonResponse)) {
+            throw ODataException::createInternalServerError('Controller response not well-formed json.');
+        }
+        $outData = $result->getData();
+        if (is_object($outData)) {
+            $outData = (array) $outData;
+        }
+
+        if (!is_array($outData)) {
+            throw ODataException::createInternalServerError('Controller response does not have an array.');
+        }
+        if (!(key_exists('id', $outData) && key_exists('status', $outData) && key_exists('errors', $outData))) {
+            throw ODataException::createInternalServerError(
+                'Controller response array missing at least one of id, status and/or errors fields.'
+            );
+        }
+        return $outData;
     }
 }

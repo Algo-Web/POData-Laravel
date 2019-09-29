@@ -408,7 +408,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
 
         $result = call_user_func_array(array($controller, $method), $parms);
 
-        return $this->createUpdateDeleteProcessOutput($result);
+        return $this->getWriter()->createUpdateDeleteProcessOutput($result);
     }
 
     /**
@@ -459,32 +459,6 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
             }
         }
         throw new ODataException('Target model not successfully ' . $lastWord, 422);
-    }
-
-    /**
-     * @param $result
-     * @throws ODataException
-     * @return array|mixed
-     */
-    private function createUpdateDeleteProcessOutput($result)
-    {
-        if (!($result instanceof \Illuminate\Http\JsonResponse)) {
-            throw ODataException::createInternalServerError('Controller response not well-formed json.');
-        }
-        $outData = $result->getData();
-        if (is_object($outData)) {
-            $outData = (array) $outData;
-        }
-
-        if (!is_array($outData)) {
-            throw ODataException::createInternalServerError('Controller response does not have an array.');
-        }
-        if (!(key_exists('id', $outData) && key_exists('status', $outData) && key_exists('errors', $outData))) {
-            throw ODataException::createInternalServerError(
-                'Controller response array missing at least one of id, status and/or errors fields.'
-            );
-        }
-        return $outData;
     }
 
     /**
