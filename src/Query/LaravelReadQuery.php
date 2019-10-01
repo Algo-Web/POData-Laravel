@@ -109,8 +109,10 @@ class LaravelReadQuery extends LaravelBaseQuery
         if (isset($filterInfo)) {
             $method = 'return ' . $filterInfo->getExpressionAsString() . ';';
             $clln = '$' . $resourceSet->getResourceType()->getName();
-            $isvalid = create_function($clln, $method);
-            $nullFilter = false;
+            $isvalid = function ($inputD) use ($clln, $method) {
+                $$clln = $inputD;
+                return eval($method);
+            };
         }
 
         list($bulkSetCount, $resultSet, $resultCount, $skip) = $this->applyFiltering(
