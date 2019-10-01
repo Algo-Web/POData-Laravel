@@ -85,15 +85,13 @@ trait MetadataTrait
         foreach ($columns as $column) {
             // Doctrine schema manager returns columns with lowercased names
             $rawColumn = $foo[strtolower($column)];
-            $nullable = !($rawColumn->getNotNull());
-            $fillable = in_array($column, $this->getFillable());
             /** @var IType $rawType */
             $rawType = $rawColumn->getType();
             $type = $rawType->getName();
             $default = $this->$column;
             $tableData[$column] = ['type' => $type,
-                'nullable' => $nullable,
-                'fillable' => $fillable,
+                'nullable' => !($rawColumn->getNotNull()),
+                'fillable' => in_array($column, $this->getFillable()),
                 'default' => $default
             ];
         }
