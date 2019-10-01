@@ -103,10 +103,7 @@ class MetadataProvider extends MetadataBaseProvider
                 $objectMap->addEntity($gubbins);
             }
         }
-        if (null != self::$afterExtract) {
-            $func = self::$afterExtract;
-            $func($objectMap);
-        }
+        $this->handleCustomFunction($objectMap, self::$afterExtract);
         return $objectMap;
     }
 
@@ -123,20 +120,15 @@ class MetadataProvider extends MetadataBaseProvider
             $mgh->addEntity($entity);
         }
         $objectMap->setAssociations($mgh->getRelations());
-        if (null != self::$afterUnify) {
-            $func = self::$afterUnify;
-            $func($objectMap);
-        }
+
+        $this->handleCustomFunction($objectMap, self::$afterUnify);
         return $objectMap;
     }
 
     private function verify(Map $objectModel)
     {
         $objectModel->isOK();
-        if (null != self::$afterVerify) {
-            $func = self::$afterVerify;
-            $func($objectModel);
-        }
+        $this->handleCustomFunction($objectModel, self::$afterVerify);
     }
 
     /**
@@ -183,10 +175,7 @@ class MetadataProvider extends MetadataBaseProvider
             }
             $this->implementAssociationsMonomorphic($objectModel, $association);
         }
-        if (null != self::$afterImplement) {
-            $func = self::$afterImplement;
-            $func($objectModel);
-        }
+        $this->handleCustomFunction($objectModel, self::$afterImplement);
     }
 
     /**
@@ -422,5 +411,18 @@ class MetadataProvider extends MetadataBaseProvider
     public function isRunningInArtisan()
     {
         return App::runningInConsole() && !App::runningUnitTests();
+    }
+
+    /**
+     * Encapsulate applying self::$after{FOO} calls
+     *
+     * @param mixed $parm
+     * @param callable|null $func
+     */
+    private function handleCustomFunction($parm, callable $func = null)
+    {
+        if (null != $func) {
+            $func($parm);
+        }
     }
 }
