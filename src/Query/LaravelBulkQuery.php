@@ -9,6 +9,7 @@ use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use POData\Common\InvalidOperationException;
@@ -148,6 +149,7 @@ class LaravelBulkQuery
         foreach ($paramList as $spec) {
             $varType = isset($spec['type']) ? $spec['type'] : null;
             if (null !== $varType) {
+                /** @var Request $var */
                 $var = new $varType();
                 if ($spec['isRequest']) {
                     $var->setMethod($isCreate ? 'POST' : 'PUT');

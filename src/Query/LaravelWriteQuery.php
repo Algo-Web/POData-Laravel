@@ -10,6 +10,7 @@ namespace AlgoWeb\PODataLaravel\Query;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
@@ -39,6 +40,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
                 continue;
             }
             // TODO: Give this smarts and actively pick up instantiation details
+            /** @var Request $var */
             $var = new $varType();
             if ($spec['isRequest']) {
                 $var->setMethod('POST');
