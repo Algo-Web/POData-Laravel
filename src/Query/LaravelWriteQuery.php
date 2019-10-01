@@ -140,11 +140,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
             $msg = 'Data must not be null';
             throw new InvalidOperationException($msg);
         }
-        if (is_object($data)) {
-            $arrayData = (array) $data;
-        } else {
-            $arrayData = $data;
-        }
+        $arrayData = is_object($data) ? (array)$data : $data;
         if (!is_array($arrayData)) {
             throw ODataException::createPreConditionFailedError(
                 'Data not resolvable to key-value array.'

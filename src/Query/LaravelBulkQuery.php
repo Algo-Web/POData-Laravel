@@ -218,10 +218,9 @@ class LaravelBulkQuery
             } catch (\Exception $e) {
                 throw new ODataException($e->getMessage(), 500);
             }
-        } else {
-            $msg = 'Target models not successfully ' . $pastVerb;
-            throw new ODataException($msg, 422);
         }
+        $msg = 'Target models not successfully ' . $pastVerb;
+        throw new ODataException($msg, 422);
     }
 
     /**

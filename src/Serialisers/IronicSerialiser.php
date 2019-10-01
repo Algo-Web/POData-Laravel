@@ -727,26 +727,25 @@ class IronicSerialiser implements IObjectSerialiser
         $expandedProjectionNode = $this->rootNode;
         if (null === $expandedProjectionNode) {
             return null;
-        } else {
-            $segmentNames = $this->getLightStack();
-            $depth = count($segmentNames);
-            // $depth == 1 means serialization of root entry
-            //(the resource identified by resource path) is going on,
-            //so control won't get into the below for loop.
-            //we will directly return the root node,
-            //which is 'ExpandedProjectionNode'
-            // for resource identified by resource path.
-            if (0 != $depth) {
-                for ($i = 2; $i < $depth; ++$i) {
-                    $segName = $segmentNames[$i]['prop'];
-                    $expandedProjectionNode = $expandedProjectionNode->findNode($segName);
-                    if (null === $expandedProjectionNode) {
-                        throw new InvalidOperationException('is_null($expandedProjectionNode)');
-                    }
-                    if (!$expandedProjectionNode instanceof ExpandedProjectionNode) {
-                        $msg = '$expandedProjectionNode not instanceof ExpandedProjectionNode';
-                        throw new InvalidOperationException($msg);
-                    }
+        }
+        $segmentNames = $this->getLightStack();
+        $depth = count($segmentNames);
+        // $depth == 1 means serialization of root entry
+        //(the resource identified by resource path) is going on,
+        //so control won't get into the below for loop.
+        //we will directly return the root node,
+        //which is 'ExpandedProjectionNode'
+        // for resource identified by resource path.
+        if (0 != $depth) {
+            for ($i = 2; $i < $depth; ++$i) {
+                $segName = $segmentNames[$i]['prop'];
+                $expandedProjectionNode = $expandedProjectionNode->findNode($segName);
+                if (null === $expandedProjectionNode) {
+                    throw new InvalidOperationException('is_null($expandedProjectionNode)');
+                }
+                if (!$expandedProjectionNode instanceof ExpandedProjectionNode) {
+                    $msg = '$expandedProjectionNode not instanceof ExpandedProjectionNode';
+                    throw new InvalidOperationException($msg);
                 }
             }
         }
