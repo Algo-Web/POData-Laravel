@@ -362,7 +362,7 @@ class LaravelQueryTest extends TestCase
             ->andReturnSelf()->once();
         $sourceEntity->shouldReceive('count')->andReturn(3)->once();
         $sourceEntity->shouldReceive('skip')->andReturn($sourceEntity)->never();
-        $sourceEntity->shouldReceive('take')->andReturn($sourceEntity)->never();
+        $sourceEntity->shouldReceive('take->with')->andReturn($sourceEntity)->never();
 
         $subPathSegment = m::mock(OrderBySubPathSegment::class);
         $subPathSegment->shouldReceive('getName')->andReturn('hammer');
@@ -448,9 +448,9 @@ class LaravelQueryTest extends TestCase
 
         $collet = collect([0, 1, 0, 1]);
         $source = m::mock(TestModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $source->shouldReceive('enforceOrderBy')->andReturnNull()->once();
+        $source->shouldReceive('enforceOrderBy')->andReturnNull();
         $source->shouldReceive('count')->andReturn(20001)->once();
-        $source->shouldReceive('get')->withAnyArgs()->andReturn($collet)->once();
+        $source->shouldReceive('skip->take->with->get')->withAnyArgs()->andReturn(collect([1, 0]))->once();
         $source->shouldReceive('newQuery')->andReturn($query);
         $source->shouldReceive('forPage')->withAnyArgs()->andReturn($source, collect([]));
 
@@ -459,7 +459,7 @@ class LaravelQueryTest extends TestCase
         $foo->shouldReceive('getAuth')->andReturn($auth);
 
         $result = $foo->getResourceSet($queryType, $mockResource, $filter, null, 2, 1, null, null, $source);
-        $this->assertEquals(4, $result->count);
+        $this->assertEquals(20001, $result->count);
         $this->assertEquals(2, count($result->results));
         $res = $result->results;
         $this->assertEquals(1, $res[0]);
