@@ -425,23 +425,15 @@ trait MetadataTrait
         } else {
             $methodList = get_class_methods(get_class($foo));
             $fkMethodName = 'getQualifiedForeignPivotKeyName';
-            foreach ($fkList as $option) {
-                if (in_array($option, $methodList)) {
-                    $fkMethodName = $option;
-                    break;
-                }
-            }
+            $fkIntersect = array_values(array_intersect($fkList, $methodList));
+            $fkMethodName = (0 < count($fkIntersect)) ? $fkIntersect[0] : $fkMethodName;
             if (!(in_array($fkMethodName, $methodList))) {
                 $msg = 'Selected method, ' . $fkMethodName . ', not in method list';
                 throw new InvalidOperationException($msg);
             }
             $rkMethodName = 'getQualifiedRelatedPivotKeyName';
-            foreach ($rkList as $option) {
-                if (in_array($option, $methodList)) {
-                    $rkMethodName = $option;
-                    break;
-                }
-            }
+            $rkIntersect = array_values(array_intersect($rkList, $methodList));
+            $rkMethodName = (0 < count($rkIntersect)) ? $rkIntersect[0] : $rkMethodName;
             if (!(in_array($rkMethodName, $methodList))) {
                 $msg = 'Selected method, ' . $rkMethodName . ', not in method list';
                 throw new InvalidOperationException($msg);
