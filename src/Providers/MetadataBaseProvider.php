@@ -25,15 +25,15 @@ abstract class MetadataBaseProvider extends ServiceProvider
      */
     protected function handlePostBoot($isCaching, $hasCache, $key, $meta)
     {
-        if ($isCaching) {
-            $hasCache = isset($hasCache) ? boolval($hasCache) : false;
-            if (!$hasCache) {
-                $cacheTime = abs(intval(env('APP_METADATA_CACHE_DURATION', 10)));
-                $cacheTime = max($cacheTime, 1);
-                Cache::put($key, $meta, $cacheTime);
-            }
-        } else {
+        if (!$isCaching) {
             Cache::forget($key);
+            return;
+        }
+        $hasCache = isset($hasCache) ? boolval($hasCache) : false;
+        if (!$hasCache) {
+            $cacheTime = abs(intval(env('APP_METADATA_CACHE_DURATION', 10)));
+            $cacheTime = max($cacheTime, 1);
+            Cache::put($key, $meta, $cacheTime);
         }
     }
 

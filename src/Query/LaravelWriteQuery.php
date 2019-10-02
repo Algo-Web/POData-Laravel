@@ -10,6 +10,7 @@ namespace AlgoWeb\PODataLaravel\Query;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
@@ -39,6 +40,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
                 continue;
             }
             // TODO: Give this smarts and actively pick up instantiation details
+            /** @var Request $var */
             $var = new $varType();
             if ($spec['isRequest']) {
                 $var->setMethod('POST');
@@ -138,11 +140,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
             $msg = 'Data must not be null';
             throw new InvalidOperationException($msg);
         }
-        if (is_object($data)) {
-            $arrayData = (array) $data;
-        } else {
-            $arrayData = $data;
-        }
+        $arrayData = is_object($data) ? (array)$data : $data;
         if (!is_array($arrayData)) {
             throw ODataException::createPreConditionFailedError(
                 'Data not resolvable to key-value array.'

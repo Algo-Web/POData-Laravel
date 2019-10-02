@@ -342,11 +342,6 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     private function unpackExpressionType($expressionType)
     {
-        if ($expressionType instanceof ExpressionType) {
-            $type = $expressionType->getValue();
-        } else {
-            $type = $expressionType;
-        }
-        return $type;
+        return $expressionType instanceof ExpressionType ? $expressionType->getValue() : $expressionType;
     }
 }
