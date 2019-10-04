@@ -229,12 +229,16 @@ class IronicSerialiser implements IObjectSerialiser
         $absoluteUri = rtrim($this->absoluteServiceUri, '/') . '/' . $relativeUri;
 
         /** var $mediaLink ODataMediaLink|null */
+        $mediaLink = null;
         /** var $mediaLinks ODataMediaLink[] */
-        list($mediaLink, $mediaLinks) = $this->writeMediaData(
+        $mediaLinks = [];
+        $this->writeMediaData(
             $res,
             $type,
             $relativeUri,
-            $resourceType
+            $resourceType,
+            $mediaLink,
+            $mediaLinks
         );
 
         $propertyContent = $this->writePrimitiveProperties($res, $nonRelProp);
@@ -649,11 +653,19 @@ class IronicSerialiser implements IObjectSerialiser
      * @param $type
      * @param $relativeUri
      * @param ResourceType $resourceType
-     * @return array<ODataMediaLink|ODataMediaLink[]|null>
+     * @param ODataMediaLink|null $mediaLink
+     * @param ODataMediaLink[] $mediaLinks
+     * @return void
      * @throws InvalidOperationException
      */
-    protected function writeMediaData($entryObject, $type, $relativeUri, ResourceType $resourceType)
-    {
+    protected function writeMediaData(
+        $entryObject,
+        $type,
+        $relativeUri,
+        ResourceType $resourceType,
+        ODataMediaLink &$mediaLink = null,
+        array &$mediaLinks = []
+    ) {
         $context = $this->getService()->getOperationContext();
         $streamProviderWrapper = $this->getService()->getStreamProviderWrapper();
         if (null == $streamProviderWrapper) {
@@ -692,7 +704,6 @@ class IronicSerialiser implements IObjectSerialiser
                 $mediaLinks[] = $nuLink;
             }
         }
-        return [$mediaLink, $mediaLinks];
     }
 
     /**
