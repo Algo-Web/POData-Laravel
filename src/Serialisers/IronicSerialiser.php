@@ -228,6 +228,8 @@ class IronicSerialiser implements IObjectSerialiser
         );
         $absoluteUri = rtrim($this->absoluteServiceUri, '/') . '/' . $relativeUri;
 
+        /** var $mediaLink ODataMediaLink|null */
+        /** var $mediaLinks ODataMediaLink[] */
         list($mediaLink, $mediaLinks) = $this->writeMediaData(
             $res,
             $type,
@@ -647,7 +649,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @param $type
      * @param $relativeUri
      * @param ResourceType $resourceType
-     * @return array<ODataMediaLink|null|array>
+     * @return array<ODataMediaLink|ODataMediaLink[]|null>
      * @throws InvalidOperationException
      */
     protected function writeMediaData($entryObject, $type, $relativeUri, ResourceType $resourceType)
@@ -658,11 +660,13 @@ class IronicSerialiser implements IObjectSerialiser
             throw new InvalidOperationException('Retrieved stream provider must not be null');
         }
 
+        /** @var ODataMediaLink|null $mediaLink */
         $mediaLink = null;
         if ($resourceType->isMediaLinkEntry()) {
             $eTag = $streamProviderWrapper->getStreamETag2($entryObject, null, $context);
             $mediaLink = new ODataMediaLink($type, '/$value', $relativeUri . '/$value', '*/*', $eTag, 'edit-media');
         }
+        /** @var ODataMediaLink[] $mediaLinks */
         $mediaLinks = [];
         if ($resourceType->hasNamedStream()) {
             $namedStreams = $resourceType->getAllNamedStreams();
