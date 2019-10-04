@@ -874,12 +874,14 @@ class IronicSerialiser implements IObjectSerialiser
      */
     protected function getNextPageLinkQueryParametersForRootResourceSet()
     {
+        /** @var string|null $queryParameterString */
         $queryParameterString = null;
         foreach ([ODataConstants::HTTPQUERY_STRING_FILTER,
                      ODataConstants::HTTPQUERY_STRING_EXPAND,
                      ODataConstants::HTTPQUERY_STRING_ORDERBY,
                      ODataConstants::HTTPQUERY_STRING_INLINECOUNT,
                      ODataConstants::HTTPQUERY_STRING_SELECT, ] as $queryOption) {
+            /** @var string|null $value */
             $value = $this->getService()->getHost()->getQueryStringItem($queryOption);
             if (null !== $value) {
                 if (null !== $queryParameterString) {
