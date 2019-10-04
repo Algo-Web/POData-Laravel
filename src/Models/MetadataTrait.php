@@ -407,43 +407,39 @@ trait MetadataTrait
      */
     private function polyglotKeyMethodNames($foo, $condition = false)
     {
+        // if $condition is falsy, return quickly - don't muck around
+        if (!$condition) {
+            return [null, null];
+        }
+
         $fkList = ['getQualifiedForeignKeyName', 'getForeignKey'];
         $rkList = ['getQualifiedRelatedKeyName', 'getOtherKey', 'getOwnerKey'];
 
         $fkMethodName = null;
         $rkMethodName = null;
-        if ($condition) {
-            if (array_key_exists(get_class($foo), static::$methodPrimary)) {
-                $line = static::$methodPrimary[get_class($foo)];
-                $fkMethodName = $line['fk'];
-                $rkMethodName = $line['rk'];
-            } else {
-                $methodList = get_class_methods(get_class($foo));
-                $fkMethodName = 'getQualifiedForeignPivotKeyName';
-                foreach ($fkList as $option) {
-                    if (in_array($option, $methodList)) {
-                        $fkMethodName = $option;
-                        break;
-                    }
-                }
-                if (!(in_array($fkMethodName, $methodList))) {
-                    $msg = 'Selected method, ' . $fkMethodName . ', not in method list';
-                    throw new InvalidOperationException($msg);
-                }
-                $rkMethodName = 'getQualifiedRelatedPivotKeyName';
-                foreach ($rkList as $option) {
-                    if (in_array($option, $methodList)) {
-                        $rkMethodName = $option;
-                        break;
-                    }
-                }
-                if (!(in_array($rkMethodName, $methodList))) {
-                    $msg = 'Selected method, ' . $rkMethodName . ', not in method list';
-                    throw new InvalidOperationException($msg);
-                }
-                $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
-                static::$methodPrimary[get_class($foo)] = $line;
+
+        if (array_key_exists(get_class($foo), static::$methodPrimary)) {
+            $line = static::$methodPrimary[get_class($foo)];
+            $fkMethodName = $line['fk'];
+            $rkMethodName = $line['rk'];
+        } else {
+            $methodList = get_class_methods(get_class($foo));
+            $fkMethodName = 'getQualifiedForeignPivotKeyName';
+            $fkIntersect = array_values(array_intersect($fkList, $methodList));
+            $fkMethodName = (0 < count($fkIntersect)) ? $fkIntersect[0] : $fkMethodName;
+            if (!(in_array($fkMethodName, $methodList))) {
+                $msg = 'Selected method, ' . $fkMethodName . ', not in method list';
+                throw new InvalidOperationException($msg);
             }
+            $rkMethodName = 'getQualifiedRelatedPivotKeyName';
+            $rkIntersect = array_values(array_intersect($rkList, $methodList));
+            $rkMethodName = (0 < count($rkIntersect)) ? $rkIntersect[0] : $rkMethodName;
+            if (!(in_array($rkMethodName, $methodList))) {
+                $msg = 'Selected method, ' . $rkMethodName . ', not in method list';
+                throw new InvalidOperationException($msg);
+            }
+            $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
+            static::$methodPrimary[get_class($foo)] = $line;
         }
         return [$fkMethodName, $rkMethodName];
     }
@@ -456,41 +452,45 @@ trait MetadataTrait
      */
     private function polyglotKeyMethodBackupNames($foo, $condition = false)
     {
+        // if $condition is falsy, return quickly - don't muck around
+        if (!$condition) {
+            return [null, null];
+        }
+
         $fkList = ['getForeignKey', 'getForeignKeyName', 'getQualifiedFarKeyName'];
         $rkList = ['getOtherKey', 'getQualifiedParentKeyName'];
 
         $fkMethodName = null;
         $rkMethodName = null;
-        if ($condition) {
-            if (array_key_exists(get_class($foo), static::$methodAlternate)) {
-                $line = static::$methodAlternate[get_class($foo)];
-                $fkMethodName = $line['fk'];
-                $rkMethodName = $line['rk'];
-            } else {
-                $methodList = get_class_methods(get_class($foo));
-                $fkCombo = array_values(array_intersect($fkList, $methodList));
-                if (!(1 <= count($fkCombo))) {
-                    $msg = 'Expected at least 1 element in foreign-key list, got ' . count($fkCombo);
-                    throw new InvalidOperationException($msg);
-                }
-                $fkMethodName = $fkCombo[0];
-                if (!(in_array($fkMethodName, $methodList))) {
-                    $msg = 'Selected method, ' . $fkMethodName . ', not in method list';
-                    throw new InvalidOperationException($msg);
-                }
-                $rkCombo = array_values(array_intersect($rkList, $methodList));
-                if (!(1 <= count($rkCombo))) {
-                    $msg = 'Expected at least 1 element in related-key list, got ' . count($rkCombo);
-                    throw new InvalidOperationException($msg);
-                }
-                $rkMethodName = $rkCombo[0];
-                if (!(in_array($rkMethodName, $methodList))) {
-                    $msg = 'Selected method, ' . $rkMethodName . ', not in method list';
-                    throw new InvalidOperationException($msg);
-                }
-                $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
-                static::$methodAlternate[get_class($foo)] = $line;
+
+        if (array_key_exists(get_class($foo), static::$methodAlternate)) {
+            $line = static::$methodAlternate[get_class($foo)];
+            $fkMethodName = $line['fk'];
+            $rkMethodName = $line['rk'];
+        } else {
+            $methodList = get_class_methods(get_class($foo));
+            $fkCombo = array_values(array_intersect($fkList, $methodList));
+            if (!(1 <= count($fkCombo))) {
+                $msg = 'Expected at least 1 element in foreign-key list, got ' . count($fkCombo);
+                throw new InvalidOperationException($msg);
             }
+            $fkMethodName = $fkCombo[0];
+            if (!(in_array($fkMethodName, $methodList))) {
+                $msg = 'Selected method, ' . $fkMethodName . ', not in method list';
+                throw new InvalidOperationException($msg);
+            }
+            $rkCombo = array_values(array_intersect($rkList, $methodList));
+            if (!(1 <= count($rkCombo))) {
+                $msg = 'Expected at least 1 element in related-key list, got ' . count($rkCombo);
+                throw new InvalidOperationException($msg);
+            }
+            $rkMethodName = $rkCombo[0];
+            if (!(in_array($rkMethodName, $methodList))) {
+                $msg = 'Selected method, ' . $rkMethodName . ', not in method list';
+                throw new InvalidOperationException($msg);
+            }
+            $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
+            static::$methodAlternate[get_class($foo)] = $line;
         }
         return [$fkMethodName, $rkMethodName];
     }

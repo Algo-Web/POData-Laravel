@@ -136,12 +136,14 @@ abstract class AssociationStubBase
         if ($this instanceof AssociationStubMonomorphic && null === $targType) {
             return false;
         }
-        if (null !== $targType && (!is_string($targType) || empty($targType))) {
-            return false;
-        }
         $foreignField = $this->foreignField;
-        if (null !== $targType && (null === $foreignField || !is_string($foreignField) || empty($foreignField))) {
-            return false;
+        if (null !== $targType) {
+            if (!$this->checkStringInput($targType)) {
+                return false;
+            }
+            if (!$this->checkStringInput($foreignField)) {
+                return false;
+            }
         }
         return (null === $targType) === (null === $foreignField);
     }
