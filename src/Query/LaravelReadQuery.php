@@ -104,7 +104,7 @@ class LaravelReadQuery extends LaravelBaseQuery
             $top = PHP_INT_MAX;
         }
 
-        $nullFilter = true;
+        $nullFilter = !isset($filterInfo);
         $isvalid = null;
         if (isset($filterInfo)) {
             $method = 'return ' . $filterInfo->getExpressionAsString() . ';';
