@@ -73,7 +73,8 @@ class EntityField
     public function setPrimitiveType(EntityFieldPrimitiveType $primitiveType)
     {
         $this->primitiveType = $primitiveType;
-        $this->edmFieldType = $this->primitiveTypeToEdmType($primitiveType);
+        $rawType = $this->primitiveTypeToEdmType($primitiveType);
+        $this->edmFieldType = 'stream' === $rawType ? $rawType : new EdmPrimitiveType($rawType);
     }
 
     /**
@@ -215,6 +216,7 @@ class EntityField
     private function primitiveTypeToEdmType(EntityFieldPrimitiveType $primitiveType)
     {
         $value = $primitiveType->getValue();
+
         return array_key_exists($value, self::$primitiveToEdmMapping) ?
             self::$primitiveToEdmMapping[$value] : EdmPrimitiveType::STRING;
     }

@@ -252,7 +252,7 @@ class MetadataProvider extends MetadataBaseProvider
             }
 
             $default = $field->getDefaultValue();
-            $isFieldBool = TypeCode::BOOLEAN == $field->getEdmFieldType();
+            $isFieldBool = TypeCode::BOOLEAN == $field->getEdmFieldType()->getValue();
             $default = $isFieldBool ? ($default ? 'true' : 'false') : strval($default);
 
             $meta->addPrimitiveProperty(
