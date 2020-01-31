@@ -1,6 +1,8 @@
 Unreleased
 ----------
    * Fix up test infrastructure - it had rotted somewhat
+   * Wring out plain filtering
+     - Thank you to bgoak for finding this and helping to fix it
 
 0.3.5 (2018-07-17)
 ------------------
