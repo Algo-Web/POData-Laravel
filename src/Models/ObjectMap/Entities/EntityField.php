@@ -47,12 +47,12 @@ class EntityField
      */
     private $primitiveType;
     /**
-     * @var TypeCode
+     * @var EdmPrimitiveType
      */
     private $edmFieldType;
 
     /**
-     * @return \POData\Providers\Metadata\Type\TypeCode
+     * @return EdmPrimitiveType
      */
     public function getEdmFieldType()
     {
@@ -211,7 +211,7 @@ class EntityField
     /**
      * @param \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType $primitiveType
      *
-     * @return TypeCode
+     * @return int
      */
     private function primitiveTypeToEdmType(EntityFieldPrimitiveType $primitiveType)
     {
