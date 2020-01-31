@@ -32,7 +32,12 @@ class LaravelReadQueryTest extends TestCase
 
         $foo = new LaravelReadQuery();
 
-        $this->expectException(\TypeError::class);
+        $phpVersion = phpversion();
+        if ($phpVersion > 6) {
+            $this->expectException(\TypeError::class);
+        } else {
+            $this->expectException(\ErrorException::class);
+        }
         $foo->getResourceSet($query, $resource, null, null, null, null, $skipToken);
     }
 

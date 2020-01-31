@@ -127,7 +127,12 @@ class LaravelQueryTest extends TestCase
 
         $foo = new LaravelQuery();
 
-        $this->expectException(\TypeError::class);
+        $phpVersion = phpversion();
+        if ($phpVersion > 6) {
+            $this->expectException(\TypeError::class);
+        } else {
+            $this->expectException(\ErrorException::class);
+        }
         $foo->getResourceSet($query, $resourceSet, $filter);
     }
 
