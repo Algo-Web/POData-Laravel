@@ -31,7 +31,7 @@ after_success:
 
 env: # important!
   - LARAVEL_DEP=5.1.*
-  - LARAVEL_DEP=">5.1.11"
+  - LARAVEL_DEP=">5.1.11|^6.0"
 matrix:
   allow_failures:
   - php: nightly
