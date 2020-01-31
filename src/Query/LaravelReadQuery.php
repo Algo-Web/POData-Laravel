@@ -108,7 +108,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         $isvalid = null;
         if (isset($filterInfo)) {
             $method = 'return ' . $filterInfo->getExpressionAsString() . ';';
-            $clln = '$' . $resourceSet->getResourceType()->getName();
+            $clln = $resourceSet->getResourceType()->getName();
             $isvalid = function ($inputD) use ($clln, $method) {
                 $$clln = $inputD;
                 return eval($method);
