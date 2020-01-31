@@ -104,11 +104,11 @@ class LaravelReadQuery extends LaravelBaseQuery
             $top = PHP_INT_MAX;
         }
 
-        $nullFilter = true;
+        $nullFilter = !isset($filterInfo);
         $isvalid = null;
         if (isset($filterInfo)) {
             $method = 'return ' . $filterInfo->getExpressionAsString() . ';';
-            $clln = '$' . $resourceSet->getResourceType()->getName();
+            $clln = $resourceSet->getResourceType()->getName();
             $isvalid = function ($inputD) use ($clln, $method) {
                 $$clln = $inputD;
                 return eval($method);
@@ -514,7 +514,8 @@ class LaravelReadQuery extends LaravelBaseQuery
 
         if ($nullFilter) {
             // default no-filter case, palm processing off to database engine - is a lot faster
-            $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($rawLoad)->get();
+            $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($rawLoad)
+                ->get();
             $resultCount = $bulkSetCount;
         } elseif ($bigSet) {
             if (!(isset($isvalid))) {

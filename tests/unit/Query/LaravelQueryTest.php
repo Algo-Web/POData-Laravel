@@ -18,6 +18,7 @@ use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
 use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
@@ -334,7 +336,12 @@ class LaravelQueryTest extends TestCase
         $property = \Mockery::mock(ResourceProperty::class);
         $property->shouldReceive('getName')->withNoArgs()->andReturn('morphTarget');
 
-        $rawBuilder = $this->getBuilder();
+        $conn = m::mock(Connection::class)->makePartial();
+        $conn->shouldReceive('getName')->andReturn('default');
+
+        $proc = m::mock(Processor::class)->makePartial();
+
+        $rawBuilder = $this->getBuilder($conn, $proc);
 
         $morphTarg = new TestMorphTarget();
 
@@ -345,8 +352,10 @@ class LaravelQueryTest extends TestCase
         $rawResult->shouldReceive('with')->andReturnSelf()->never();
         $this->assertTrue(null != ($rawResult->getQuery()->getProcessor()));
 
+        $modelArray = [$morphTarg, $morphTarg, $morphTarg];
+
         $resultSet = m::mock(\Illuminate\Support\Collection::class)->makePartial();
-        $resultSet->shouldReceive('get')->andReturn(collect([$morphTarg, $morphTarg, $morphTarg]));
+        $resultSet->shouldReceive('get')->andReturn(collect($modelArray));
         $resultSet->shouldReceive('count')->andReturn(3);
         $resultSet->shouldReceive('slice')->andReturnSelf()->once();
         $resultSet->shouldReceive('take')->andReturnSelf()->once();
@@ -354,12 +363,14 @@ class LaravelQueryTest extends TestCase
 
         $newQuery = m::mock(Builder::class)->makePartial();
         $newQuery->shouldReceive('with')->andReturnSelf()->once();
-        $newQuery->shouldReceive('getModels')->andReturn([$morphTarg, $morphTarg, $morphTarg]);
+        $newQuery->shouldReceive('getModels')->andReturn($modelArray);
         $newQuery->shouldReceive('get')->andReturn($resultSet);
 
-        $sourceEntity = \Mockery::mock(TestMorphManySource::class)->makePartial();
+        $sourceEntity = \Mockery::mock(TestMorphManySource::class)->makePartial()
+            ->shouldAllowMockingProtectedMethods();
         $sourceEntity->shouldReceive('getKeyName')->andReturn('id');
         $sourceEntity->shouldReceive('getQuery')->andReturn($newQuery);
+        $sourceEntity->shouldReceive('newBaseQueryBuilder')->andReturn($rawBuilder);
         $sourceEntity->shouldReceive('getEagerLoad')->andReturn([]);
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
         $sourceEntity->shouldReceive('orderBy')->withArgs(['testmorphmanytarget.hammer', 'asc'])
@@ -367,8 +378,13 @@ class LaravelQueryTest extends TestCase
         $sourceEntity->shouldReceive('orderBy')->withArgs(['testmorphmanytarget.hammer', 'desc'])
             ->andReturnSelf()->once();
         $sourceEntity->shouldReceive('count')->andReturn(3)->once();
-        $sourceEntity->shouldReceive('skip')->andReturn($sourceEntity)->never();
-        $sourceEntity->shouldReceive('take->with')->andReturn($sourceEntity)->never();
+        $sourceEntity->shouldReceive('skip')->andReturn($sourceEntity);
+        $sourceEntity->shouldReceive('take')->andReturn($sourceEntity);
+        $sourceEntity->shouldReceive('with')->andReturn($sourceEntity);
+        $sourceEntity->shouldReceive('newInstance')->andReturn($sourceEntity);
+        $sourceEntity->shouldReceive('get')->andReturn(collect($modelArray));
+
+        $newQuery->shouldReceive('newModelInstance')->andReturn($sourceEntity);
 
         $subPathSegment = m::mock(OrderBySubPathSegment::class);
         $subPathSegment->shouldReceive('getName')->andReturn('hammer');

@@ -5,6 +5,7 @@ namespace AlgoWeb\PODataLaravel\Models;
 use AlgoWeb\PODataLaravel\Kernels\ConsoleKernel;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as BaseTestCase;
@@ -49,10 +50,14 @@ class TestCase extends BaseTestCase
         ]);
     }
 
-    protected function getBuilder(ConnectionInterface $conn = null)
+    protected function getBuilder(ConnectionInterface $conn = null, Processor $proc = null)
     {
         $grammar = new \Illuminate\Database\Query\Grammars\Grammar;
-        $processor = \Mockery::mock('Illuminate\Database\Query\Processors\Processor')->makePartial();
+        if (null !== $proc) {
+            $processor = $proc;
+        } else {
+            $processor = \Mockery::mock(Processor::class)->makePartial();
+        }
         if (null != $conn) {
             $connect = $conn;
         } else {
