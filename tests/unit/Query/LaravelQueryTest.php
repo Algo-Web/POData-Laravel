@@ -19,6 +19,7 @@ use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
 use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -126,7 +127,12 @@ class LaravelQueryTest extends TestCase
 
         $foo = new LaravelQuery();
 
-        $this->expectException(\TypeError::class);
+        $phpVersion = phpversion();
+        if ($phpVersion > 6) {
+            $this->expectException(\TypeError::class);
+        } else {
+            $this->expectException(\ErrorException::class);
+        }
         $foo->getResourceSet($query, $resourceSet, $filter);
     }
 
@@ -427,6 +433,9 @@ class LaravelQueryTest extends TestCase
         $this->assertEquals(1, count($result->results));
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testGetResourceSetWithBigSetAndFilter()
     {
         $query = m::mock(Builder::class)->makePartial();
@@ -450,9 +459,15 @@ class LaravelQueryTest extends TestCase
         $source = m::mock(TestModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $source->shouldReceive('enforceOrderBy')->andReturnNull();
         $source->shouldReceive('count')->andReturn(20001)->once();
-        $source->shouldReceive('skip->take->with->get')->withAnyArgs()->andReturn(collect([1, 0]))->once();
+        //$source->shouldReceive('skip->take->with->get')->withAnyArgs()->andReturn(collect([1, 0]))->once();
         $source->shouldReceive('newQuery')->andReturn($query);
-        $source->shouldReceive('forPage')->withAnyArgs()->andReturn($source, collect([]));
+        //$source->shouldReceive('forPage')->withAnyArgs()->andReturn($source, collect([]));
+
+        $resultCollect = m::mock(Collection::class);
+        $resultCollect->shouldReceive('count')->andReturn(20001);
+        $resultCollect->shouldReceive('filter')->andReturn($resultCollect);
+        $resultCollect->shouldReceive('all')->andReturn([0, 1, 0]);
+        $source->shouldReceive('forPage->get')->withAnyArgs()->andReturn($resultCollect);
 
         $auth = new NullAuthProvider();
         $foo = m::mock(LaravelReadQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();

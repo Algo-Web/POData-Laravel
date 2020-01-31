@@ -14,11 +14,12 @@ before_script:
   - composer global require hirak/prestissimo
   - if [ "$LARAVEL_DEP" == "5.1.*" ]; then composer require phpunit/phpunit "^5.6" --no-update --dev; fi;
   - composer require laravel/framework:${LARAVEL_DEP} --no-update
-  - composer install
+  - COMPOSER_MEMORY_LIMIT=-1 travis_retry composer install --prefer-dist --no-interaction
+
 
 script:
   - mkdir -p build/logs
-  - phpunit --coverage-clover build/logs/clover.xml
+  - php vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 
 after_script:
   - php vendor/bin/php-coveralls --exclude-no-stmt

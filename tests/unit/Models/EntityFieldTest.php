@@ -50,7 +50,7 @@ class EntityFieldTest extends TestCase
         $foo = new EntityField();
         $foo->setPrimitiveType($type);
         $result = $foo->getEdmFieldType();
-        $this->assertEquals(EdmPrimitiveType::INT32, $result);
+        $this->assertEquals(EdmPrimitiveType::INT32(), $result);
     }
 
     public function testSetDatePrimitiveType()
@@ -59,7 +59,7 @@ class EntityFieldTest extends TestCase
         $foo = new EntityField();
         $foo->setPrimitiveType($type);
         $result = $foo->getEdmFieldType();
-        $this->assertEquals(EdmPrimitiveType::DATETIME, $result);
+        $this->assertEquals(EdmPrimitiveType::DATETIME(), $result);
     }
 
     public function testSetDateTimeTzPrimitiveType()
@@ -68,7 +68,7 @@ class EntityFieldTest extends TestCase
         $foo = new EntityField();
         $foo->setPrimitiveType($type);
         $result = $foo->getEdmFieldType();
-        $this->assertEquals(EdmPrimitiveType::DATETIME, $result);
+        $this->assertEquals(EdmPrimitiveType::DATETIME(), $result);
     }
 
     public function testSetBigIntPrimitiveType()
@@ -77,7 +77,7 @@ class EntityFieldTest extends TestCase
         $foo = new EntityField();
         $foo->setPrimitiveType($type);
         $result = $foo->getEdmFieldType();
-        $this->assertEquals(EdmPrimitiveType::INT64, $result);
+        $this->assertEquals(EdmPrimitiveType::INT64(), $result);
     }
 
     public function testSetBinaryPrimitiveType()
@@ -86,7 +86,7 @@ class EntityFieldTest extends TestCase
         $foo = new EntityField();
         $foo->setPrimitiveType($type);
         $result = $foo->getEdmFieldType();
-        $this->assertEquals(EdmPrimitiveType::BINARY, $result);
+        $this->assertEquals(EdmPrimitiveType::BINARY(), $result);
     }
 
     public function testSetTextPrimitiveType()
@@ -95,6 +95,6 @@ class EntityFieldTest extends TestCase
         $foo = new EntityField();
         $foo->setPrimitiveType($type);
         $result = $foo->getEdmFieldType();
-        $this->assertEquals(EdmPrimitiveType::STRING, $result);
+        $this->assertEquals(EdmPrimitiveType::STRING(), $result);
     }
 }

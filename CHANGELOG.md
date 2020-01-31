@@ -1,3 +1,7 @@
+Unreleased
+----------
+   * Fix up test infrastructure - it had rotted somewhat
+
 0.3.5 (2018-07-17)
 ------------------
    * Make README hopefully less confusing

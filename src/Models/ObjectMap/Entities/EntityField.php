@@ -47,12 +47,12 @@ class EntityField
      */
     private $primitiveType;
     /**
-     * @var TypeCode
+     * @var EdmPrimitiveType
      */
     private $edmFieldType;
 
     /**
-     * @return \POData\Providers\Metadata\Type\TypeCode
+     * @return EdmPrimitiveType
      */
     public function getEdmFieldType()
     {
@@ -73,7 +73,8 @@ class EntityField
     public function setPrimitiveType(EntityFieldPrimitiveType $primitiveType)
     {
         $this->primitiveType = $primitiveType;
-        $this->edmFieldType = $this->primitiveTypeToEdmType($primitiveType);
+        $rawType = $this->primitiveTypeToEdmType($primitiveType);
+        $this->edmFieldType = 'stream' === $rawType ? $rawType : new EdmPrimitiveType($rawType);
     }
 
     /**
@@ -210,11 +211,12 @@ class EntityField
     /**
      * @param \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType $primitiveType
      *
-     * @return TypeCode
+     * @return int
      */
     private function primitiveTypeToEdmType(EntityFieldPrimitiveType $primitiveType)
     {
         $value = $primitiveType->getValue();
+
         return array_key_exists($value, self::$primitiveToEdmMapping) ?
             self::$primitiveToEdmMapping[$value] : EdmPrimitiveType::STRING;
     }
