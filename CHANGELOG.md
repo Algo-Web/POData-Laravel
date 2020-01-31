@@ -8,6 +8,7 @@ Unreleased
    * PHP 5.6 is no longer officially supported
    * PHP 7.0 is no longer officially supported
    * Laravel 5.8 can now be used
+   * Laravel 6.x can now be used
 
 0.3.5 (2018-07-17)
 ------------------
