@@ -23,4 +23,12 @@ class InfrastructureTest extends TestCase
 
         $this->assertEquals(1, OrchestraTestModel::count());
     }
+
+    public function testCanGetServiceDoc()
+    {
+        $url = 'odata.svc/';
+
+        $result = $this->get($url);
+        $this->assertEquals(200, $result->getStatusCode());
+    }
 }
