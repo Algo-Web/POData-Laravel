@@ -35,11 +35,18 @@ class TestCase extends BaseTestCase
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Foundation\Application $app
      * @return void
+     * @throws \ReflectionException
      */
     protected function getEnvironmentSetUp($app)
     {
+        // Brute-force set app namespace
+        $reflec = new \ReflectionClass($app);
+        $prop = $reflec->getProperty('namespace');
+        $prop->setAccessible(true);
+        $prop->setValue($app, "AlgoWeb\\PODataLaravel\\Orchestra\\");
+
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [

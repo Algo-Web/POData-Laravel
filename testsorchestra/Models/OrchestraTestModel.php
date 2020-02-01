@@ -8,8 +8,12 @@
 
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Models;
 
+use AlgoWeb\PODataLaravel\Models\MetadataTrait;
+
 class OrchestraTestModel extends \Illuminate\Database\Eloquent\Model
 {
+    use MetadataTrait;
+
     protected $table = 'test_models';
 
     protected $fillable = [ 'name', 'added_at', 'weight', 'code'];

@@ -11,6 +11,7 @@ namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\App;
 
 class InfrastructureTest extends TestCase
 {
@@ -27,6 +28,14 @@ class InfrastructureTest extends TestCase
     public function testCanGetServiceDoc()
     {
         $url = 'odata.svc/';
+
+        $result = $this->get($url);
+        $this->assertEquals(200, $result->getStatusCode());
+    }
+
+    public function testCanGetServiceMetadata()
+    {
+        $url = 'odata.svc/$metadata';
 
         $result = $this->get($url);
         $this->assertEquals(200, $result->getStatusCode());
