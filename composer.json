@@ -21,7 +21,8 @@
     },
     "autoload": {
         "psr-4": {
-            "AlgoWeb\\PODataLaravel\\": "src/"
+            "AlgoWeb\\PODataLaravel\\": "src/",
+            "AlgoWeb\\PODataLaravel\\Orchestra\\Tests\\": "testsorchestra/"
         },
         "classmap": [
             "tests/"

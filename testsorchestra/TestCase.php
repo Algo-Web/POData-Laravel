@@ -53,5 +53,6 @@ class TestCase extends BaseTestCase
     {
         parent::setUp();
         date_default_timezone_set('UTC');
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
     }
 }
