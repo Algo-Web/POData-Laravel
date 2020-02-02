@@ -288,9 +288,6 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
 
-        if (false !== self::$isBooted) {
-            throw new InvalidOperationException('Provider booted twice');
-        }
         $isCaching = true === $this->getIsCaching();
         $meta = Cache::get('metadata');
         $objectMap = Cache::get('objectmap');

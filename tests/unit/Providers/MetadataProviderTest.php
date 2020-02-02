@@ -126,37 +126,6 @@ class MetadataProviderTest extends TestCase
         $this->assertEquals('wombat', $result);
     }
 
-    public function testBootBlowsUpWhenBootedTwice()
-    {
-        $this->setUpSchemaFacade();
-
-        $meta = m::mock(SimpleMetadataProvider::class);
-        App::instance('metadata', $meta);
-
-        $map = m::mock(Map::class);
-        App::instance('objectmap', $map);
-
-        //$cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
-        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn('aybabtu')->once();
-        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn('wombat')->once();
-        //Cache::swap($cache);
-
-        $foo = $this->object;
-        $foo->shouldReceive('getIsCaching')->andReturn(true)->once();
-
-        $foo->boot(false);
-
-        $expected = 'Provider booted twice';
-        $actual = null;
-
-        try {
-            $foo->boot(false);
-        } catch (InvalidOperationException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
     public function testBootHasMigrationsShouldBeCached()
     {
         $metaRaw = [];
