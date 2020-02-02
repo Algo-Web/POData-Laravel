@@ -62,6 +62,6 @@ class MetadataRouteProvider extends ServiceProvider
      */
     protected function isAuthDisable()
     {
-        return true === env('APP_DISABLE_AUTH', null);
+        return true === boolval(env('APP_DISABLE_AUTH', null));
     }
 }
