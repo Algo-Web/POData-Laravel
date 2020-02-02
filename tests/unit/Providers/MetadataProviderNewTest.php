@@ -109,7 +109,7 @@ class MetadataProviderNewTest extends TestCase
     {
         $app = m::mock(\Illuminate\Contracts\Foundation\Application::class);
         $foo = new MetadataProvider($app);
-        $this->assertTrue($foo->getRelationHolder() instanceof MetadataGubbinsHolder);
+        $this->assertFalse($foo->getRelationHolder() instanceof MetadataGubbinsHolder);
     }
 
     public function testBootHasMigrationsIsCached()

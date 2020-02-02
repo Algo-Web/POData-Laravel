@@ -48,22 +48,22 @@ class MetadataProvider extends MetadataBaseProvider
     protected static $afterVerify;
     protected static $afterImplement;
 
-    public static function setAfterExtract(callable $method)
+    public static function setAfterExtract(callable $method = null)
     {
         self::$afterExtract = $method;
     }
 
-    public static function setAfterUnify(callable $method)
+    public static function setAfterUnify(callable $method = null)
     {
         self::$afterUnify = $method;
     }
 
-    public static function setAfterVerify(callable $method)
+    public static function setAfterVerify(callable $method = null)
     {
         self::$afterVerify = $method;
     }
 
-    public static function setAfterImplement(callable $method)
+    public static function setAfterImplement(callable $method = null)
     {
         self::$afterImplement = $method;
     }

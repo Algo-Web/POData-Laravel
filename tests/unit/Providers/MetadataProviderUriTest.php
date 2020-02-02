@@ -46,6 +46,16 @@ class MetadataProviderUriTest extends TestCase
         $foo->reset();
     }
 
+    public function tearDown()
+    {
+        MetadataProvider::setAfterExtract(null);
+        MetadataProvider::setAfterUnify(null);
+        MetadataProvider::setAfterVerify(null);
+        MetadataProvider::setAfterImplement(null);
+
+        parent::tearDown();
+    }
+
     public function testUriOfMonomorphicOneToOneRelation()
     {
         $metaRaw = [];
@@ -401,6 +411,14 @@ class MetadataProviderUriTest extends TestCase
         $this->assertFalse($desc->getSegments()[1]->isSingleResult());
     }
 
+    /**
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \POData\Common\ODataException
+     * @throws \POData\Common\UrlFormatException
+     * @throws \ReflectionException
+     */
     public function testUriOfPolymorphicManyToManyRelation()
     {
         $metaRaw = [];
