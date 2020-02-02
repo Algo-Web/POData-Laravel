@@ -31,7 +31,7 @@ class TestServiceProvider extends BaseServiceProvider
 
     protected function loadMigrationsFrom($path)
     {
-        Artisan::call('migrate:fresh', ['--database' => 'testbench']);
+        Artisan::call('migrate:refresh', ['--database' => 'testbench']);
         $migrator = $this->app->make('migrator');
         $migrator->run($path);
     }
