@@ -41,9 +41,11 @@ class InfrastructureTest extends TestCase
         $this->assertEquals(200, $result->getStatusCode());
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testGetCandidateModels()
     {
-
         $app = App::make('app');
         $foo = new MetadataProvider($app);
 

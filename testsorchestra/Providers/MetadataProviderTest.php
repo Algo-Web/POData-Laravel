@@ -14,5 +14,4 @@ use Illuminate\Support\Facades\App;
 
 class MetadataProviderTest extends TestServiceProvider
 {
-
 }
