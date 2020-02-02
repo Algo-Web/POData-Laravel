@@ -8,7 +8,42 @@
 
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Functional;
 
-class FilterTest
-{
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraTestModel;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
+use AlgoWeb\PODataLaravel\Providers\MetadataRouteProvider;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Facades\App;
+use Mockery as m;
 
+class FilterTest extends TestCase
+{
+    public static function setUpBeforeClass()
+    {
+        putenv('APP_DISABLE_AUTH=true');
+    }
+
+    public static function tearDownAfterClass()
+    {
+        putenv('APP_DISABLE_AUTH=false');
+    }
+
+    public function testCountAndFilterWithNoMatches()
+    {
+        $names = ['foo', 'bar', 'simon'];
+
+        foreach ($names as $name) {
+            $foo = new OrchestraTestModel(['name' => $name]);
+            $this->assertTrue($foo->save());
+        }
+
+        $url = 'odata.svc/OrchestraTestModels/$count?$filter=name eq \'bruce\'';
+
+        $result = $this->get($url);
+        if ($result instanceof TestCase) {
+            $this->assertEquals(200, $result->response->getStatusCode());
+        } else {
+            $this->assertEquals(200, $result->getStatusCode());
+            $result->assertDontSee('Error');
+        }
+    }
 }

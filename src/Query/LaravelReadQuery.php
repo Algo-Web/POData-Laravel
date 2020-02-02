@@ -549,10 +549,6 @@ class LaravelReadQuery extends LaravelBaseQuery
             $resultSet = $resultSet->slice($skip);
             $resultCount = $rawCount;
         } else {
-            if ($sourceEntityInstance instanceof Model) {
-                /** @var Builder $sourceEntityInstance */
-                $sourceEntityInstance = $sourceEntityInstance->getQuery();
-            }
             /** @var Collection $resultSet */
             $resultSet = $sourceEntityInstance->with($rawLoad)->get();
             $resultSet = $resultSet->filter($isvalid);
