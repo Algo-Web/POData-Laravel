@@ -52,6 +52,7 @@ added.
 * This can be worked around by setting a custom endpoint name on one
 of the colliding models.
 * Controller input parameters map 'id' to underlying model's primary key
+* Assumes autoloader has been optimised with composer -o dump-autoload.
 
 -- Configuration options --
 These need to go in your Laravel project's .env file.

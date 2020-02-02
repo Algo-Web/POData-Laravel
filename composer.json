@@ -27,5 +27,10 @@
             "tests/"
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "AlgoWeb\\PODataLaravel\\Orchestra\\Tests\\": "testsorchestra/"
+        }
+    },
     "minimum-stability": "dev"
 }

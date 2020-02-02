@@ -48,22 +48,22 @@ class MetadataProvider extends MetadataBaseProvider
     protected static $afterVerify;
     protected static $afterImplement;
 
-    public static function setAfterExtract(callable $method)
+    public static function setAfterExtract(callable $method = null)
     {
         self::$afterExtract = $method;
     }
 
-    public static function setAfterUnify(callable $method)
+    public static function setAfterUnify(callable $method = null)
     {
         self::$afterUnify = $method;
     }
 
-    public static function setAfterVerify(callable $method)
+    public static function setAfterVerify(callable $method = null)
     {
         self::$afterVerify = $method;
     }
 
-    public static function setAfterImplement(callable $method)
+    public static function setAfterImplement(callable $method = null)
     {
         self::$afterImplement = $method;
     }
@@ -74,7 +74,6 @@ class MetadataProvider extends MetadataBaseProvider
     public function __construct($app)
     {
         parent::__construct($app);
-        $this->relationHolder = new MetadataGubbinsHolder();
         self::$isBooted = false;
     }
 
@@ -278,6 +277,10 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function boot($reset = true)
     {
+        App::forgetInstance('metadata');
+        App::forgetInstance('objectmap');
+        $this->relationHolder = new MetadataGubbinsHolder();
+
         self::$metaNAMESPACE = env('ODataMetaNamespace', 'Data');
         // If we aren't migrated, there's no DB tables to pull metadata _from_, so bail out early
         try {
@@ -288,9 +291,6 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
 
-        if (false !== self::$isBooted) {
-            throw new InvalidOperationException('Provider booted twice');
-        }
         $isCaching = true === $this->getIsCaching();
         $meta = Cache::get('metadata');
         $objectMap = Cache::get('objectmap');
@@ -304,7 +304,7 @@ class MetadataProvider extends MetadataBaseProvider
         }
         $meta = App::make('metadata');
         if (false !== $reset) {
-            $this->reset();
+            //$this->reset();
         }
 
         $modelNames = $this->getCandidateModels();

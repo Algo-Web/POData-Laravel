@@ -111,4 +111,10 @@ class Map
         $firstClass->addAssociation($association);
         $secondClass->addAssociation($association, false);
     }
+
+    public function reset()
+    {
+        $this->entities = [];
+        $this->associations = [];
+    }
 }

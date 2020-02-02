@@ -126,37 +126,6 @@ class MetadataProviderTest extends TestCase
         $this->assertEquals('wombat', $result);
     }
 
-    public function testBootBlowsUpWhenBootedTwice()
-    {
-        $this->setUpSchemaFacade();
-
-        $meta = m::mock(SimpleMetadataProvider::class);
-        App::instance('metadata', $meta);
-
-        $map = m::mock(Map::class);
-        App::instance('objectmap', $map);
-
-        //$cache = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
-        Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn('aybabtu')->once();
-        Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn('wombat')->once();
-        //Cache::swap($cache);
-
-        $foo = $this->object;
-        $foo->shouldReceive('getIsCaching')->andReturn(true)->once();
-
-        $foo->boot(false);
-
-        $expected = 'Provider booted twice';
-        $actual = null;
-
-        try {
-            $foo->boot(false);
-        } catch (InvalidOperationException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
     public function testBootHasMigrationsShouldBeCached()
     {
         $metaRaw = [];
@@ -210,10 +179,6 @@ class MetadataProviderTest extends TestCase
 
         $this->setUpSchemaFacade();
 
-        //$meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
-        $meta = new SimpleMetadataProvider('Data', 'Data');
-        App::instance('metadata', $meta);
-
         $cacheStore = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         $cacheStore->shouldReceive('forget')->withArgs(['metadata'])->andReturnNull()->once();
@@ -226,6 +191,7 @@ class MetadataProviderTest extends TestCase
         $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
 
         $foo->boot();
+        $meta = App::make('metadata');
 
         $resources = $meta->getResourceSets();
         $this->assertTrue(is_array($resources));
@@ -246,9 +212,6 @@ class MetadataProviderTest extends TestCase
 
         $this->setUpSchemaFacade();
 
-        $meta = new SimpleMetadataProvider('Data', 'Data');
-        App::instance('metadata', $meta);
-
         $cacheStore = Cache::getFacadeRoot();
         Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
@@ -261,6 +224,7 @@ class MetadataProviderTest extends TestCase
         $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
 
         $foo->boot();
+        $meta = App::make('metadata');
 
         $resources = $meta->getResourceSets();
         $this->assertTrue(is_array($resources));
