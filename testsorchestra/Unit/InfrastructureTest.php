@@ -29,8 +29,13 @@ class InfrastructureTest extends TestCase
         $url = 'odata.svc/';
 
         $result = $this->get($url);
-        $this->assertEquals(200, $result->getStatusCode());
-        $this->assertContains('OrchestraTestModel', $result->getContent());
+        if ($result instanceof TestCase) {
+            $this->assertEquals(200, $result->response->getStatusCode());
+            $this->assertContains('OrchestraTestModel', $result->response->getContent());
+        } else {
+            $this->assertEquals(200, $result->getStatusCode());
+            $this->assertContains('OrchestraTestModel', $result->getContent());
+        }
     }
 
     public function testCanGetServiceMetadata()
@@ -38,7 +43,11 @@ class InfrastructureTest extends TestCase
         $url = 'odata.svc/$metadata';
 
         $result = $this->get($url);
-        $this->assertEquals(200, $result->getStatusCode());
+        if ($result instanceof TestCase) {
+            $this->assertEquals(200, $result->response->getStatusCode());
+        } else {
+            $this->assertEquals(200, $result->getStatusCode());
+        }
     }
 
     /**
