@@ -15,7 +15,9 @@ class TestCase extends BaseTestCase
 {
     protected function getPackageProviders($app)
     {
-        return [\AlgoWeb\PODataLaravel\Providers\MetadataProvider::class,
+        return [
+            TestServiceProvider::class,
+            \AlgoWeb\PODataLaravel\Providers\MetadataProvider::class,
             \AlgoWeb\PODataLaravel\Providers\MetadataRouteProvider::class,
             \AlgoWeb\PODataLaravel\Providers\QueryProvider::class,
             \AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider::class];
@@ -59,7 +61,7 @@ class TestCase extends BaseTestCase
     public function setUp()
     {
         parent::setUp();
+        //$this->loadMigrationsFrom(__DIR__ . '/database/migrations');
         date_default_timezone_set('UTC');
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
     }
 }

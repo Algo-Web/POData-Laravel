@@ -74,7 +74,6 @@ class MetadataProvider extends MetadataBaseProvider
     public function __construct($app)
     {
         parent::__construct($app);
-        $this->relationHolder = new MetadataGubbinsHolder();
         self::$isBooted = false;
     }
 
@@ -280,6 +279,8 @@ class MetadataProvider extends MetadataBaseProvider
     {
         App::forgetInstance('metadata');
         App::forgetInstance('objectmap');
+        $this->relationHolder = new MetadataGubbinsHolder();
+
         self::$metaNAMESPACE = env('ODataMetaNamespace', 'Data');
         // If we aren't migrated, there's no DB tables to pull metadata _from_, so bail out early
         try {
@@ -303,7 +304,7 @@ class MetadataProvider extends MetadataBaseProvider
         }
         $meta = App::make('metadata');
         if (false !== $reset) {
-            $this->reset();
+            //$this->reset();
         }
 
         $modelNames = $this->getCandidateModels();
