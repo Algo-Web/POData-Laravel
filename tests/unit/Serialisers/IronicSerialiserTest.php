@@ -410,9 +410,6 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $this->setUpSchemaFacade();
 
-        $simple = new SimpleMetadataProvider('Data', 'Data');
-        App::instance('metadata', $simple);
-
         $classen = [ TestMorphOneSource::class, TestMorphOneSourceAlternate::class, TestMorphTarget::class];
 
         foreach ($classen as $className) {
@@ -501,6 +498,8 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $payload = new QueryResult();
         $payload->results = $model;
+
+        $simple = App::make('metadata');
 
         $service = new Url('http://localhost/odata.svc');
         $request = new Url('http://localhost/odata.svc/TestMorphTargets(42)');

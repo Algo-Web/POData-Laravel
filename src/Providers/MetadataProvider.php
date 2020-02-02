@@ -278,6 +278,8 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function boot($reset = true)
     {
+        App::forgetInstance('metadata');
+        App::forgetInstance('objectmap');
         self::$metaNAMESPACE = env('ODataMetaNamespace', 'Data');
         // If we aren't migrated, there's no DB tables to pull metadata _from_, so bail out early
         try {

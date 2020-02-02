@@ -179,7 +179,7 @@ class MetadataProviderNewTest extends TestCase
         $foo->boot();
     }
 
-    public function testBootHasMigrationsSingleModel()
+    public function testBootHasMigrationsSingleModel1()
     {
         $meta = [];
         $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -190,10 +190,6 @@ class MetadataProviderNewTest extends TestCase
         App::instance(TestModel::class, $testModel);
 
         $this->setUpSchemaFacade();
-
-        //$meta = \Mockery::mock(SimpleMetadataProvider::class)->makePartial();
-        $meta = new SimpleMetadataProvider('Data', 'Data');
-        App::instance('metadata', $meta);
 
         $cacheStore = m::mock(\Illuminate\Cache\Repository::class)->makePartial();
         $cacheStore->shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
@@ -207,7 +203,7 @@ class MetadataProviderNewTest extends TestCase
         $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
 
         $foo->boot();
-
+        $meta = App::make('metadata');
         $resources = $meta->getResourceSets();
         $this->assertTrue(is_array($resources));
         $this->assertEquals(1, count($resources));
@@ -227,9 +223,6 @@ class MetadataProviderNewTest extends TestCase
 
         $this->setUpSchemaFacade();
 
-        $meta = new SimpleMetadataProvider('Data', 'Data');
-        App::instance('metadata', $meta);
-
         $cacheStore = Cache::getFacadeRoot();
         Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null)->once();
         Cache::shouldReceive('get')->withArgs(['objectmap'])->andReturn(null)->once();
@@ -242,7 +235,7 @@ class MetadataProviderNewTest extends TestCase
         $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
 
         $foo->boot();
-
+        $meta = App::make('metadata');
         $resources = $meta->getResourceSets();
         $this->assertTrue(is_array($resources));
         $this->assertEquals(1, count($resources));
@@ -454,9 +447,6 @@ class MetadataProviderNewTest extends TestCase
 
         $this->setUpSchemaFacade();
 
-        $meta = new SimpleMetadataProvider('Data', 'Data');
-        App::instance('metadata', $meta);
-
         $map = m::mock(Map::class)->makePartial();
         $map->shouldReceive('addEntity')->passthru()->atLeast(1);
         $map->shouldReceive('getEntities')->passthru()->atLeast(1);
@@ -477,6 +467,7 @@ class MetadataProviderNewTest extends TestCase
         $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
 
         $foo->boot();
+        $meta = App::make('metadata');
 
         $resources = $meta->getResourceSets();
         $this->assertTrue(is_array($resources));

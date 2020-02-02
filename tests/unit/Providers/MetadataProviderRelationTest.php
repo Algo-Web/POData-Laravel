@@ -63,9 +63,6 @@ class MetadataProviderRelationTest extends TestCase
 
         $this->setUpSchemaFacade();
 
-        $simple = new SimpleMetadataProvider('Data', 'Data');
-        App::instance('metadata', $simple);
-
         $classen = [ TestMorphManySource::class, TestMorphManySourceAlternate::class, TestMorphTarget::class];
 
         foreach ($classen as $className) {
@@ -85,6 +82,7 @@ class MetadataProviderRelationTest extends TestCase
         $foo->setCandidateModels($classen);
 
         $foo->boot();
+        $simple = App::make('metadata');
         // now verify that actual-PK field shows up alongside literal-PK field for unknown-side models
         $source = $simple->resolveResourceType('TestMorphManySource');
         $this->assertNotNull($source);
