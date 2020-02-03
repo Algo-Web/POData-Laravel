@@ -317,7 +317,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @throws ODataException
      * @throws \ReflectionException
      */
-    public function writeTopLevelElements(QueryResult & $entryObjects)
+    public function writeTopLevelElements(QueryResult &$entryObjects)
     {
         $res = $entryObjects->results;
         if (!(is_array($res) || $res instanceof Collection)) {
@@ -392,6 +392,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @return ODataURL
      * @throws InvalidOperationException
      * @throws ODataException
+     * @throws \ReflectionException
      */
     public function writeUrlElement(QueryResult $entryObject)
     {
@@ -420,6 +421,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @return ODataURLCollection
      * @throws InvalidOperationException
      * @throws ODataException
+     * @throws \ReflectionException
      */
     public function writeUrlElements(QueryResult $entryObjects)
     {
@@ -466,7 +468,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @throws InvalidOperationException
      * @throws \ReflectionException
      */
-    public function writeTopLevelComplexObject(QueryResult & $complexValue, $propertyName, ResourceType & $resourceType)
+    public function writeTopLevelComplexObject(QueryResult &$complexValue, $propertyName, ResourceType &$resourceType)
     {
         $result = $complexValue->results;
 
@@ -498,7 +500,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @throws InvalidOperationException
      * @throws \ReflectionException
      */
-    public function writeTopLevelBagObject(QueryResult & $BagValue, $propertyName, ResourceType & $resourceType)
+    public function writeTopLevelBagObject(QueryResult &$BagValue, $propertyName, ResourceType &$resourceType)
     {
         $result = $BagValue->results;
 
@@ -523,7 +525,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @throws InvalidOperationException
      * @throws \ReflectionException
      */
-    public function writeTopLevelPrimitive(QueryResult & $primitiveValue, ResourceProperty & $resourceProperty = null)
+    public function writeTopLevelPrimitive(QueryResult &$primitiveValue, ResourceProperty &$resourceProperty = null)
     {
         if (null === $resourceProperty) {
             throw new InvalidOperationException('Resource property must not be null');
@@ -615,6 +617,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @return string
      * @throws InvalidOperationException
      * @throws ODataException
+     * @throws \ReflectionException
      */
     protected function getEntryInstanceKey($entityInstance, ResourceType $resourceType, $containerName)
     {
@@ -931,7 +934,7 @@ class IronicSerialiser implements IObjectSerialiser
      *
      * @return string
      */
-    private function primitiveToString(IType & $type, $primitiveValue)
+    private function primitiveToString(IType &$type, $primitiveValue)
     {
         // kludge to enable switching on type of $type without getting tripped up by mocks as we would with get_class
         // switch (true) means we unconditionally enter, and then lean on case statements to match given block
@@ -1073,7 +1076,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @throws InvalidOperationException
      * @throws \ReflectionException
      */
-    protected function writeBagValue(ResourceType & $resourceType, $result)
+    protected function writeBagValue(ResourceType &$resourceType, $result)
     {
         if (!(null == $result || is_array($result))) {
             throw new InvalidOperationException('Bag parameter must be null or array');
@@ -1113,7 +1116,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @throws InvalidOperationException
      * @throws \ReflectionException
      */
-    protected function writeComplexValue(ResourceType & $resourceType, &$result, $propertyName = null)
+    protected function writeComplexValue(ResourceType &$resourceType, &$result, $propertyName = null)
     {
         if (!is_object($result)) {
             throw new InvalidOperationException('Supplied $customObject must be an object');
