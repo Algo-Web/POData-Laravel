@@ -337,7 +337,7 @@ class MetadataProvider extends MetadataBaseProvider
      * Resolve possible reverse relation property names.
      *
      * @param Model $source
-     * @param $propName
+     * @param string $propName
      * @throws InvalidOperationException
      * @return null|string
      * @internal param Model $target

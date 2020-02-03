@@ -414,7 +414,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * @param Model       $sourceEntityInstance
      * @param ResourceSet $targetResourceSet
      * @param Model       $targetEntityInstance
-     * @param $navPropName
+     * @param string      $navPropName
      *
      * @throws InvalidOperationException
      * @return bool
@@ -442,7 +442,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * @param Model       $sourceEntityInstance
      * @param ResourceSet $targetResourceSet
      * @param Model       $targetEntityInstance
-     * @param $navPropName
+     * @param string      $navPropName
      *
      * @throws InvalidOperationException
      * @return bool

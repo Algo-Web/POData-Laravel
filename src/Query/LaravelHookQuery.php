@@ -25,7 +25,7 @@ class LaravelHookQuery extends LaravelBaseQuery
      * @param Model       $sourceEntityInstance
      * @param ResourceSet $targetResourceSet
      * @param Model       $targetEntityInstance
-     * @param $navPropName
+     * @param string      $navPropName
      *
      * @throws InvalidOperationException
      * @return bool
@@ -62,7 +62,7 @@ class LaravelHookQuery extends LaravelBaseQuery
      * @param Model       $sourceEntityInstance
      * @param ResourceSet $targetResourceSet
      * @param Model       $targetEntityInstance
-     * @param $navPropName
+     * @param string      $navPropName
      *
      * @throws InvalidOperationException
      * @return bool
@@ -115,7 +115,7 @@ class LaravelHookQuery extends LaravelBaseQuery
     /**
      * @param $sourceEntityInstance
      * @param $targetEntityInstance
-     * @param $navPropName
+     * @param string $navPropName
      * @throws \InvalidArgumentException
      * @throws InvalidOperationException
      * @return Relation

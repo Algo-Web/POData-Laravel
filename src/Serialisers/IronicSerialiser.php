@@ -487,7 +487,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * @param  QueryResult               $entryObject
      * @param  ResourceProperty          $prop
-     * @param  OdataLink                 $nuLink
+     * @param  ODataLink                 $nuLink
      * @param  int                       $propKind
      * @param  string                    $propName
      * @throws InvalidOperationException
