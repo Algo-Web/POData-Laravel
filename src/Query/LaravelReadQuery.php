@@ -128,17 +128,17 @@ class LaravelReadQuery extends LaravelBaseQuery
             $resultSet = $resultSet->take($top);
         }
 
-        $qVal = $queryType->getValue();
-        if (QueryType::ENTITIES()->getValue() == $qVal || QueryType::ENTITIES_WITH_COUNT()->getValue() == $qVal) {
+        $qVal = $queryType;
+        if (QueryType::ENTITIES() == $qVal || QueryType::ENTITIES_WITH_COUNT() == $qVal) {
             $result->results = [];
             foreach ($resultSet as $res) {
                 $result->results[] = $res;
             }
         }
-        if (QueryType::COUNT()->getValue() == $qVal || QueryType::ENTITIES_WITH_COUNT()->getValue() == $qVal) {
+        if (QueryType::COUNT() == $qVal || QueryType::ENTITIES_WITH_COUNT() == $qVal) {
             $result->count = $resultCount;
         }
-        $hazMore = $bulkSetCount > $skip+count($resultSet);
+        $hazMore = $bulkSetCount > $skip + count($resultSet);
         $result->hasMore = $hazMore;
         return $result;
     }
