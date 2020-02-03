@@ -182,6 +182,7 @@ class MetadataProvider extends MetadataBaseProvider
      * @param Map $objectModel
      * @param AssociationMonomorphic $associationUnderHammer
      * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     private function implementAssociationsMonomorphic(Map $objectModel, AssociationMonomorphic $associationUnderHammer)
     {
@@ -229,6 +230,7 @@ class MetadataProvider extends MetadataBaseProvider
     /**
      * @param EntityGubbins $unifiedEntity
      * @throws InvalidOperationException
+     * @throws \ReflectionException
      */
     private function implementProperties(EntityGubbins $unifiedEntity)
     {
