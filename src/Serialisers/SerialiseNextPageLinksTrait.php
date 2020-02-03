@@ -75,7 +75,7 @@ trait SerialiseNextPageLinksTrait
     /**
      * Get next page link from the given entity instance.
      *
-     * @param  mixed                     &$lastObject Last object serialized to be
+     * @param  mixed                     $lastObject  Last object serialized to be
      *                                                used for generating
      *                                                $skiptoken
      * @throws ODataException

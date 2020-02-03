@@ -171,7 +171,7 @@ abstract class SerialiserLowLevelWriters
      * Convert the given primitive value to string.
      * Note: This method will not handle null primitive value.
      *
-     * @param IType &$type          Type of the primitive property needing conversion
+     * @param IType $type           Type of the primitive property needing conversion
      * @param mixed $primitiveValue Primitive value to convert
      *
      * @return string

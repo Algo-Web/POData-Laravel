@@ -204,7 +204,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level feed element.
      *
-     * @param QueryResult &$entryObjects Array of entry resources to be written
+     * @param QueryResult $entryObjects Array of entry resources to be written
      *
      * @throws InvalidOperationException
      * @throws ODataException
@@ -321,9 +321,9 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level complex resource.
      *
-     * @param QueryResult  &$complexValue The complex object to be written
+     * @param QueryResult  $complexValue  The complex object to be written
      * @param string       $propertyName  The name of the complex property
-     * @param ResourceType &$resourceType Describes the type of complex object
+     * @param ResourceType $resourceType  Describes the type of complex object
      *
      * @throws InvalidOperationException
      * @throws \ReflectionException
@@ -351,11 +351,11 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level bag resource.
      *
-     * @param QueryResult  &$BagValue     The bag object to be
+     * @param QueryResult  $BagValue      The bag object to be
      *                                    written
      * @param string       $propertyName  The name of the
      *                                    bag property
-     * @param ResourceType &$resourceType Describes the type of
+     * @param ResourceType $resourceType  Describes the type of
      *                                    bag object
      *
      * @throws InvalidOperationException
@@ -379,9 +379,9 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level primitive value.
      *
-     * @param  QueryResult               &$primitiveValue   The primitive value to be
+     * @param  QueryResult               $primitiveValue    The primitive value to be
      *                                                      written
-     * @param  ResourceProperty          &$resourceProperty Resource property describing the
+     * @param  ResourceProperty          $resourceProperty  Resource property describing the
      *                                                      primitive property to be written
      * @throws InvalidOperationException
      * @throws \ReflectionException
