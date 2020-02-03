@@ -361,15 +361,10 @@ class LaravelQueryTest extends TestCase
         $resultSet->shouldReceive('take')->andReturnSelf()->once();
         $resultSet->shouldReceive('filter')->andReturnSelf()->once();
 
-        $newQuery = m::mock(Builder::class)->makePartial();
-        $newQuery->shouldReceive('with')->andReturnSelf()->once();
-        $newQuery->shouldReceive('getModels')->andReturn($modelArray);
-        $newQuery->shouldReceive('get')->andReturn($resultSet);
-
         $sourceEntity = \Mockery::mock(TestMorphManySource::class)->makePartial()
             ->shouldAllowMockingProtectedMethods();
         $sourceEntity->shouldReceive('getKeyName')->andReturn('id');
-        $sourceEntity->shouldReceive('getQuery')->andReturn($newQuery);
+        $sourceEntity->shouldReceive('get')->andReturn($resultSet);
         $sourceEntity->shouldReceive('newBaseQueryBuilder')->andReturn($rawBuilder);
         $sourceEntity->shouldReceive('getEagerLoad')->andReturn([]);
         $sourceEntity->shouldReceive('morphTarget')->andReturn($rawResult);
@@ -383,8 +378,6 @@ class LaravelQueryTest extends TestCase
         $sourceEntity->shouldReceive('with')->andReturn($sourceEntity);
         $sourceEntity->shouldReceive('newInstance')->andReturn($sourceEntity);
         $sourceEntity->shouldReceive('get')->andReturn(collect($modelArray));
-
-        $newQuery->shouldReceive('newModelInstance')->andReturn($sourceEntity);
 
         $subPathSegment = m::mock(OrderBySubPathSegment::class);
         $subPathSegment->shouldReceive('getName')->andReturn('hammer');
