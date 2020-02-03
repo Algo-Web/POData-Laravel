@@ -1,0 +1,8 @@
+includes:
+    - ./vendor/nunomaduro/larastan/extension.neon
+parameters:
+    level: max
+    ignoreErrors:
+        - "#Internal error: Facade does not implement getFacadeAccessor method.#"
+    paths:
+        - src
