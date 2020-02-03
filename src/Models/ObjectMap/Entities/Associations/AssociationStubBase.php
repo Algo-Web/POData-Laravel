@@ -111,8 +111,8 @@ abstract class AssociationStubBase
         }
         $thisMult = $this->getMultiplicity();
         $thatMult = $otherStub->getMultiplicity();
-        return (AssociationStubRelationType::MANY()->getValue() == $thisMult->getValue()
-                || $thisMult->getValue() != $thatMult->getValue());
+        return (AssociationStubRelationType::MANY() == $thisMult
+                || $thisMult != $thatMult);
     }
 
     /**

@@ -202,7 +202,7 @@ class MetadataProvider extends MetadataBaseProvider
                 break;
             case AssociationType::NULL_ONE_TO_MANY():
             case AssociationType::ONE_TO_MANY():
-                if ($first->getMultiplicity()->getValue() == AssociationStubRelationType::MANY) {
+                if ($first->getMultiplicity() == AssociationStubRelationType::MANY()) {
                     $oneSide = $last;
                     $manySide = $first;
                 } else {
@@ -251,14 +251,14 @@ class MetadataProvider extends MetadataBaseProvider
             }
 
             $default = $field->getDefaultValue();
-            $isFieldBool = TypeCode::BOOLEAN == $field->getEdmFieldType()->getValue();
+            $isFieldBool = TypeCode::BOOLEAN() == $field->getEdmFieldType();
             $default = $isFieldBool ? ($default ? 'true' : 'false') : strval($default);
 
             $meta->addPrimitiveProperty(
                 $odataEntity,
                 $field->getName(),
                 $field->getEdmFieldType(),
-                $field->getFieldType()->getValue() == EntityFieldType::PRIMITIVE_BAG()->getValue(),
+                $field->getFieldType() == EntityFieldType::PRIMITIVE_BAG(),
                 $default,
                 $field->getIsNullable()
             );
