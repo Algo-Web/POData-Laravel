@@ -391,7 +391,8 @@ class LaravelReadQuery extends LaravelBaseQuery
                 : $sourceEntityInstance instanceof Model ? $sourceEntityInstance
                     : $sourceEntityInstance instanceof Relation ? $sourceEntityInstance
                         : null;
-        if (!$this->getAuth()->canAuth(ActionVerb::READ(), $sourceEntityInstance, $check)) {
+        $sourceName = null !== $check ? get_class($check) : null;
+        if (!$this->getAuth()->canAuth(ActionVerb::READ(), $sourceName, $check)) {
             throw new ODataException('Access denied', 403);
         }
     }
