@@ -9,6 +9,8 @@
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests;
 
 use AlgoWeb\PODataLaravel\Kernels\ConsoleKernel;
+use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use Illuminate\Support\Facades\App;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
@@ -21,7 +23,8 @@ class TestCase extends BaseTestCase
             \AlgoWeb\PODataLaravel\Providers\MetadataRouteProvider::class,
             \AlgoWeb\PODataLaravel\Providers\QueryProvider::class,
             \AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider::class,
-            \Orchestra\Database\ConsoleServiceProvider::class,];
+            \Orchestra\Database\ConsoleServiceProvider::class,
+            ];
     }
 
     /**
@@ -63,6 +66,7 @@ class TestCase extends BaseTestCase
     {
         parent::setUp();
         $this->loadMigrationsFrom(realpath(__DIR__ . '/database/migrations'));
+        App::make(MetadataProvider::class)->boot();
         date_default_timezone_set('UTC');
     }
 

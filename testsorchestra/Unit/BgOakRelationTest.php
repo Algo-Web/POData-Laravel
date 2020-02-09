@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Schema;
  */
 class BgOakRelationTest extends TestCase
 {
-    use DatabaseMigrations;
+    //use DatabaseMigrations;
 
     public function testCityAddressRelationRoundTrip()
     {
