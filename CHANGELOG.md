@@ -5,6 +5,7 @@ Unreleased
      - Thank you to bgoak for finding this and helping to fix it
    * Wring out filtering + counting
      - Thank you to bgoak for finding this and helping to fix it
+   * PHP 5.6 is no longer officially supported
 
 0.3.5 (2018-07-17)
 ------------------
