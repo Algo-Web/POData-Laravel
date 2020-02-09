@@ -64,4 +64,13 @@ class TestCase extends BaseTestCase
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
         date_default_timezone_set('UTC');
     }
+
+    protected function assertSeeShim($result, $expected)
+    {
+        if (method_exists($result, 'assertSee')) {
+            $result->assertSee($expected);
+        } else {
+            $this->assertContains($expected, $result->response->getOriginalContent());
+        }
+    }
 }

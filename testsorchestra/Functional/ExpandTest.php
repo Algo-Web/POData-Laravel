@@ -59,8 +59,8 @@ class ExpandTest extends TestCase
         $expectedLink = '<link rel="edit" title="Address" href="Addresses(addressId=\'foo\')"/>';
         $expectedId = '<d:addressId m:type="Edm.String">foo</d:addressId>';
         $result = $this->get($url);
-        $result->assertSee($expectedLink);
-        $result->assertSee($expectedId);
+        $this->assertSeeShim($result, $expectedLink);
+        $this->assertSeeShim($result, $expectedId);
     }
 
     public function testSingleExpandBelongsToFromAddress()
@@ -70,8 +70,8 @@ class ExpandTest extends TestCase
         $expectedLink = '<link rel="edit" title="City" href="Cities(cityId=\'baz\')"/>';
         $expectedId = '<d:cityId m:type="Edm.String">baz</d:cityId>';
         $result = $this->get($url);
-        $result->assertSee($expectedLink);
-        $result->assertSee($expectedId);
+        $this->assertSeeShim($result, $expectedLink);
+        $this->assertSeeShim($result, $expectedId);
     }
 
     public function testSingleExpandHasManyFromAddress()
@@ -81,8 +81,8 @@ class ExpandTest extends TestCase
         $expectedLink = '<link rel="edit" title="Person" href="People(personId=\'bar\')"/>';
         $expectedId = '<d:personId m:type="Edm.String">bar</d:personId>';
         $result = $this->get($url);
-        $result->assertSee($expectedLink);
-        $result->assertSee($expectedId);
+        $this->assertSeeShim($result, $expectedLink);
+        $this->assertSeeShim($result, $expectedId);
     }
 
     public function testSingleExpandHasManyFromCity()
@@ -92,19 +92,19 @@ class ExpandTest extends TestCase
         $expectedLink = '<link rel="edit" title="Address" href="Addresses(addressId=\'foo\')"/>';
         $expectedId = '<d:addressId m:type="Edm.String">foo</d:addressId>';
         $result = $this->get($url);
-        $result->assertSee($expectedLink);
-        $result->assertSee($expectedId);
+        $this->assertSeeShim($result, $expectedLink);
+        $this->assertSeeShim($result, $expectedId);
     }
 
     public function testSingleRetrieveOffParent()
     {
         $url = 'odata.svc/Addresses(addressId=\'foo\')/City';
 
-        $expectedLink = '';
-        $expectedId = '';
+        $expectedLink = '<link rel="edit" title="City" href="Cities(cityId=\'baz\')"/>';
+        $expectedId = '<d:cityId m:type="Edm.String">baz</d:cityId>';
         $result = $this->get($url);
-        $result->assertSee($expectedLink);
-        $result->assertSee($expectedId);
+        $this->assertSeeShim($result, $expectedLink);
+        $this->assertSeeShim($result, $expectedId);
     }
 
     public function testDoubleExpandBelongsToThenBelongsTo()
@@ -114,8 +114,8 @@ class ExpandTest extends TestCase
         $expectedLink = '<link rel="edit" title="City" href="Cities(cityId=\'baz\')"/>';
         $expectedId = '<d:personId m:type="Edm.String">bar</d:personId>';
         $result = $this->get($url);
-        $result->assertSee($expectedLink);
-        $result->assertSee($expectedId);
+        $this->assertSeeShim($result, $expectedLink);
+        $this->assertSeeShim($result, $expectedId);
     }
 
     public function testDoubleExpandHasManyThenHasMany()
@@ -125,7 +125,7 @@ class ExpandTest extends TestCase
         $expectedLink = '<link rel="edit" title="Person" href="People(personId=\'bar\')"/>';
         $expectedId = '<d:personId m:type="Edm.String">bar</d:personId>';
         $result = $this->get($url);
-        $result->assertSee($expectedLink);
-        $result->assertSee($expectedId);
+        $this->assertSeeShim($result, $expectedLink);
+        $this->assertSeeShim($result, $expectedId);
     }
 }
