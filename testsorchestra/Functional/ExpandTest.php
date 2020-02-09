@@ -96,6 +96,17 @@ class ExpandTest extends TestCase
         $result->assertSee($expectedId);
     }
 
+    public function testSingleRetrieveOffParent()
+    {
+        $url = 'odata.svc/Addresses(addressId=\'foo\')/City';
+
+        $expectedLink = '';
+        $expectedId = '';
+        $result = $this->get($url);
+        $result->assertSee($expectedLink);
+        $result->assertSee($expectedId);
+    }
+
     public function testDoubleExpandBelongsToThenBelongsTo()
     {
         $url = 'odata.svc/People?$expand=Address/City';
