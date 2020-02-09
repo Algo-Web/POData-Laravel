@@ -24,7 +24,7 @@ use Mockery as m;
 
 class IronicSerialiserTest extends TestCase
 {
-    //use DatabaseMigrations;
+    use DatabaseMigrations;
 
     public function setUp()
     {

@@ -12,7 +12,6 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -72,7 +71,7 @@ class MetadataProvider extends MetadataBaseProvider
 
     protected $relationHolder;
 
-    public function __construct(Application $app)
+    public function __construct($app)
     {
         parent::__construct($app);
         self::$isBooted = false;
@@ -355,7 +354,6 @@ class MetadataProvider extends MetadataBaseProvider
                 }
             }
         }
-
         return $ends;
     }
 
