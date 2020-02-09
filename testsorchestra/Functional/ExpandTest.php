@@ -96,4 +96,25 @@ class ExpandTest extends TestCase
         $result->assertSee($expectedId);
     }
 
+    public function testDoubleExpandBelongsToThenBelongsTo()
+    {
+        $url = 'odata.svc/People?$expand=Address/City';
+
+        $expectedLink = '<link rel="edit" title="City" href="Cities(cityId=\'baz\')"/>';
+        $expectedId = '<d:personId m:type="Edm.String">bar</d:personId>';
+        $result = $this->get($url);
+        $result->assertSee($expectedLink);
+        $result->assertSee($expectedId);
+    }
+
+    public function testDoubleExpandHasManyThenHasMany()
+    {
+        $url = 'odata.svc/Cities?$expand=Address/Person';
+
+        $expectedLink = '<link rel="edit" title="Person" href="People(personId=\'bar\')"/>';
+        $expectedId = '<d:personId m:type="Edm.String">bar</d:personId>';
+        $result = $this->get($url);
+        $result->assertSee($expectedLink);
+        $result->assertSee($expectedId);
+    }
 }
