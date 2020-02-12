@@ -44,7 +44,7 @@ use POData\Providers\Metadata\SimpleMetadataProvider;
 
 class MetadataProviderRelationTest extends TestCase
 {
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
         $map = new Map();

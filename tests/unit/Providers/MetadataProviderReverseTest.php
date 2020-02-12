@@ -33,7 +33,7 @@ class MetadataProviderReverseTest extends TestCase
 {
     private $metadataProvider;
 
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
         $map = new Map();

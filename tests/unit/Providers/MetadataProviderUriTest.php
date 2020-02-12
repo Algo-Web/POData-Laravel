@@ -37,7 +37,7 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 
 class MetadataProviderUriTest extends TestCase
 {
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
         $map = new Map();
@@ -46,7 +46,7 @@ class MetadataProviderUriTest extends TestCase
         $foo->reset();
     }
 
-    public function tearDown()
+    public function tearDown() : void
     {
         MetadataProvider::setAfterExtract(null);
         MetadataProvider::setAfterUnify(null);

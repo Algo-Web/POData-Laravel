@@ -12,12 +12,12 @@ class ModelSerialiserTest extends TestCase
 {
     private $serialiser;
 
-    public function setUp()
+    public function setUp() : void
     {
         $this->serialiser = new ModelSerialiser();
     }
 
-    public function tearDown()
+    public function tearDown() : void
     {
         $this->serialiser->reset();
     }
