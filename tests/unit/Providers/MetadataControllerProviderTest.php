@@ -290,6 +290,7 @@ class MetadataControllerProviderTest extends TestCase
         App::shouldReceive('removeAbstractAlias')->passthru();
         App::shouldReceive('resolve')->passthru();
         App::shouldReceive('findInContextualBindings')->passthru();
+        App::shouldReceive('isDeferredService')->passthru();
 
         $container = m::mock(MetadataControllerContainer::class);
         $container->shouldReceive('setMetadata')->withArgs([[]])->passthru()->never();

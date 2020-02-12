@@ -413,7 +413,7 @@ trait MetadataTrait
         }
 
         $fkList = ['getQualifiedForeignKeyName', 'getForeignKey'];
-        $rkList = ['getQualifiedRelatedKeyName', 'getOtherKey', 'getOwnerKey'];
+        $rkList = ['getQualifiedRelatedKeyName', 'getOtherKey', 'getOwnerKey', 'getQualifiedOwnerKeyName'];
 
         $fkMethodName = null;
         $rkMethodName = null;
