@@ -24,7 +24,7 @@ class QueryProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(
+        $this->app->/** @scrutinizer ignore-call */singleton(
             'odataquery',
             function () {
                 return new LaravelQuery();

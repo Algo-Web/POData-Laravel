@@ -85,7 +85,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
      */
     public function register()
     {
-        $this->app->singleton(
+        $this->app->/** @scrutinizer ignore-call */singleton(
             'metadataControllers',
             function () {
                 return new MetadataControllerContainer();
