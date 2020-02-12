@@ -90,7 +90,7 @@ class TestCase extends BaseTestCase
         return $database;
     }
 
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
         date_default_timezone_set('UTC');
@@ -104,7 +104,7 @@ class TestCase extends BaseTestCase
         //Schema::swap($builder);
     }
 
-    public function tearDown()
+    public function tearDown() : void
     {
         //Schema::swap($this->origFacade['schema']);
         parent::tearDown();

@@ -20,7 +20,8 @@ class TestCase extends BaseTestCase
             \AlgoWeb\PODataLaravel\Providers\MetadataProvider::class,
             \AlgoWeb\PODataLaravel\Providers\MetadataRouteProvider::class,
             \AlgoWeb\PODataLaravel\Providers\QueryProvider::class,
-            \AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider::class];
+            \AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider::class,
+            \Orchestra\Database\ConsoleServiceProvider::class,];
     }
 
     /**
@@ -58,10 +59,19 @@ class TestCase extends BaseTestCase
         ]);
     }
 
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
-        //$this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+        $this->loadMigrationsFrom(realpath(__DIR__ . '/database/migrations'));
         date_default_timezone_set('UTC');
+    }
+
+    protected function assertSeeShim($result, $expected)
+    {
+        if (method_exists($result, 'assertSee')) {
+            $result->assertSee($expected);
+        } else {
+            $this->assertContains($expected, $result->response->getOriginalContent());
+        }
     }
 }

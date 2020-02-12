@@ -24,7 +24,7 @@ class MetadataTraitTest extends TestCase
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
         $this->object = $this->getMockForTrait('\AlgoWeb\PODataLaravel\Models\MetadataTrait');
@@ -43,7 +43,7 @@ class MetadataTraitTest extends TestCase
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */
-    public function tearDown()
+    public function tearDown() : void
     {
         parent::tearDown();
     }
@@ -414,7 +414,7 @@ class MetadataTraitTest extends TestCase
 
         try {
             $foo->setEagerLoad($relations);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
@@ -519,7 +519,7 @@ class MetadataTraitTest extends TestCase
 
         try {
             $foo->setEagerLoad(['foobar', new \stdClass()]);
-        } catch (ErrorException $e) {
+        } catch (\Throwable $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);

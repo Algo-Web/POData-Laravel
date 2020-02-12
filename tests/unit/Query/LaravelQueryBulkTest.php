@@ -610,13 +610,13 @@ class LaravelQueryBulkTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
         $this->origFacade['DB'] = DB::getFacadeRoot();
     }
 
-    public function tearDown()
+    public function tearDown() : void
     {
         DB::swap($this->origFacade['DB']);
         parent::tearDown();
