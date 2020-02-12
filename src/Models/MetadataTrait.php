@@ -616,7 +616,7 @@ trait MetadataTrait
         foreach ($rels['KnownPolyMorphSide'] as $property => $foo) {
             $isMany = $foo instanceof MorphToMany;
             $targ = get_class($foo->getRelated());
-            $mult = $isMany ? '*' : $foo instanceof MorphMany ? '*' : '1';
+            $mult = $isMany ? '*' : ($foo instanceof MorphMany ? '*' : '1');
             $mult = $foo instanceof MorphOne ? '0..1' : $mult;
 
             list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isMany);
