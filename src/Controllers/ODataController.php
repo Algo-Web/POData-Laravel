@@ -79,10 +79,12 @@ class ODataController extends BaseController
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     protected function getAppPageSize()
     {
-        return env('APP_PAGE_SIZE', null);
+        /** @var mixed|null $size */
+        $size = env('APP_PAGE_SIZE', null);
+        return null !== $size ? intval($size) : null;
     }
 }
