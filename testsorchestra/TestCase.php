@@ -59,7 +59,7 @@ class TestCase extends BaseTestCase
         ]);
     }
 
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
         $this->loadMigrationsFrom(realpath(__DIR__ . '/database/migrations'));
