@@ -265,42 +265,46 @@ trait MetadataTrait
                              'morphedByMany'
                          ] as $relation) {
                     $search = '$this->' . $relation . '(';
-                    if (stripos(/** @scrutinizer ignore-type */$code, $search)) {
-                        //Resolve the relation's model to a Relation object.
-                        $relationObj = $model->$method();
-                        if ($relationObj instanceof Relation) {
-                            $relObject = $relationObj->getRelated();
-                            $relatedModel = '\\' . get_class($relObject);
-                            if (in_array(MetadataTrait::class, class_uses($relatedModel))) {
-                                $relations = [
-                                    'hasManyThrough',
-                                    'belongsToMany',
-                                    'hasMany',
-                                    'morphMany',
-                                    'morphToMany',
-                                    'morphedByMany'
-                                ];
-                                if (in_array($relation, $relations)) {
-                                    //Collection or array of models (because Collection is Arrayable)
-                                    $relationships['HasMany'][$method] = $biDir ? $relationObj : $relatedModel;
-                                } elseif ('morphTo' === $relation) {
-                                    // Model isn't specified because relation is polymorphic
-                                    $relationships['UnknownPolyMorphSide'][$method] =
-                                        $biDir ? $relationObj : '\Illuminate\Database\Eloquent\Model|\Eloquent';
-                                } else {
-                                    //Single model is returned
-                                    $relationships['HasOne'][$method] = $biDir ? $relationObj : $relatedModel;
-                                }
-                                if (in_array($relation, ['morphMany', 'morphOne', 'morphToMany'])) {
-                                    $relationships['KnownPolyMorphSide'][$method] =
-                                        $biDir ? $relationObj : $relatedModel;
-                                }
-                                if (in_array($relation, ['morphedByMany'])) {
-                                    $relationships['UnknownPolyMorphSide'][$method] =
-                                        $biDir ? $relationObj : $relatedModel;
-                                }
-                            }
-                        }
+                    $found = stripos(/** @scrutinizer ignore-type */$code, $search);
+                    if (!$found) {
+                        continue;
+                    }
+                    //Resolve the relation's model to a Relation object.
+                    $relationObj = $model->$method();
+                    if (!($relationObj instanceof Relation)) {
+                        continue;
+                    }
+                    $relObject = $relationObj->getRelated();
+                    $relatedModel = '\\' . get_class($relObject);
+                    if (!in_array(MetadataTrait::class, class_uses($relatedModel))) {
+                        continue;
+                    }
+                    $relations = [
+                        'hasManyThrough',
+                        'belongsToMany',
+                        'hasMany',
+                        'morphMany',
+                        'morphToMany',
+                        'morphedByMany'
+                    ];
+                    if (in_array($relation, $relations)) {
+                        //Collection or array of models (because Collection is Arrayable)
+                        $relationships['HasMany'][$method] = $biDir ? $relationObj : $relatedModel;
+                    } elseif ('morphTo' === $relation) {
+                        // Model isn't specified because relation is polymorphic
+                        $relationships['UnknownPolyMorphSide'][$method] =
+                            $biDir ? $relationObj : '\Illuminate\Database\Eloquent\Model|\Eloquent';
+                    } else {
+                        //Single model is returned
+                        $relationships['HasOne'][$method] = $biDir ? $relationObj : $relatedModel;
+                    }
+                    if (in_array($relation, ['morphMany', 'morphOne', 'morphToMany'])) {
+                        $relationships['KnownPolyMorphSide'][$method] =
+                            $biDir ? $relationObj : $relatedModel;
+                    }
+                    if (in_array($relation, ['morphedByMany'])) {
+                        $relationships['UnknownPolyMorphSide'][$method] =
+                            $biDir ? $relationObj : $relatedModel;
                     }
                 }
             }
