@@ -414,7 +414,7 @@ class MetadataTraitTest extends TestCase
 
         try {
             $foo->setEagerLoad($relations);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
@@ -519,7 +519,7 @@ class MetadataTraitTest extends TestCase
 
         try {
             $foo->setEagerLoad(['foobar', new \stdClass()]);
-        } catch (ErrorException $e) {
+        } catch (\Throwable $e) {
             $actual = $e->getMessage();
         }
         $this->assertEquals($expected, $actual);
