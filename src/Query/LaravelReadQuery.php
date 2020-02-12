@@ -386,11 +386,11 @@ class LaravelReadQuery extends LaravelBaseQuery
      */
     private function checkAuth($sourceEntityInstance, $checkInstance = null)
     {
-        $check = $checkInstance instanceof Model ? $checkInstance
-            : $checkInstance instanceof Relation ? $checkInstance
-                : $sourceEntityInstance instanceof Model ? $sourceEntityInstance
-                    : $sourceEntityInstance instanceof Relation ? $sourceEntityInstance
-                        : null;
+        $check = array_reduce([$sourceEntityInstance, $checkInstance], function ($carry, $item) {
+            if ($item instanceof Model || $item instanceof Relation) {
+                return $item;
+            }
+        }, null);
         $sourceName = null !== $check ? get_class($check) : null;
         if (!$this->getAuth()->canAuth(ActionVerb::READ(), $sourceName, $check)) {
             throw new ODataException('Access denied', 403);
