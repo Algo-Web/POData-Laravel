@@ -291,24 +291,23 @@ trait MetadataTrait
                     if (!in_array(MetadataTrait::class, class_uses($relatedModel))) {
                         continue;
                     }
+                    $targObject = $biDir ? $relationObj : $relatedModel;
                     if (in_array($relation, static::$manyRelTypes)) {
                         //Collection or array of models (because Collection is Arrayable)
-                        $relationships['HasMany'][$method] = $biDir ? $relationObj : $relatedModel;
+                        $relationships['HasMany'][$method] = $targObject;
                     } elseif ('morphTo' === $relation) {
                         // Model isn't specified because relation is polymorphic
                         $relationships['UnknownPolyMorphSide'][$method] =
                             $biDir ? $relationObj : '\Illuminate\Database\Eloquent\Model|\Eloquent';
                     } else {
                         //Single model is returned
-                        $relationships['HasOne'][$method] = $biDir ? $relationObj : $relatedModel;
+                        $relationships['HasOne'][$method] = $targObject;
                     }
                     if (in_array($relation, ['morphMany', 'morphOne', 'morphToMany'])) {
-                        $relationships['KnownPolyMorphSide'][$method] =
-                            $biDir ? $relationObj : $relatedModel;
+                        $relationships['KnownPolyMorphSide'][$method] = $targObject;
                     }
                     if (in_array($relation, ['morphedByMany'])) {
-                        $relationships['UnknownPolyMorphSide'][$method] =
-                            $biDir ? $relationObj : $relatedModel;
+                        $relationships['UnknownPolyMorphSide'][$method] = $targObject;
                     }
                 }
             }
