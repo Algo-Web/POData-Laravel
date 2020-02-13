@@ -118,20 +118,12 @@ trait MetadataKeyMethodNamesTrait
                 throw new InvalidOperationException($msg);
             }
             $fkMethodName = $fkCombo[0];
-            if (!(in_array($fkMethodName, $methodList))) {
-                $msg = 'Selected method, ' . $fkMethodName . ', not in method list';
-                throw new InvalidOperationException($msg);
-            }
             $rkCombo = array_values(array_intersect($rkList, $methodList));
             if (!(1 <= count($rkCombo))) {
                 $msg = 'Expected at least 1 element in related-key list, got ' . count($rkCombo);
                 throw new InvalidOperationException($msg);
             }
             $rkMethodName = $rkCombo[0];
-            if (!(in_array($rkMethodName, $methodList))) {
-                $msg = 'Selected method, ' . $rkMethodName . ', not in method list';
-                throw new InvalidOperationException($msg);
-            }
             $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
             static::$methodAlternate[get_class($foo)] = $line;
         }
@@ -174,5 +166,11 @@ trait MetadataKeyMethodNamesTrait
         $methods = get_class_methods($rel);
 
         return $methods;
+    }
+
+    protected function resetKeyMethod()
+    {
+        static::$methodPrimary = [];
+        static::$methodAlternate = [];
     }
 }

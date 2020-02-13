@@ -21,6 +21,11 @@ class CreateTestModelsTable extends Migration
             $table->float('weight')->default(0);
             $table->string('code')->default('');
         });
+
+        Schema::create('relation_test_dummy_models', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -30,6 +35,7 @@ class CreateTestModelsTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('relation_test_dummy_models');
         Schema::dropIfExists('test_models');
     }
 }
