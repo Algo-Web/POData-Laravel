@@ -16,12 +16,12 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class ExpandTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass() : void
     {
         putenv('APP_DISABLE_AUTH=true');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass() : void
     {
         putenv('APP_DISABLE_AUTH=false');
     }
