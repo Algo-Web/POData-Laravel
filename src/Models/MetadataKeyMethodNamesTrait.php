@@ -25,7 +25,7 @@ trait MetadataKeyMethodNamesTrait
      * @return array|null
      * @throws InvalidOperationException
      */
-    protected function getRelationsHasManyKeyNames($foo)
+    protected function getRelationsHasManyKeyNames(Relation $foo)
     {
         $thruName = null;
         if ($foo instanceof HasManyThrough) {
@@ -48,7 +48,7 @@ trait MetadataKeyMethodNamesTrait
      * @return array
      * @throws InvalidOperationException
      */
-    protected function polyglotKeyMethodNames($foo, $condition = false)
+    protected function polyglotKeyMethodNames(Relation $foo, $condition = false)
     {
         // if $condition is falsy, return quickly - don't muck around
         if (!$condition) {
@@ -93,7 +93,7 @@ trait MetadataKeyMethodNamesTrait
      * @return array
      * @throws InvalidOperationException
      */
-    protected function polyglotKeyMethodBackupNames($foo, $condition = false)
+    protected function polyglotKeyMethodBackupNames(Relation $foo, $condition = false)
     {
         // if $condition is falsy, return quickly - don't muck around
         if (!$condition) {
