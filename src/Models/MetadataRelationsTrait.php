@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Mockery\Mock;
 use POData\Common\InvalidOperationException;
 
 trait MetadataRelationsTrait
@@ -328,5 +327,4 @@ trait MetadataRelationsTrait
             'type' => $type
         ];
     }
-
 }
