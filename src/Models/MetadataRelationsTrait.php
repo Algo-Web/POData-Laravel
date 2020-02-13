@@ -101,7 +101,7 @@ trait MetadataRelationsTrait
                 'HasMany' => [],
                 'KnownPolyMorphSide' => []
             ];
-            $methods = $this->getClassMethods($model);
+            $methods = $this->getModelClassMethods($model);
             foreach ($methods as $method) {
                 //Use reflection to inspect the code, based on Illuminate/Support/SerializableClosure.php
                 $reflection = new \ReflectionMethod($model, $method);
@@ -329,21 +329,4 @@ trait MetadataRelationsTrait
         ];
     }
 
-    /**
-     * @param Model $model
-     * @return array
-     */
-    protected function getClassMethods(Model $model)
-    {
-        $methods = get_class_methods($model);
-        $filter = function ($method) {
-            return (!method_exists('Illuminate\Database\Eloquent\Model', $method)
-                    && !method_exists(Mock::class, $method)
-                    && !method_exists(MetadataTrait::class, $method)
-            );
-        };
-        $methods = array_filter($methods, $filter);
-
-        return $methods;
-    }
 }

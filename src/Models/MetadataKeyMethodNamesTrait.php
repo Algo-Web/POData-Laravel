@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Mockery\Mock;
 use POData\Common\InvalidOperationException;
 
 trait MetadataKeyMethodNamesTrait
@@ -41,7 +42,7 @@ trait MetadataKeyMethodNamesTrait
     }
 
     /**
-     * @param       $foo
+     * @param Relation $foo
      * @param mixed $condition
      *
      * @return array
@@ -65,7 +66,7 @@ trait MetadataKeyMethodNamesTrait
             $fkMethodName = $line['fk'];
             $rkMethodName = $line['rk'];
         } else {
-            $methodList = get_class_methods(get_class($foo));
+            $methodList = $this->getRelationClassMethods($foo);
             $fkMethodName = 'getQualifiedForeignPivotKeyName';
             $fkIntersect = array_values(array_intersect($fkList, $methodList));
             $fkMethodName = (0 < count($fkIntersect)) ? $fkIntersect[0] : $fkMethodName;
@@ -87,7 +88,7 @@ trait MetadataKeyMethodNamesTrait
     }
 
     /**
-     * @param Model|Relation $foo
+     * @param Relation $foo
      * @param bool $condition
      * @return array
      * @throws InvalidOperationException
@@ -110,7 +111,7 @@ trait MetadataKeyMethodNamesTrait
             $fkMethodName = $line['fk'];
             $rkMethodName = $line['rk'];
         } else {
-            $methodList = get_class_methods(get_class($foo));
+            $methodList = $this->getRelationClassMethods($foo);
             $fkCombo = array_values(array_intersect($fkList, $methodList));
             if (!(1 <= count($fkCombo))) {
                 $msg = 'Expected at least 1 element in foreign-key list, got ' . count($fkCombo);
@@ -141,8 +142,37 @@ trait MetadataKeyMethodNamesTrait
     {
         $thruList = ['getThroughKey', 'getQualifiedFirstKeyName'];
 
-        $methodList = get_class_methods(get_class($foo));
+        $methodList = $this->getRelationClassMethods($foo);
         $thruCombo = array_values(array_intersect($thruList, $methodList));
         return $thruCombo[0];
+    }
+
+    /**
+     * @param Model $model
+     * @return array
+     */
+    protected function getModelClassMethods(Model $model)
+    {
+        $methods = get_class_methods($model);
+        $filter = function ($method) {
+            return (!method_exists('Illuminate\Database\Eloquent\Model', $method)
+                    && !method_exists(Mock::class, $method)
+                    && !method_exists(MetadataTrait::class, $method)
+            );
+        };
+        $methods = array_filter($methods, $filter);
+
+        return $methods;
+    }
+
+    /**
+     * @param Relation $rel
+     * @return array
+     */
+    protected function getRelationClassMethods(Relation $rel)
+    {
+        $methods = get_class_methods($rel);
+
+        return $methods;
     }
 }
