@@ -33,6 +33,28 @@ trait MetadataTrait
     protected static $tableData = [];
     protected static $dontCastTypes = ['object', 'array', 'collection', 'int'];
 
+    protected static $relTypes = [
+        'hasMany',
+        'hasManyThrough',
+        'belongsToMany',
+        'hasOne',
+        'belongsTo',
+        'morphOne',
+        'morphTo',
+        'morphMany',
+        'morphToMany',
+        'morphedByMany'
+    ];
+
+    protected static $manyRelTypes = [
+        'hasManyThrough',
+        'belongsToMany',
+        'hasMany',
+        'morphMany',
+        'morphToMany',
+        'morphedByMany'
+    ];
+
     /**
      * Retrieve and assemble this model's metadata for OData packaging
      * @return array
@@ -253,18 +275,7 @@ trait MetadataTrait
                     $msg = 'Final character of function definition must be closing brace';
                     throw new InvalidOperationException($msg);
                 }
-                foreach ([
-                             'hasMany',
-                             'hasManyThrough',
-                             'belongsToMany',
-                             'hasOne',
-                             'belongsTo',
-                             'morphOne',
-                             'morphTo',
-                             'morphMany',
-                             'morphToMany',
-                             'morphedByMany'
-                         ] as $relation) {
+                foreach (static::$relTypes as $relation) {
                     $search = '$this->' . $relation . '(';
                     $found = stripos(/** @scrutinizer ignore-type */$code, $search);
                     if (!$found) {
@@ -280,15 +291,7 @@ trait MetadataTrait
                     if (!in_array(MetadataTrait::class, class_uses($relatedModel))) {
                         continue;
                     }
-                    $relations = [
-                        'hasManyThrough',
-                        'belongsToMany',
-                        'hasMany',
-                        'morphMany',
-                        'morphToMany',
-                        'morphedByMany'
-                    ];
-                    if (in_array($relation, $relations)) {
+                    if (in_array($relation, static::$manyRelTypes)) {
                         //Collection or array of models (because Collection is Arrayable)
                         $relationships['HasMany'][$method] = $biDir ? $relationObj : $relatedModel;
                     } elseif ('morphTo' === $relation) {
