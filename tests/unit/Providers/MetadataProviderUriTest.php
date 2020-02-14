@@ -94,7 +94,7 @@ class MetadataProviderUriTest extends TestCase
         $app = App::make('app');
         $foo = new MetadataProviderDummy($app);
         $foo->setCandidateModels($classen);
-        $foo->boot(false);
+        $foo->boot();
 
         $meta = App::make('metadata');
 
@@ -162,7 +162,7 @@ class MetadataProviderUriTest extends TestCase
         $app = App::make('app');
         $foo = new MetadataProviderDummy($app);
         $foo->setCandidateModels($classen);
-        $foo->boot(false);
+        $foo->boot();
 
         $meta = App::make('metadata');
 
@@ -381,7 +381,7 @@ class MetadataProviderUriTest extends TestCase
         $app = App::make('app');
         $foo = new MetadataProviderDummy($app);
         $foo->setCandidateModels($classen);
-        $foo->boot(false);
+        $foo->boot();
 
         $meta = App::make('metadata');
 
@@ -465,7 +465,7 @@ class MetadataProviderUriTest extends TestCase
         $app = App::make('app');
         $foo = new MetadataProviderDummy($app);
         $foo->setCandidateModels($classen);
-        $foo->boot(false);
+        $foo->boot();
 
         $meta = App::make('metadata');
 

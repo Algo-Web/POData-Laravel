@@ -246,14 +246,12 @@ class MetadataProvider extends MetadataBaseProvider
     /**
      * Bootstrap the application services.  Post-boot.
      *
-     * @param mixed $reset
-     *
      * @return void
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function boot($reset = true)
+    public function boot()
     {
         App::forgetInstance('metadata');
         App::forgetInstance('objectmap');
@@ -281,9 +279,6 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
         $meta = App::make('metadata');
-        if (false !== $reset) {
-            //$this->reset();
-        }
 
         $modelNames = $this->getCandidateModels();
         $objectModel = $this->extract($modelNames);
