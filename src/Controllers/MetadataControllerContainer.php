@@ -23,8 +23,8 @@ class MetadataControllerContainer
     }
 
     /**
-     * @param $modelName
-     * @param $verb
+     * @param string $modelName
+     * @param string $verb
      * @return array
      */
     public function getMapping($modelName, $verb)
