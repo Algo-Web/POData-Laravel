@@ -19,9 +19,13 @@ use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 
 class LaravelBulkQuery
 {
+    /** @var AuthInterface */
     protected $auth;
+    /** @var MetadataProvider */
     protected $metadataProvider;
+    /** @var LaravelQuery */
     protected $query;
+    /** @var MetadataControllerContainer */
     protected $controllerContainer;
 
     public function __construct(LaravelQuery &$query, AuthInterface $auth = null)
@@ -225,7 +229,7 @@ class LaravelBulkQuery
 
     /**
      * @param ResourceSet $sourceResourceSet
-     * @param $verbName
+     * @param string $verbName
      * @return array|null
      * @throws InvalidOperationException
      * @throws \ReflectionException
@@ -242,6 +246,9 @@ class LaravelBulkQuery
         return $this->getControllerContainer()->getMapping($modelName, $verbName);
     }
 
+    /**
+     * @return LaravelQuery
+     */
     public function getQuery()
     {
         return $this->query;

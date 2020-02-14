@@ -24,6 +24,8 @@ use POData\Providers\Metadata\Type\TypeCode;
 
 class MetadataProvider extends MetadataBaseProvider
 {
+    use MetadataProviderStepTrait;
+
     protected $multConstraints = ['0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
     protected static $metaNAMESPACE = 'Data';
     protected static $isBooted = false;
@@ -42,32 +44,6 @@ class MetadataProvider extends MetadataBaseProvider
     {
         return $this->completedObjectMap;
     }
-
-    protected static $afterExtract;
-    protected static $afterUnify;
-    protected static $afterVerify;
-    protected static $afterImplement;
-
-    public static function setAfterExtract(callable $method = null)
-    {
-        self::$afterExtract = $method;
-    }
-
-    public static function setAfterUnify(callable $method = null)
-    {
-        self::$afterUnify = $method;
-    }
-
-    public static function setAfterVerify(callable $method = null)
-    {
-        self::$afterVerify = $method;
-    }
-
-    public static function setAfterImplement(callable $method = null)
-    {
-        self::$afterImplement = $method;
-    }
-
 
     protected $relationHolder;
 
@@ -270,14 +246,12 @@ class MetadataProvider extends MetadataBaseProvider
     /**
      * Bootstrap the application services.  Post-boot.
      *
-     * @param mixed $reset
-     *
      * @return void
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function boot($reset = true)
+    public function boot()
     {
         App::forgetInstance('metadata');
         App::forgetInstance('objectmap');
@@ -305,9 +279,6 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
         $meta = App::make('metadata');
-        if (false !== $reset) {
-            //$this->reset();
-        }
 
         $modelNames = $this->getCandidateModels();
         $objectModel = $this->extract($modelNames);
@@ -412,18 +383,5 @@ class MetadataProvider extends MetadataBaseProvider
     public function isRunningInArtisan()
     {
         return App::runningInConsole() && !App::runningUnitTests();
-    }
-
-    /**
-     * Encapsulate applying self::$after{FOO} calls
-     *
-     * @param mixed $parm
-     * @param callable|null $func
-     */
-    private function handleCustomFunction($parm, callable $func = null)
-    {
-        if (null != $func) {
-            $func($parm);
-        }
     }
 }

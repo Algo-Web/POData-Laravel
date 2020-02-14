@@ -394,7 +394,7 @@ class MetadataProviderRelationTest extends TestCase
         $app = App::make('app');
         $foo = new MetadataProviderDummy($app);
         $foo->setCandidateModels($classen);
-        $foo->boot(false);
+        $foo->boot();
 
         $metadata = App::make('metadata');
         $xml = $metadata->getXML();
