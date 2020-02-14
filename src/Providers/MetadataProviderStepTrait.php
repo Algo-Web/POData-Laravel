@@ -10,7 +10,6 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 trait MetadataProviderStepTrait
 {
-
     protected static $afterExtract;
     protected static $afterUnify;
     protected static $afterVerify;
