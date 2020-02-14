@@ -20,8 +20,6 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 class LaravelWriteQuery extends LaravelBaseQuery
 {
-
-
     /**
      * @param $data
      * @param $paramList
@@ -136,10 +134,6 @@ class LaravelWriteQuery extends LaravelBaseQuery
             );
         }
 
-        if (null === $data) {
-            $msg = 'Data must not be null';
-            throw new InvalidOperationException($msg);
-        }
         $arrayData = is_object($data) ? (array)$data : $data;
         if (!is_array($arrayData)) {
             throw ODataException::createPreConditionFailedError(
