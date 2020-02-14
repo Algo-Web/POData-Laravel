@@ -24,6 +24,8 @@ use POData\Providers\Metadata\Type\TypeCode;
 
 class MetadataProvider extends MetadataBaseProvider
 {
+    use MetadataProviderStepTrait;
+
     protected $multConstraints = ['0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
     protected static $metaNAMESPACE = 'Data';
     protected static $isBooted = false;
@@ -42,32 +44,6 @@ class MetadataProvider extends MetadataBaseProvider
     {
         return $this->completedObjectMap;
     }
-
-    protected static $afterExtract;
-    protected static $afterUnify;
-    protected static $afterVerify;
-    protected static $afterImplement;
-
-    public static function setAfterExtract(callable $method = null)
-    {
-        self::$afterExtract = $method;
-    }
-
-    public static function setAfterUnify(callable $method = null)
-    {
-        self::$afterUnify = $method;
-    }
-
-    public static function setAfterVerify(callable $method = null)
-    {
-        self::$afterVerify = $method;
-    }
-
-    public static function setAfterImplement(callable $method = null)
-    {
-        self::$afterImplement = $method;
-    }
-
 
     protected $relationHolder;
 
@@ -412,18 +388,5 @@ class MetadataProvider extends MetadataBaseProvider
     public function isRunningInArtisan()
     {
         return App::runningInConsole() && !App::runningUnitTests();
-    }
-
-    /**
-     * Encapsulate applying self::$after{FOO} calls
-     *
-     * @param mixed $parm
-     * @param callable|null $func
-     */
-    private function handleCustomFunction($parm, callable $func = null)
-    {
-        if (null != $func) {
-            $func($parm);
-        }
     }
 }
