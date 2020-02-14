@@ -177,6 +177,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         $this->checkAuth($sourceEntityInstance);
 
         $propertyName = $targetProperty->getName();
+        /** @var Relation $results */
         $results = $sourceEntityInstance->$propertyName();
 
         return $this->getResourceSet(
@@ -334,6 +335,7 @@ class LaravelReadQuery extends LaravelBaseQuery
             throw new InvalidArgumentException($msg);
         }
         // take key descriptor and turn it into where clause here, rather than in getResource call
+        /** @var Relation $sourceEntityInstance */
         $sourceEntityInstance = $sourceEntityInstance->$propertyName();
         $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
         $result = $this->getResource(null, null, [], [], $sourceEntityInstance);
