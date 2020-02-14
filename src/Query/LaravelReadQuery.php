@@ -253,7 +253,7 @@ class LaravelReadQuery extends LaravelBaseQuery
             throw new InvalidOperationException('');
         }
 
-        $this->processKeyDescriptor(/** @scrutinizer ignore-type */$sourceEntityInstance, $keyDescriptor);
+        $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
         foreach ($whereCondition as $fieldName => $fieldValue) {
             $sourceEntityInstance = $sourceEntityInstance->where($fieldName, $fieldValue);
         }
@@ -294,12 +294,10 @@ class LaravelReadQuery extends LaravelBaseQuery
 
         $propertyName = $targetProperty->getName();
         $propertyName = $this->getLaravelRelationName($propertyName);
+        /** @var Model|null $result */
         $result = $sourceEntityInstance->$propertyName()->first();
         if (null === $result) {
             return null;
-        }
-        if (!$result instanceof Model) {
-            throw new InvalidOperationException('Model not retrieved from Eloquent relation');
         }
         if ($targetProperty->getResourceType()->getInstanceType()->getName() != get_class($result)) {
             return null;

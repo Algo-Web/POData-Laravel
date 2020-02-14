@@ -738,20 +738,12 @@ class LaravelQueryTest extends TestCase
         $sourceEntity->shouldReceive('where')->andReturnSelf();
         $sourceEntity->shouldReceive('orderBy')->andReturnSelf();
         $sourceEntity->shouldReceive('morphTarget')->andReturnSelf()->once();
-        $sourceEntity->shouldReceive('first')->andReturn('a')->once();
+        $sourceEntity->shouldReceive('first')->andReturnSelf()->once();
         $property->shouldReceive('getResourceType->getInstanceType->getName')->andReturn(get_class($sourceEntity));
 
         $foo = new LaravelQuery();
 
-        $expected = 'Model not retrieved from Eloquent relation';
-        $actual = null;
-
-        try {
-            $result = $foo->getRelatedResourceReference($srcResource, $sourceEntity, $dstResource, $property);
-        } catch (InvalidOperationException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
+        $result = $foo->getRelatedResourceReference($srcResource, $sourceEntity, $dstResource, $property);
     }
 
     public function testGetRelatedResourceReferenceWithValidGubbins()
