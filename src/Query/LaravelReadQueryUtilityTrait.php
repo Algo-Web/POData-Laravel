@@ -22,6 +22,8 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 trait LaravelReadQueryUtilityTrait
 {
+    protected $name;
+
     /**
      * @param SkipTokenInfo $skipToken
      * @param Model|Builder $sourceEntityInstance
