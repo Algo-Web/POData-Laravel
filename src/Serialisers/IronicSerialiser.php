@@ -888,7 +888,7 @@ class IronicSerialiser implements IObjectSerialiser
             $value = $this->getService()->getHost()->getQueryStringItem($queryOption);
             if (null !== $value) {
                 if (null !== $queryParameterString) {
-                    $queryParameterString = $queryParameterString . '&';
+                    $queryParameterString = /** @scrutinizer ignore-type */$queryParameterString . '&';
                 }
 
                 $queryParameterString .= $queryOption . '=' . $value;
