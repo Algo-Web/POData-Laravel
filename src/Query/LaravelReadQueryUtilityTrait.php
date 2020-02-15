@@ -97,7 +97,7 @@ trait LaravelReadQueryUtilityTrait
     }
 
     /**
-     * @param Model|Builder $sourceEntityInstance
+     * @param Model|Relation|Builder $sourceEntityInstance
      * @param  KeyDescriptor|null        $keyDescriptor
      * @throws InvalidOperationException
      */

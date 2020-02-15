@@ -234,32 +234,6 @@ class LaravelReadQueryTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testGetRelatedResourceReferenceBadResult()
-    {
-        $rSet = m::mock(ResourceSet::class);
-        $targProp = m::mock(ResourceProperty::class);
-        $targProp->shouldReceive('getName')->andReturn('oneSource')->once();
-
-        $foo = m::mock(LaravelReadQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
-
-        $rel = m::mock(HasOne::class)->makePartial();
-        $rel->shouldReceive('first')->andReturn(new \stdClass())->once();
-
-        $entity = m::mock(TestMonomorphicSource::class)->makePartial();
-        $entity->shouldReceive('oneSource')->andReturn($rel)->once();
-
-        $expected = 'Model not retrieved from Eloquent relation';
-        $actual = null;
-
-        try {
-            $foo->getRelatedResourceReference($rSet, $entity, $rSet, $targProp);
-        } catch (InvalidOperationException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
     public function testGetResourceFromRelatedResourceSetBadResult()
     {
         $rSet = m::mock(ResourceSet::class);

@@ -200,6 +200,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         $skip = null,
         $skipToken = null
     ) {
+        /** @var Model $source */
         $source = $this->unpackSourceEntity($sourceEntityInstance);
         return $this->getReader()->getRelatedResourceSet(
             $queryType,
@@ -235,6 +236,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         ResourceProperty $targetProperty,
         KeyDescriptor $keyDescriptor
     ) {
+        /** @var Model $source */
         $source = $this->unpackSourceEntity($sourceEntityInstance);
         return $this->getReader()->getResourceFromRelatedResourceSet(
             $sourceResourceSet,
@@ -264,6 +266,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty
     ) {
+        /** @var Model $source */
         $source = $this->unpackSourceEntity($sourceEntityInstance);
 
         $result = $this->getReader()->getRelatedResourceReference(

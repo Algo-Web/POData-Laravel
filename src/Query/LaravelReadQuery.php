@@ -177,6 +177,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         $this->checkAuth($sourceEntityInstance);
 
         $propertyName = $targetProperty->getName();
+        /** @var Relation $results */
         $results = $sourceEntityInstance->$propertyName();
 
         return $this->getResourceSet(
@@ -252,7 +253,7 @@ class LaravelReadQuery extends LaravelBaseQuery
             throw new InvalidOperationException('');
         }
 
-        $this->processKeyDescriptor(/** @scrutinizer ignore-type */$sourceEntityInstance, $keyDescriptor);
+        $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
         foreach ($whereCondition as $fieldName => $fieldValue) {
             $sourceEntityInstance = $sourceEntityInstance->where($fieldName, $fieldValue);
         }
@@ -293,12 +294,10 @@ class LaravelReadQuery extends LaravelBaseQuery
 
         $propertyName = $targetProperty->getName();
         $propertyName = $this->getLaravelRelationName($propertyName);
+        /** @var Model|null $result */
         $result = $sourceEntityInstance->$propertyName()->first();
         if (null === $result) {
             return null;
-        }
-        if (!$result instanceof Model) {
-            throw new InvalidOperationException('Model not retrieved from Eloquent relation');
         }
         if ($targetProperty->getResourceType()->getInstanceType()->getName() != get_class($result)) {
             return null;
@@ -334,6 +333,7 @@ class LaravelReadQuery extends LaravelBaseQuery
             throw new InvalidArgumentException($msg);
         }
         // take key descriptor and turn it into where clause here, rather than in getResource call
+        /** @var Relation $sourceEntityInstance */
         $sourceEntityInstance = $sourceEntityInstance->$propertyName();
         $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
         $result = $this->getResource(null, null, [], [], $sourceEntityInstance);

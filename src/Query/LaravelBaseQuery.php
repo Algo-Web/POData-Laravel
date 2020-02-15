@@ -13,6 +13,8 @@ use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Providers\Query\QueryResult;
@@ -27,6 +29,10 @@ abstract class LaravelBaseQuery
     protected $controllerContainer;
     protected $verbMap = [];
 
+    /**
+     * LaravelBaseQuery constructor.
+     * @param AuthInterface|null $auth
+     */
     public function __construct(AuthInterface $auth = null)
     {
         $this->auth = isset($auth) ? $auth : new NullAuthProvider();
@@ -58,6 +64,9 @@ abstract class LaravelBaseQuery
         return $this->controllerContainer;
     }
 
+    /**
+     * @return array
+     */
     public function getVerbMap()
     {
         if (0 == count($this->verbMap)) {
@@ -68,6 +77,9 @@ abstract class LaravelBaseQuery
         return $this->verbMap;
     }
 
+    /**
+     * @return AuthInterface
+     */
     protected function getAuth()
     {
         return $this->auth;
@@ -75,7 +87,7 @@ abstract class LaravelBaseQuery
 
     /**
      * @param $sourceEntityInstance
-     * @return mixed|null|\object[]
+     * @return Model|Relation|null
      */
     protected function unpackSourceEntity($sourceEntityInstance)
     {
