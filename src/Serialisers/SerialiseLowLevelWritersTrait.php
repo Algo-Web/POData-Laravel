@@ -18,7 +18,11 @@ use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourcePropertyKind;
 use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\ResourceTypeKind;
+use POData\Providers\Metadata\Type\Binary;
+use POData\Providers\Metadata\Type\Boolean;
+use POData\Providers\Metadata\Type\DateTime;
 use POData\Providers\Metadata\Type\IType;
+use POData\Providers\Metadata\Type\StringType;
 
 trait SerialiseLowLevelWritersTrait
 {
@@ -152,6 +156,40 @@ trait SerialiseLowLevelWritersTrait
 
         unset($this->complexTypeInstanceCollection[$count]);
         return $internalContent;
+    }
+
+
+    /**
+     * Convert the given primitive value to string.
+     * Note: This method will not handle null primitive value.
+     *
+     * @param IType &$type                  Type of the primitive property needing conversion
+     * @param mixed $primitiveValue         Primitive value to convert
+     *
+     * @return string
+     */
+    protected function primitiveToString(IType &$type, $primitiveValue)
+    {
+        // kludge to enable switching on type of $type without getting tripped up by mocks as we would with get_class
+        // switch (true) means we unconditionally enter, and then lean on case statements to match given block
+        switch (true) {
+            case $type instanceof StringType:
+                $stringValue = utf8_encode($primitiveValue);
+                break;
+            case $type instanceof Boolean:
+                $stringValue = (true === $primitiveValue) ? 'true' : 'false';
+                break;
+            case $type instanceof Binary:
+                $stringValue = base64_encode($primitiveValue);
+                break;
+            case $type instanceof DateTime && $primitiveValue instanceof \DateTime:
+                $stringValue = $primitiveValue->format(\DateTime::ATOM);
+                break;
+            default:
+                $stringValue = strval($primitiveValue);
+        }
+
+        return $stringValue;
     }
 
     /**
