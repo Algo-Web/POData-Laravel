@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\IService;
 use POData\Providers\Metadata\IMetadataProvider;
+use POData\Providers\Metadata\ResourceSetWrapper;
 use POData\UriProcessor\RequestDescription;
 use POData\UriProcessor\SegmentStack;
 
@@ -33,6 +34,7 @@ trait SerialiseDepWrapperTrait
 
     /**
      * Lightweight stack tracking for recursive descent fill.
+     * @var array
      */
     protected $lightStack = [];
 
@@ -56,6 +58,20 @@ trait SerialiseDepWrapperTrait
     protected $metaProvider;
 
     /**
+     * Absolute service Uri.
+     *
+     * @var string
+     */
+    protected $absoluteServiceUri;
+
+    /**
+     * Absolute service Uri with slash.
+     *
+     * @var string
+     */
+    protected $absoluteServiceUriWithSlash;
+
+    /**
      * Gets the data service instance.
      *
      * @return IService
@@ -63,6 +79,19 @@ trait SerialiseDepWrapperTrait
     public function getService()
     {
         return $this->service;
+    }
+
+    /**
+     * Sets the data service instance.
+     *
+     * @param IService $service
+     * @return void
+     */
+    public function setService(IService $service)
+    {
+        $this->service = $service;
+        $this->absoluteServiceUri = $service->getHost()->getAbsoluteServiceUri()->getUrlAsString();
+        $this->absoluteServiceUriWithSlash = rtrim($this->absoluteServiceUri, '/') . '/';
     }
 
     /**
@@ -118,5 +147,38 @@ trait SerialiseDepWrapperTrait
             $this->metaProvider = App::make('metadata');
         }
         return $this->metaProvider;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getLightStack()
+    {
+        return $this->lightStack;
+    }
+
+    /**
+     * @throws InvalidOperationException
+     */
+    protected function loadStackIfEmpty()
+    {
+        if (0 == count($this->lightStack)) {
+            $typeName = $this->getRequest()->getTargetResourceType()->getName();
+            array_push($this->lightStack, ['type' => $typeName, 'property' => $typeName, 'count' => 1]);
+        }
+    }
+
+    /**
+     * Resource set wrapper for the resource being serialized.
+     *
+     * @return ResourceSetWrapper
+     * @throws InvalidOperationException
+     */
+    protected function getCurrentResourceSetWrapper()
+    {
+        $segmentWrappers = $this->getStack()->getSegmentWrappers();
+        $count = count($segmentWrappers);
+
+        return 0 == $count ? $this->getRequest()->getTargetResourceSetWrapper() : $segmentWrappers[$count-1];
     }
 }

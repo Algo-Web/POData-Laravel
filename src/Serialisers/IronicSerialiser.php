@@ -64,20 +64,6 @@ class IronicSerialiser implements IObjectSerialiser
     protected $complexTypeInstanceCollection;
 
     /**
-     * Absolute service Uri.
-     *
-     * @var string
-     */
-    protected $absoluteServiceUri;
-
-    /**
-     * Absolute service Uri with slash.
-     *
-     * @var string
-     */
-    protected $absoluteServiceUriWithSlash;
-
-    /**
      * Update time to insert into ODataEntry/ODataFeed fields
      * @var Carbon
      */
@@ -686,20 +672,6 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Resource set wrapper for the resource being serialized.
-     *
-     * @return ResourceSetWrapper
-     * @throws InvalidOperationException
-     */
-    protected function getCurrentResourceSetWrapper()
-    {
-        $segmentWrappers = $this->getStack()->getSegmentWrappers();
-        $count = count($segmentWrappers);
-
-        return 0 == $count ? $this->getRequest()->getTargetResourceSetWrapper() : $segmentWrappers[$count-1];
-    }
-
-    /**
      * Get next page link from the given entity instance.
      *
      * @param  mixed          &$lastObject Last object serialized to be
@@ -780,17 +752,6 @@ class IronicSerialiser implements IObjectSerialiser
         }
 
         return $queryParameterString;
-    }
-
-    /**
-     * @throws InvalidOperationException
-     */
-    private function loadStackIfEmpty()
-    {
-        if (0 == count($this->lightStack)) {
-            $typeName = $this->getRequest()->getTargetResourceType()->getName();
-            array_push($this->lightStack, ['type' => $typeName, 'property' => $typeName, 'count' => 1]);
-        }
     }
 
     /**
@@ -925,19 +886,6 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Gets the data service instance.
-     *
-     * @param IService $service
-     * @return void
-     */
-    public function setService(IService $service)
-    {
-        $this->service = $service;
-        $this->absoluteServiceUri = $service->getHost()->getAbsoluteServiceUri()->getUrlAsString();
-        $this->absoluteServiceUriWithSlash = rtrim($this->absoluteServiceUri, '/') . '/';
-    }
-
-    /**
      * @param ResourceType $resourceType
      * @param $result
      * @return ODataBagContent|null
@@ -1045,14 +993,6 @@ class IronicSerialiser implements IObjectSerialiser
             return false;
         }
         return 0 == ($resourceKind % 4);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getLightStack()
-    {
-        return $this->lightStack;
     }
 
     /**
