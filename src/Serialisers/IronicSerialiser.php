@@ -216,13 +216,15 @@ class IronicSerialiser implements IObjectSerialiser
     public function writeTopLevelElements(QueryResult &$entryObjects)
     {
         $res = $entryObjects->results;
-        if (!(is_array($res) || $res instanceof Collection)) {
+        $isArray = is_array($res);
+        $isColl = !$isArray && $res instanceof Collection;
+        if (!($isArray || $isColl)) {
             throw new InvalidOperationException('!is_array($entryObjects->results)');
         }
-        if (is_array($res) && 0 == count($res)) {
+        if ($isArray && 0 == count($res)) {
             $entryObjects->hasMore = false;
         }
-        if ($res instanceof Collection && 0 == $res->count()) {
+        if ($isColl && 0 == $res->count()) {
             $entryObjects->hasMore = false;
         }
 
@@ -808,7 +810,8 @@ class IronicSerialiser implements IObjectSerialiser
      */
     protected function writeBagValue(ResourceType &$resourceType, $result)
     {
-        if (!(null == $result || is_array($result))) {
+        $isNull = null == $result;
+        if (!($isNull || is_array($result))) {
             throw new InvalidOperationException('Bag parameter must be null or array');
         }
         $typeKind = $resourceType->getResourceTypeKind();
@@ -818,7 +821,7 @@ class IronicSerialiser implements IObjectSerialiser
                    .' && $bagItemResourceTypeKind != ResourceTypeKind::COMPLEX';
             throw new InvalidOperationException($msg);
         }
-        if (null == $result) {
+        if ($isNull) {
             return null;
         }
         $bag = new ODataBagContent();
