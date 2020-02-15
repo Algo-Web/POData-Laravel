@@ -190,40 +190,7 @@ class IronicSerialiser implements IObjectSerialiser
 
         $propertyContent = $this->writePrimitiveProperties($res, $nonRelProp);
 
-        $links = [];
-        foreach ($relProp as $prop) {
-            $nuLink = new ODataLink();
-            $propKind = $prop->getKind();
-
-            if (!(ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind
-                  || ResourcePropertyKind::RESOURCE_REFERENCE == $propKind)) {
-                $msg = '$propKind != ResourcePropertyKind::RESOURCESET_REFERENCE &&'
-                       .' $propKind != ResourcePropertyKind::RESOURCE_REFERENCE';
-                throw new InvalidOperationException($msg);
-            }
-            $propTail = ResourcePropertyKind::RESOURCE_REFERENCE == $propKind ? 'entry' : 'feed';
-            $propType = 'application/atom+xml;type=' . $propTail;
-            $propName = $prop->getName();
-            $nuLink->title = $propName;
-            $nuLink->name = ODataConstants::ODATA_RELATED_NAMESPACE . $propName;
-            $nuLink->url = $relativeUri . '/' . $propName;
-            $nuLink->type = $propType;
-            $nuLink->isExpanded = false;
-            $nuLink->isCollection = 'feed' === $propTail;
-
-            $shouldExpand = $this->shouldExpandSegment($propName);
-
-            $navProp = new ODataNavigationPropertyInfo($prop, $shouldExpand);
-            if ($navProp->expanded) {
-                $this->expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName);
-            }
-            $nuLink->isExpanded = isset($nuLink->expandedResult);
-            if (null === $nuLink->isCollection) {
-                throw new InvalidOperationException('');
-            }
-
-            $links[] = $nuLink;
-        }
+        $links = $this->buildLinksFromRels($entryObject, $relProp, $relativeUri);
 
         $odata = new ODataEntry();
         $odata->resourceSetName = $resourceSet->getName();
@@ -1118,5 +1085,53 @@ class IronicSerialiser implements IObjectSerialiser
             throw new InvalidOperationException('Concrete resource type not selected for payload ' . $payloadClass);
         }
         return $resourceType;
+    }
+
+    /**
+     * @param QueryResult $entryObject
+     * @param array $relProp
+     * @param $relativeUri
+     * @return array
+     * @throws InvalidOperationException
+     * @throws ODataException
+     * @throws \ReflectionException
+     */
+    protected function buildLinksFromRels(QueryResult $entryObject, array $relProp, $relativeUri)
+    {
+        $links = [];
+        foreach ($relProp as $prop) {
+            $nuLink = new ODataLink();
+            $propKind = $prop->getKind();
+
+            if (!(ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind
+                  || ResourcePropertyKind::RESOURCE_REFERENCE == $propKind)) {
+                $msg = '$propKind != ResourcePropertyKind::RESOURCESET_REFERENCE &&'
+                       . ' $propKind != ResourcePropertyKind::RESOURCE_REFERENCE';
+                throw new InvalidOperationException($msg);
+            }
+            $propTail = ResourcePropertyKind::RESOURCE_REFERENCE == $propKind ? 'entry' : 'feed';
+            $propType = 'application/atom+xml;type=' . $propTail;
+            $propName = $prop->getName();
+            $nuLink->title = $propName;
+            $nuLink->name = ODataConstants::ODATA_RELATED_NAMESPACE . $propName;
+            $nuLink->url = $relativeUri . '/' . $propName;
+            $nuLink->type = $propType;
+            $nuLink->isExpanded = false;
+            $nuLink->isCollection = 'feed' === $propTail;
+
+            $shouldExpand = $this->shouldExpandSegment($propName);
+
+            $navProp = new ODataNavigationPropertyInfo($prop, $shouldExpand);
+            if ($navProp->expanded) {
+                $this->expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName);
+            }
+            $nuLink->isExpanded = isset($nuLink->expandedResult);
+            if (null === $nuLink->isCollection) {
+                throw new InvalidOperationException('');
+            }
+
+            $links[] = $nuLink;
+        }
+        return $links;
     }
 }
