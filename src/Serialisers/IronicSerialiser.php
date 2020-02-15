@@ -51,13 +51,7 @@ class IronicSerialiser implements IObjectSerialiser
     use SerialiseDepWrapperTrait;
     use SerialisePropertyCacheTrait;
     use SerialiseNavigationTrait;
-
-    /**
-     * Collection of complex type instances used for cycle detection.
-     *
-     * @var array
-     */
-    protected $complexTypeInstanceCollection;
+    use SerialiseLowLevelWritersTrait;
 
     /**
      * Update time to insert into ODataEntry/ODataFeed fields
@@ -702,33 +696,6 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param $entryObject
-     * @param $nonRelProp
-     * @return ODataPropertyContent
-     * @throws InvalidOperationException
-     */
-    private function writePrimitiveProperties(Model $entryObject, $nonRelProp)
-    {
-        $propertyContent = new ODataPropertyContent();
-        $cereal = $this->getModelSerialiser()->bulkSerialise($entryObject);
-        foreach ($cereal as $corn => $flake) {
-            if (!array_key_exists($corn, $nonRelProp)) {
-                continue;
-            }
-            $corn = strval($corn);
-            $rType = $nonRelProp[$corn]['type'];
-            /** @var ResourceProperty $nrp */
-            $nrp = $nonRelProp[$corn]['prop'];
-            $subProp = new ODataProperty();
-            $subProp->name = $corn;
-            $subProp->value = isset($flake) ? $this->primitiveToString($rType, $flake) : null;
-            $subProp->typeName = $nrp->getResourceType()->getFullName();
-            $propertyContent->properties[$corn] = $subProp;
-        }
-        return $propertyContent;
-    }
-
-    /**
      * @param QueryResult $entryObject
      * @param ResourceProperty $prop
      * @param $nuLink
@@ -797,105 +764,6 @@ class IronicSerialiser implements IObjectSerialiser
         if (!isset($nuLink->expandedResult)) {
             throw new InvalidOperationException('');
         }
-    }
-
-    /**
-     * @param ResourceType $resourceType
-     * @param $result
-     * @return ODataBagContent|null
-     * @throws InvalidOperationException
-     * @throws \ReflectionException
-     */
-    protected function writeBagValue(ResourceType &$resourceType, $result)
-    {
-        if (!(null == $result || is_array($result))) {
-            throw new InvalidOperationException('Bag parameter must be null or array');
-        }
-        $typeKind = $resourceType->getResourceTypeKind();
-        $kVal = $typeKind;
-        if (!(ResourceTypeKind::PRIMITIVE() == $kVal || ResourceTypeKind::COMPLEX() == $kVal)) {
-            $msg = '$bagItemResourceTypeKind != ResourceTypeKind::PRIMITIVE'
-                   .' && $bagItemResourceTypeKind != ResourceTypeKind::COMPLEX';
-            throw new InvalidOperationException($msg);
-        }
-        if (null == $result) {
-            return null;
-        }
-        $bag = new ODataBagContent();
-        $result = array_filter($result);
-        foreach ($result as $value) {
-            if (ResourceTypeKind::PRIMITIVE() == $kVal) {
-                $instance = $resourceType->getInstanceType();
-                if (!$instance instanceof IType) {
-                    throw new InvalidOperationException(get_class($instance));
-                }
-                $bag->propertyContents[] = $this->primitiveToString($instance, $value);
-            } elseif (ResourceTypeKind::COMPLEX() == $kVal) {
-                $bag->propertyContents[] = $this->writeComplexValue($resourceType, $value);
-            }
-        }
-        return $bag;
-    }
-
-    /**
-     * @param  ResourceType         $resourceType
-     * @param  object               $result
-     * @param  string|null          $propertyName
-     * @return ODataPropertyContent
-     * @throws InvalidOperationException
-     * @throws \ReflectionException
-     */
-    protected function writeComplexValue(ResourceType &$resourceType, &$result, $propertyName = null)
-    {
-        if (!is_object($result)) {
-            throw new InvalidOperationException('Supplied $customObject must be an object');
-        }
-
-        $count = count($this->complexTypeInstanceCollection);
-        for ($i = 0; $i < $count; ++$i) {
-            if ($this->complexTypeInstanceCollection[$i] === $result) {
-                throw new InvalidOperationException(
-                    Messages::objectModelSerializerLoopsNotAllowedInComplexTypes($propertyName)
-                );
-            }
-        }
-
-        $this->complexTypeInstanceCollection[$count] = &$result;
-
-        $internalContent = new ODataPropertyContent();
-        $resourceProperties = $resourceType->getAllProperties();
-        // first up, handle primitive properties
-        foreach ($resourceProperties as $prop) {
-            $resourceKind = $prop->getKind();
-            $propName = $prop->getName();
-            $internalProperty = new ODataProperty();
-            $internalProperty->name = $propName;
-            if (static::isMatchPrimitive($resourceKind)) {
-                $iType = $prop->getInstanceType();
-                if (!$iType instanceof IType) {
-                    throw new InvalidOperationException(get_class($iType));
-                }
-                $internalProperty->typeName = $iType->getFullTypeName();
-
-                $rType = $prop->getResourceType()->getInstanceType();
-                if (!$rType instanceof IType) {
-                    throw new InvalidOperationException(get_class($rType));
-                }
-
-                $internalProperty->value = $this->primitiveToString($rType, $result->$propName);
-
-                $internalContent->properties[$propName] = $internalProperty;
-            } elseif (ResourcePropertyKind::COMPLEX_TYPE == $resourceKind) {
-                $rType = $prop->getResourceType();
-                $internalProperty->typeName = $rType->getFullName();
-                $internalProperty->value = $this->writeComplexValue($rType, $result->$propName, $propName);
-
-                $internalContent->properties[$propName] = $internalProperty;
-            }
-        }
-
-        unset($this->complexTypeInstanceCollection[$count]);
-        return $internalContent;
     }
 
     public static function isMatchPrimitive($resourceKind)
