@@ -712,9 +712,6 @@ class IronicSerialiser implements IObjectSerialiser
             } else {
                 $query = $entry;
             }
-            if (!$query instanceof QueryResult) {
-                throw new InvalidOperationException(get_class($query));
-            }
             $odata->entries[] = $this->writeTopLevelElement($query);
         }
     }
