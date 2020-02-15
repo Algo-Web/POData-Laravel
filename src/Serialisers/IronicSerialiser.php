@@ -250,7 +250,7 @@ class IronicSerialiser implements IObjectSerialiser
         $requestTop = (null === $requestTop) ? $pageSize+1 : $requestTop;
 
         if (true === $entryObjects->hasMore && $requestTop > $pageSize) {
-            $this->buildFeedNextPageLink($entryObjects, $odata);
+            $this->buildNextPageLink($entryObjects, $odata);
         }
 
         return $odata;
@@ -312,7 +312,7 @@ class IronicSerialiser implements IObjectSerialiser
             }
 
             if ($i > 0 && true === $entryObjects->hasMore) {
-                $this->buildUrlsNextPageLink($entryObjects, $urls);
+                $this->buildNextPageLink($entryObjects, $urls);
             }
         }
 
@@ -798,28 +798,6 @@ class IronicSerialiser implements IObjectSerialiser
             $links[] = $nuLink;
         }
         return $links;
-    }
-
-    /**
-     * @param QueryResult $entryObjects
-     * @param ODataURLCollection $odata
-     * @throws InvalidOperationException
-     * @throws ODataException
-     */
-    protected function buildUrlsNextPageLink(QueryResult $entryObjects, ODataURLCollection $odata)
-    {
-        $this->buildNextPageLink($entryObjects, $odata);
-    }
-
-    /**
-     * @param QueryResult $entryObjects
-     * @param ODataFeed $odata
-     * @throws InvalidOperationException
-     * @throws ODataException
-     */
-    protected function buildFeedNextPageLink(QueryResult &$entryObjects, ODataFeed $odata)
-    {
-        $this->buildNextPageLink($entryObjects, $odata);
     }
 
     /**
