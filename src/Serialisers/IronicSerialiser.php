@@ -48,27 +48,9 @@ use POData\UriProcessor\SegmentStack;
 
 class IronicSerialiser implements IObjectSerialiser
 {
-    private $propertiesCache = [];
-
-    /**
-     * @var RootProjectionNode
-     */
-    private $rootNode = null;
-
-    /**
-     * The service implementation.
-     *
-     * @var IService
-     */
-    protected $service;
-
-    /**
-     * Request description instance describes OData request the
-     * the client has submitted and result of the request.
-     *
-     * @var RequestDescription
-     */
-    protected $request;
+    use SerialiseDepWrapperTrait;
+    use SerialisePropertyCacheTrait;
+    use SerialiseNavigationTrait;
 
     /**
      * Collection of complex type instances used for cycle detection.
@@ -78,52 +60,14 @@ class IronicSerialiser implements IObjectSerialiser
     protected $complexTypeInstanceCollection;
 
     /**
-     * Absolute service Uri.
-     *
-     * @var string
-     */
-    protected $absoluteServiceUri;
-
-    /**
-     * Absolute service Uri with slash.
-     *
-     * @var string
-     */
-    protected $absoluteServiceUriWithSlash;
-
-    /**
-     * Holds reference to segment stack being processed.
-     *
-     * @var SegmentStack
-     */
-    protected $stack;
-
-    /**
-     * Lightweight stack tracking for recursive descent fill.
-     */
-    protected $lightStack = [];
-
-    /**
-     * @var ModelSerialiser
-     */
-    private $modelSerialiser;
-
-
-
-    /**
-     * @var IMetadataProvider
-     */
-    private $metaProvider;
-
-    /*
      * Update time to insert into ODataEntry/ODataFeed fields
-     * @var Carbon;
+     * @var Carbon
      */
     private $updated;
 
-    /*
+    /**
      * Has base URI already been written out during serialisation?
-     * @var bool;
+     * @var bool
      */
     private $isBaseWritten = false;
 
@@ -193,22 +137,7 @@ class IronicSerialiser implements IObjectSerialiser
             throw new InvalidOperationException($msg);
         }
 
-        if (!array_key_exists($targClass, $this->propertiesCache)) {
-            $rawProp = $resourceType->getAllProperties();
-            $relProp = [];
-            $nonRelProp = [];
-            foreach ($rawProp as $prop) {
-                $propType = $prop->getResourceType();
-                if ($propType instanceof ResourceEntityType) {
-                    $relProp[] = $prop;
-                } else {
-                    $nonRelProp[$prop->getName()] = ['prop' => $prop, 'type' => $propType->getInstanceType()];
-                }
-            }
-            $this->propertiesCache[$targClass] = ['rel' => $relProp, 'nonRel' => $nonRelProp];
-        }
-        unset($relProp);
-        unset($nonRelProp);
+        $this->checkRelationPropertiesCached($targClass, $resourceType);
         /** @var ResourceProperty[] $relProp */
         $relProp = $this->propertiesCache[$targClass]['rel'];
         /** @var ResourceProperty[] $nonRelProp */
@@ -243,40 +172,7 @@ class IronicSerialiser implements IObjectSerialiser
 
         $propertyContent = $this->writePrimitiveProperties($res, $nonRelProp);
 
-        $links = [];
-        foreach ($relProp as $prop) {
-            $nuLink = new ODataLink();
-            $propKind = $prop->getKind();
-
-            if (!(ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind
-                  || ResourcePropertyKind::RESOURCE_REFERENCE == $propKind)) {
-                $msg = '$propKind != ResourcePropertyKind::RESOURCESET_REFERENCE &&'
-                       .' $propKind != ResourcePropertyKind::RESOURCE_REFERENCE';
-                throw new InvalidOperationException($msg);
-            }
-            $propTail = ResourcePropertyKind::RESOURCE_REFERENCE == $propKind ? 'entry' : 'feed';
-            $propType = 'application/atom+xml;type=' . $propTail;
-            $propName = $prop->getName();
-            $nuLink->title = $propName;
-            $nuLink->name = ODataConstants::ODATA_RELATED_NAMESPACE . $propName;
-            $nuLink->url = $relativeUri . '/' . $propName;
-            $nuLink->type = $propType;
-            $nuLink->isExpanded = false;
-            $nuLink->isCollection = 'feed' === $propTail;
-
-            $shouldExpand = $this->shouldExpandSegment($propName);
-
-            $navProp = new ODataNavigationPropertyInfo($prop, $shouldExpand);
-            if ($navProp->expanded) {
-                $this->expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName);
-            }
-            $nuLink->isExpanded = isset($nuLink->expandedResult);
-            if (null === $nuLink->isCollection) {
-                throw new InvalidOperationException('');
-            }
-
-            $links[] = $nuLink;
-        }
+        $links = $this->buildLinksFromRels($entryObject, $relProp, $relativeUri);
 
         $odata = new ODataEntry();
         $odata->resourceSetName = $resourceSet->getName();
@@ -555,52 +451,6 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Gets reference to the request submitted by client.
-     *
-     * @return RequestDescription
-     * @throws InvalidOperationException
-     */
-    public function getRequest()
-    {
-        if (null == $this->request) {
-            throw new InvalidOperationException('Request not yet set');
-        }
-
-        return $this->request;
-    }
-
-    /**
-     * Sets reference to the request submitted by client.
-     *
-     * @param RequestDescription $request
-     */
-    public function setRequest(RequestDescription $request)
-    {
-        $this->request = $request;
-        $this->stack->setRequest($request);
-    }
-
-    /**
-     * Gets the data service instance.
-     *
-     * @return IService
-     */
-    public function getService()
-    {
-        return $this->service;
-    }
-
-    /**
-     * Gets the segment stack instance.
-     *
-     * @return SegmentStack
-     */
-    public function getStack()
-    {
-        return $this->stack;
-    }
-
-    /**
      * Get update timestamp.
      *
      * @return Carbon
@@ -710,88 +560,6 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Gets collection of projection nodes under the current node.
-     *
-     * @return ProjectionNode[]|ExpandedProjectionNode[]|null List of nodes describing projections for the current
-     *                                                        segment, If this method returns null it means no
-     *                                                        projections are to be applied and the entire resource for
-     *                                                        the current segment should be serialized, If it returns
-     *                                                        non-null only the properties described by the returned
-     *                                                        projection segments should be serialized
-     * @throws InvalidOperationException
-     */
-    protected function getProjectionNodes()
-    {
-        $expandedProjectionNode = $this->getCurrentExpandedProjectionNode();
-        if (null === $expandedProjectionNode || $expandedProjectionNode->canSelectAllProperties()) {
-            return null;
-        }
-
-        return $expandedProjectionNode->getChildNodes();
-    }
-
-    /**
-     * Find a 'ExpandedProjectionNode' instance in the projection tree
-     * which describes the current segment.
-     *
-     * @return null|RootProjectionNode|ExpandedProjectionNode
-     * @throws InvalidOperationException
-     */
-    protected function getCurrentExpandedProjectionNode()
-    {
-        if (null === $this->rootNode) {
-            $this->rootNode = $this->getRequest()->getRootProjectionNode();
-        }
-        $expandedProjectionNode = $this->rootNode;
-        if (null === $expandedProjectionNode) {
-            return null;
-        }
-        $segmentNames = $this->getLightStack();
-        $depth = count($segmentNames);
-        // $depth == 1 means serialization of root entry
-        //(the resource identified by resource path) is going on,
-        //so control won't get into the below for loop.
-        //we will directly return the root node,
-        //which is 'ExpandedProjectionNode'
-        // for resource identified by resource path.
-        if (0 != $depth) {
-            for ($i = 1; $i < $depth; ++$i) {
-                $segName = $segmentNames[$i]['prop'];
-                $expandedProjectionNode = $expandedProjectionNode->findNode($segName);
-                if (null === $expandedProjectionNode) {
-                    throw new InvalidOperationException('is_null($expandedProjectionNode)');
-                }
-                if (!$expandedProjectionNode instanceof ExpandedProjectionNode) {
-                    $msg = '$expandedProjectionNode not instanceof ExpandedProjectionNode';
-                    throw new InvalidOperationException($msg);
-                }
-            }
-        }
-
-        return $expandedProjectionNode;
-    }
-
-    /**
-     * Check whether to expand a navigation property or not.
-     *
-     * @param string $navigationPropertyName Name of naviagtion property in question
-     *
-     * @return bool True if the given navigation should be expanded, otherwise false
-     * @throws InvalidOperationException
-     */
-    protected function shouldExpandSegment($navigationPropertyName)
-    {
-        $expandedProjectionNode = $this->getCurrentExpandedProjectionNode();
-        if (null === $expandedProjectionNode) {
-            return false;
-        }
-        $expandedProjectionNode = $expandedProjectionNode->findNode($navigationPropertyName);
-
-        // null is a valid input to an instanceof call as of PHP 5.6 - will always return false
-        return $expandedProjectionNode instanceof ExpandedProjectionNode;
-    }
-
-    /**
      * Wheter next link is needed for the current resource set (feed)
      * being serialized.
      *
@@ -815,20 +583,6 @@ class IronicSerialiser implements IObjectSerialiser
             }
         }
         return $resultSetCount == $pageSize;
-    }
-
-    /**
-     * Resource set wrapper for the resource being serialized.
-     *
-     * @return ResourceSetWrapper
-     * @throws InvalidOperationException
-     */
-    protected function getCurrentResourceSetWrapper()
-    {
-        $segmentWrappers = $this->getStack()->getSegmentWrappers();
-        $count = count($segmentWrappers);
-
-        return 0 == $count ? $this->getRequest()->getTargetResourceSetWrapper() : $segmentWrappers[$count-1];
     }
 
     /**
@@ -912,17 +666,6 @@ class IronicSerialiser implements IObjectSerialiser
         }
 
         return $queryParameterString;
-    }
-
-    /**
-     * @throws InvalidOperationException
-     */
-    private function loadStackIfEmpty()
-    {
-        if (0 == count($this->lightStack)) {
-            $typeName = $this->getRequest()->getTargetResourceType()->getName();
-            array_push($this->lightStack, ['type' => $typeName, 'property' => $typeName, 'count' => 1]);
-        }
     }
 
     /**
@@ -1057,19 +800,6 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Gets the data service instance.
-     *
-     * @param IService $service
-     * @return void
-     */
-    public function setService(IService $service)
-    {
-        $this->service = $service;
-        $this->absoluteServiceUri = $service->getHost()->getAbsoluteServiceUri()->getUrlAsString();
-        $this->absoluteServiceUriWithSlash = rtrim($this->absoluteServiceUri, '/') . '/';
-    }
-
-    /**
      * @param ResourceType $resourceType
      * @param $result
      * @return ODataBagContent|null
@@ -1092,17 +822,16 @@ class IronicSerialiser implements IObjectSerialiser
             return null;
         }
         $bag = new ODataBagContent();
+        $result = array_filter($result);
         foreach ($result as $value) {
-            if (isset($value)) {
-                if (ResourceTypeKind::PRIMITIVE() == $kVal) {
-                    $instance = $resourceType->getInstanceType();
-                    if (!$instance instanceof IType) {
-                        throw new InvalidOperationException(get_class($instance));
-                    }
-                    $bag->propertyContents[] = $this->primitiveToString($instance, $value);
-                } elseif (ResourceTypeKind::COMPLEX() == $kVal) {
-                    $bag->propertyContents[] = $this->writeComplexValue($resourceType, $value);
+            if (ResourceTypeKind::PRIMITIVE() == $kVal) {
+                $instance = $resourceType->getInstanceType();
+                if (!$instance instanceof IType) {
+                    throw new InvalidOperationException(get_class($instance));
                 }
+                $bag->propertyContents[] = $this->primitiveToString($instance, $value);
+            } elseif (ResourceTypeKind::COMPLEX() == $kVal) {
+                $bag->propertyContents[] = $this->writeComplexValue($resourceType, $value);
             }
         }
         return $bag;
@@ -1180,33 +909,6 @@ class IronicSerialiser implements IObjectSerialiser
         return 0 == ($resourceKind % 4);
     }
 
-    /*
-     * @return IMetadataProvider
-     */
-    protected function getMetadata()
-    {
-        if (null == $this->metaProvider) {
-            $this->metaProvider = App::make('metadata');
-        }
-        return $this->metaProvider;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getLightStack()
-    {
-        return $this->lightStack;
-    }
-
-    /**
-     * @return ModelSerialiser
-     */
-    public function getModelSerialiser()
-    {
-        return $this->modelSerialiser;
-    }
-
     /**
      * @param ResourceEntityType $resourceType
      * @param $payloadClass
@@ -1237,5 +939,53 @@ class IronicSerialiser implements IObjectSerialiser
             throw new InvalidOperationException('Concrete resource type not selected for payload ' . $payloadClass);
         }
         return $resourceType;
+    }
+
+    /**
+     * @param QueryResult $entryObject
+     * @param array $relProp
+     * @param $relativeUri
+     * @return array
+     * @throws InvalidOperationException
+     * @throws ODataException
+     * @throws \ReflectionException
+     */
+    protected function buildLinksFromRels(QueryResult $entryObject, array $relProp, $relativeUri)
+    {
+        $links = [];
+        foreach ($relProp as $prop) {
+            $nuLink = new ODataLink();
+            $propKind = $prop->getKind();
+
+            if (!(ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind
+                  || ResourcePropertyKind::RESOURCE_REFERENCE == $propKind)) {
+                $msg = '$propKind != ResourcePropertyKind::RESOURCESET_REFERENCE &&'
+                       . ' $propKind != ResourcePropertyKind::RESOURCE_REFERENCE';
+                throw new InvalidOperationException($msg);
+            }
+            $propTail = ResourcePropertyKind::RESOURCE_REFERENCE == $propKind ? 'entry' : 'feed';
+            $propType = 'application/atom+xml;type=' . $propTail;
+            $propName = $prop->getName();
+            $nuLink->title = $propName;
+            $nuLink->name = ODataConstants::ODATA_RELATED_NAMESPACE . $propName;
+            $nuLink->url = $relativeUri . '/' . $propName;
+            $nuLink->type = $propType;
+            $nuLink->isExpanded = false;
+            $nuLink->isCollection = 'feed' === $propTail;
+
+            $shouldExpand = $this->shouldExpandSegment($propName);
+
+            $navProp = new ODataNavigationPropertyInfo($prop, $shouldExpand);
+            if ($navProp->expanded) {
+                $this->expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName);
+            }
+            $nuLink->isExpanded = isset($nuLink->expandedResult);
+            if (null === $nuLink->isCollection) {
+                throw new InvalidOperationException('');
+            }
+
+            $links[] = $nuLink;
+        }
+        return $links;
     }
 }
