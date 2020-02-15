@@ -243,18 +243,7 @@ class IronicSerialiser implements IObjectSerialiser
         if ($this->getRequest()->queryType == QueryType::ENTITIES_WITH_COUNT()) {
             $odata->rowCount = $this->getRequest()->getCountValue();
         }
-        foreach ($res as $entry) {
-            if (!$entry instanceof QueryResult) {
-                $query = new QueryResult();
-                $query->results = $entry;
-            } else {
-                $query = $entry;
-            }
-            if (!$query instanceof QueryResult) {
-                throw new InvalidOperationException(get_class($query));
-            }
-            $odata->entries[] = $this->writeTopLevelElement($query);
-        }
+        $this->buildEntriesFromElements($res, $odata);
 
         $resourceSet = $this->getRequest()->getTargetResourceSetWrapper()->getResourceSet();
         $requestTop = $this->getRequest()->getTopOptionCount();
@@ -262,13 +251,7 @@ class IronicSerialiser implements IObjectSerialiser
         $requestTop = (null === $requestTop) ? $pageSize+1 : $requestTop;
 
         if (true === $entryObjects->hasMore && $requestTop > $pageSize) {
-            $stackSegment = $setName;
-            $lastObject = end($entryObjects->results);
-            $segment = $this->getNextLinkUri($lastObject);
-            $nextLink = new ODataLink();
-            $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
-            $nextLink->url = rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment;
-            $odata->nextPageLink = $nextLink;
+            $this->buildFeedNextPageLink($entryObjects, $setName, $odata);
         }
 
         return $odata;
@@ -330,13 +313,7 @@ class IronicSerialiser implements IObjectSerialiser
             }
 
             if ($i > 0 && true === $entryObjects->hasMore) {
-                $stackSegment = $this->getRequest()->getTargetResourceSetWrapper()->getName();
-                $lastObject = end($entryObjects->results);
-                $segment = $this->getNextLinkUri($lastObject);
-                $nextLink = new ODataLink();
-                $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
-                $nextLink->url = rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment;
-                $urls->nextPageLink = $nextLink;
+                $this->buildUrlsNextPageLink($entryObjects, $urls);
             }
         }
 
@@ -822,5 +799,63 @@ class IronicSerialiser implements IObjectSerialiser
             $links[] = $nuLink;
         }
         return $links;
+    }
+
+    /**
+     * @param QueryResult $entryObjects
+     * @param ODataURLCollection $urls
+     * @throws InvalidOperationException
+     * @throws ODataException
+     */
+    protected function buildUrlsNextPageLink(QueryResult $entryObjects, ODataURLCollection $urls)
+    {
+        $stackSegment = $this->getRequest()->getTargetResourceSetWrapper()->getName();
+        $lastObject = end($entryObjects->results);
+        $segment = $this->getNextLinkUri($lastObject);
+        $nextLink = new ODataLink();
+        $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
+        $nextLink->url = rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment;
+        $urls->nextPageLink = $nextLink;
+    }
+
+    /**
+     * @param QueryResult $entryObjects
+     * @param $setName
+     * @param ODataFeed $odata
+     * @throws InvalidOperationException
+     * @throws ODataException
+     */
+    protected function buildFeedNextPageLink(QueryResult &$entryObjects, $setName, ODataFeed $odata)
+    {
+        $stackSegment = $setName;
+        $lastObject = end($entryObjects->results);
+        $segment = $this->getNextLinkUri($lastObject);
+        $nextLink = new ODataLink();
+        $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
+        $nextLink->url = rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment;
+        $odata->nextPageLink = $nextLink;
+    }
+
+    /**
+     * @param $res
+     * @param ODataFeed $odata
+     * @throws InvalidOperationException
+     * @throws ODataException
+     * @throws \ReflectionException
+     */
+    protected function buildEntriesFromElements($res, ODataFeed $odata)
+    {
+        foreach ($res as $entry) {
+            if (!$entry instanceof QueryResult) {
+                $query = new QueryResult();
+                $query->results = $entry;
+            } else {
+                $query = $entry;
+            }
+            if (!$query instanceof QueryResult) {
+                throw new InvalidOperationException(get_class($query));
+            }
+            $odata->entries[] = $this->writeTopLevelElement($query);
+        }
     }
 }
