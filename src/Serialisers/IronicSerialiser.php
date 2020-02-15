@@ -52,6 +52,7 @@ class IronicSerialiser implements IObjectSerialiser
     use SerialisePropertyCacheTrait;
     use SerialiseNavigationTrait;
     use SerialiseLowLevelWritersTrait;
+    use SerialiseNextPageLinksTrait;
 
     /**
      * Update time to insert into ODataEntry/ODataFeed fields
@@ -530,115 +531,6 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * Wheter next link is needed for the current resource set (feed)
-     * being serialized.
-     *
-     * @param int $resultSetCount Number of entries in the current
-     *                            resource set
-     *
-     * @return bool true if the feed must have a next page link
-     * @throws InvalidOperationException
-     */
-    protected function needNextPageLink($resultSetCount)
-    {
-        $currentResourceSet = $this->getCurrentResourceSetWrapper();
-        $recursionLevel = count($this->getStack()->getSegmentNames());
-        $pageSize = $currentResourceSet->getResourceSetPageSize();
-
-        if (1 == $recursionLevel) {
-            //presence of $top option affect next link for root container
-            $topValueCount = $this->getRequest()->getTopOptionCount();
-            if (null !== $topValueCount && ($topValueCount <= $pageSize)) {
-                return false;
-            }
-        }
-        return $resultSetCount == $pageSize;
-    }
-
-    /**
-     * Get next page link from the given entity instance.
-     *
-     * @param  mixed          &$lastObject Last object serialized to be
-     *                                     used for generating
-     *                                     $skiptoken
-     * @throws ODataException
-     * @return string         for the link for next page
-     * @throws InvalidOperationException
-     */
-    protected function getNextLinkUri(&$lastObject)
-    {
-        $currentExpandedProjectionNode = $this->getCurrentExpandedProjectionNode();
-        $internalOrderByInfo = $currentExpandedProjectionNode->getInternalOrderByInfo();
-        if (null === $internalOrderByInfo) {
-            throw new InvalidOperationException('Null');
-        }
-        if (!$internalOrderByInfo instanceof InternalOrderByInfo) {
-            throw new InvalidOperationException(get_class($internalOrderByInfo));
-        }
-        $numSegments = count($internalOrderByInfo->getOrderByPathSegments());
-        $queryParameterString = $this->getNextPageLinkQueryParametersForRootResourceSet();
-
-        $skipToken = $internalOrderByInfo->buildSkipTokenValue($lastObject);
-        if (empty($skipToken)) {
-            throw new InvalidOperationException('!is_null($skipToken)');
-        }
-        $token = (1 < $numSegments) ? '$skiptoken=' : '$skip=';
-        $skipToken = (1 < $numSegments) ? $skipToken : intval(trim($skipToken, '\''));
-        $skipToken = '?' . $queryParameterString . $token . $skipToken;
-
-        return $skipToken;
-    }
-
-    /**
-     * Builds the string corresponding to query parameters for top level results
-     * (result set identified by the resource path) to be put in next page link.
-     *
-     * @return string|null string representing the query parameters in the URI
-     *                     query parameter format, NULL if there
-     *                     is no query parameters
-     *                     required for the next link of top level result set
-     * @throws InvalidOperationException
-     */
-    protected function getNextPageLinkQueryParametersForRootResourceSet()
-    {
-        /** @var string|null $queryParameterString */
-        $queryParameterString = null;
-        foreach ([ODataConstants::HTTPQUERY_STRING_FILTER,
-                     ODataConstants::HTTPQUERY_STRING_EXPAND,
-                     ODataConstants::HTTPQUERY_STRING_ORDERBY,
-                     ODataConstants::HTTPQUERY_STRING_INLINECOUNT,
-                     ODataConstants::HTTPQUERY_STRING_SELECT, ] as $queryOption) {
-            /** @var string|null $value */
-            $value = $this->getService()->getHost()->getQueryStringItem($queryOption);
-            if (null !== $value) {
-                if (null !== $queryParameterString) {
-                    $queryParameterString = /** @scrutinizer ignore-type */$queryParameterString . '&';
-                }
-
-                $queryParameterString .= $queryOption . '=' . $value;
-            }
-        }
-
-        $topCountValue = $this->getRequest()->getTopOptionCount();
-        if (null !== $topCountValue) {
-            $remainingCount = $topCountValue-$this->getRequest()->getTopCount();
-            if (0 < $remainingCount) {
-                if (null !== $queryParameterString) {
-                    $queryParameterString .= '&';
-                }
-
-                $queryParameterString .= ODataConstants::HTTPQUERY_STRING_TOP . '=' . $remainingCount;
-            }
-        }
-
-        if (null !== $queryParameterString) {
-            $queryParameterString .= '&';
-        }
-
-        return $queryParameterString;
-    }
-
-    /**
      * @param QueryResult $entryObject
      * @param ResourceProperty $prop
      * @param $nuLink
@@ -802,23 +694,6 @@ class IronicSerialiser implements IObjectSerialiser
             $links[] = $nuLink;
         }
         return $links;
-    }
-
-    /**
-     * @param QueryResult $entryObjects
-     * @param ODataURLCollection|ODataFeed $odata
-     * @throws InvalidOperationException
-     * @throws ODataException
-     */
-    protected function buildNextPageLink(QueryResult $entryObjects, $odata)
-    {
-        $stackSegment = $this->getRequest()->getTargetResourceSetWrapper()->getName();
-        $lastObject = end($entryObjects->results);
-        $segment = $this->getNextLinkUri($lastObject);
-        $nextLink = new ODataLink();
-        $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
-        $nextLink->url = rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment;
-        $odata->nextPageLink = $nextLink;
     }
 
     /**
