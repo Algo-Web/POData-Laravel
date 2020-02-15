@@ -49,8 +49,7 @@ use POData\UriProcessor\SegmentStack;
 class IronicSerialiser implements IObjectSerialiser
 {
     use SerialiseDepWrapperTrait;
-
-    private $propertiesCache = [];
+    use SerialisePropertyCacheTrait;
 
     /**
      * @var RootProjectionNode
@@ -156,22 +155,7 @@ class IronicSerialiser implements IObjectSerialiser
             throw new InvalidOperationException($msg);
         }
 
-        if (!array_key_exists($targClass, $this->propertiesCache)) {
-            $rawProp = $resourceType->getAllProperties();
-            $relProp = [];
-            $nonRelProp = [];
-            foreach ($rawProp as $prop) {
-                $propType = $prop->getResourceType();
-                if ($propType instanceof ResourceEntityType) {
-                    $relProp[] = $prop;
-                } else {
-                    $nonRelProp[$prop->getName()] = ['prop' => $prop, 'type' => $propType->getInstanceType()];
-                }
-            }
-            $this->propertiesCache[$targClass] = ['rel' => $relProp, 'nonRel' => $nonRelProp];
-        }
-        unset($relProp);
-        unset($nonRelProp);
+        $this->checkRelationPropertiesCached($targClass, $resourceType);
         /** @var ResourceProperty[] $relProp */
         $relProp = $this->propertiesCache[$targClass]['rel'];
         /** @var ResourceProperty[] $nonRelProp */
