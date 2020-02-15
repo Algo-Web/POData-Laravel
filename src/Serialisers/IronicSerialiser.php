@@ -221,7 +221,6 @@ class IronicSerialiser implements IObjectSerialiser
         }
 
         $this->loadStackIfEmpty();
-        $setName = $this->getRequest()->getTargetResourceSetWrapper()->getName();
 
         $title = $this->getRequest()->getContainerName();
         $relativeUri = $this->getRequest()->getIdentifier();
@@ -251,7 +250,7 @@ class IronicSerialiser implements IObjectSerialiser
         $requestTop = (null === $requestTop) ? $pageSize+1 : $requestTop;
 
         if (true === $entryObjects->hasMore && $requestTop > $pageSize) {
-            $this->buildFeedNextPageLink($entryObjects, $setName, $odata);
+            $this->buildFeedNextPageLink($entryObjects, $odata);
         }
 
         return $odata;
@@ -803,31 +802,35 @@ class IronicSerialiser implements IObjectSerialiser
 
     /**
      * @param QueryResult $entryObjects
-     * @param ODataURLCollection $urls
+     * @param ODataURLCollection $odata
      * @throws InvalidOperationException
      * @throws ODataException
      */
-    protected function buildUrlsNextPageLink(QueryResult $entryObjects, ODataURLCollection $urls)
+    protected function buildUrlsNextPageLink(QueryResult $entryObjects, ODataURLCollection $odata)
     {
-        $stackSegment = $this->getRequest()->getTargetResourceSetWrapper()->getName();
-        $lastObject = end($entryObjects->results);
-        $segment = $this->getNextLinkUri($lastObject);
-        $nextLink = new ODataLink();
-        $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
-        $nextLink->url = rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment;
-        $urls->nextPageLink = $nextLink;
+        $this->buildNextPageLink($odata, $entryObjects);
     }
 
     /**
      * @param QueryResult $entryObjects
-     * @param $setName
      * @param ODataFeed $odata
      * @throws InvalidOperationException
      * @throws ODataException
      */
-    protected function buildFeedNextPageLink(QueryResult &$entryObjects, $setName, ODataFeed $odata)
+    protected function buildFeedNextPageLink(QueryResult &$entryObjects, ODataFeed $odata)
     {
-        $stackSegment = $setName;
+        $this->buildNextPageLink($odata, $entryObjects);
+    }
+
+    /**
+     * @param ODataURLCollection|ODataFeed $odata
+     * @param QueryResult $entryObjects
+     * @throws InvalidOperationException
+     * @throws ODataException
+     */
+    protected function buildNextPageLink($odata, QueryResult $entryObjects)
+    {
+        $stackSegment = $this->getRequest()->getTargetResourceSetWrapper()->getName();
         $lastObject = end($entryObjects->results);
         $segment = $this->getNextLinkUri($lastObject);
         $nextLink = new ODataLink();
