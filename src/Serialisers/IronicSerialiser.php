@@ -808,7 +808,7 @@ class IronicSerialiser implements IObjectSerialiser
      */
     protected function buildUrlsNextPageLink(QueryResult $entryObjects, ODataURLCollection $odata)
     {
-        $this->buildNextPageLink($odata, $entryObjects);
+        $this->buildNextPageLink($entryObjects, $odata);
     }
 
     /**
@@ -819,16 +819,16 @@ class IronicSerialiser implements IObjectSerialiser
      */
     protected function buildFeedNextPageLink(QueryResult &$entryObjects, ODataFeed $odata)
     {
-        $this->buildNextPageLink($odata, $entryObjects);
+        $this->buildNextPageLink($entryObjects, $odata);
     }
 
     /**
-     * @param ODataURLCollection|ODataFeed $odata
      * @param QueryResult $entryObjects
+     * @param ODataURLCollection|ODataFeed $odata
      * @throws InvalidOperationException
      * @throws ODataException
      */
-    protected function buildNextPageLink($odata, QueryResult $entryObjects)
+    protected function buildNextPageLink(QueryResult $entryObjects, $odata)
     {
         $stackSegment = $this->getRequest()->getTargetResourceSetWrapper()->getName();
         $lastObject = end($entryObjects->results);
