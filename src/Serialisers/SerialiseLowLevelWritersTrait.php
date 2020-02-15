@@ -39,10 +39,9 @@ trait SerialiseLowLevelWritersTrait
     {
         $propertyContent = new ODataPropertyContent();
         $cereal = $this->getModelSerialiser()->bulkSerialise($entryObject);
+        $cereal = array_intersect_key($cereal, $nonRelProp);
+
         foreach ($cereal as $corn => $flake) {
-            if (!array_key_exists($corn, $nonRelProp)) {
-                continue;
-            }
             $corn = strval($corn);
             $rType = $nonRelProp[$corn]['type'];
             /** @var ResourceProperty $nrp */
