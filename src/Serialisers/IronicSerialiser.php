@@ -50,11 +50,7 @@ class IronicSerialiser implements IObjectSerialiser
 {
     use SerialiseDepWrapperTrait;
     use SerialisePropertyCacheTrait;
-
-    /**
-     * @var RootProjectionNode
-     */
-    private $rootNode = null;
+    use SerialiseNavigationTrait;
 
     /**
      * Collection of complex type instances used for cycle detection.
@@ -561,88 +557,6 @@ class IronicSerialiser implements IObjectSerialiser
                 $mediaLinks[] = $nuLink;
             }
         }
-    }
-
-    /**
-     * Gets collection of projection nodes under the current node.
-     *
-     * @return ProjectionNode[]|ExpandedProjectionNode[]|null List of nodes describing projections for the current
-     *                                                        segment, If this method returns null it means no
-     *                                                        projections are to be applied and the entire resource for
-     *                                                        the current segment should be serialized, If it returns
-     *                                                        non-null only the properties described by the returned
-     *                                                        projection segments should be serialized
-     * @throws InvalidOperationException
-     */
-    protected function getProjectionNodes()
-    {
-        $expandedProjectionNode = $this->getCurrentExpandedProjectionNode();
-        if (null === $expandedProjectionNode || $expandedProjectionNode->canSelectAllProperties()) {
-            return null;
-        }
-
-        return $expandedProjectionNode->getChildNodes();
-    }
-
-    /**
-     * Find a 'ExpandedProjectionNode' instance in the projection tree
-     * which describes the current segment.
-     *
-     * @return null|RootProjectionNode|ExpandedProjectionNode
-     * @throws InvalidOperationException
-     */
-    protected function getCurrentExpandedProjectionNode()
-    {
-        if (null === $this->rootNode) {
-            $this->rootNode = $this->getRequest()->getRootProjectionNode();
-        }
-        $expandedProjectionNode = $this->rootNode;
-        if (null === $expandedProjectionNode) {
-            return null;
-        }
-        $segmentNames = $this->getLightStack();
-        $depth = count($segmentNames);
-        // $depth == 1 means serialization of root entry
-        //(the resource identified by resource path) is going on,
-        //so control won't get into the below for loop.
-        //we will directly return the root node,
-        //which is 'ExpandedProjectionNode'
-        // for resource identified by resource path.
-        if (0 != $depth) {
-            for ($i = 1; $i < $depth; ++$i) {
-                $segName = $segmentNames[$i]['prop'];
-                $expandedProjectionNode = $expandedProjectionNode->findNode($segName);
-                if (null === $expandedProjectionNode) {
-                    throw new InvalidOperationException('is_null($expandedProjectionNode)');
-                }
-                if (!$expandedProjectionNode instanceof ExpandedProjectionNode) {
-                    $msg = '$expandedProjectionNode not instanceof ExpandedProjectionNode';
-                    throw new InvalidOperationException($msg);
-                }
-            }
-        }
-
-        return $expandedProjectionNode;
-    }
-
-    /**
-     * Check whether to expand a navigation property or not.
-     *
-     * @param string $navigationPropertyName Name of naviagtion property in question
-     *
-     * @return bool True if the given navigation should be expanded, otherwise false
-     * @throws InvalidOperationException
-     */
-    protected function shouldExpandSegment($navigationPropertyName)
-    {
-        $expandedProjectionNode = $this->getCurrentExpandedProjectionNode();
-        if (null === $expandedProjectionNode) {
-            return false;
-        }
-        $expandedProjectionNode = $expandedProjectionNode->findNode($navigationPropertyName);
-
-        // null is a valid input to an instanceof call as of PHP 5.6 - will always return false
-        return $expandedProjectionNode instanceof ExpandedProjectionNode;
     }
 
     /**
