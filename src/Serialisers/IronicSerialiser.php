@@ -734,13 +734,17 @@ class IronicSerialiser implements IObjectSerialiser
             if (0 == count($derived)) {
                 throw new InvalidOperationException('Supplied abstract type must have at least one derived type');
             }
+            $derived = array_filter(
+                $derived,
+                function (ResourceType $element) {
+                    return !$element->isAbstract();
+                }
+            );
             foreach ($derived as $rawType) {
-                if (!$rawType->isAbstract()) {
-                    $name = $rawType->getInstanceType()->getName();
-                    if ($payloadClass == $name) {
-                        $resourceType = $rawType;
-                        break;
-                    }
+                $name = $rawType->getInstanceType()->getName();
+                if ($payloadClass == $name) {
+                    $resourceType = $rawType;
+                    break;
                 }
             }
         }
