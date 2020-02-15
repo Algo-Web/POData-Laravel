@@ -48,27 +48,14 @@ use POData\UriProcessor\SegmentStack;
 
 class IronicSerialiser implements IObjectSerialiser
 {
+    use SerialiseDepWrapperTrait;
+
     private $propertiesCache = [];
 
     /**
      * @var RootProjectionNode
      */
     private $rootNode = null;
-
-    /**
-     * The service implementation.
-     *
-     * @var IService
-     */
-    protected $service;
-
-    /**
-     * Request description instance describes OData request the
-     * the client has submitted and result of the request.
-     *
-     * @var RequestDescription
-     */
-    protected $request;
 
     /**
      * Collection of complex type instances used for cycle detection.
@@ -92,38 +79,14 @@ class IronicSerialiser implements IObjectSerialiser
     protected $absoluteServiceUriWithSlash;
 
     /**
-     * Holds reference to segment stack being processed.
-     *
-     * @var SegmentStack
-     */
-    protected $stack;
-
-    /**
-     * Lightweight stack tracking for recursive descent fill.
-     */
-    protected $lightStack = [];
-
-    /**
-     * @var ModelSerialiser
-     */
-    private $modelSerialiser;
-
-
-
-    /**
-     * @var IMetadataProvider
-     */
-    private $metaProvider;
-
-    /*
      * Update time to insert into ODataEntry/ODataFeed fields
-     * @var Carbon;
+     * @var Carbon
      */
     private $updated;
 
-    /*
+    /**
      * Has base URI already been written out during serialisation?
-     * @var bool;
+     * @var bool
      */
     private $isBaseWritten = false;
 
@@ -552,52 +515,6 @@ class IronicSerialiser implements IObjectSerialiser
         $propertyContent->properties[$odataProperty->name] = $odataProperty;
 
         return $propertyContent;
-    }
-
-    /**
-     * Gets reference to the request submitted by client.
-     *
-     * @return RequestDescription
-     * @throws InvalidOperationException
-     */
-    public function getRequest()
-    {
-        if (null == $this->request) {
-            throw new InvalidOperationException('Request not yet set');
-        }
-
-        return $this->request;
-    }
-
-    /**
-     * Sets reference to the request submitted by client.
-     *
-     * @param RequestDescription $request
-     */
-    public function setRequest(RequestDescription $request)
-    {
-        $this->request = $request;
-        $this->stack->setRequest($request);
-    }
-
-    /**
-     * Gets the data service instance.
-     *
-     * @return IService
-     */
-    public function getService()
-    {
-        return $this->service;
-    }
-
-    /**
-     * Gets the segment stack instance.
-     *
-     * @return SegmentStack
-     */
-    public function getStack()
-    {
-        return $this->stack;
     }
 
     /**
@@ -1179,31 +1096,12 @@ class IronicSerialiser implements IObjectSerialiser
         return 0 == ($resourceKind % 4);
     }
 
-    /*
-     * @return IMetadataProvider
-     */
-    protected function getMetadata()
-    {
-        if (null == $this->metaProvider) {
-            $this->metaProvider = App::make('metadata');
-        }
-        return $this->metaProvider;
-    }
-
     /**
      * @return array
      */
     protected function getLightStack()
     {
         return $this->lightStack;
-    }
-
-    /**
-     * @return ModelSerialiser
-     */
-    public function getModelSerialiser()
-    {
-        return $this->modelSerialiser;
     }
 
     /**
