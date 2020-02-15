@@ -1092,17 +1092,16 @@ class IronicSerialiser implements IObjectSerialiser
             return null;
         }
         $bag = new ODataBagContent();
+        $result = array_filter($result);
         foreach ($result as $value) {
-            if (isset($value)) {
-                if (ResourceTypeKind::PRIMITIVE() == $kVal) {
-                    $instance = $resourceType->getInstanceType();
-                    if (!$instance instanceof IType) {
-                        throw new InvalidOperationException(get_class($instance));
-                    }
-                    $bag->propertyContents[] = $this->primitiveToString($instance, $value);
-                } elseif (ResourceTypeKind::COMPLEX() == $kVal) {
-                    $bag->propertyContents[] = $this->writeComplexValue($resourceType, $value);
+            if (ResourceTypeKind::PRIMITIVE() == $kVal) {
+                $instance = $resourceType->getInstanceType();
+                if (!$instance instanceof IType) {
+                    throw new InvalidOperationException(get_class($instance));
                 }
+                $bag->propertyContents[] = $this->primitiveToString($instance, $value);
+            } elseif (ResourceTypeKind::COMPLEX() == $kVal) {
+                $bag->propertyContents[] = $this->writeComplexValue($resourceType, $value);
             }
         }
         return $bag;
