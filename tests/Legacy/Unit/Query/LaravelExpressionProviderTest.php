@@ -68,20 +68,6 @@ class LaravelExpressionProviderTest extends TestCase
         $this->assertEquals('dangerZone', $remix->getName());
     }
 
-    public function testOnLogicalExpressionNullArguments()
-    {
-        $foo      = new LaravelExpressionProvider();
-        $expected = 'onLogicalExpression';
-        $actual   = null;
-
-        try {
-            $result = $foo->onLogicalExpression(ExpressionType::NOT_LOGICAL(), null, null);
-        } catch (\InvalidArgumentException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
     public function testOnLogicalExpressionLogicalAnd()
     {
         $foo      = new LaravelExpressionProvider();
@@ -116,20 +102,6 @@ class LaravelExpressionProviderTest extends TestCase
 
         $result = $foo->onLogicalExpression($type, $left, $right);
         $this->assertEquals($expected, $result);
-    }
-
-    public function testOnArithmeticExpressionNullArguments()
-    {
-        $foo      = new LaravelExpressionProvider();
-        $expected = 'onArithmeticExpression';
-        $actual   = null;
-
-        try {
-            $result = $foo->onArithmeticExpression(ExpressionType::NOT_LOGICAL(), null, null);
-        } catch (\InvalidArgumentException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
     }
 
     public function testOnArithmeticExpressionMultiply()
@@ -190,20 +162,6 @@ class LaravelExpressionProviderTest extends TestCase
 
         $result = $foo->onArithmeticExpression($type, $left, $right);
         $this->assertEquals($expected, $result);
-    }
-
-    public function testOnRelationalExpressionNullArguments()
-    {
-        $foo      = new LaravelExpressionProvider();
-        $expected = 'onRelationalExpression';
-        $actual   = null;
-
-        try {
-            $result = $foo->onRelationalExpression(ExpressionType::NOT_LOGICAL(), null, null);
-        } catch (\InvalidArgumentException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
     }
 
     public function testOnRelationalExpressionGreaterThan()
@@ -278,25 +236,11 @@ class LaravelExpressionProviderTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testOnUnaryExpressionNullArguments()
-    {
-        $foo      = new LaravelExpressionProvider();
-        $expected = 'onUnaryExpression';
-        $actual   = null;
-
-        try {
-            $result = $foo->onUnaryExpression(ExpressionType::NOTEQUAL(), null);
-        } catch (\InvalidArgumentException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
     public function testOnUnaryExpressionNegation()
     {
         $foo = new LaravelExpressionProvider();
 
-        $type  = ExpressionType::NEGATE();
+        $type = ExpressionType::NEGATE();
         $child = 'hammertime';
 
         $expected = '-(hammertime)';
@@ -309,7 +253,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $type  = ExpressionType::NOT_LOGICAL();
+        $type = ExpressionType::NOT_LOGICAL();
         $child = 'hammertime';
 
         $expected = '!(hammertime)';
@@ -379,20 +323,6 @@ class LaravelExpressionProviderTest extends TestCase
         $expected = 'testIterator->SecondPropertyAccessor->TopPropertyAccessor';
         $result   = $foo->onPropertyAccessExpression($topLevelPropertyAccess);
         $this->assertEquals($expected, $result);
-    }
-
-    public function testOnFunctionCallExpressionNullArguments()
-    {
-        $foo      = new LaravelExpressionProvider();
-        $expected = 'onFunctionCallExpression';
-        $actual   = null;
-
-        try {
-            $result = $foo->onFunctionCallExpression(null, null);
-        } catch (\InvalidArgumentException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
     }
 
     public function testOnFunctionCallExpressionBadName()

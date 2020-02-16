@@ -10,6 +10,7 @@ use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\Type\IType;
 use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\ExpressionType;
 use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\PropertyAccessExpression;
+use POData\UriProcessor\QueryProcessor\FunctionDescription;
 
 class LaravelExpressionProvider implements IExpressionProvider
 {
@@ -308,9 +309,6 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onFunctionCallExpression($functionDescription, $params)
     {
-        if (!isset($functionDescription)) {
-            throw new \InvalidArgumentException('onFunctionCallExpression');
-        }
         if (!array_key_exists($functionDescription->name, $this->functionDescriptionParsers)) {
             throw new \InvalidArgumentException('onFunctionCallExpression');
         }
