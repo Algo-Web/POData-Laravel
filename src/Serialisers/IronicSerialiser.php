@@ -100,11 +100,7 @@ class IronicSerialiser implements IObjectSerialiser
             array_pop($this->lightStack);
             return null;
         }
-        if (!$entryObject->results instanceof Model) {
-            $res = $entryObject->results;
-            $msg = is_array($res) ? 'Entry object must be single Model' : get_class($res);
-            throw new InvalidOperationException($msg);
-        }
+        $this->checkSingleElementInput($entryObject);
 
         $this->loadStackIfEmpty();
         $baseURI = $this->isBaseWritten ? null : $this->absoluteServiceUriWithSlash;

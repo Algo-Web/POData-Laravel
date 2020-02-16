@@ -8,6 +8,7 @@
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use POData\Common\InvalidOperationException;
 use POData\Providers\Query\QueryResult;
@@ -29,6 +30,19 @@ trait SerialiseUtilitiesTrait
         }
         if ($res instanceof Collection && 0 == $res->count()) {
             $entryObjects->hasMore = false;
+        }
+    }
+
+    /**
+     * @param QueryResult $entryObject
+     * @throws InvalidOperationException
+     */
+    protected function checkSingleElementInput(QueryResult $entryObject)
+    {
+        if (!$entryObject->results instanceof Model) {
+            $res = $entryObject->results;
+            $msg = is_array($res) ? 'Entry object must be single Model' : get_class($res);
+            throw new InvalidOperationException($msg);
         }
     }
 }
