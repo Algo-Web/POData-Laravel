@@ -546,42 +546,6 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param ResourceEntityType $resourceType
-     * @param $payloadClass
-     * @return ResourceEntityType|ResourceType
-     * @throws InvalidOperationException
-     * @throws \ReflectionException
-     */
-    protected function getConcreteTypeFromAbstractType(ResourceEntityType $resourceType, $payloadClass)
-    {
-        if ($resourceType->isAbstract()) {
-            $derived = $this->getMetadata()->getDerivedTypes($resourceType);
-            if (0 == count($derived)) {
-                throw new InvalidOperationException('Supplied abstract type must have at least one derived type');
-            }
-            $derived = array_filter(
-                $derived,
-                function (ResourceType $element) {
-                    return !$element->isAbstract();
-                }
-            );
-            foreach ($derived as $rawType) {
-                $name = $rawType->getInstanceType()->getName();
-                if ($payloadClass == $name) {
-                    $resourceType = $rawType;
-                    break;
-                }
-            }
-        }
-        // despite all set up, checking, etc, if we haven't picked a concrete resource type,
-        // wheels have fallen off, so blow up
-        if ($resourceType->isAbstract()) {
-            throw new InvalidOperationException('Concrete resource type not selected for payload ' . $payloadClass);
-        }
-        return $resourceType;
-    }
-
-    /**
      * @param QueryResult $entryObject
      * @param array $relProp
      * @param $relativeUri

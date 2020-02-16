@@ -13,6 +13,8 @@ use Illuminate\Support\Collection;
 use POData\Common\InvalidOperationException;
 use POData\Common\Messages;
 use POData\Common\ODataException;
+use POData\Providers\Metadata\IMetadataProvider;
+use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\Type\IType;
 use POData\Providers\Query\QueryResult;
@@ -105,4 +107,45 @@ trait SerialiseUtilitiesTrait
 
         return $keyString;
     }
+
+    /**
+     * @param ResourceEntityType $resourceType
+     * @param string $payloadClass
+     * @return ResourceEntityType|ResourceType
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     */
+    protected function getConcreteTypeFromAbstractType(ResourceEntityType $resourceType, $payloadClass)
+    {
+        if ($resourceType->isAbstract()) {
+            $derived = $this->getMetadata()->getDerivedTypes($resourceType);
+            if (0 == count($derived)) {
+                throw new InvalidOperationException('Supplied abstract type must have at least one derived type');
+            }
+            $derived = array_filter(
+                $derived,
+                function (ResourceType $element) {
+                    return !$element->isAbstract();
+                }
+            );
+            foreach ($derived as $rawType) {
+                $name = $rawType->getInstanceType()->getName();
+                if ($payloadClass == $name) {
+                    $resourceType = $rawType;
+                    break;
+                }
+            }
+        }
+        // despite all set up, checking, etc, if we haven't picked a concrete resource type,
+        // wheels have fallen off, so blow up
+        if ($resourceType->isAbstract()) {
+            throw new InvalidOperationException('Concrete resource type not selected for payload ' . $payloadClass);
+        }
+        return $resourceType;
+    }
+
+    /**
+     * @return IMetadataProvider
+     */
+    abstract protected function getMetadata();
 }
