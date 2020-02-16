@@ -417,47 +417,6 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param Model $entityInstance
-     * @param ResourceType $resourceType
-     * @param string $containerName
-     * @return string
-     * @throws InvalidOperationException
-     * @throws ODataException
-     * @throws \ReflectionException
-     */
-    protected function getEntryInstanceKey($entityInstance, ResourceType $resourceType, $containerName)
-    {
-        $typeName = $resourceType->getName();
-        $keyProperties = $resourceType->getKeyProperties();
-        if (0 == count($keyProperties)) {
-            throw new InvalidOperationException('count($keyProperties) == 0');
-        }
-        $keyString = $containerName . '(';
-        $comma = null;
-        foreach ($keyProperties as $keyName => $resourceProperty) {
-            $keyType = $resourceProperty->getInstanceType();
-            if (!$keyType instanceof IType) {
-                throw new InvalidOperationException('$keyType not instanceof IType');
-            }
-            $keyName = $resourceProperty->getName();
-            $keyValue = $entityInstance->$keyName;
-            if (!isset($keyValue)) {
-                throw ODataException::createInternalServerError(
-                    Messages::badQueryNullKeysAreNotSupported($typeName, $keyName)
-                );
-            }
-
-            $keyValue = $keyType->convertToOData($keyValue);
-            $keyString .= $comma . $keyName . '=' . $keyValue;
-            $comma = ',';
-        }
-
-        $keyString .= ')';
-
-        return $keyString;
-    }
-
-    /**
      * @param $entryObject
      * @param $type
      * @param $relativeUri
@@ -584,17 +543,6 @@ class IronicSerialiser implements IObjectSerialiser
         if (!isset($nuLink->expandedResult)) {
             throw new InvalidOperationException('');
         }
-    }
-
-    public static function isMatchPrimitive($resourceKind)
-    {
-        if (16 > $resourceKind) {
-            return false;
-        }
-        if (28 < $resourceKind) {
-            return false;
-        }
-        return 0 == ($resourceKind % 4);
     }
 
     /**
