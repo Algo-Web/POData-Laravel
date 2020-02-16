@@ -84,6 +84,24 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
+     * @param QueryResult $entryObjects
+     * @throws InvalidOperationException
+     */
+    protected function checkElementsInput(QueryResult &$entryObjects)
+    {
+        $res = $entryObjects->results;
+        if (!(is_array($res) || $res instanceof Collection)) {
+            throw new InvalidOperationException('!is_array($entryObjects->results)');
+        }
+        if (is_array($res) && 0 == count($res)) {
+            $entryObjects->hasMore = false;
+        }
+        if ($res instanceof Collection && 0 == $res->count()) {
+            $entryObjects->hasMore = false;
+        }
+    }
+
+    /**
      * Write a top level entry resource.
      *
      * @param QueryResult $entryObject Reference to the entry object to be written
@@ -210,16 +228,7 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeTopLevelElements(QueryResult &$entryObjects)
     {
-        $res = $entryObjects->results;
-        if (!(is_array($res) || $res instanceof Collection)) {
-            throw new InvalidOperationException('!is_array($entryObjects->results)');
-        }
-        if (is_array($res) && 0 == count($res)) {
-            $entryObjects->hasMore = false;
-        }
-        if ($res instanceof Collection && 0 == $res->count()) {
-            $entryObjects->hasMore = false;
-        }
+        $this->checkElementsInput($entryObjects);
 
         $this->loadStackIfEmpty();
 
