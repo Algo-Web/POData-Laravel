@@ -364,6 +364,7 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeTopLevelBagObject(QueryResult &$BagValue, $propertyName, ResourceType &$resourceType)
     {
+        /** @var array|null $result */
         $result = $BagValue->results;
 
         $propertyContent         = new ODataPropertyContent();
