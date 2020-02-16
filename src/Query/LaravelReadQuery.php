@@ -449,8 +449,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         $resultSet,
         $resultCount,
         $bulkSetCount
-    )
-    {
+    ) {
         $qVal = $queryType;
         if (QueryType::ENTITIES() == $qVal || QueryType::ENTITIES_WITH_COUNT() == $qVal) {
             $result->results = [];
