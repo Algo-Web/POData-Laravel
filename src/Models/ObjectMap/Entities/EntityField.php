@@ -205,7 +205,6 @@ class EntityField
         EntityFieldPrimitiveType::FLOAT => EdmPrimitiveType::SINGLE,
         EntityFieldPrimitiveType::DECIMAL => EdmPrimitiveType::DECIMAL,
         EntityFieldPrimitiveType::TEXT => EdmPrimitiveType::STRING,
-        EntityFieldPrimitiveType::STRING => EdmPrimitiveType::STRING,
         EntityFieldPrimitiveType::BOOLEAN => EdmPrimitiveType::BOOLEAN,
         EntityFieldPrimitiveType::BLOB => 'stream'
     ];
