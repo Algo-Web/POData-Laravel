@@ -76,18 +76,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         $result->results = null;
         $result->count   = null;
 
-        if (null != $orderBy) {
-            foreach ($orderBy->getOrderByInfo()->getOrderByPathSegments() as $order) {
-                foreach ($order->getSubPathSegments() as $subOrder) {
-                    $subName = $subOrder->getName();
-                    $subName = $tableName.'.'.$subName;
-                    $sourceEntityInstance = $sourceEntityInstance->orderBy(
-                        $subName,
-                        $order->isAscending() ? 'asc' : 'desc'
-                    );
-                }
-            }
-        }
+        $sourceEntityInstance = $this->buildOrderBy($orderBy, $sourceEntityInstance, $tableName);
 
         // throttle up for trench run
         if (null != $skipToken) {
@@ -125,18 +114,7 @@ class LaravelReadQuery extends LaravelBaseQuery
             $resultSet = $resultSet->take($top);
         }
 
-        $qVal = $queryType;
-        if (QueryType::ENTITIES() == $qVal || QueryType::ENTITIES_WITH_COUNT() == $qVal) {
-            $result->results = [];
-            foreach ($resultSet as $res) {
-                $result->results[] = $res;
-            }
-        }
-        if (QueryType::COUNT() == $qVal || QueryType::ENTITIES_WITH_COUNT() == $qVal) {
-            $result->count = $resultCount;
-        }
-        $hazMore = $bulkSetCount > $skip + count($resultSet);
-        $result->hasMore = $hazMore;
+        $this->packageResourceSetResults($queryType, $skip, $result, $resultSet, $resultCount, $bulkSetCount);
         return $result;
     }
 
@@ -431,5 +409,59 @@ class LaravelReadQuery extends LaravelBaseQuery
             }
         }
         return [$bulkSetCount, $resultSet, $resultCount, $skip];
+    }
+
+    /**
+     * @param $orderBy
+     * @param $sourceEntityInstance
+     * @param $tableName
+     * @return mixed
+     */
+    protected function buildOrderBy($orderBy, $sourceEntityInstance, $tableName)
+    {
+        if (null != $orderBy) {
+            foreach ($orderBy->getOrderByInfo()->getOrderByPathSegments() as $order) {
+                foreach ($order->getSubPathSegments() as $subOrder) {
+                    $subName = $subOrder->getName();
+                    $subName = $tableName . '.' . $subName;
+                    $sourceEntityInstance = $sourceEntityInstance->orderBy(
+                        $subName,
+                        $order->isAscending() ? 'asc' : 'desc'
+                    );
+                }
+            }
+        }
+        return $sourceEntityInstance;
+    }
+
+    /**
+     * @param QueryType $queryType
+     * @param $skip
+     * @param QueryResult $result
+     * @param $resultSet
+     * @param $resultCount
+     * @param $bulkSetCount
+     */
+    protected function packageResourceSetResults(
+        QueryType $queryType,
+        $skip,
+        QueryResult $result,
+        $resultSet,
+        $resultCount,
+        $bulkSetCount
+    )
+    {
+        $qVal = $queryType;
+        if (QueryType::ENTITIES() == $qVal || QueryType::ENTITIES_WITH_COUNT() == $qVal) {
+            $result->results = [];
+            foreach ($resultSet as $res) {
+                $result->results[] = $res;
+            }
+        }
+        if (QueryType::COUNT() == $qVal || QueryType::ENTITIES_WITH_COUNT() == $qVal) {
+            $result->count = $resultCount;
+        }
+        $hazMore = $bulkSetCount > $skip + count($resultSet);
+        $result->hasMore = $hazMore;
     }
 }
