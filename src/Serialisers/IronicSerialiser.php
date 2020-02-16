@@ -188,10 +188,7 @@ class IronicSerialiser implements IObjectSerialiser
             $msg = 'Should have ' . $stackCount . ' elements in stack, have ' . $newCount . ' elements';
             throw new InvalidOperationException($msg);
         }
-        $this->lightStack[$newCount-1]['count']--;
-        if (0 == $this->lightStack[$newCount-1]['count']) {
-            array_pop($this->lightStack);
-        }
+        $this->updateLightStack($newCount);
         return $odata;
     }
 
