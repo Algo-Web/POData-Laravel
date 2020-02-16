@@ -111,24 +111,10 @@ class MetadataGubbinsHolder
     {
         $classNames = array_keys($this->relations);
 
-        $associations = [];
+        $associations = $this->buildRelationAssociations($classNames);
 
-        foreach ($classNames as $class) {
-            $rawAssoc = $this->getRelationsByClass($class);
-            foreach ($rawAssoc as $raw) {
-                if (!in_array($raw, $associations)) {
-                    $associations[] = $raw;
-                }
-            }
-        }
+        $unknowns = $this->buildUnknownSides();
 
-        $unknowns = [];
-        foreach ($this->knownSides as $knownType => $knownDeets) {
-            $unknowns[$knownType] = [];
-            foreach (array_keys($knownDeets) as $key) {
-                $unknowns[$knownType][$key] = [];
-            }
-        }
         $monoAssoc = [];
         $polyAssoc = [];
         foreach ($associations as $assoc) {
@@ -190,5 +176,40 @@ class MetadataGubbinsHolder
             $msg = $className . ' does not exist in holder';
             throw new \InvalidArgumentException($msg);
         }
+    }
+
+    /**
+     * @param array $classNames
+     * @return array
+     * @throws InvalidOperationException
+     */
+    protected function buildRelationAssociations(array $classNames)
+    {
+        $associations = [];
+
+        foreach ($classNames as $class) {
+            $rawAssoc = $this->getRelationsByClass($class);
+            foreach ($rawAssoc as $raw) {
+                if (!in_array($raw, $associations)) {
+                    $associations[] = $raw;
+                }
+            }
+        }
+        return $associations;
+    }
+
+    /**
+     * @return array
+     */
+    protected function buildUnknownSides()
+    {
+        $unknowns = [];
+        foreach ($this->knownSides as $knownType => $knownDeets) {
+            $unknowns[$knownType] = [];
+            foreach (array_keys($knownDeets) as $key) {
+                $unknowns[$knownType][$key] = [];
+            }
+        }
+        return $unknowns;
     }
 }
