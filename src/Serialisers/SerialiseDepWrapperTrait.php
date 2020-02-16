@@ -181,4 +181,15 @@ trait SerialiseDepWrapperTrait
 
         return 0 == $count ? $this->getRequest()->getTargetResourceSetWrapper() : $segmentWrappers[$count-1];
     }
+
+    /**
+     * @param int $newCount
+     */
+    protected function updateLightStack($newCount)
+    {
+        $this->lightStack[$newCount - 1]['count']--;
+        if (0 == $this->lightStack[$newCount - 1]['count']) {
+            array_pop($this->lightStack);
+        }
+    }
 }
