@@ -243,7 +243,7 @@ class IronicSerialiser implements IObjectSerialiser
         if ($this->getRequest()->queryType == QueryType::ENTITIES_WITH_COUNT()) {
             $odata->rowCount = $this->getRequest()->getCountValue();
         }
-        $this->buildEntriesFromElements($res, $odata);
+        $this->buildEntriesFromElements($entryObjects->results, $odata);
 
         $resourceSet = $this->getRequest()->getTargetResourceSetWrapper()->getResourceSet();
         $requestTop = $this->getRequest()->getTopOptionCount();
