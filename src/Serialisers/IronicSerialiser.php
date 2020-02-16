@@ -108,7 +108,9 @@ class IronicSerialiser implements IObjectSerialiser
 
         $stackCount = count($this->lightStack);
         $topOfStack = $this->lightStack[$stackCount-1];
-        $payloadClass = get_class($entryObject->results);
+        /** @var object $res */
+        $res = $entryObject->results;
+        $payloadClass = get_class($res);
         /** @var ResourceEntityType $resourceType */
         $resourceType = $this->getService()->getProvidersWrapper()->resolveResourceType($topOfStack['type']);
 

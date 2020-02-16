@@ -34,7 +34,9 @@ trait SerialiseNextPageLinksTrait
     protected function buildNextPageLink(QueryResult $entryObjects, $odata)
     {
         $stackSegment = $this->getRequest()->getTargetResourceSetWrapper()->getName();
-        $lastObject = end($entryObjects->results);
+        /** @var array $res */
+        $res = $entryObjects->results;
+        $lastObject = end($res);
         $segment = $this->getNextLinkUri($lastObject);
         $nextLink = new ODataLink();
         $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
