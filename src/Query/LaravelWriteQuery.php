@@ -11,6 +11,7 @@ namespace AlgoWeb\PODataLaravel\Query;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
@@ -52,7 +53,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
 
 
     /**
-     * @param $result
+     * @param JsonResponse $result
      * @throws ODataException
      * @return array|mixed
      */
@@ -79,8 +80,8 @@ class LaravelWriteQuery extends LaravelBaseQuery
 
     /**
      * @param ResourceSet $sourceResourceSet
-     * @param $data
-     * @param                            $verb
+     * @param array       $data
+     * @param string                     $verb
      * @param  Model|null                $source
      * @throws InvalidOperationException
      * @throws ODataException
@@ -115,8 +116,8 @@ class LaravelWriteQuery extends LaravelBaseQuery
 
 
     /**
-     * @param $sourceEntityInstance
-     * @param $data
+     * @param Model $sourceEntityInstance
+     * @param array $data
      * @param string $class
      * @param string $verb
      *
@@ -233,7 +234,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
      *
      * @param ResourceSet   $resourceSet   The entity set containing the entity to update
      * @param KeyDescriptor $keyDescriptor The key identifying the entity to update
-     * @param $data
+     * @param array $data
      *
      * @return bool|null Returns result of executing query
      */

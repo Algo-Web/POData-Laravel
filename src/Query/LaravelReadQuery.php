@@ -408,7 +408,7 @@ class LaravelReadQuery extends LaravelBaseQuery
     }
 
     /**
-     * @param $sourceEntityInstance
+     * @param  Model|Relation           $sourceEntityInstance
      * @param  string                   $tableName
      * @param  InternalOrderByInfo|null $orderBy
      * @return mixed
@@ -434,7 +434,7 @@ class LaravelReadQuery extends LaravelBaseQuery
      * @param QueryType   $queryType
      * @param int         $skip
      * @param QueryResult $result
-     * @param $resultSet
+     * @param array       $resultSet
      * @param int $resultCount
      * @param int $bulkSetCount
      */

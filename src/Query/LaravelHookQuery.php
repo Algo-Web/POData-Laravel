@@ -113,8 +113,8 @@ class LaravelHookQuery extends LaravelBaseQuery
     }
 
     /**
-     * @param $sourceEntityInstance
-     * @param $targetEntityInstance
+     * @param Model $sourceEntityInstance
+     * @param Model $targetEntityInstance
      * @param string $navPropName
      * @throws \InvalidArgumentException
      * @throws InvalidOperationException

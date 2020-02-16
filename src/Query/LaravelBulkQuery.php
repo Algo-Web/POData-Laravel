@@ -273,7 +273,7 @@ class LaravelBulkQuery
     }
 
     /**
-     * @param $result
+     * @param JsonResponse $result
      * @throws ODataException
      * @return array|mixed
      */

@@ -427,9 +427,9 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param $entryObject
-     * @param $type
-     * @param $relativeUri
+     * @param  mixed                     $entryObject
+     * @param  string                    $type
+     * @param  string                    $relativeUri
      * @param  ResourceType              $resourceType
      * @param  ODataMediaLink|null       $mediaLink
      * @param  ODataMediaLink[]          $mediaLinks

@@ -341,7 +341,7 @@ class LaravelExpressionProvider implements IExpressionProvider
     }
 
     /**
-     * @param $expressionType
+     * @param ExpressionType|int $expressionType
      * @return mixed
      */
     private function unpackExpressionType($expressionType)

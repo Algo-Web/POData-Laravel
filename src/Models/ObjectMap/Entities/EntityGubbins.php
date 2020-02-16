@@ -220,7 +220,7 @@ class EntityGubbins
     }
 
     /**
-     * @param $relName
+     * @param string $relName
      * @return Association|null
      */
     public function resolveAssociation($relName): ?Association
