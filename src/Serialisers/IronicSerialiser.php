@@ -53,6 +53,7 @@ class IronicSerialiser implements IObjectSerialiser
     use SerialiseNavigationTrait;
     use SerialiseLowLevelWritersTrait;
     use SerialiseNextPageLinksTrait;
+    use SerialiseUtilitiesTrait;
 
     /**
      * Update time to insert into ODataEntry/ODataFeed fields
@@ -81,24 +82,6 @@ class IronicSerialiser implements IObjectSerialiser
         $this->complexTypeInstanceCollection = [];
         $this->modelSerialiser = new ModelSerialiser();
         $this->updated = Carbon::now();
-    }
-
-    /**
-     * @param QueryResult $entryObjects
-     * @throws InvalidOperationException
-     */
-    protected function checkElementsInput(QueryResult &$entryObjects)
-    {
-        $res = $entryObjects->results;
-        if (!(is_array($res) || $res instanceof Collection)) {
-            throw new InvalidOperationException('!is_array($entryObjects->results)');
-        }
-        if (is_array($res) && 0 == count($res)) {
-            $entryObjects->hasMore = false;
-        }
-        if ($res instanceof Collection && 0 == $res->count()) {
-            $entryObjects->hasMore = false;
-        }
     }
 
     /**
