@@ -1658,6 +1658,102 @@ class LaravelQueryTest extends TestCase
         $this->assertTrue($foo->unhookSingleModel($source, $srcInstance, $target, $targInstance, 'manySource'));
     }
 
+    public function testUnhookSingleModelBothInputsNotModel()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMorphOneSource($meta);
+        $morphOne = m::mock(MorphTo::class)->makePartial();
+        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
+        $morphOne->shouldReceive('associate')->andReturn(null)->never();
+        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
+        $targInstance = new TestMorphOneSource($meta);
+        $navPropName = 'morphTarget';
+
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
+
+        $expected = 'Argument 1 passed to';
+        $this->expectExceptionMessage($expected);
+        $this->expectException(\TypeError::class);
+
+        $foo->unhookSingleModel($source, null, $target, null, $navPropName);
+    }
+
+    public function testUnhookSingleModelFirstInputNotModel()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMorphOneSource($meta);
+        $morphOne = m::mock(MorphTo::class)->makePartial();
+        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
+        $morphOne->shouldReceive('associate')->andReturn(null)->never();
+        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
+        $targInstance = new TestMorphOneSource($meta);
+        $navPropName = 'morphTarget';
+
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
+
+        $expected = 'Argument 1 passed to';
+        $this->expectExceptionMessage($expected);
+        $this->expectException(\TypeError::class);
+
+        $foo->unhookSingleModel($source, null, $target, $targInstance, $navPropName);
+    }
+
+    public function testUnhookSingleModelSecondInputNotModel()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMorphOneSource($meta);
+        $morphOne = m::mock(MorphTo::class)->makePartial();
+        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
+        $morphOne->shouldReceive('associate')->andReturn(null)->never();
+        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
+        $targInstance = new TestMorphOneSource($meta);
+        $navPropName = 'morphTarget';
+
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
+
+        $expected = 'Argument 2 passed to';
+        $this->expectExceptionMessage($expected);
+        $this->expectException(\TypeError::class);
+
+        $foo->unhookSingleModel($source, $srcInstance, $target, null, $navPropName);
+    }
+
     public function testStartTransaction()
     {
         $db = DB::getFacadeRoot();

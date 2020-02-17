@@ -117,7 +117,6 @@ class LaravelHookQuery extends LaravelBaseQuery
      * @param Model $targetEntityInstance
      * @param string $navPropName
      * @throws \InvalidArgumentException
-     * @throws InvalidOperationException
      * @return Relation
      */
     protected function isModelHookInputsOk(
