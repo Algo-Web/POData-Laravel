@@ -90,21 +90,17 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         $actual                 = null;
         $actualExceptionClass   = null;
 
+        $expected = 'Argument 2 passed to';
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage($expected);
+
         try {
             $object->writeTopLevelBagObject($collection, $propName, $rType);
         } catch (\Exception $e) {
             $expectedExceptionClass = get_class($e);
             $expected               = $e->getMessage();
         }
-        try {
-            $ironic->writeTopLevelBagObject($collection, $propName, $rType);
-        } catch (\Exception $e) {
-            $actualExceptionClass = get_class($e);
-            $actual               = $e->getMessage();
-        }
-
-        $this->assertEquals($expectedExceptionClass, $actualExceptionClass);
-        $this->assertEquals($expected, $actual);
+        $ironic->writeTopLevelBagObject($collection, $propName, $rType);
     }
 
     public function testWriteBagObjectWithInconsistentType()

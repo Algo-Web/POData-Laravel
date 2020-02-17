@@ -65,11 +65,8 @@ abstract class SerialiserLowLevelWriters
      * @throws \ReflectionException
      * @return ODataBagContent|null
      */
-    public static function writeBagValue(ResourceType &$resourceType, $result): ?ODataBagContent
+    public static function writeBagValue(ResourceType &$resourceType, ?array $result): ?ODataBagContent
     {
-        if (!(null == $result || is_array($result))) {
-            throw new InvalidOperationException('Bag parameter must be null or array');
-        }
         $typeKind = $resourceType->getResourceTypeKind();
         $kVal     = $typeKind;
         if (!(ResourceTypeKind::PRIMITIVE() == $kVal || ResourceTypeKind::COMPLEX() == $kVal)) {
