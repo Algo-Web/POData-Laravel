@@ -57,19 +57,10 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @throws ODataException
      * @return array|mixed
      */
-    protected function createUpdateDeleteProcessOutput($result)
+    protected function createUpdateDeleteProcessOutput(JsonResponse $result)
     {
-        if (!($result instanceof \Illuminate\Http\JsonResponse)) {
-            throw ODataException::createInternalServerError('Controller response not well-formed json.');
-        }
-        $outData = $result->getData();
-        if (is_object($outData)) {
-            $outData = (array) $outData;
-        }
+        $outData = $result->getData(true);
 
-        if (!is_array($outData)) {
-            throw ODataException::createInternalServerError('Controller response does not have an array.');
-        }
         if (!(key_exists('id', $outData) && key_exists('status', $outData) && key_exists('errors', $outData))) {
             throw ODataException::createInternalServerError(
                 'Controller response array missing at least one of id, status and/or errors fields.'
@@ -159,7 +150,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @param object      $sourceEntityInstance
      *
      * @throws \Exception
-     * @return bool       true if resources sucessfully deteled, otherwise false
+     * @return bool       true if resources successfully deleted, otherwise false
      */
     public function deleteResource(
         ResourceSet $sourceResourceSet,
