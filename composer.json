@@ -30,7 +30,7 @@
             "AlgoWeb\\PODataLaravel\\Orchestra\\Tests\\": "testsorchestra/"
         },
         "classmap": [
-            "tests/"
+            "tests/Legacy"
         ]
     },
     "minimum-stability": "dev"
