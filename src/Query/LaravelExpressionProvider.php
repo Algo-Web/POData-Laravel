@@ -168,7 +168,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      *
      * @return string
      */
-    public function onLogicalExpression($expressionType, $left, $right)
+    public function onLogicalExpression(ExpressionType $expressionType, $left, $right)
     {
         $type = $this->unpackExpressionType($expressionType);
         switch ($type) {
@@ -189,7 +189,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      *
      * @return string
      */
-    public function onArithmeticExpression($expressionType, $left, $right)
+    public function onArithmeticExpression(ExpressionType $expressionType, $left, $right)
     {
         $type = $this->unpackExpressionType($expressionType);
         switch ($type) {
@@ -216,7 +216,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      *
      * @return string
      */
-    public function onRelationalExpression($expressionType, $left, $right)
+    public function onRelationalExpression(ExpressionType $expressionType, $left, $right)
     {
         $type = $this->unpackExpressionType($expressionType);
         switch ($type) {
@@ -244,7 +244,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      *
      * @return string
      */
-    public function onUnaryExpression($expressionType, $child)
+    public function onUnaryExpression(ExpressionType $expressionType, $child)
     {
         $type = $this->unpackExpressionType($expressionType);
         switch ($type) {
@@ -280,7 +280,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      *
      * @return string
      */
-    public function onPropertyAccessExpression($expression)
+    public function onPropertyAccessExpression(PropertyAccessExpression $expression)
     {
         $parent = $expression;
         $variable = null;
