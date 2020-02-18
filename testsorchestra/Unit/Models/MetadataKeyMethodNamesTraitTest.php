@@ -5,9 +5,9 @@
  * Date: 14/02/20
  * Time: 1:52 AM.
  */
-namespace Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Unit\Models;
+namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Models;
 
-use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\Address;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\Address;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\RelationTestDummyModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;

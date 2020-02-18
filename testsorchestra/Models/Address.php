@@ -5,7 +5,7 @@
  * Date: 9/02/20
  * Time: 1:29 PM.
  */
-namespace Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models;
+namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

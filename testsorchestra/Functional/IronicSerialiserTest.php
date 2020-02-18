@@ -5,12 +5,12 @@
  * Date: 9/02/20
  * Time: 6:42 PM.
  */
-namespace Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Tests\Functional;
+namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Functional;
 
-use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\Address;
-use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\City;
-use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\Person;
-use Tests\Regression\AlgoWeb\PODataLaravel\TestCase;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\Address;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\City;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\Person;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\Request;

@@ -1,10 +1,19 @@
 <?php
-namespace Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Unit\Models;
+/**
+ * Created by PhpStorm.
+ * User: alex
+ * Date: 9/02/20
+ * Time: 1:41 PM.
+ */
+namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit;
 
-use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\Address;
-use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\City;
-use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\Person;
-use Tests\Regression\AlgoWeb\PODataLaravel\TestCase;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\Address;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\City;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\Person;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * As the name suggests, these tests were added to help diagnose and ultimately fix issue #188, reported by
@@ -15,8 +24,10 @@ use Tests\Regression\AlgoWeb\PODataLaravel\TestCase;
  * Class BgOakRelationTests
  * @package AlgoWeb\PODataLaravel\Orchestra\Tests\Unit
  */
-class RelationTest extends TestCase
+class BgOakRelationTest extends TestCase
 {
+    //use DatabaseMigrations;
+
     public function testCityAddressRelationRoundTrip()
     {
         $foo = new City();
