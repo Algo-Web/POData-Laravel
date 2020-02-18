@@ -55,7 +55,7 @@ class Map
     }
 
     /**
-     * @param Association[] $associations
+     * @param  Association[]                            $associations
      * @throws \POData\Common\InvalidOperationException
      */
     public function setAssociations(array $associations)
@@ -66,7 +66,7 @@ class Map
     }
 
     /**
-     * @param Association $association
+     * @param  Association                              $association
      * @throws \POData\Common\InvalidOperationException
      */
     public function addAssociation(Association $association)
@@ -101,7 +101,7 @@ class Map
     }
 
     /**
-     * @param AssociationMonomorphic $association
+     * @param  AssociationMonomorphic                   $association
      * @throws \POData\Common\InvalidOperationException
      */
     private function addAssociationMonomorphic(AssociationMonomorphic $association)

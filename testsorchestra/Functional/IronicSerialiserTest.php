@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 9/02/20
- * Time: 6:42 PM
+ * Time: 6:42 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Functional;
 
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\Address;
@@ -16,11 +15,11 @@ use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Mockery as m;
 use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext;
 use POData\Providers\Query\QueryResult;
 use POData\SimpleDataService;
-use Mockery as m;
 
 class IronicSerialiserTest extends TestCase
 {
@@ -63,7 +62,7 @@ class IronicSerialiserTest extends TestCase
         $request = m::mock(Request::class)->makePartial();
         $request->shouldReceive('getMethod')->andReturn('GET');
         $request->shouldReceive('fullUrl')->andReturn($url);
-        $request->shouldReceive('all')->andReturn(['$expand' => "Address/City"]);
+        $request->shouldReceive('all')->andReturn(['$expand' => 'Address/City']);
         $request->shouldReceive('header')->withArgs(['DATASERVICEVERSION'])->andReturnNull();
         $request->shouldReceive('header')->withArgs(['MAXDATASERVICEVERSION'])->andReturnNull();
         $request->shouldReceive('header')->withArgs(['IF_MATCH'])->andReturnNull();

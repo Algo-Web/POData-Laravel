@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 16/02/20
- * Time: 12:12 AM
+ * Time: 12:12 AM.
  */
-
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use Illuminate\Database\Eloquent\Model;
@@ -36,8 +35,8 @@ trait SerialiseLowLevelWritersTrait
     /**
      * @param $entryObject
      * @param $nonRelProp
-     * @return ODataPropertyContent
      * @throws InvalidOperationException
+     * @return ODataPropertyContent
      */
     protected function writePrimitiveProperties(Model $entryObject, $nonRelProp)
     {
@@ -62,9 +61,9 @@ trait SerialiseLowLevelWritersTrait
     /**
      * @param ResourceType $resourceType
      * @param $result
-     * @return ODataBagContent|null
      * @throws InvalidOperationException
      * @throws \ReflectionException
+     * @return ODataBagContent|null
      */
     protected function writeBagValue(ResourceType &$resourceType, $result)
     {
@@ -98,12 +97,12 @@ trait SerialiseLowLevelWritersTrait
     }
 
     /**
-     * @param  ResourceType         $resourceType
-     * @param  object               $result
-     * @param  string|null          $propertyName
-     * @return ODataPropertyContent
+     * @param  ResourceType              $resourceType
+     * @param  object                    $result
+     * @param  string|null               $propertyName
      * @throws InvalidOperationException
      * @throws \ReflectionException
+     * @return ODataPropertyContent
      */
     protected function writeComplexValue(ResourceType &$resourceType, &$result, $propertyName = null)
     {
@@ -163,8 +162,8 @@ trait SerialiseLowLevelWritersTrait
      * Convert the given primitive value to string.
      * Note: This method will not handle null primitive value.
      *
-     * @param IType &$type                  Type of the primitive property needing conversion
-     * @param mixed $primitiveValue         Primitive value to convert
+     * @param IType &$type          Type of the primitive property needing conversion
+     * @param mixed $primitiveValue Primitive value to convert
      *
      * @return string
      */

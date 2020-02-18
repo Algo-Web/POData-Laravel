@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 29/09/19
- * Time: 6:08 PM
+ * Time: 6:08 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Query;
 
 use Illuminate\Database\Eloquent\Model;
@@ -23,7 +22,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
     /**
      * @param $data
      * @param $paramList
-     * @param Model|null $sourceEntityInstance
+     * @param  Model|null $sourceEntityInstance
      * @return array
      */
     protected function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance)
@@ -159,8 +158,8 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @param ResourceSet $sourceResourceSet
      * @param object      $sourceEntityInstance
      *
-     * @return bool true if resources sucessfully deteled, otherwise false
      * @throws \Exception
+     * @return bool       true if resources sucessfully deteled, otherwise false
      */
     public function deleteResource(
         ResourceSet $sourceResourceSet,
@@ -188,13 +187,13 @@ class LaravelWriteQuery extends LaravelBaseQuery
     }
 
     /**
-     * @param ResourceSet     $resourceSet          The entity set containing the entity to fetch
-     * @param Model|Relation  $sourceEntityInstance The source entity instance
-     * @param object          $data                 the New data for the entity instance
+     * @param ResourceSet    $resourceSet          The entity set containing the entity to fetch
+     * @param Model|Relation $sourceEntityInstance The source entity instance
+     * @param object         $data                 the New data for the entity instance
      *
-     * @return Model|null                           returns the newly created model if successful,
-     *                                              or null if model creation failed.
      * @throws \Exception
+     * @return Model|null returns the newly created model if successful,
+     *                    or null if model creation failed
      */
     public function createResourceforResourceSet(
         ResourceSet $resourceSet,
@@ -208,14 +207,14 @@ class LaravelWriteQuery extends LaravelBaseQuery
     /**
      * Updates a resource.
      *
-     * @param ResourceSet       $sourceResourceSet    The entity set containing the source entity
-     * @param Model|Relation    $sourceEntityInstance The source entity instance
-     * @param KeyDescriptor     $keyDescriptor        The key identifying the entity to fetch
-     * @param object            $data                 the New data for the entity instance
-     * @param bool              $shouldUpdate         Should undefined values be updated or reset to default
+     * @param ResourceSet    $sourceResourceSet    The entity set containing the source entity
+     * @param Model|Relation $sourceEntityInstance The source entity instance
+     * @param KeyDescriptor  $keyDescriptor        The key identifying the entity to fetch
+     * @param object         $data                 the New data for the entity instance
+     * @param bool           $shouldUpdate         Should undefined values be updated or reset to default
      *
-     * @return Model|null the new resource value if it is assignable or throw exception for null
      * @throws \Exception
+     * @return Model|null the new resource value if it is assignable or throw exception for null
      */
     public function updateResource(
         ResourceSet $sourceResourceSet,
@@ -248,13 +247,13 @@ class LaravelWriteQuery extends LaravelBaseQuery
 
 
     /**
-     * @param ResourceSet $resourceSet
-     * @param Model|Relation|null $sourceEntityInstance
-     * @param mixed $data
-     * @param mixed $verb
-     * @return Model|null
+     * @param  ResourceSet               $resourceSet
+     * @param  Model|Relation|null       $sourceEntityInstance
+     * @param  mixed                     $data
+     * @param  mixed                     $verb
      * @throws InvalidOperationException
      * @throws ODataException
+     * @return Model|null
      */
     protected function createUpdateMainWrapper(ResourceSet $resourceSet, $sourceEntityInstance, $data, $verb)
     {

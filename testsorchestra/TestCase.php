@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 1/02/20
- * Time: 1:21 PM
+ * Time: 1:21 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests;
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
@@ -28,8 +27,8 @@ class TestCase extends BaseTestCase
      * Define environment setup.
      *
      * @param  \Illuminate\Foundation\Application $app
-     * @return void
      * @throws \ReflectionException
+     * @return void
      */
     protected function getEnvironmentSetUp($app)
     {
@@ -37,7 +36,7 @@ class TestCase extends BaseTestCase
         $reflec = new \ReflectionClass($app);
         $prop = $reflec->getProperty('namespace');
         $prop->setAccessible(true);
-        $prop->setValue($app, "AlgoWeb\\PODataLaravel\\Orchestra\\");
+        $prop->setValue($app, 'AlgoWeb\\PODataLaravel\\Orchestra\\');
 
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'testbench');

@@ -54,10 +54,10 @@ trait MetadataTrait
     ];
 
     /**
-     * Retrieve and assemble this model's metadata for OData packaging
-     * @return array
+     * Retrieve and assemble this model's metadata for OData packaging.
      * @throws InvalidOperationException
      * @throws \Doctrine\DBAL\DBALException
+     * @return array
      */
     public function metadata()
     {
@@ -138,7 +138,7 @@ trait MetadataTrait
 
     /**
      * Return the set of fields that are permitted to be in metadata
-     * - following same visible-trumps-hidden guideline as Laravel
+     * - following same visible-trumps-hidden guideline as Laravel.
      *
      * @return array
      */
@@ -275,7 +275,7 @@ trait MetadataTrait
 
         foreach ($getterz as $getter) {
             $residual = substr($getter, 3);
-            $residual = substr(/** @scrutinizer ignore-type */$residual, 0, -9);
+            $residual = substr(/* @scrutinizer ignore-type */$residual, 0, -9);
             $methods[] = $residual;
         }
         return $methods;
@@ -315,11 +315,11 @@ trait MetadataTrait
     /**
      * Extract entity gubbins detail for later downstream use.
      *
-     * @return EntityGubbins
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Exception
+     * @return EntityGubbins
      */
     public function extractGubbins()
     {
@@ -401,7 +401,7 @@ trait MetadataTrait
     }
 
     /**
-     * Get columns for selected table
+     * Get columns for selected table.
      *
      * @return array
      */
@@ -419,10 +419,10 @@ trait MetadataTrait
     }
 
     /**
-     * Get Doctrine columns for selected table
+     * Get Doctrine columns for selected table.
      *
-     * @return array
      * @throws \Doctrine\DBAL\DBALException
+     * @return array
      */
     protected function getTableDoctrineColumns()
     {

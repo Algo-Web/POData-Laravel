@@ -36,10 +36,10 @@ trait MetadataControllerTrait
     /**
      * @param $modelName
      * @param $crudVerb
-     * @return array
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @throws \Exception
+     * @return array
      */
     public function getMethodName($modelName, $crudVerb)
     {
@@ -92,10 +92,10 @@ trait MetadataControllerTrait
     }
 
     /**
-     * @return array
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @throws \Exception
+     * @return array
      */
     public function getMappings()
     {
@@ -152,9 +152,8 @@ trait MetadataControllerTrait
 
     /**
      * @param $result
-     * @return array
-     *
      * @throws \ReflectionException
+     * @return array
      */
     protected function getParameterNames($result)
     {

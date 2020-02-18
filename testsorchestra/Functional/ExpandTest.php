@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 9/02/20
- * Time: 2:38 PM
+ * Time: 2:38 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Functional;
 
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\Address;

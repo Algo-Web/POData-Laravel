@@ -17,10 +17,9 @@ class ODataController extends BaseController
     /**
      * Display a listing of the resource.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\Response
-     *
+     * @param  Request                   $request
      * @throws \Exception
+     * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {

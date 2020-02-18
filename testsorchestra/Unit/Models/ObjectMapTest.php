@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 15/02/20
- * Time: 4:26 AM
+ * Time: 4:26 AM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Models;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;

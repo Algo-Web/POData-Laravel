@@ -55,8 +55,8 @@ class AssociationStubPolymorphic extends AssociationStubBase
     }
 
     /**
-     * @return bool
      * @throws InvalidOperationException
+     * @return bool
      */
     public function isKnownSide()
     {
@@ -67,10 +67,10 @@ class AssociationStubPolymorphic extends AssociationStubBase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function morphicType()
     {
-        return "polymorphic";
+        return 'polymorphic';
     }
 }

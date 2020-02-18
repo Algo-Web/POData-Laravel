@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 15/02/20
- * Time: 6:00 PM
+ * Time: 6:00 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use Illuminate\Support\Facades\App;
@@ -84,7 +83,7 @@ trait SerialiseDepWrapperTrait
     /**
      * Sets the data service instance.
      *
-     * @param IService $service
+     * @param  IService $service
      * @return void
      */
     public function setService(IService $service)
@@ -107,8 +106,8 @@ trait SerialiseDepWrapperTrait
     /**
      * Gets reference to the request submitted by client.
      *
-     * @return RequestDescription
      * @throws InvalidOperationException
+     * @return RequestDescription
      */
     public function getRequest()
     {
@@ -139,8 +138,8 @@ trait SerialiseDepWrapperTrait
     }
 
     /**
-    * @return IMetadataProvider
-    */
+     * @return IMetadataProvider
+     */
     protected function getMetadata()
     {
         if (null == $this->metaProvider) {
@@ -171,8 +170,8 @@ trait SerialiseDepWrapperTrait
     /**
      * Resource set wrapper for the resource being serialized.
      *
-     * @return ResourceSetWrapper
      * @throws InvalidOperationException
+     * @return ResourceSetWrapper
      */
     protected function getCurrentResourceSetWrapper()
     {

@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 15/02/20
- * Time: 8:05 PM
+ * Time: 8:05 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use POData\Common\InvalidOperationException;
@@ -25,8 +24,8 @@ trait SerialiseNavigationTrait
      * Find a 'ExpandedProjectionNode' instance in the projection tree
      * which describes the current segment.
      *
-     * @return null|RootProjectionNode|ExpandedProjectionNode
      * @throws InvalidOperationException
+     * @return null|RootProjectionNode|ExpandedProjectionNode
      */
     protected function getCurrentExpandedProjectionNode()
     {
@@ -65,13 +64,13 @@ trait SerialiseNavigationTrait
     /**
      * Gets collection of projection nodes under the current node.
      *
+     * @throws InvalidOperationException
      * @return ProjectionNode[]|ExpandedProjectionNode[]|null List of nodes describing projections for the current
      *                                                        segment, If this method returns null it means no
      *                                                        projections are to be applied and the entire resource for
      *                                                        the current segment should be serialized, If it returns
      *                                                        non-null only the properties described by the returned
      *                                                        projection segments should be serialized
-     * @throws InvalidOperationException
      */
     protected function getProjectionNodes()
     {
@@ -88,8 +87,8 @@ trait SerialiseNavigationTrait
      *
      * @param string $navigationPropertyName Name of navigation property in question
      *
-     * @return bool True if the given navigation should be expanded, otherwise false
      * @throws InvalidOperationException
+     * @return bool                      True if the given navigation should be expanded, otherwise false
      */
     protected function shouldExpandSegment($navigationPropertyName)
     {
@@ -106,8 +105,8 @@ trait SerialiseNavigationTrait
     /**
      * Gets reference to the request submitted by client.
      *
-     * @return RequestDescription
      * @throws InvalidOperationException
+     * @return RequestDescription
      */
     abstract public function getRequest();
 

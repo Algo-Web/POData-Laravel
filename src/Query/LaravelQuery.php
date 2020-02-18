@@ -119,10 +119,10 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * @param string[]|null            $eagerLoad            array of relations to eager load
      * @param Model|Relation|null      $sourceEntityInstance Starting point of query
      *
-     * @return QueryResult
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \ReflectionException
+     * @return QueryResult
      */
     public function getResourceSet(
         QueryType $queryType,
@@ -158,8 +158,8 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * @param KeyDescriptor|null $keyDescriptor The key identifying the entity to fetch
      * @param string[]|null      $eagerLoad     array of relations to eager load
      *
-     * @return Model|null Returns entity instance if found else null
      * @throws \Exception
+     * @return Model|null Returns entity instance if found else null
      */
     public function getResourceFromResourceSet(
         ResourceSet $resourceSet,
@@ -185,8 +185,8 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * @param int|null           $skip                 number of records which need to be skipped
      * @param SkipTokenInfo|null $skipToken            value indicating what records to skip
      *
-     * @return QueryResult
      * @throws \Exception
+     * @return QueryResult
      */
     public function getRelatedResourceSet(
         QueryType $queryType,
@@ -226,8 +226,8 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * @param ResourceProperty $targetProperty       the metadata of the target property
      * @param KeyDescriptor    $keyDescriptor        The key identifying the entity to fetch
      *
-     * @return Model|null Returns entity instance if found else null
      * @throws \Exception
+     * @return Model|null Returns entity instance if found else null
      */
     public function getResourceFromRelatedResourceSet(
         ResourceSet $sourceResourceSet,
@@ -257,8 +257,8 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * @param ResourceSet      $targetResourceSet    The entity set containing the entity pointed to by the nav property
      * @param ResourceProperty $targetProperty       The navigation property to fetch
      *
-     * @return Model|null The related resource if found else null
      * @throws \Exception
+     * @return Model|null The related resource if found else null
      */
     public function getRelatedResourceReference(
         ResourceSet $sourceResourceSet,
@@ -281,14 +281,14 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     /**
      * Updates a resource.
      *
-     * @param ResourceSet       $sourceResourceSet    The entity set containing the source entity
-     * @param Model|Relation    $sourceEntityInstance The source entity instance
-     * @param KeyDescriptor     $keyDescriptor        The key identifying the entity to fetch
-     * @param object            $data                 the New data for the entity instance
-     * @param bool              $shouldUpdate         Should undefined values be updated or reset to default
+     * @param ResourceSet    $sourceResourceSet    The entity set containing the source entity
+     * @param Model|Relation $sourceEntityInstance The source entity instance
+     * @param KeyDescriptor  $keyDescriptor        The key identifying the entity to fetch
+     * @param object         $data                 the New data for the entity instance
+     * @param bool           $shouldUpdate         Should undefined values be updated or reset to default
      *
-     * @return Model|null the new resource value if it is assignable or throw exception for null
      * @throws \Exception
+     * @return Model|null the new resource value if it is assignable or throw exception for null
      */
     public function updateResource(
         ResourceSet $sourceResourceSet,
@@ -312,8 +312,8 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * @param ResourceSet $sourceResourceSet
      * @param object      $sourceEntityInstance
      *
-     * @return bool true if resources sucessfully deteled, otherwise false
      * @throws \Exception
+     * @return bool       true if resources sucessfully deteled, otherwise false
      */
     public function deleteResource(
         ResourceSet $sourceResourceSet,
@@ -323,13 +323,13 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     }
 
     /**
-     * @param ResourceSet     $resourceSet          The entity set containing the entity to fetch
-     * @param Model|Relation  $sourceEntityInstance The source entity instance
-     * @param object          $data                 the New data for the entity instance
+     * @param ResourceSet    $resourceSet          The entity set containing the entity to fetch
+     * @param Model|Relation $sourceEntityInstance The source entity instance
+     * @param object         $data                 the New data for the entity instance
      *
-     * @return Model|null                           returns the newly created model if successful,
-     *                                              or null if model creation failed.
      * @throws \Exception
+     * @return Model|null returns the newly created model if successful,
+     *                    or null if model creation failed
      */
     public function createResourceforResourceSet(
         ResourceSet $resourceSet,
@@ -362,9 +362,9 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * @param ResourceSet $sourceResourceSet The entity set containing the entity to fetch
      * @param object[]    $data              The new data for the entity instance
      *
-     * @return object[] returns the newly created model if successful, or throws an exception if model creation failed
      * @throws InvalidOperationException
      * @throws \ReflectionException
+     * @return object[]                  returns the newly created model if successful, or throws an exception if model creation failed
      * @throw  \Exception
      */
     public function createBulkResourceforResourceSet(
@@ -383,9 +383,9 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * @param object[]        $data                 The new data for the entity instances
      * @param bool            $shouldUpdate         Should undefined values be updated or reset to default
      *
-     * @return object[] the new resource value if it is assignable, or throw exception for null
-     * @throw  \Exception
      * @throws InvalidOperationException
+     * @return object[]                  the new resource value if it is assignable, or throw exception for null
+     * @throw  \Exception
      */
     public function updateBulkResource(
         ResourceSet $sourceResourceSet,
@@ -413,8 +413,8 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * @param Model       $targetEntityInstance
      * @param $navPropName
      *
-     * @return bool
      * @throws InvalidOperationException
+     * @return bool
      */
     public function hookSingleModel(
         ResourceSet $sourceResourceSet,
@@ -441,8 +441,8 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * @param Model       $targetEntityInstance
      * @param $navPropName
      *
-     * @return bool
      * @throws InvalidOperationException
+     * @return bool
      */
     public function unhookSingleModel(
         ResourceSet $sourceResourceSet,

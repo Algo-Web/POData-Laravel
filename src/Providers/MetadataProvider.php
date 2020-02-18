@@ -54,11 +54,11 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * @param array $modelNames
-     * @return Map
+     * @param  array                        $modelNames
      * @throws InvalidOperationException
      * @throws \Doctrine\DBAL\DBALException
      * @throws \ReflectionException
+     * @return Map
      */
     private function extract(array $modelNames)
     {
@@ -84,9 +84,9 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * @param Map $objectMap
-     * @return Map
+     * @param  Map                       $objectMap
      * @throws InvalidOperationException
+     * @return Map
      */
     private function unify(Map $objectMap)
     {
@@ -108,7 +108,7 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * @param Map $objectModel
+     * @param  Map                       $objectModel
      * @throws InvalidOperationException
      * @throws \ReflectionException
      */
@@ -155,8 +155,8 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * @param Map $objectModel
-     * @param AssociationMonomorphic $associationUnderHammer
+     * @param  Map                       $objectModel
+     * @param  AssociationMonomorphic    $associationUnderHammer
      * @throws InvalidOperationException
      * @throws \ReflectionException
      */
@@ -204,7 +204,7 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * @param EntityGubbins $unifiedEntity
+     * @param  EntityGubbins             $unifiedEntity
      * @throws InvalidOperationException
      * @throws \ReflectionException
      */
@@ -246,10 +246,10 @@ class MetadataProvider extends MetadataBaseProvider
     /**
      * Bootstrap the application services.  Post-boot.
      *
-     * @return void
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @throws \Doctrine\DBAL\DBALException
+     * @return void
      */
     public function boot()
     {
@@ -300,10 +300,10 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function register()
     {
-        $this->app->/** @scrutinizer ignore-call */singleton('metadata', function () {
+        $this->app->/* @scrutinizer ignore-call */singleton('metadata', function () {
             return new SimpleMetadataProvider('Data', self::$metaNAMESPACE);
         });
-        $this->app->/** @scrutinizer ignore-call */singleton('objectmap', function () {
+        $this->app->/* @scrutinizer ignore-call */singleton('objectmap', function () {
             return new Map();
         });
     }
@@ -350,9 +350,9 @@ class MetadataProvider extends MetadataBaseProvider
      *
      * @param Model $source
      * @param $propName
+     * @throws InvalidOperationException
      * @return null|string
      * @internal param Model $target
-     * @throws InvalidOperationException
      */
     public function resolveReverseProperty(Model $source, $propName)
     {
