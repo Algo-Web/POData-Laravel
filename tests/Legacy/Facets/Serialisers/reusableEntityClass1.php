@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Serialisers;
+namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Serialisers;
 
 class reusableEntityClass1
 {
