@@ -25,13 +25,11 @@
             "AlgoWeb\\PODataLaravel\\": "src/"
         }
     },
-    "autoload-dev": {
-        "psr-4": {
-            "AlgoWeb\\PODataLaravel\\Orchestra\\Tests\\": "testsorchestra/"
-        },
-        "classmap": [
-            "tests/Legacy"
-        ]
-    },
+  "autoload-dev": {
+    "psr-4": {
+      "AlgoWeb\\PODataLaravel\\Orchestra\\Tests\\": "testsorchestra/",
+      "Tests\\Legacy\\AlgoWeb\\PODataLaravel\\": "tests/Legacy"
+    }
+  },
     "minimum-stability": "dev"
 }
