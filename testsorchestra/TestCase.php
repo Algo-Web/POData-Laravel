@@ -8,7 +8,6 @@
 
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests;
 
-use AlgoWeb\PODataLaravel\Kernels\ConsoleKernel;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
@@ -24,16 +23,6 @@ class TestCase extends BaseTestCase
             \Orchestra\Database\ConsoleServiceProvider::class,];
     }
 
-    /**
-     * Resolve application Console Kernel implementation.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    protected function resolveApplicationConsoleKernel($app)
-    {
-        $app->singleton('Illuminate\Contracts\Console\Kernel', ConsoleKernel::class);
-    }
 
     /**
      * Define environment setup.
