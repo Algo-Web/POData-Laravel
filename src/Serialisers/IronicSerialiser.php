@@ -325,6 +325,7 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeTopLevelComplexObject(QueryResult &$complexValue, $propertyName, ResourceType &$resourceType)
     {
+        /** @var object $result */
         $result = $complexValue->results;
 
         $propertyContent = new ODataPropertyContent();
