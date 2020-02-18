@@ -73,7 +73,7 @@ class LaravelExpressionProviderTest extends TestCase
         $actual = null;
 
         try {
-            $result = $foo->onLogicalExpression(null, null, null);
+            $result = $foo->onLogicalExpression(ExpressionType::NOT_LOGICAL(), null, null);
         } catch (\InvalidArgumentException $e) {
             $actual = $e->getMessage();
         }
@@ -85,7 +85,7 @@ class LaravelExpressionProviderTest extends TestCase
         $foo = new LaravelExpressionProvider();
         $left = 'x < 4';
         $right = 'y > 2';
-        $type = ExpressionType::AND_LOGICAL;
+        $type = ExpressionType::AND_LOGICAL();
         $expected = '(x < 4 && y > 2)';
 
         $result = $foo->onLogicalExpression($type, $left, $right);
@@ -97,7 +97,7 @@ class LaravelExpressionProviderTest extends TestCase
         $foo = new LaravelExpressionProvider();
         $left = 'x < 4';
         $right = 'y > 2';
-        $type = ExpressionType::OR_LOGICAL;
+        $type = ExpressionType::OR_LOGICAL();
         $expected = '(x < 4 || y > 2)';
 
         $result = $foo->onLogicalExpression($type, $left, $right);
@@ -123,7 +123,7 @@ class LaravelExpressionProviderTest extends TestCase
         $actual = null;
 
         try {
-            $result = $foo->onArithmeticExpression(null, null, null);
+            $result = $foo->onArithmeticExpression(ExpressionType::NOT_LOGICAL(), null, null);
         } catch (\InvalidArgumentException $e) {
             $actual = $e->getMessage();
         }
@@ -135,7 +135,7 @@ class LaravelExpressionProviderTest extends TestCase
         $foo = new LaravelExpressionProvider();
         $left = '4';
         $right = 2;
-        $type = ExpressionType::MULTIPLY;
+        $type = ExpressionType::MULTIPLY();
         $expected = '(4 * 2)';
 
         $result = $foo->onArithmeticExpression($type, $left, $right);
@@ -147,7 +147,7 @@ class LaravelExpressionProviderTest extends TestCase
         $foo = new LaravelExpressionProvider();
         $left = '4';
         $right = 2;
-        $type = ExpressionType::DIVIDE;
+        $type = ExpressionType::DIVIDE();
         $expected = '(4 / 2)';
 
         $result = $foo->onArithmeticExpression($type, $left, $right);
@@ -159,7 +159,7 @@ class LaravelExpressionProviderTest extends TestCase
         $foo = new LaravelExpressionProvider();
         $left = '4';
         $right = 2;
-        $type = ExpressionType::ADD;
+        $type = ExpressionType::ADD();
         $expected = '(4 + 2)';
 
         $result = $foo->onArithmeticExpression($type, $left, $right);
@@ -171,7 +171,7 @@ class LaravelExpressionProviderTest extends TestCase
         $foo = new LaravelExpressionProvider();
         $left = '4';
         $right = 2;
-        $type = ExpressionType::SUBTRACT;
+        $type = ExpressionType::SUBTRACT();
         $expected = '(4 - 2)';
 
         $result = $foo->onArithmeticExpression($type, $left, $right);
@@ -183,7 +183,7 @@ class LaravelExpressionProviderTest extends TestCase
         $foo = new LaravelExpressionProvider();
         $left = '4';
         $right = 2;
-        $type = ExpressionType::MODULO;
+        $type = ExpressionType::MODULO();
         $expected = '(4 % 2)';
 
         $result = $foo->onArithmeticExpression($type, $left, $right);
@@ -197,7 +197,7 @@ class LaravelExpressionProviderTest extends TestCase
         $actual = null;
 
         try {
-            $result = $foo->onRelationalExpression(null, null, null);
+            $result = $foo->onRelationalExpression(ExpressionType::NOT_LOGICAL(), null, null);
         } catch (\InvalidArgumentException $e) {
             $actual = $e->getMessage();
         }
@@ -209,7 +209,7 @@ class LaravelExpressionProviderTest extends TestCase
         $foo = new LaravelExpressionProvider();
         $left = '4';
         $right = 2;
-        $type = ExpressionType::GREATERTHAN;
+        $type = ExpressionType::GREATERTHAN();
         $expected = '(4 > 2)';
 
         $result = $foo->onRelationalExpression($type, $left, $right);
@@ -221,7 +221,7 @@ class LaravelExpressionProviderTest extends TestCase
         $foo = new LaravelExpressionProvider();
         $left = '4';
         $right = 2;
-        $type = ExpressionType::GREATERTHAN_OR_EQUAL;
+        $type = ExpressionType::GREATERTHAN_OR_EQUAL();
         $expected = '(4 >= 2)';
 
         $result = $foo->onRelationalExpression($type, $left, $right);
@@ -233,7 +233,7 @@ class LaravelExpressionProviderTest extends TestCase
         $foo = new LaravelExpressionProvider();
         $left = '4';
         $right = 2;
-        $type = ExpressionType::LESSTHAN;
+        $type = ExpressionType::LESSTHAN();
         $expected = '(4 < 2)';
 
         $result = $foo->onRelationalExpression($type, $left, $right);
@@ -245,7 +245,7 @@ class LaravelExpressionProviderTest extends TestCase
         $foo = new LaravelExpressionProvider();
         $left = '4';
         $right = 2;
-        $type = ExpressionType::LESSTHAN_OR_EQUAL;
+        $type = ExpressionType::LESSTHAN_OR_EQUAL();
         $expected = '(4 <= 2)';
 
         $result = $foo->onRelationalExpression($type, $left, $right);
@@ -257,7 +257,7 @@ class LaravelExpressionProviderTest extends TestCase
         $foo = new LaravelExpressionProvider();
         $left = '4';
         $right = 2;
-        $type = ExpressionType::EQUAL;
+        $type = ExpressionType::EQUAL();
         $expected = '(4 == 2)';
 
         $result = $foo->onRelationalExpression($type, $left, $right);
@@ -269,7 +269,7 @@ class LaravelExpressionProviderTest extends TestCase
         $foo = new LaravelExpressionProvider();
         $left = '4';
         $right = 2;
-        $type = ExpressionType::NOTEQUAL;
+        $type = ExpressionType::NOTEQUAL();
         $expected = '(4 != 2)';
 
         $result = $foo->onRelationalExpression($type, $left, $right);
@@ -283,7 +283,7 @@ class LaravelExpressionProviderTest extends TestCase
         $actual = null;
 
         try {
-            $result = $foo->onUnaryExpression(null, null);
+            $result = $foo->onUnaryExpression(ExpressionType::NOTEQUAL(), null);
         } catch (\InvalidArgumentException $e) {
             $actual = $e->getMessage();
         }
@@ -294,7 +294,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $type = ExpressionType::NEGATE;
+        $type = ExpressionType::NEGATE();
         $child = 'hammertime';
 
         $expected = '-(hammertime)';
@@ -307,7 +307,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $type = ExpressionType::NOT_LOGICAL;
+        $type = ExpressionType::NOT_LOGICAL();
         $child = 'hammertime';
 
         $expected = '!(hammertime)';
