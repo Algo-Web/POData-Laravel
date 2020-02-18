@@ -26,13 +26,6 @@ use POData\Providers\Metadata\Type\StringType;
 trait SerialiseLowLevelWritersTrait
 {
     /**
-     * Collection of complex type instances used for cycle detection.
-     *
-     * @var array
-     */
-    protected $complexTypeInstanceCollection;
-
-    /**
      * @param Model $entryObject
      * @param ModelSerialiser $modelSerialiser
      * @param $nonRelProp
@@ -101,26 +94,31 @@ trait SerialiseLowLevelWritersTrait
      * @param  ResourceType              $resourceType
      * @param  object                    $result
      * @param  string|null               $propertyName
+     * @param  array                     $instanceCollection
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @return ODataPropertyContent
      */
-    protected function writeComplexValue(ResourceType &$resourceType, &$result, $propertyName = null)
-    {
+    protected function writeComplexValue(
+        ResourceType &$resourceType,
+        &$result,
+        $propertyName = null,
+        array &$instanceCollection = []
+    ) {
         if (!is_object($result)) {
             throw new InvalidOperationException('Supplied $customObject must be an object');
         }
 
-        $count = count($this->complexTypeInstanceCollection);
+        $count = count($instanceCollection);
         for ($i = 0; $i < $count; ++$i) {
-            if ($this->complexTypeInstanceCollection[$i] === $result) {
+            if ($instanceCollection[$i] === $result) {
                 throw new InvalidOperationException(
                     Messages::objectModelSerializerLoopsNotAllowedInComplexTypes($propertyName)
                 );
             }
         }
 
-        $this->complexTypeInstanceCollection[$count] = &$result;
+        $instanceCollection[$count] = &$result;
 
         $internalContent = new ODataPropertyContent();
         $resourceProperties = $resourceType->getAllProperties();
@@ -148,13 +146,18 @@ trait SerialiseLowLevelWritersTrait
             } elseif (ResourcePropertyKind::COMPLEX_TYPE == $resourceKind) {
                 $rType = $prop->getResourceType();
                 $internalProperty->typeName = $rType->getFullName();
-                $internalProperty->value = $this->writeComplexValue($rType, $result->$propName, $propName);
+                $internalProperty->value = $this->writeComplexValue(
+                    $rType,
+                    $result->$propName,
+                    $propName,
+                    $instanceCollection
+                );
 
                 $internalContent->properties[$propName] = $internalProperty;
             }
         }
 
-        unset($this->complexTypeInstanceCollection[$count]);
+        unset($instanceCollection[$count]);
         return $internalContent;
     }
 

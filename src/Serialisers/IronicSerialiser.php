@@ -78,7 +78,6 @@ class IronicSerialiser implements IObjectSerialiser
         $this->absoluteServiceUri = $service->getHost()->getAbsoluteServiceUri()->getUrlAsString();
         $this->absoluteServiceUriWithSlash = rtrim($this->absoluteServiceUri, '/') . '/';
         $this->stack = new SegmentStack($request);
-        $this->complexTypeInstanceCollection = [];
         $this->modelSerialiser = new ModelSerialiser();
         $this->updated = Carbon::now();
     }
