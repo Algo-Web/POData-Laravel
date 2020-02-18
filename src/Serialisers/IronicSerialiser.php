@@ -115,7 +115,7 @@ class IronicSerialiser implements IObjectSerialiser
         $resourceType = $this->getService()->getProvidersWrapper()->resolveResourceType($topOfStack['type']);
 
         // need gubbinz to unpack an abstract resource type
-        $resourceType = $this->getConcreteTypeFromAbstractType($resourceType, $payloadClass);
+        $resourceType = $this->getConcreteTypeFromAbstractType($resourceType, $this->getMetadata(), $payloadClass);
 
         // make sure we're barking up right tree
         if (!$resourceType instanceof ResourceEntityType) {

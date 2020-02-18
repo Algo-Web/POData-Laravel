@@ -109,15 +109,19 @@ trait SerialiseUtilitiesTrait
 
     /**
      * @param  ResourceEntityType              $resourceType
+     * @param  IMetadataProvider               $metadata
      * @param  string                          $payloadClass
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @return ResourceEntityType|ResourceType
      */
-    protected function getConcreteTypeFromAbstractType(ResourceEntityType $resourceType, $payloadClass)
-    {
+    protected function getConcreteTypeFromAbstractType(
+        ResourceEntityType $resourceType,
+        IMetadataProvider $metadata,
+        $payloadClass
+    ) {
         if ($resourceType->isAbstract()) {
-            $derived = $this->getMetadata()->getDerivedTypes($resourceType);
+            $derived = $metadata->getDerivedTypes($resourceType);
             if (0 == count($derived)) {
                 throw new InvalidOperationException('Supplied abstract type must have at least one derived type');
             }
@@ -142,9 +146,4 @@ trait SerialiseUtilitiesTrait
         }
         return $resourceType;
     }
-
-    /**
-     * @return IMetadataProvider
-     */
-    abstract protected function getMetadata();
 }
