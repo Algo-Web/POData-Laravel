@@ -23,7 +23,7 @@ use POData\SimpleDataService;
 
 class IronicSerialiserTest extends TestCase
 {
-    use DatabaseMigrations;
+    //use DatabaseMigrations;
 
     public function setUp() : void
     {

@@ -25,7 +25,7 @@ class ExpandTest extends TestCase
         putenv('APP_DISABLE_AUTH=false');
     }
 
-    use DatabaseMigrations;
+    //use DatabaseMigrations;
 
     public function setUp() : void
     {
