@@ -15,7 +15,7 @@ before_script:
   - composer global require hirak/prestissimo
   - if [ "$LARAVEL_DEP" == "5.1.*" ]; then composer require phpunit/phpunit "^5.6" --no-update --dev; fi;
   - composer require laravel/framework:${LARAVEL_DEP} --no-update
-  - if [ php --version | head -n 1 | cut -d " " -f 2 | cut -c 1,3 == "80" ]; then
+  - if [ `php --version | head -n 1 | cut -d " " -f 2 | cut -c 1,3` == "80" ]; then
   - COMPOSER_MEMORY_LIMIT=-1 travis_retry composer install --prefer-dist --no-interaction -o  --ignore-platform-reqs
   - else
   - COMPOSER_MEMORY_LIMIT=-1 travis_retry composer install --prefer-dist --no-interaction -o
