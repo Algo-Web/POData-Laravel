@@ -1,22 +1,21 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Serialisers;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
-use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
-use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
-use Tests\AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
 use POData\ObjectModel\ObjectModelSerializer;
-use POData\ObjectModel\ODataPropertyContent;
 use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
 use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Serialisers\TestDataService;
 
 class SerialiserWriteUrlTest extends SerialiserTestBase
 {

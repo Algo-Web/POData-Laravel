@@ -1,31 +1,15 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Query;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Query;
 
-use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use AlgoWeb\PODataLaravel\Query\LaravelWriteQuery;
-use Tests\AlgoWeb\PODataLaravel\Controllers\TestController;
-use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
-use Tests\AlgoWeb\PODataLaravel\Models\LaravelBulkQueryDummy;
-use Tests\AlgoWeb\PODataLaravel\Models\LaravelQueryDummy;
-use Tests\AlgoWeb\PODataLaravel\Models\TestBulkCreateRequest;
-use Tests\AlgoWeb\PODataLaravel\Models\TestBulkUpdateRequest;
-use Tests\AlgoWeb\PODataLaravel\Models\TestCase;
-use Tests\AlgoWeb\PODataLaravel\Models\TestModel;
-use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
-use Tests\AlgoWeb\PODataLaravel\Requests\TestRequest;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Mockery as m;
-use POData\Common\ODataException;
-use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
-use POData\Providers\Metadata\Type\Int32;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase;
 
 class LaravelQueryBatchProcessingTest extends TestCase
 {

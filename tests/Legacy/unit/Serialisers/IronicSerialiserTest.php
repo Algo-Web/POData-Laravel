@@ -1,19 +1,12 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Serialisers;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
-use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
-use AlgoWeb\PODataLaravel\Serialisers\ModelSerialiser;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
+use AlgoWeb\PODataLaravel\Serialisers\ModelSerialiser;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\App;
@@ -38,7 +31,6 @@ use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSetWrapper;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\ProvidersWrapper;
-use POData\Providers\Query\IQueryProvider;
 use POData\Providers\Query\QueryResult;
 use POData\Providers\Stream\StreamProviderWrapper;
 use POData\SimpleDataService;
@@ -46,6 +38,15 @@ use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjection
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\RootProjectionNode;
 use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
 use POData\UriProcessor\RequestDescription;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Serialisers\IronicSerialiserDummy;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Serialisers\TestDataService;
 
 class IronicSerialiserTest extends SerialiserTestBase
 {
@@ -577,7 +578,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $foo->shouldReceive('getService->getProvidersWrapper->resolveResourceType')->andReturn($targType);
 
         $expected = 'Concrete resource type not selected for payload '.
-                     \Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget::class;
+                     \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphTarget::class;
         $actual = null;
 
         try {

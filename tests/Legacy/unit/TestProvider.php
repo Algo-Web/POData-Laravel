@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Providers;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Providers\MetadataBaseProvider;
 

@@ -1,13 +1,11 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Providers;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Providers\MetadataRouteProvider;
-use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
-use Illuminate\Config\Repository;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Mockery as m;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 
 class MetadataRouteProviderTest extends TestCase
 {

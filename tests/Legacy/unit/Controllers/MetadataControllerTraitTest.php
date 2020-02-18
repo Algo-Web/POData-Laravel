@@ -1,15 +1,11 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Controllers;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Controllers;
 
-use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
-use Tests\AlgoWeb\PODataLaravel\Models\TestModel as TestModel;
-use Tests\AlgoWeb\PODataLaravel\Requests\TestRequest;
-use Illuminate\Database\Connection;
-use Illuminate\Http\Request as Request;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Controllers\TestController;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel as TestModel;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Requests\TestRequest;
 
 class MetadataControllerTraitTest extends TestCase
 {
@@ -180,7 +176,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo = new TestController();
         $foo->setMapping([TestModel::class => '']);
 
-        $expected = 'Metadata mapping for model ' . \Tests\AlgoWeb\PODataLaravel\Models\TestModel::class . ' not an array';
+        $expected = 'Metadata mapping for model ' . \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel::class . ' not an array';
         $actual = null;
         try {
             $foo->getMethodName(TestModel::class, 'delete');
@@ -195,7 +191,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo = new TestController();
         $foo->setMapping([TestModel::class => []]);
 
-        $expected = 'Metadata mapping for CRUD verb delete on model ' . \Tests\AlgoWeb\PODataLaravel\Models\TestModel::class . ' not defined';
+        $expected = 'Metadata mapping for CRUD verb delete on model ' . \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel::class . ' not defined';
         $actual = null;
         try {
             $foo->getMethodName(TestModel::class, 'delete');
@@ -210,7 +206,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo = new TestController();
         $foo->setMapping([TestModel::class => ['delete' => null]]);
 
-        $expected = 'Metadata mapping for CRUD verb delete on model ' . \Tests\AlgoWeb\PODataLaravel\Models\TestModel::class . ' null';
+        $expected = 'Metadata mapping for CRUD verb delete on model ' . \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel::class . ' null';
         $actual = null;
         try {
             $foo->getMethodName(TestModel::class, 'delete');
@@ -226,7 +222,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo->setMapping([TestModel::class => ['delete' => 'MoshAroundTheWorld']]);
 
         $expected = 'Metadata target for CRUD verb delete on model';
-        $expected .= ' ' . \Tests\AlgoWeb\PODataLaravel\Models\TestModel::class . ' does not exist';
+        $expected .= ' ' . \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel::class . ' does not exist';
         $actual = null;
         try {
             $foo->getMethodName(TestModel::class, 'delete');
@@ -262,7 +258,7 @@ class MetadataControllerTraitTest extends TestCase
         $this->assertTrue(is_array($result['parameters']));
         $this->assertEquals(2, count($result['parameters']));
         $this->assertEquals('request', $result['parameters']['request']['name']);
-        $this->assertEquals(\Tests\AlgoWeb\PODataLaravel\Requests\TestRequest::class, $result['parameters']['request']['type']);
+        $this->assertEquals(\Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Requests\TestRequest::class, $result['parameters']['request']['type']);
         $this->assertEquals('id', $result['parameters']['id']['name']);
     }
 
@@ -271,7 +267,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo = new TestController();
         $foo->setMapping([TestModel::class => '']);
 
-        $expected = 'Metadata mapping for model ' . \Tests\AlgoWeb\PODataLaravel\Models\TestModel::class . ' not an array';
+        $expected = 'Metadata mapping for model ' . \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel::class . ' not an array';
         $actual = null;
         try {
             $foo->getMappings();
@@ -301,7 +297,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo = new TestController();
         $foo->setMapping([TestModel::class => ['delete' => null]]);
 
-        $expected = 'Metadata mapping for CRUD verb delete on model ' . \Tests\AlgoWeb\PODataLaravel\Models\TestModel::class . ' null';
+        $expected = 'Metadata mapping for CRUD verb delete on model ' . \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel::class . ' null';
         $actual = null;
         try {
             $foo->getMappings();
@@ -317,7 +313,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo->setMapping([TestModel::class => ['delete' => 'toTheSoundOfTheDrums']]);
 
         $expected = 'Metadata target for CRUD verb delete on model';
-        $expected .= ' ' . \Tests\AlgoWeb\PODataLaravel\Models\TestModel::class . ' does not exist';
+        $expected .= ' ' . \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel::class . ' does not exist';
         $actual = null;
         try {
             $foo->getMappings();

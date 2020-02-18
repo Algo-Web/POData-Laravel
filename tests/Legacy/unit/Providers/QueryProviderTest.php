@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Providers;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Providers\QueryProvider;
-use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Illuminate\Support\Facades\App;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 
 /**
  * Generated Test Class.
