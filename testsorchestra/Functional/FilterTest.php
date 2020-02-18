@@ -5,7 +5,7 @@
  * Date: 2/02/20
  * Time: 11:42 PM.
  */
-namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Functional;
+namespace Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Tests\Functional;
 
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
