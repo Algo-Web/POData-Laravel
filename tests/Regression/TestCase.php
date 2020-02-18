@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Tests\Regression\AlgoWeb\PODataLaravel;
-
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
