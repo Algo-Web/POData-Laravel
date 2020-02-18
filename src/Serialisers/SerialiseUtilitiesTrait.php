@@ -39,7 +39,7 @@ trait SerialiseUtilitiesTrait
      * @param  QueryResult               $entryObjects
      * @throws InvalidOperationException
      */
-    protected function checkElementsInput(QueryResult &$entryObjects)
+    public function checkElementsInput(QueryResult &$entryObjects)
     {
         $res = $entryObjects->results;
         if (!(is_array($res) || $res instanceof Collection)) {
@@ -57,7 +57,7 @@ trait SerialiseUtilitiesTrait
      * @param  QueryResult               $entryObject
      * @throws InvalidOperationException
      */
-    protected function checkSingleElementInput(QueryResult $entryObject)
+    public function checkSingleElementInput(QueryResult $entryObject)
     {
         if (!$entryObject->results instanceof Model) {
             $res = $entryObject->results;
@@ -75,7 +75,7 @@ trait SerialiseUtilitiesTrait
      * @throws \ReflectionException
      * @return string
      */
-    protected function getEntryInstanceKey($entityInstance, ResourceType $resourceType, $containerName)
+    public function getEntryInstanceKey($entityInstance, ResourceType $resourceType, $containerName)
     {
         $typeName = $resourceType->getName();
         $keyProperties = $resourceType->getKeyProperties();
@@ -115,7 +115,7 @@ trait SerialiseUtilitiesTrait
      * @throws \ReflectionException
      * @return ResourceEntityType|ResourceType
      */
-    protected function getConcreteTypeFromAbstractType(
+    public function getConcreteTypeFromAbstractType(
         ResourceEntityType $resourceType,
         IMetadataProvider $metadata,
         $payloadClass
