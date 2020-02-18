@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 14/02/20
- * Time: 9:34 PM
+ * Time: 9:34 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Providers;
 
 trait MetadataProviderStepTrait
@@ -36,9 +35,9 @@ trait MetadataProviderStepTrait
     }
 
     /**
-     * Encapsulate applying self::$after{FOO} calls
+     * Encapsulate applying self::$after{FOO} calls.
      *
-     * @param mixed $parm
+     * @param mixed         $parm
      * @param callable|null $func
      */
     private function handleCustomFunction($parm, callable $func = null)

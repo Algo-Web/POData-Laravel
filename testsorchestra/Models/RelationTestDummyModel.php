@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 14/02/20
- * Time: 1:53 AM
+ * Time: 1:53 AM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;

@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 16/02/20
- * Time: 1:18 AM
+ * Time: 1:18 AM.
  */
-
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use POData\Common\InvalidOperationException;
@@ -26,8 +25,8 @@ use POData\UriProcessor\SegmentStack;
 trait SerialiseNextPageLinksTrait
 {
     /**
-     * @param QueryResult $entryObjects
-     * @param ODataURLCollection|ODataFeed $odata
+     * @param  QueryResult                  $entryObjects
+     * @param  ODataURLCollection|ODataFeed $odata
      * @throws InvalidOperationException
      * @throws ODataException
      */
@@ -51,8 +50,8 @@ trait SerialiseNextPageLinksTrait
      * @param int $resultSetCount Number of entries in the current
      *                            resource set
      *
-     * @return bool true if the feed must have a next page link
      * @throws InvalidOperationException
+     * @return bool                      true if the feed must have a next page link
      */
     protected function needNextPageLink($resultSetCount)
     {
@@ -74,12 +73,12 @@ trait SerialiseNextPageLinksTrait
     /**
      * Get next page link from the given entity instance.
      *
-     * @param  mixed          &$lastObject Last object serialized to be
-     *                                     used for generating
-     *                                     $skiptoken
+     * @param  mixed                     &$lastObject Last object serialized to be
+     *                                                used for generating
+     *                                                $skiptoken
      * @throws ODataException
-     * @return string         for the link for next page
      * @throws InvalidOperationException
+     * @return string                    for the link for next page
      */
     protected function getNextLinkUri(&$lastObject)
     {
@@ -109,11 +108,11 @@ trait SerialiseNextPageLinksTrait
      * Builds the string corresponding to query parameters for top level results
      * (result set identified by the resource path) to be put in next page link.
      *
-     * @return string|null string representing the query parameters in the URI
-     *                     query parameter format, NULL if there
-     *                     is no query parameters
-     *                     required for the next link of top level result set
      * @throws InvalidOperationException
+     * @return string|null               string representing the query parameters in the URI
+     *                                   query parameter format, NULL if there
+     *                                   is no query parameters
+     *                                   required for the next link of top level result set
      */
     protected function getNextPageLinkQueryParametersForRootResourceSet()
     {
@@ -128,7 +127,7 @@ trait SerialiseNextPageLinksTrait
             $value = $this->getService()->getHost()->getQueryStringItem($queryOption);
             if (null !== $value) {
                 if (null !== $queryParameterString) {
-                    $queryParameterString = /** @scrutinizer ignore-type */$queryParameterString . '&';
+                    $queryParameterString = /* @scrutinizer ignore-type */$queryParameterString . '&';
                 }
 
                 $queryParameterString .= $queryOption . '=' . $value;
@@ -157,8 +156,8 @@ trait SerialiseNextPageLinksTrait
     /**
      * Gets reference to the request submitted by client.
      *
-     * @return RequestDescription
      * @throws InvalidOperationException
+     * @return RequestDescription
      */
     abstract public function getRequest();
 
@@ -172,8 +171,8 @@ trait SerialiseNextPageLinksTrait
     /**
      * Resource set wrapper for the resource being serialized.
      *
-     * @return ResourceSetWrapper
      * @throws InvalidOperationException
+     * @return ResourceSetWrapper
      */
     abstract protected function getCurrentResourceSetWrapper();
 
@@ -181,8 +180,8 @@ trait SerialiseNextPageLinksTrait
      * Find a 'ExpandedProjectionNode' instance in the projection tree
      * which describes the current segment.
      *
-     * @return null|RootProjectionNode|ExpandedProjectionNode
      * @throws InvalidOperationException
+     * @return null|RootProjectionNode|ExpandedProjectionNode
      */
     abstract protected function getCurrentExpandedProjectionNode();
 

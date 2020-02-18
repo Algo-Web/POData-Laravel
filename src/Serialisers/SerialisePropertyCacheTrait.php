@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 15/02/20
- * Time: 6:43 PM
+ * Time: 6:43 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use POData\Providers\Metadata\ResourceEntityType;
@@ -15,10 +14,10 @@ trait SerialisePropertyCacheTrait
     protected $propertiesCache = [];
 
     /**
-     * @param string $targClass
-     * @param ResourceEntityType $resourceType
-     * @return void
+     * @param  string               $targClass
+     * @param  ResourceEntityType   $resourceType
      * @throws \ReflectionException
+     * @return void
      */
     protected function checkRelationPropertiesCached($targClass, ResourceEntityType $resourceType)
     {

@@ -491,9 +491,7 @@ class LaravelQueryBulkTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     *
-     */
+    
     public function testBulkCustomUpdateGoodLookup()
     {
         $callResult = response()->json(['status' => 'success', 'id' => [2, 4, 6], 'errors' => null]);
@@ -600,7 +598,7 @@ class LaravelQueryBulkTest extends TestCase
 
         $foo = m::mock(LaravelBulkQueryDummy::class)->makePartial();
 
-        $expected = "Null";
+        $expected = 'Null';
         $actual = null;
 
         try {

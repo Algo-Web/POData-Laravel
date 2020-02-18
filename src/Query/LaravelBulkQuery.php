@@ -40,12 +40,12 @@ class LaravelBulkQuery
      * Create multiple new resources in a resource set.
      *
      * @param ResourceSet $sourceResourceSet The entity set containing the entity to fetch
-     * @param object[] $data The new data for the entity instance
+     * @param object[]    $data              The new data for the entity instance
      *
-     * @return object[] returns the newly created model if successful, or throws an exception if model creation failed
      * @throws \Exception
      * @throws InvalidOperationException
      * @throws \ReflectionException
+     * @return object[]                  returns the newly created model if successful, or throws an exception if model creation failed
      */
     public function createBulkResourceforResourceSet(
         ResourceSet $sourceResourceSet,
@@ -87,9 +87,9 @@ class LaravelBulkQuery
      * @param object[]        $data                 The new data for the entity instances
      * @param bool            $shouldUpdate         Should undefined values be updated or reset to default
      *
-     * @return object[] the new resource value if it is assignable, or throw exception for null
      * @throws \Exception
      * @throws InvalidOperationException
+     * @return object[]                  the new resource value if it is assignable, or throw exception for null
      */
     public function updateBulkResource(
         ResourceSet $sourceResourceSet,
@@ -138,11 +138,10 @@ class LaravelBulkQuery
      * correspond 1-1 to those in $data.
      *
      * @param $paramList
-     * @param array                $data
-     * @param KeyDescriptor[]|null $keyDescriptors
-     * @return array
-     *
+     * @param  array                     $data
+     * @param  KeyDescriptor[]|null      $keyDescriptors
      * @throws InvalidOperationException
+     * @return array
      */
     protected function prepareBulkRequestInput($paramList, array $data, array $keyDescriptors = null)
     {
@@ -184,10 +183,10 @@ class LaravelBulkQuery
 
     /**
      * @param ResourceSet $sourceResourceSet
-     * @param array $data
+     * @param array       $data
      * @param $mapping
      * @param $pastVerb
-     * @param  KeyDescriptor[]|null $keyDescriptor
+     * @param  KeyDescriptor[]|null      $keyDescriptor
      * @throws ODataException
      * @throws \ReflectionException
      * @throws InvalidOperationException
@@ -228,11 +227,11 @@ class LaravelBulkQuery
     }
 
     /**
-     * @param ResourceSet $sourceResourceSet
-     * @param string $verbName
-     * @return array|null
+     * @param  ResourceSet               $sourceResourceSet
+     * @param  string                    $verbName
      * @throws InvalidOperationException
      * @throws \ReflectionException
+     * @return array|null
      */
     protected function getOptionalVerbMapping(ResourceSet $sourceResourceSet, $verbName)
     {
@@ -257,8 +256,8 @@ class LaravelBulkQuery
     /**
      * Dig out local copy of controller metadata mapping.
      *
-     * @return MetadataControllerContainer
      * @throws InvalidOperationException
+     * @return MetadataControllerContainer
      */
     public function getControllerContainer()
     {

@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 13/02/20
- * Time: 1:08 PM
+ * Time: 1:08 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -27,9 +26,9 @@ trait MetadataRelationsTrait
     /**
      * Get model's relationships.
      *
-     * @return array
      * @throws InvalidOperationException
      * @throws \ReflectionException
+     * @return array
      */
     public function getRelationships()
     {
@@ -83,9 +82,9 @@ trait MetadataRelationsTrait
     /**
      * @param bool $biDir
      *
-     * @return array
      * @throws InvalidOperationException
      * @throws \ReflectionException
+     * @return array
      */
     protected function getRelationshipsFromMethods($biDir = false)
     {
@@ -120,15 +119,15 @@ trait MetadataRelationsTrait
                     throw new InvalidOperationException($msg);
                 }
                 $begin = strpos($code, 'function(');
-                $code = substr($code, /** @scrutinizer ignore-type */$begin, strrpos($code, '}')-$begin+1);
-                $lastCode = $code[strlen(/** @scrutinizer ignore-type */$code)-1];
+                $code = substr($code, /* @scrutinizer ignore-type */$begin, strrpos($code, '}')-$begin+1);
+                $lastCode = $code[strlen(/* @scrutinizer ignore-type */$code)-1];
                 if ('}' != $lastCode) {
                     $msg = 'Final character of function definition must be closing brace';
                     throw new InvalidOperationException($msg);
                 }
                 foreach (static::$relTypes as $relation) {
                     $search = '$this->' . $relation . '(';
-                    $found = stripos(/** @scrutinizer ignore-type */$code, $search);
+                    $found = stripos(/* @scrutinizer ignore-type */$code, $search);
                     if (!$found) {
                         continue;
                     }
@@ -175,7 +174,7 @@ trait MetadataRelationsTrait
     protected function getRelationshipsHasMany($rels, &$hooks)
     {
         /**
-         * @var string $property
+         * @var string   $property
          * @var Relation $foo
          */
         foreach ($rels['HasMany'] as $property => $foo) {
@@ -211,7 +210,7 @@ trait MetadataRelationsTrait
     protected function getRelationshipsHasOne($rels, &$hooks)
     {
         /**
-         * @var string $property
+         * @var string   $property
          * @var Relation $foo
          */
         foreach ($rels['HasOne'] as $property => $foo) {
@@ -245,7 +244,7 @@ trait MetadataRelationsTrait
     protected function getRelationshipsKnownPolyMorph($rels, &$hooks)
     {
         /**
-         * @var string $property
+         * @var string   $property
          * @var Relation $foo
          */
         foreach ($rels['KnownPolyMorphSide'] as $property => $foo) {
@@ -277,7 +276,7 @@ trait MetadataRelationsTrait
     protected function getRelationshipsUnknownPolyMorph($rels, &$hooks)
     {
         /**
-         * @var string $property
+         * @var string   $property
          * @var Relation $foo
          */
         foreach ($rels['UnknownPolyMorphSide'] as $property => $foo) {

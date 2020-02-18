@@ -28,10 +28,10 @@ class AssociationStubMonomorphic extends AssociationStubBase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function morphicType()
     {
-        return "monomorphic";
+        return 'monomorphic';
     }
 }

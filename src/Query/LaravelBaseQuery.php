@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 29/09/19
- * Time: 4:55 PM
+ * Time: 4:55 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
@@ -53,8 +52,8 @@ abstract class LaravelBaseQuery
     /**
      * Dig out local copy of controller metadata mapping.
      *
-     * @return MetadataControllerContainer
      * @throws InvalidOperationException
+     * @return MetadataControllerContainer
      */
     public function getControllerContainer()
     {

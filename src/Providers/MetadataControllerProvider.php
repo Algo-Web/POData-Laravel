@@ -19,9 +19,9 @@ class MetadataControllerProvider extends MetadataBaseProvider
     /**
      * Bootstrap the application services.  Post-boot.
      *
-     * @return void
      * @throws InvalidOperationException
      * @throws \Exception
+     * @return void
      */
     public function boot()
     {
@@ -85,7 +85,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
      */
     public function register()
     {
-        $this->app->/** @scrutinizer ignore-call */singleton(
+        $this->app->/* @scrutinizer ignore-call */singleton(
             'metadataControllers',
             function () {
                 return new MetadataControllerContainer();

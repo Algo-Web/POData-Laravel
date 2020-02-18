@@ -25,9 +25,8 @@ class LaravelHookQuery extends LaravelBaseQuery
      * @param Model       $targetEntityInstance
      * @param $navPropName
      *
-     * @return bool
-     *
      * @throws InvalidOperationException
+     * @return bool
      */
     public function hookSingleModel(
         ResourceSet $sourceResourceSet,
@@ -62,8 +61,8 @@ class LaravelHookQuery extends LaravelBaseQuery
      * @param Model       $targetEntityInstance
      * @param $navPropName
      *
-     * @return bool
      * @throws InvalidOperationException
+     * @return bool
      */
     public function unhookSingleModel(
         ResourceSet $sourceResourceSet,
