@@ -1206,7 +1206,6 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $foo = m::mock(IronicSerialiser::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getMetadata')->andReturn($meta);
         $foo->shouldReceive('getService->getProvidersWrapper->resolveResourceType')->andReturn($firstType)->once();
-        $foo->shouldReceive('getConcreteTypeFromAbstractType')->andReturn($secondType)->once();
         $foo->shouldReceive('getRequest->getTargetResourceType->getName')->andReturn('TestModel');
 
         $expected = 'POData_Providers_Metadata_ResourceComplexType';
