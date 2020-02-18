@@ -1,12 +1,25 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Models;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicChildOfMorphTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicParentOfMorphTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase;
 
 class MetadataGubbinsHolderTest extends TestCase
 {
@@ -26,7 +39,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $foo = new MetadataGubbinsHolder();
         $foo->addEntity($gubbins);
 
-        $expected = \Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource::class .' already added';
+        $expected = \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource::class .' already added';
         $actual = null;
 
         try {
@@ -41,7 +54,7 @@ class MetadataGubbinsHolderTest extends TestCase
     {
         $foo = new MetadataGubbinsHolder();
 
-        $expected = \Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource::class . ' does not exist in holder';
+        $expected = \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource::class . ' does not exist in holder';
         $actual = null;
 
         try {
@@ -68,7 +81,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $foo = new MetadataGubbinsHolder();
         $foo->addEntity($gubbins);
 
-        $expected = 'Relation foo not registered on '. \Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource::class;
+        $expected = 'Relation foo not registered on '. \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource::class;
         $actual = null;
 
         try {

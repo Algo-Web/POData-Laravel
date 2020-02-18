@@ -1,20 +1,17 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Providers;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Providers;
 
-use AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider;
-use Tests\AlgoWeb\PODataLaravel\Controllers\ElectricBoogalooController;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
-use Tests\AlgoWeb\PODataLaravel\Controllers\TestController;
-use Tests\AlgoWeb\PODataLaravel\Models\TestApplication;
-use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
-use Tests\AlgoWeb\PODataLaravel\Models\TestModel;
-use AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider as Provider;
-use ErrorException;
+use AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Mockery as m;
 use POData\Common\InvalidOperationException;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Controllers\ElectricBoogalooController;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Controllers\TestController;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel;
 
 class MetadataControllerProviderTest extends TestCase
 {
@@ -122,7 +119,7 @@ class MetadataControllerProviderTest extends TestCase
         $foo = m::mock(MetadataControllerProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCandidateControllers')->andReturn([$controller1, $controller2])->once();
 
-        $expected = 'Mapping already defined for model ' . \Tests\AlgoWeb\PODataLaravel\Models\TestModel::class
+        $expected = 'Mapping already defined for model ' . \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel::class
                     .' and CRUD verb create';
         $actual = null;
 
@@ -173,7 +170,7 @@ class MetadataControllerProviderTest extends TestCase
         $foo = m::mock(MetadataControllerProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCandidateControllers')->andReturn([$controller1, $controller2])->once();
 
-        $expected = 'Mapping already defined for model ' . \Tests\AlgoWeb\PODataLaravel\Models\TestModel::class
+        $expected = 'Mapping already defined for model ' . \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel::class
                     .' and CRUD verb bulkCreate';
         $actual = null;
 

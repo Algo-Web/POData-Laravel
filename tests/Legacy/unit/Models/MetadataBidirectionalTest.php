@@ -1,8 +1,22 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Models;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Models;
 
-use Mockery as m;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicChildOfMorphTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManyTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicParentOfMorphTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphTargetChild;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase;
 
 class MetadataBidirectionalTest extends TestCase
 {

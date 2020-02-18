@@ -1,15 +1,14 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Models;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
-use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase;
-use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 use Mockery as m;
 use POData\Providers\Metadata\ResourceEntityType;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase;
 
 class EntityGubbinsTest extends TestCase
 {

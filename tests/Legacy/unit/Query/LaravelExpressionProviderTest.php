@@ -1,13 +1,13 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Query;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Query;
 
-use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider as LaravelExpressionProvider;
 use POData\Common\ODataConstants;
 use POData\Providers\Metadata\ResourceType;
 use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\ExpressionType;
 use POData\UriProcessor\QueryProcessor\FunctionDescription;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 
 /**
  * Generated Test Class.

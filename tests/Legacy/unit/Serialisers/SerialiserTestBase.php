@@ -1,15 +1,15 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Serialisers;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
-use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 use Symfony\Component\HttpFoundation\HeaderBag;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 
 class SerialiserTestBase extends TestCase
 {

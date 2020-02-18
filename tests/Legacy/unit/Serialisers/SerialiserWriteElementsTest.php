@@ -1,33 +1,26 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Serialisers;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
-use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
-use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
-use Tests\AlgoWeb\PODataLaravel\Models\TestModel;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 use POData\ObjectModel\ObjectModelSerializer;
-use POData\ObjectModel\ODataPropertyContent;
 use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
-use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
-use POData\SimpleDataService as DataService;
-use POData\UriProcessor\RequestDescription;
-use Symfony\Component\HttpFoundation\HeaderBag;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Serialisers\TestDataService;
 
 class SerialiserWriteElementsTest extends SerialiserTestBase
 {

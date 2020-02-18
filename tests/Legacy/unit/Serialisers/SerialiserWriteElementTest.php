@@ -1,30 +1,19 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Serialisers;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
-use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
-use AlgoWeb\PODataLaravel\Serialisers\ModelSerialiser;
-use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
-use Tests\AlgoWeb\PODataLaravel\Models\TestModel;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicParentOfMorphTarget;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphManySource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
+use AlgoWeb\PODataLaravel\Serialisers\ModelSerialiser;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 use POData\Common\InvalidOperationException;
 use POData\ObjectModel\ObjectModelSerializer;
@@ -39,16 +28,20 @@ use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
 use POData\Providers\Metadata\ResourceComplexType;
 use POData\Providers\Metadata\ResourceEntityType;
-use POData\Providers\Metadata\ResourceType;
-use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Query\QueryResult;
-use POData\Providers\Query\QueryType;
-use POData\SimpleDataService as DataService;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjectionNode;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\RootProjectionNode;
-use POData\UriProcessor\RequestDescription;
-use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicParentOfMorphTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Serialisers\IronicSerialiserDummy;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Serialisers\TestDataService;
 
 class SerialiserWriteElementTest extends SerialiserTestBase
 {
@@ -1234,7 +1227,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $foo->shouldReceive('getRequest->getTargetResourceType->getName')->andReturn('TestModel');
 
         $expected = 'Object being serialised not instance of expected class, ' .TestMonomorphicSource::class
-                    .', is actually ' . \Tests\AlgoWeb\PODataLaravel\Models\TestModel::class;
+                    .', is actually ' . \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel::class;
         $actual = null;
 
         try {

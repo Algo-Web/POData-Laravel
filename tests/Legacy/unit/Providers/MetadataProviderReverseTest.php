@@ -1,34 +1,24 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Providers;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
-use Tests\AlgoWeb\PODataLaravel\Models\TestCase;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManySource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManyTarget;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphManySource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 use POData\Common\InvalidOperationException;
-use POData\Providers\Metadata\ResourceEntityType;
-use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\SimpleMetadataProvider;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 
 class MetadataProviderReverseTest extends TestCase
 {

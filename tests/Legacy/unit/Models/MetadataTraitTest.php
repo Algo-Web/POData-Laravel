@@ -1,14 +1,31 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Models;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Models;
 
-use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
-use ErrorException;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
-use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\SimpleMetadataProvider;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestCastModel;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestExplicitModel;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestGetterModel;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicOneAndManyTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManySourceWithUnexposedTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphTargetChild;
 
 /**
  * Generated Test Class.

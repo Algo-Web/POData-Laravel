@@ -1,18 +1,15 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Controllers;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Controllers;
 
-use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Mockery as m;
 use POData\Common\ODataException;
 use POData\Providers\Metadata\SimpleMetadataProvider;
-use Symfony\Component\HttpFoundation\HeaderBag;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 
 /**
  * Generated Test Class.

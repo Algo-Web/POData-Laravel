@@ -1,24 +1,11 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Providers;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Providers;
 
-use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
-use Tests\AlgoWeb\PODataLaravel\Models\MetadataProviderDummy;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
-use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
-use Tests\AlgoWeb\PODataLaravel\Models\TestCase;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
-use Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -35,6 +22,17 @@ use POData\Providers\ProvidersWrapper;
 use POData\Providers\Query\IQueryProvider;
 use POData\UriProcessor\ResourcePathProcessor\ResourcePathProcessor;
 use Symfony\Component\HttpFoundation\HeaderBag;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\MetadataProviderDummy;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 
 class MetadataProviderUriTest extends TestCase
 {
@@ -356,10 +354,10 @@ class MetadataProviderUriTest extends TestCase
         MetadataProvider::setAfterVerify(function (Map $objectMap) use ($classen) {
             $entities = $objectMap->getEntities();
             $this->assertEquals(count($classen), count($entities), 'The object map contained to many entities');
-            $this->assertArrayHasKey(\Tests\AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate::class, $entities);
-            $this->assertArrayHasKey(\Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget::class, $entities);
-            $morphTarget = $entities[\Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget::class];
-            $MorphManySourceAlternate = $entities[\Tests\AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate::class];
+            $this->assertArrayHasKey(\Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate::class, $entities);
+            $this->assertArrayHasKey(\Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphTarget::class, $entities);
+            $morphTarget = $entities[\Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphTarget::class];
+            $MorphManySourceAlternate = $entities[\Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate::class];
             $morphTargetStubs = $morphTarget->getStubs();
             $this->assertEquals(4, count($morphTargetStubs));
             $MorphManySourceAlternateStubs = $MorphManySourceAlternate->getStubs();

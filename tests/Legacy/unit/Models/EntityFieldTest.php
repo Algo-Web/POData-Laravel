@@ -1,11 +1,12 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Models;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
 use POData\Providers\Metadata\Type\EdmPrimitiveType;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase;
 
 class EntityFieldTest extends TestCase
 {

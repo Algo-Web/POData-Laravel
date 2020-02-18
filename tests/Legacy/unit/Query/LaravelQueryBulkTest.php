@@ -1,20 +1,12 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Query;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
+use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
+use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelBulkQuery;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
-use Tests\AlgoWeb\PODataLaravel\Controllers\TestController;
-use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
-use Tests\AlgoWeb\PODataLaravel\Models\LaravelBulkQueryDummy;
-use Tests\AlgoWeb\PODataLaravel\Models\LaravelQueryDummy;
-use Tests\AlgoWeb\PODataLaravel\Models\TestBulkCreateRequest;
-use Tests\AlgoWeb\PODataLaravel\Models\TestBulkUpdateRequest;
-use Tests\AlgoWeb\PODataLaravel\Models\TestCase;
-use Tests\AlgoWeb\PODataLaravel\Models\TestModel;
-use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
-use Tests\AlgoWeb\PODataLaravel\Requests\TestRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +18,14 @@ use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\Type\Int32;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Models\TestCase;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Controllers\TestController;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\LaravelBulkQueryDummy;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\LaravelQueryDummy;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestBulkCreateRequest;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestBulkUpdateRequest;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Requests\TestRequest;
 
 class LaravelQueryBulkTest extends TestCase
 {
@@ -203,7 +203,7 @@ class LaravelQueryBulkTest extends TestCase
         $foo->shouldReceive('getControllerContainer')->andReturn($container);
         $foo->shouldReceive('getBulk')->andReturn($bulk);
 
-        $expected = 'No query results for model ['.\Tests\AlgoWeb\PODataLaravel\Models\TestModel::class.'].';
+        $expected = 'No query results for model ['. \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel::class.'].';
         $actual = null;
 
         try {
@@ -480,7 +480,7 @@ class LaravelQueryBulkTest extends TestCase
         $foo->shouldReceive('getBulk')->andReturn($bulk);
         $foo->shouldReceive('getControllerContainer')->andReturn($container);
 
-        $expected = 'No query results for model ['.\Tests\AlgoWeb\PODataLaravel\Models\TestModel::class.'].';
+        $expected = 'No query results for model ['. \Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel::class.'].';
         $actual = null;
 
         try {

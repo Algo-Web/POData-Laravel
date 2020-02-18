@@ -1,13 +1,12 @@
 <?php
 
-namespace Tests\AlgoWeb\PODataLaravel\Serialisers;
+namespace Tests\Legacy\Unit\AlgoWeb\PODataLaravel\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
-use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
-use Tests\AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Mockery as m;
@@ -24,6 +23,8 @@ use POData\Providers\Metadata\Type\IType;
 use POData\Providers\Metadata\Type\StringType;
 use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel;
+use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Serialisers\TestDataService;
 
 class SerialiserWritePrimitiveTest extends SerialiserTestBase
 {
