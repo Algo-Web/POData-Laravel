@@ -42,11 +42,11 @@ class LaravelReadQuery extends LaravelBaseQuery
      * @param string[]|null            $eagerLoad            array of relations to eager load
      * @param Model|Relation|null      $sourceEntityInstance Starting point of query
      *
-     * @return QueryResult
      * @throws InvalidArgumentException
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @throws ODataException
+     * @return QueryResult
      */
     public function getResourceSet(
         QueryType $queryType,
@@ -134,16 +134,16 @@ class LaravelReadQuery extends LaravelBaseQuery
      * @param int|null           $skip                 number of records which need to be skipped
      * @param SkipTokenInfo|null $skipToken            value indicating what records to skip
      *
-     * @return QueryResult
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \ReflectionException
+     * @return QueryResult
      */
     public function getRelatedResourceSet(
         QueryType $queryType,
         ResourceSet $sourceResourceSet,
         Model $sourceEntityInstance,
-        /** @noinspection PhpUnusedParameterInspection */
+        /* @noinspection PhpUnusedParameterInspection */
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty,
         FilterInfo $filter = null,
@@ -180,8 +180,8 @@ class LaravelReadQuery extends LaravelBaseQuery
      * @param KeyDescriptor|null $keyDescriptor The key identifying the entity to fetch
      * @param string[]|null      $eagerLoad     array of relations to eager load
      *
-     * @return Model|null Returns entity instance if found else null
      * @throws \Exception;
+     * @return Model|null  Returns entity instance if found else null
      */
     public function getResourceFromResourceSet(
         ResourceSet $resourceSet,
@@ -201,8 +201,8 @@ class LaravelReadQuery extends LaravelBaseQuery
      * @param array               $whereCondition
      * @param string[]|null       $eagerLoad            array of relations to eager load
      *
-     * @return Model|null
      * @throws \Exception
+     * @return Model|null
      */
     public function getResource(
         ResourceSet $resourceSet = null,
@@ -256,13 +256,13 @@ class LaravelReadQuery extends LaravelBaseQuery
      * @param ResourceSet      $targetResourceSet    The entity set containing the entity pointed to by the nav property
      * @param ResourceProperty $targetProperty       The navigation property to fetch
      *
-     * @return Model|null The related resource if found else null
      * @throws ODataException
      * @throws InvalidOperationException
      * @throws \ReflectionException
+     * @return Model|null                The related resource if found else null
      */
     public function getRelatedResourceReference(
-        /** @noinspection PhpUnusedParameterInspection */
+        /* @noinspection PhpUnusedParameterInspection */
         ResourceSet $sourceResourceSet,
         Model $sourceEntityInstance,
         ResourceSet $targetResourceSet,
@@ -293,12 +293,12 @@ class LaravelReadQuery extends LaravelBaseQuery
      * @param ResourceProperty $targetProperty       the metadata of the target property
      * @param KeyDescriptor    $keyDescriptor        The key identifying the entity to fetch
      *
-     * @return Model|null Returns entity instance if found else null
      * @throws InvalidOperationException
      * @throws \Exception
+     * @return Model|null                Returns entity instance if found else null
      */
     public function getResourceFromRelatedResourceSet(
-        /** @noinspection PhpUnusedParameterInspection */
+        /* @noinspection PhpUnusedParameterInspection */
         ResourceSet $sourceResourceSet,
         Model $sourceEntityInstance,
         ResourceSet $targetResourceSet,
@@ -324,7 +324,7 @@ class LaravelReadQuery extends LaravelBaseQuery
 
     /**
      * @param Model|Relation|null $sourceEntityInstance
-     * @param null|mixed $checkInstance
+     * @param null|mixed          $checkInstance
      *
      * @throws ODataException
      */
@@ -347,9 +347,9 @@ class LaravelReadQuery extends LaravelBaseQuery
      * @param Model|Builder $sourceEntityInstance
      * @param $nullFilter
      * @param $rawLoad
-     * @param callable|null $isvalid
-     * @return array
+     * @param  callable|null             $isvalid
      * @throws InvalidOperationException
+     * @return array
      */
     protected function applyFiltering(
         $top,

@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 13/02/20
- * Time: 4:22 AM
+ * Time: 4:22 AM.
  */
-
 namespace AlgoWeb\PODataLaravel\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -21,9 +20,9 @@ trait MetadataKeyMethodNamesTrait
     protected static $methodPrimary = [];
 
     /**
-     * @param Relation $foo
-     * @return array|null
+     * @param  Relation                  $foo
      * @throws InvalidOperationException
+     * @return array|null
      */
     protected function getRelationsHasManyKeyNames(Relation $foo)
     {
@@ -43,10 +42,10 @@ trait MetadataKeyMethodNamesTrait
 
     /**
      * @param Relation $foo
-     * @param mixed $condition
+     * @param mixed    $condition
      *
-     * @return array
      * @throws InvalidOperationException
+     * @return array
      */
     protected function polyglotKeyMethodNames(Relation $foo, $condition = false)
     {
@@ -88,10 +87,10 @@ trait MetadataKeyMethodNamesTrait
     }
 
     /**
-     * @param Relation $foo
-     * @param bool $condition
-     * @return array
+     * @param  Relation                  $foo
+     * @param  bool                      $condition
      * @throws InvalidOperationException
+     * @return array
      */
     protected function polyglotKeyMethodBackupNames(Relation $foo, $condition = false)
     {
@@ -140,7 +139,7 @@ trait MetadataKeyMethodNamesTrait
     }
 
     /**
-     * @param Model $model
+     * @param  Model $model
      * @return array
      */
     protected function getModelClassMethods(Model $model)
@@ -158,7 +157,7 @@ trait MetadataKeyMethodNamesTrait
     }
 
     /**
-     * @param Relation $rel
+     * @param  Relation $rel
      * @return array
      */
     protected function getRelationClassMethods(Relation $rel)

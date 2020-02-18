@@ -56,7 +56,7 @@ class IronicSerialiser implements IObjectSerialiser
     use SerialiseUtilitiesTrait;
 
     /**
-     * Update time to insert into ODataEntry/ODataFeed fields
+     * Update time to insert into ODataEntry/ODataFeed fields.
      * @var Carbon
      */
     private $updated;
@@ -68,8 +68,8 @@ class IronicSerialiser implements IObjectSerialiser
     private $isBaseWritten = false;
 
     /**
-     * @param IService                $service Reference to the data service instance
-     * @param RequestDescription|null $request Type instance describing the client submitted request
+     * @param  IService                $service Reference to the data service instance
+     * @param  RequestDescription|null $request Type instance describing the client submitted request
      * @throws \Exception
      */
     public function __construct(IService $service, RequestDescription $request = null)
@@ -89,10 +89,10 @@ class IronicSerialiser implements IObjectSerialiser
      *
      * @param QueryResult $entryObject Reference to the entry object to be written
      *
-     * @return ODataEntry|null
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @throws ODataException
+     * @return ODataEntry|null
      */
     public function writeTopLevelElement(QueryResult $entryObject)
     {
@@ -199,10 +199,10 @@ class IronicSerialiser implements IObjectSerialiser
      *
      * @param QueryResult &$entryObjects Array of entry resources to be written
      *
-     * @return ODataFeed
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \ReflectionException
+     * @return ODataFeed
      */
     public function writeTopLevelElements(QueryResult &$entryObjects)
     {
@@ -249,10 +249,10 @@ class IronicSerialiser implements IObjectSerialiser
      *
      * @param QueryResult $entryObject The entry resource whose url to be written
      *
-     * @return ODataURL
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \ReflectionException
+     * @return ODataURL
      */
     public function writeUrlElement(QueryResult $entryObject)
     {
@@ -278,10 +278,10 @@ class IronicSerialiser implements IObjectSerialiser
      *
      * @param QueryResult $entryObjects Array of entry resources whose url to be written
      *
-     * @return ODataURLCollection
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \ReflectionException
+     * @return ODataURLCollection
      */
     public function writeUrlElements(QueryResult $entryObjects)
     {
@@ -318,9 +318,9 @@ class IronicSerialiser implements IObjectSerialiser
      * @param string       $propertyName  The name of the complex property
      * @param ResourceType &$resourceType Describes the type of complex object
      *
-     * @return ODataPropertyContent
      * @throws InvalidOperationException
      * @throws \ReflectionException
+     * @return ODataPropertyContent
      */
     public function writeTopLevelComplexObject(QueryResult &$complexValue, $propertyName, ResourceType &$resourceType)
     {
@@ -350,9 +350,9 @@ class IronicSerialiser implements IObjectSerialiser
      * @param ResourceType &$resourceType Describes the type of
      *                                    bag object
      *
-     * @return ODataPropertyContent
      * @throws InvalidOperationException
      * @throws \ReflectionException
+     * @return ODataPropertyContent
      */
     public function writeTopLevelBagObject(QueryResult &$BagValue, $propertyName, ResourceType &$resourceType)
     {
@@ -371,13 +371,13 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level primitive value.
      *
-     * @param  QueryResult          &$primitiveValue   The primitive value to be
-     *                                                 written
-     * @param  ResourceProperty     &$resourceProperty Resource property describing the
-     *                                                 primitive property to be written
-     * @return ODataPropertyContent
+     * @param  QueryResult               &$primitiveValue   The primitive value to be
+     *                                                      written
+     * @param  ResourceProperty          &$resourceProperty Resource property describing the
+     *                                                      primitive property to be written
      * @throws InvalidOperationException
      * @throws \ReflectionException
+     * @return ODataPropertyContent
      */
     public function writeTopLevelPrimitive(QueryResult &$primitiveValue, ResourceProperty &$resourceProperty = null)
     {
@@ -422,11 +422,11 @@ class IronicSerialiser implements IObjectSerialiser
      * @param $entryObject
      * @param $type
      * @param $relativeUri
-     * @param ResourceType $resourceType
-     * @param ODataMediaLink|null $mediaLink
-     * @param ODataMediaLink[] $mediaLinks
-     * @return void
+     * @param  ResourceType              $resourceType
+     * @param  ODataMediaLink|null       $mediaLink
+     * @param  ODataMediaLink[]          $mediaLinks
      * @throws InvalidOperationException
+     * @return void
      */
     protected function writeMediaData(
         $entryObject,
@@ -477,7 +477,7 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param QueryResult $entryObject
+     * @param QueryResult      $entryObject
      * @param ResourceProperty $prop
      * @param $nuLink
      * @param $propKind
@@ -549,12 +549,12 @@ class IronicSerialiser implements IObjectSerialiser
 
     /**
      * @param QueryResult $entryObject
-     * @param array $relProp
+     * @param array       $relProp
      * @param $relativeUri
-     * @return array
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \ReflectionException
+     * @return array
      */
     protected function buildLinksFromRels(QueryResult $entryObject, array $relProp, $relativeUri)
     {
@@ -597,7 +597,7 @@ class IronicSerialiser implements IObjectSerialiser
 
     /**
      * @param $res
-     * @param ODataFeed $odata
+     * @param  ODataFeed                 $odata
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \ReflectionException

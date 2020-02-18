@@ -240,7 +240,7 @@ abstract class AssociationStubBase
     }
 
     /**
-     * Return what type of stub this is - polymorphic, monomorphic, or something else
+     * Return what type of stub this is - polymorphic, monomorphic, or something else.
      *
      * @return string
      */

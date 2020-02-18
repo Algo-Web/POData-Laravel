@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 16/02/20
- * Time: 1:19 PM
+ * Time: 1:19 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use Illuminate\Database\Eloquent\Model;
@@ -22,7 +21,7 @@ use POData\Providers\Query\QueryResult;
 trait SerialiseUtilitiesTrait
 {
     /**
-     * @param int $resourceKind
+     * @param  int  $resourceKind
      * @return bool
      */
     public static function isMatchPrimitive($resourceKind)
@@ -37,7 +36,7 @@ trait SerialiseUtilitiesTrait
     }
 
     /**
-     * @param QueryResult $entryObjects
+     * @param  QueryResult               $entryObjects
      * @throws InvalidOperationException
      */
     protected function checkElementsInput(QueryResult &$entryObjects)
@@ -55,7 +54,7 @@ trait SerialiseUtilitiesTrait
     }
 
     /**
-     * @param QueryResult $entryObject
+     * @param  QueryResult               $entryObject
      * @throws InvalidOperationException
      */
     protected function checkSingleElementInput(QueryResult $entryObject)
@@ -68,13 +67,13 @@ trait SerialiseUtilitiesTrait
     }
 
     /**
-     * @param Model $entityInstance
-     * @param ResourceType $resourceType
-     * @param string $containerName
-     * @return string
+     * @param  Model                     $entityInstance
+     * @param  ResourceType              $resourceType
+     * @param  string                    $containerName
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \ReflectionException
+     * @return string
      */
     protected function getEntryInstanceKey($entityInstance, ResourceType $resourceType, $containerName)
     {
@@ -109,11 +108,11 @@ trait SerialiseUtilitiesTrait
     }
 
     /**
-     * @param ResourceEntityType $resourceType
-     * @param string $payloadClass
-     * @return ResourceEntityType|ResourceType
+     * @param  ResourceEntityType              $resourceType
+     * @param  string                          $payloadClass
      * @throws InvalidOperationException
      * @throws \ReflectionException
+     * @return ResourceEntityType|ResourceType
      */
     protected function getConcreteTypeFromAbstractType(ResourceEntityType $resourceType, $payloadClass)
     {

@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 14/02/20
- * Time: 10:54 PM
+ * Time: 10:54 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Query;
 
 use Illuminate\Database\Eloquent\Builder;
@@ -13,10 +12,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
-use POData\Providers\Metadata\ResourceSet;
-use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
+use POData\Providers\Metadata\ResourceSet;
+use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 
@@ -25,10 +24,10 @@ trait LaravelReadQueryUtilityTrait
     protected $name;
 
     /**
-     * @param SkipTokenInfo $skipToken
-     * @param Model|Builder $sourceEntityInstance
-     * @return mixed
+     * @param  SkipTokenInfo             $skipToken
+     * @param  Model|Builder             $sourceEntityInstance
      * @throws InvalidOperationException
+     * @return mixed
      */
     protected function processSkipToken(SkipTokenInfo $skipToken, $sourceEntityInstance)
     {
@@ -66,9 +65,9 @@ trait LaravelReadQueryUtilityTrait
     }
 
     /**
-     * @param  ResourceSet $resourceSet
-     * @return mixed
+     * @param  ResourceSet          $resourceSet
      * @throws \ReflectionException
+     * @return mixed
      */
     protected function getSourceEntityInstance(ResourceSet $resourceSet)
     {
@@ -77,10 +76,10 @@ trait LaravelReadQueryUtilityTrait
     }
 
     /**
-     * @param Model|Relation|null $source
-     * @param ResourceSet|null $resourceSet
-     * @return Model|Relation|mixed|null
+     * @param  Model|Relation|null       $source
+     * @param  ResourceSet|null          $resourceSet
      * @throws \ReflectionException
+     * @return Model|Relation|mixed|null
      */
     protected function checkSourceInstance($source, ResourceSet $resourceSet = null)
     {
@@ -90,14 +89,14 @@ trait LaravelReadQueryUtilityTrait
         }
 
         if (null == $source) {
-            $source = $this->getSourceEntityInstance(/** @scrutinizer ignore-type */$resourceSet);
+            $source = $this->getSourceEntityInstance(/* @scrutinizer ignore-type */$resourceSet);
         }
 
         return $source;
     }
 
     /**
-     * @param Model|Relation|Builder $sourceEntityInstance
+     * @param  Model|Relation|Builder    $sourceEntityInstance
      * @param  KeyDescriptor|null        $keyDescriptor
      * @throws InvalidOperationException
      */
@@ -113,9 +112,9 @@ trait LaravelReadQueryUtilityTrait
     }
 
     /**
-     * @param  string[]|null $eagerLoad
-     * @return array
+     * @param  string[]|null             $eagerLoad
      * @throws InvalidOperationException
+     * @return array
      */
     protected function processEagerLoadList(array $eagerLoad = null)
     {
