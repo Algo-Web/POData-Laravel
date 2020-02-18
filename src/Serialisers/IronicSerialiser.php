@@ -51,7 +51,6 @@ class IronicSerialiser implements IObjectSerialiser
     use SerialiseDepWrapperTrait;
     use SerialisePropertyCacheTrait;
     use SerialiseNavigationTrait;
-    use SerialiseLowLevelWritersTrait;
     use SerialiseNextPageLinksTrait;
 
     /**
@@ -166,7 +165,7 @@ class IronicSerialiser implements IObjectSerialiser
             $mediaLinks
         );
 
-        $propertyContent = $this->writePrimitiveProperties($res, $this->getModelSerialiser(), $nonRelProp);
+        $propertyContent = SerialiserLowLevelWriters::writePrimitiveProperties($res, $this->getModelSerialiser(), $nonRelProp);
 
         $links = $this->buildLinksFromRels($entryObject, $relProp, $relativeUri);
 
@@ -333,7 +332,7 @@ class IronicSerialiser implements IObjectSerialiser
         $odataProperty->name = $propertyName;
         $odataProperty->typeName = $resourceType->getFullName();
         if (null != $result) {
-            $internalContent = $this->writeComplexValue($resourceType, $result);
+            $internalContent = SerialiserLowLevelWriters::writeComplexValue($resourceType, $result);
             $odataProperty->value = $internalContent;
         }
 
@@ -364,7 +363,7 @@ class IronicSerialiser implements IObjectSerialiser
         $odataProperty = new ODataProperty();
         $odataProperty->name = $propertyName;
         $odataProperty->typeName = 'Collection(' . $resourceType->getFullName() . ')';
-        $odataProperty->value = $this->writeBagValue($resourceType, $result);
+        $odataProperty->value = SerialiserLowLevelWriters::writeBagValue($resourceType, $result);
 
         $propertyContent->properties[$propertyName] = $odataProperty;
         return $propertyContent;
@@ -402,7 +401,7 @@ class IronicSerialiser implements IObjectSerialiser
             if (!$rType instanceof IType) {
                 throw new InvalidOperationException(get_class($rType));
             }
-            $odataProperty->value = $this->primitiveToString($rType, $primitiveValue->results);
+            $odataProperty->value = SerialiserLowLevelWriters::primitiveToString($rType, $primitiveValue->results);
         }
 
         $propertyContent->properties[$odataProperty->name] = $odataProperty;

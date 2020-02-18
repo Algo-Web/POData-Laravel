@@ -23,7 +23,7 @@ use POData\Providers\Metadata\Type\DateTime;
 use POData\Providers\Metadata\Type\IType;
 use POData\Providers\Metadata\Type\StringType;
 
-trait SerialiseLowLevelWritersTrait
+abstract class SerialiserLowLevelWriters
 {
     /**
      * @param Model $entryObject
@@ -32,7 +32,7 @@ trait SerialiseLowLevelWritersTrait
      * @return ODataPropertyContent
      * @throws InvalidOperationException
      */
-    protected function writePrimitiveProperties(Model $entryObject, ModelSerialiser $modelSerialiser, $nonRelProp)
+    public static function writePrimitiveProperties(Model $entryObject, ModelSerialiser $modelSerialiser, $nonRelProp)
     {
         $propertyContent = new ODataPropertyContent();
         $cereal = $modelSerialiser->bulkSerialise($entryObject);
@@ -45,7 +45,7 @@ trait SerialiseLowLevelWritersTrait
             $nrp = $nonRelProp[$corn]['prop'];
             $subProp = new ODataProperty();
             $subProp->name = $corn;
-            $subProp->value = isset($flake) ? $this->primitiveToString($rType, $flake) : null;
+            $subProp->value = isset($flake) ? SerialiserLowLevelWriters::primitiveToString($rType, $flake) : null;
             $subProp->typeName = $nrp->getResourceType()->getFullName();
             $propertyContent->properties[$corn] = $subProp;
         }
@@ -59,7 +59,7 @@ trait SerialiseLowLevelWritersTrait
      * @throws \ReflectionException
      * @return ODataBagContent|null
      */
-    protected function writeBagValue(ResourceType &$resourceType, $result)
+    public static function writeBagValue(ResourceType &$resourceType, $result)
     {
         if (!(null == $result || is_array($result))) {
             throw new InvalidOperationException('Bag parameter must be null or array');
@@ -82,9 +82,9 @@ trait SerialiseLowLevelWritersTrait
                 if (!$instance instanceof IType) {
                     throw new InvalidOperationException(get_class($instance));
                 }
-                $bag->propertyContents[] = $this->primitiveToString($instance, $value);
+                $bag->propertyContents[] = SerialiserLowLevelWriters::primitiveToString($instance, $value);
             } elseif (ResourceTypeKind::COMPLEX() == $kVal) {
-                $bag->propertyContents[] = $this->writeComplexValue($resourceType, $value);
+                $bag->propertyContents[] = SerialiserLowLevelWriters::writeComplexValue($resourceType, $value);
             }
         }
         return $bag;
@@ -99,7 +99,7 @@ trait SerialiseLowLevelWritersTrait
      * @throws \ReflectionException
      * @return ODataPropertyContent
      */
-    protected function writeComplexValue(
+    public static function writeComplexValue(
         ResourceType &$resourceType,
         &$result,
         $propertyName = null,
@@ -140,13 +140,13 @@ trait SerialiseLowLevelWritersTrait
                     throw new InvalidOperationException(get_class($rType));
                 }
 
-                $internalProperty->value = $this->primitiveToString($rType, $result->$propName);
+                $internalProperty->value = SerialiserLowLevelWriters::primitiveToString($rType, $result->$propName);
 
                 $internalContent->properties[$propName] = $internalProperty;
             } elseif (ResourcePropertyKind::COMPLEX_TYPE == $resourceKind) {
                 $rType = $prop->getResourceType();
                 $internalProperty->typeName = $rType->getFullName();
-                $internalProperty->value = $this->writeComplexValue(
+                $internalProperty->value = SerialiserLowLevelWriters::writeComplexValue(
                     $rType,
                     $result->$propName,
                     $propName,
@@ -171,7 +171,7 @@ trait SerialiseLowLevelWritersTrait
      *
      * @return string
      */
-    protected function primitiveToString(IType &$type, $primitiveValue)
+    public static function primitiveToString(IType &$type, $primitiveValue)
     {
         // kludge to enable switching on type of $type without getting tripped up by mocks as we would with get_class
         // switch (true) means we unconditionally enter, and then lean on case statements to match given block
