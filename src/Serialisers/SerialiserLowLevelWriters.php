@@ -23,25 +23,19 @@ use POData\Providers\Metadata\Type\DateTime;
 use POData\Providers\Metadata\Type\IType;
 use POData\Providers\Metadata\Type\StringType;
 
-trait SerialiseLowLevelWritersTrait
+abstract class SerialiserLowLevelWriters
 {
     /**
-     * Collection of complex type instances used for cycle detection.
-     *
-     * @var array
-     */
-    protected $complexTypeInstanceCollection;
-
-    /**
-     * @param $entryObject
+     * @param Model $entryObject
+     * @param ModelSerialiser $modelSerialiser
      * @param $nonRelProp
-     * @throws InvalidOperationException
      * @return ODataPropertyContent
+     * @throws InvalidOperationException
      */
-    protected function writePrimitiveProperties(Model $entryObject, $nonRelProp)
+    public static function writePrimitiveProperties(Model $entryObject, ModelSerialiser $modelSerialiser, $nonRelProp)
     {
         $propertyContent = new ODataPropertyContent();
-        $cereal = $this->getModelSerialiser()->bulkSerialise($entryObject);
+        $cereal = $modelSerialiser->bulkSerialise($entryObject);
         $cereal = array_intersect_key($cereal, $nonRelProp);
 
         foreach ($cereal as $corn => $flake) {
@@ -51,7 +45,7 @@ trait SerialiseLowLevelWritersTrait
             $nrp = $nonRelProp[$corn]['prop'];
             $subProp = new ODataProperty();
             $subProp->name = $corn;
-            $subProp->value = isset($flake) ? $this->primitiveToString($rType, $flake) : null;
+            $subProp->value = isset($flake) ? SerialiserLowLevelWriters::primitiveToString($rType, $flake) : null;
             $subProp->typeName = $nrp->getResourceType()->getFullName();
             $propertyContent->properties[$corn] = $subProp;
         }
@@ -65,7 +59,7 @@ trait SerialiseLowLevelWritersTrait
      * @throws \ReflectionException
      * @return ODataBagContent|null
      */
-    protected function writeBagValue(ResourceType &$resourceType, $result)
+    public static function writeBagValue(ResourceType &$resourceType, $result)
     {
         if (!(null == $result || is_array($result))) {
             throw new InvalidOperationException('Bag parameter must be null or array');
@@ -88,9 +82,9 @@ trait SerialiseLowLevelWritersTrait
                 if (!$instance instanceof IType) {
                     throw new InvalidOperationException(get_class($instance));
                 }
-                $bag->propertyContents[] = $this->primitiveToString($instance, $value);
+                $bag->propertyContents[] = SerialiserLowLevelWriters::primitiveToString($instance, $value);
             } elseif (ResourceTypeKind::COMPLEX() == $kVal) {
-                $bag->propertyContents[] = $this->writeComplexValue($resourceType, $value);
+                $bag->propertyContents[] = SerialiserLowLevelWriters::writeComplexValue($resourceType, $value);
             }
         }
         return $bag;
@@ -100,26 +94,31 @@ trait SerialiseLowLevelWritersTrait
      * @param  ResourceType              $resourceType
      * @param  object                    $result
      * @param  string|null               $propertyName
+     * @param  array                     $instanceCollection
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @return ODataPropertyContent
      */
-    protected function writeComplexValue(ResourceType &$resourceType, &$result, $propertyName = null)
-    {
+    public static function writeComplexValue(
+        ResourceType &$resourceType,
+        &$result,
+        $propertyName = null,
+        array &$instanceCollection = []
+    ) {
         if (!is_object($result)) {
             throw new InvalidOperationException('Supplied $customObject must be an object');
         }
 
-        $count = count($this->complexTypeInstanceCollection);
+        $count = count($instanceCollection);
         for ($i = 0; $i < $count; ++$i) {
-            if ($this->complexTypeInstanceCollection[$i] === $result) {
+            if ($instanceCollection[$i] === $result) {
                 throw new InvalidOperationException(
                     Messages::objectModelSerializerLoopsNotAllowedInComplexTypes($propertyName)
                 );
             }
         }
 
-        $this->complexTypeInstanceCollection[$count] = &$result;
+        $instanceCollection[$count] = &$result;
 
         $internalContent = new ODataPropertyContent();
         $resourceProperties = $resourceType->getAllProperties();
@@ -129,7 +128,7 @@ trait SerialiseLowLevelWritersTrait
             $propName = $prop->getName();
             $internalProperty = new ODataProperty();
             $internalProperty->name = $propName;
-            if (static::isMatchPrimitive($resourceKind)) {
+            if (SerialiserUtilities::isMatchPrimitive($resourceKind)) {
                 $iType = $prop->getInstanceType();
                 if (!$iType instanceof IType) {
                     throw new InvalidOperationException(get_class($iType));
@@ -141,19 +140,24 @@ trait SerialiseLowLevelWritersTrait
                     throw new InvalidOperationException(get_class($rType));
                 }
 
-                $internalProperty->value = $this->primitiveToString($rType, $result->$propName);
+                $internalProperty->value = SerialiserLowLevelWriters::primitiveToString($rType, $result->$propName);
 
                 $internalContent->properties[$propName] = $internalProperty;
             } elseif (ResourcePropertyKind::COMPLEX_TYPE == $resourceKind) {
                 $rType = $prop->getResourceType();
                 $internalProperty->typeName = $rType->getFullName();
-                $internalProperty->value = $this->writeComplexValue($rType, $result->$propName, $propName);
+                $internalProperty->value = SerialiserLowLevelWriters::writeComplexValue(
+                    $rType,
+                    $result->$propName,
+                    $propName,
+                    $instanceCollection
+                );
 
                 $internalContent->properties[$propName] = $internalProperty;
             }
         }
 
-        unset($this->complexTypeInstanceCollection[$count]);
+        unset($instanceCollection[$count]);
         return $internalContent;
     }
 
@@ -167,7 +171,7 @@ trait SerialiseLowLevelWritersTrait
      *
      * @return string
      */
-    protected function primitiveToString(IType &$type, $primitiveValue)
+    public static function primitiveToString(IType &$type, $primitiveValue)
     {
         // kludge to enable switching on type of $type without getting tripped up by mocks as we would with get_class
         // switch (true) means we unconditionally enter, and then lean on case statements to match given block
@@ -190,9 +194,4 @@ trait SerialiseLowLevelWritersTrait
 
         return $stringValue;
     }
-
-    /**
-     * @return ModelSerialiser
-     */
-    abstract public function getModelSerialiser();
 }

@@ -18,7 +18,7 @@ use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\Type\IType;
 use POData\Providers\Query\QueryResult;
 
-trait SerialiseUtilitiesTrait
+abstract class SerialiserUtilities
 {
     /**
      * @param  int  $resourceKind
@@ -39,7 +39,7 @@ trait SerialiseUtilitiesTrait
      * @param  QueryResult               $entryObjects
      * @throws InvalidOperationException
      */
-    protected function checkElementsInput(QueryResult &$entryObjects)
+    public static function checkElementsInput(QueryResult &$entryObjects)
     {
         $res = $entryObjects->results;
         if (!(is_array($res) || $res instanceof Collection)) {
@@ -57,7 +57,7 @@ trait SerialiseUtilitiesTrait
      * @param  QueryResult               $entryObject
      * @throws InvalidOperationException
      */
-    protected function checkSingleElementInput(QueryResult $entryObject)
+    public static function checkSingleElementInput(QueryResult $entryObject)
     {
         if (!$entryObject->results instanceof Model) {
             $res = $entryObject->results;
@@ -75,7 +75,7 @@ trait SerialiseUtilitiesTrait
      * @throws \ReflectionException
      * @return string
      */
-    protected function getEntryInstanceKey($entityInstance, ResourceType $resourceType, $containerName)
+    public static function getEntryInstanceKey($entityInstance, ResourceType $resourceType, $containerName)
     {
         $typeName = $resourceType->getName();
         $keyProperties = $resourceType->getKeyProperties();
@@ -109,15 +109,19 @@ trait SerialiseUtilitiesTrait
 
     /**
      * @param  ResourceEntityType              $resourceType
+     * @param  IMetadataProvider               $metadata
      * @param  string                          $payloadClass
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @return ResourceEntityType|ResourceType
      */
-    protected function getConcreteTypeFromAbstractType(ResourceEntityType $resourceType, $payloadClass)
-    {
+    public static function getConcreteTypeFromAbstractType(
+        ResourceEntityType $resourceType,
+        IMetadataProvider $metadata,
+        $payloadClass
+    ) {
         if ($resourceType->isAbstract()) {
-            $derived = $this->getMetadata()->getDerivedTypes($resourceType);
+            $derived = $metadata->getDerivedTypes($resourceType);
             if (0 == count($derived)) {
                 throw new InvalidOperationException('Supplied abstract type must have at least one derived type');
             }
@@ -142,9 +146,4 @@ trait SerialiseUtilitiesTrait
         }
         return $resourceType;
     }
-
-    /**
-     * @return IMetadataProvider
-     */
-    abstract protected function getMetadata();
 }

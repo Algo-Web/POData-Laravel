@@ -51,9 +51,7 @@ class IronicSerialiser implements IObjectSerialiser
     use SerialiseDepWrapperTrait;
     use SerialisePropertyCacheTrait;
     use SerialiseNavigationTrait;
-    use SerialiseLowLevelWritersTrait;
     use SerialiseNextPageLinksTrait;
-    use SerialiseUtilitiesTrait;
 
     /**
      * Update time to insert into ODataEntry/ODataFeed fields.
@@ -79,7 +77,6 @@ class IronicSerialiser implements IObjectSerialiser
         $this->absoluteServiceUri = $service->getHost()->getAbsoluteServiceUri()->getUrlAsString();
         $this->absoluteServiceUriWithSlash = rtrim($this->absoluteServiceUri, '/') . '/';
         $this->stack = new SegmentStack($request);
-        $this->complexTypeInstanceCollection = [];
         $this->modelSerialiser = new ModelSerialiser();
         $this->updated = Carbon::now();
     }
@@ -100,7 +97,7 @@ class IronicSerialiser implements IObjectSerialiser
             array_pop($this->lightStack);
             return null;
         }
-        $this->checkSingleElementInput($entryObject);
+        SerialiserUtilities::checkSingleElementInput($entryObject);
 
         $this->loadStackIfEmpty();
         $baseURI = $this->isBaseWritten ? null : $this->absoluteServiceUriWithSlash;
@@ -115,7 +112,11 @@ class IronicSerialiser implements IObjectSerialiser
         $resourceType = $this->getService()->getProvidersWrapper()->resolveResourceType($topOfStack['type']);
 
         // need gubbinz to unpack an abstract resource type
-        $resourceType = $this->getConcreteTypeFromAbstractType($resourceType, $payloadClass);
+        $resourceType = SerialiserUtilities::getConcreteTypeFromAbstractType(
+            $resourceType,
+            $this->getMetadata(),
+            $payloadClass
+        );
 
         // make sure we're barking up right tree
         if (!$resourceType instanceof ResourceEntityType) {
@@ -144,7 +145,7 @@ class IronicSerialiser implements IObjectSerialiser
         $title = $resourceType->getName();
         $type = $resourceType->getFullName();
 
-        $relativeUri = $this->getEntryInstanceKey(
+        $relativeUri = SerialiserUtilities::getEntryInstanceKey(
             $res,
             $resourceType,
             $resourceSet->getName()
@@ -164,7 +165,7 @@ class IronicSerialiser implements IObjectSerialiser
             $mediaLinks
         );
 
-        $propertyContent = $this->writePrimitiveProperties($res, $nonRelProp);
+        $propertyContent = SerialiserLowLevelWriters::writePrimitiveProperties($res, $this->getModelSerialiser(), $nonRelProp);
 
         $links = $this->buildLinksFromRels($entryObject, $relProp, $relativeUri);
 
@@ -206,7 +207,7 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeTopLevelElements(QueryResult &$entryObjects)
     {
-        $this->checkElementsInput($entryObjects);
+        SerialiserUtilities::checkElementsInput($entryObjects);
 
         $this->loadStackIfEmpty();
 
@@ -261,7 +262,7 @@ class IronicSerialiser implements IObjectSerialiser
         $res = $entryObject->results;
         if (null !== $res) {
             $currentResourceType = $this->getCurrentResourceSetWrapper()->getResourceType();
-            $relativeUri = $this->getEntryInstanceKey(
+            $relativeUri = SerialiserUtilities::getEntryInstanceKey(
                 $res,
                 $currentResourceType,
                 $this->getCurrentResourceSetWrapper()->getName()
@@ -324,6 +325,7 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeTopLevelComplexObject(QueryResult &$complexValue, $propertyName, ResourceType &$resourceType)
     {
+        /** @var object $result */
         $result = $complexValue->results;
 
         $propertyContent = new ODataPropertyContent();
@@ -331,7 +333,7 @@ class IronicSerialiser implements IObjectSerialiser
         $odataProperty->name = $propertyName;
         $odataProperty->typeName = $resourceType->getFullName();
         if (null != $result) {
-            $internalContent = $this->writeComplexValue($resourceType, $result);
+            $internalContent = SerialiserLowLevelWriters::writeComplexValue($resourceType, $result);
             $odataProperty->value = $internalContent;
         }
 
@@ -362,7 +364,7 @@ class IronicSerialiser implements IObjectSerialiser
         $odataProperty = new ODataProperty();
         $odataProperty->name = $propertyName;
         $odataProperty->typeName = 'Collection(' . $resourceType->getFullName() . ')';
-        $odataProperty->value = $this->writeBagValue($resourceType, $result);
+        $odataProperty->value = SerialiserLowLevelWriters::writeBagValue($resourceType, $result);
 
         $propertyContent->properties[$propertyName] = $odataProperty;
         return $propertyContent;
@@ -400,7 +402,7 @@ class IronicSerialiser implements IObjectSerialiser
             if (!$rType instanceof IType) {
                 throw new InvalidOperationException(get_class($rType));
             }
-            $odataProperty->value = $this->primitiveToString($rType, $primitiveValue->results);
+            $odataProperty->value = SerialiserLowLevelWriters::primitiveToString($rType, $primitiveValue->results);
         }
 
         $propertyContent->properties[$odataProperty->name] = $odataProperty;

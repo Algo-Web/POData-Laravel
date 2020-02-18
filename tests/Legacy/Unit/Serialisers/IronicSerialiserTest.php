@@ -782,7 +782,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $actual = null;
 
         try {
-            $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
+            $ironic->getConcreteTypeFromAbstractType($abstractType, $metadata, $payloadClass);
         } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
@@ -806,7 +806,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $actual = null;
 
         try {
-            $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
+            $ironic->getConcreteTypeFromAbstractType($abstractType, $metadata, $payloadClass);
         } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
@@ -834,7 +834,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $actual = null;
 
         try {
-            $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
+            $ironic->getConcreteTypeFromAbstractType($abstractType, $metadata, $payloadClass);
         } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
@@ -858,7 +858,7 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
 
-        $result = $ironic->getConcreteTypeFromAbstractType($abstractType, $payloadClass);
+        $result = $ironic->getConcreteTypeFromAbstractType($abstractType, $metadata, $payloadClass);
         $this->assertEquals($result, $concreteType);
     }
 
