@@ -3,36 +3,37 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 9/02/20
- * Time: 1:29 PM.
+ * Time: 1:28 PM.
  */
-namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Models;
+namespace Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property string $cityId
+ * @property string $personId
+ * @property string $addressid
  * @property string $name
- * @property string $postcode
- * @property string $country
+ * @property string $givenname
  */
-class City extends Model
+class Person extends Model
 {
     use \AlgoWeb\PODataLaravel\Models\MetadataTrait;
-    protected $table = 'test_cities';
+    protected $table = 'test_people';
     public $timestamps = false;
     public $incrementing = false;
     protected $keyType = 'string';
-    protected $primaryKey = 'cityId';
+    protected $primaryKey = 'personId';
     protected $fillable = [
         'name',
-        'postcode',
-        'country'
+        'givenname',
+        'addressid',
+        'companyid'
     ];
 
     protected $guarded = [];
 
     public function Address()
     {
-        return $this->hasMany(Address::class, 'cityid');
+        return $this->belongsTo(Address::class, 'addressid');
     }
 }
