@@ -8,8 +8,10 @@
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests;
 
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schema as Schema;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 
@@ -30,8 +32,10 @@ class TestServiceProvider extends BaseServiceProvider
 
     protected function loadMigrationsFrom($path)
     {
-        Artisan::call('migrate:refresh', ['--database' => 'testbench']);
         $migrator = $this->app->make('migrator');
+        $migrationRepository = $migrator->getRepository();
+        $migrationRepository->setSource('testbench');
+        $migrationRepository->createRepository();
         $migrator->run($path);
     }
 }

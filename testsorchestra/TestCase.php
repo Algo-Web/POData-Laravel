@@ -19,7 +19,7 @@ class TestCase extends BaseTestCase
             \AlgoWeb\PODataLaravel\Providers\MetadataRouteProvider::class,
             \AlgoWeb\PODataLaravel\Providers\QueryProvider::class,
             \AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider::class,
-            \Orchestra\Database\ConsoleServiceProvider::class,];
+            /*\Orchestra\Database\ConsoleServiceProvider::class,*/];
     }
 
 
@@ -50,7 +50,7 @@ class TestCase extends BaseTestCase
     public function setUp() : void
     {
         parent::setUp();
-        $this->loadMigrationsFrom(realpath(__DIR__ . '/database/migrations'));
+        //$this->loadMigrationsFrom(realpath(__DIR__ . '/database/migrations'));
         date_default_timezone_set('UTC');
     }
 

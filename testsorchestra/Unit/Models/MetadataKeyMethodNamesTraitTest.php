@@ -17,7 +17,7 @@ use POData\Common\InvalidOperationException;
 
 class MetadataKeyMethodNamesTraitTest extends TestCase
 {
-    use DatabaseMigrations;
+    //use DatabaseMigrations;
 
     /**
      * @throws InvalidOperationException
