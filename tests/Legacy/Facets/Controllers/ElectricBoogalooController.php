@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Controllers;
+namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Controllers;
 
 use Illuminate\Support\Facades\Validator;
-use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
-use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Requests\TestRequest;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestMorphTarget;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Requests\TestRequest;
 
 class ElectricBoogalooController extends \Illuminate\Routing\Controller
 {

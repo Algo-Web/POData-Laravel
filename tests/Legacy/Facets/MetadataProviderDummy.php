@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models;
+namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models;
 
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 

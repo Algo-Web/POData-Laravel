@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Controllers;
+namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Controllers;
 
 use Illuminate\Support\Facades\Validator;
-use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestBulkCreateRequest;
-use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestBulkUpdateRequest;
-use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Models\TestModel;
-use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Requests\TestRequest;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Requests\TestBulkCreateRequest;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Requests\TestBulkUpdateRequest;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Requests\TestRequest;
 
 class TestController extends \Illuminate\Routing\Controller
 {

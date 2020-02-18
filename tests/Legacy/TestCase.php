@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Legacy\AlgoWeb\PODataLaravel\Models;
+namespace Tests\Legacy\AlgoWeb\PODataLaravel;
 
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder;
@@ -8,7 +8,7 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use Tests\Legacy\Facets\AlgoWeb\PODataLaravel\Kernels\ConsoleKernel;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Kernels\ConsoleKernel;
 
 class TestCase extends BaseTestCase
 {
