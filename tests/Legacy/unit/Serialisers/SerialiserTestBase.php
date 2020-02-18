@@ -1,9 +1,9 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Serialisers;
+namespace Tests\AlgoWeb\PODataLaravel\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
-use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;

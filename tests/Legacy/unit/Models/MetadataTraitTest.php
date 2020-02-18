@@ -1,8 +1,8 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models;
+namespace Tests\AlgoWeb\PODataLaravel\Models;
 
-use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use ErrorException;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\App;

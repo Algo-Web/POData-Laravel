@@ -1,16 +1,16 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Controllers;
+namespace Tests\AlgoWeb\PODataLaravel\Controllers;
 
-use AlgoWeb\PODataLaravel\Models\TestModel;
-use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
-use AlgoWeb\PODataLaravel\Requests\TestRequest;
+use Tests\AlgoWeb\PODataLaravel\Models\TestModel;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use Tests\AlgoWeb\PODataLaravel\Requests\TestRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ElectricBoogalooController extends \Illuminate\Routing\Controller
 {
-    use MetadataControllerTrait;
+    use \AlgoWeb\PODataLaravel\Controllers\MetadataControllerTrait;
 
     public function __construct()
     {

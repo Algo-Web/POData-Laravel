@@ -1,15 +1,20 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models;
+namespace Tests\AlgoWeb\PODataLaravel\Models;
 
+use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
-use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
 
 class MetadataGubbinsHolderTest extends TestCase
 {
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testAddSameModelTwice()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -21,7 +26,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $foo = new MetadataGubbinsHolder();
         $foo->addEntity($gubbins);
 
-        $expected = 'AlgoWeb\PODataLaravel\Models\TestMonomorphicSource already added';
+        $expected = \Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource::class .' already added';
         $actual = null;
 
         try {
@@ -36,7 +41,7 @@ class MetadataGubbinsHolderTest extends TestCase
     {
         $foo = new MetadataGubbinsHolder();
 
-        $expected = 'AlgoWeb\PODataLaravel\Models\TestMonomorphicSource does not exist in holder';
+        $expected = \Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource::class . ' does not exist in holder';
         $actual = null;
 
         try {
@@ -47,6 +52,11 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetRelationsOnNonExistentRelation()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -58,7 +68,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $foo = new MetadataGubbinsHolder();
         $foo->addEntity($gubbins);
 
-        $expected = 'Relation foo not registered on AlgoWeb\PODataLaravel\Models\TestMonomorphicSource';
+        $expected = 'Relation foo not registered on '. \Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource::class;
         $actual = null;
 
         try {
@@ -69,6 +79,11 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetRelationsByRelNameHasOne()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -94,6 +109,11 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertEquals($expected, $result[0]);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetRelationsByRelNameBelongsToOne()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -119,6 +139,11 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertEquals($expected, $result[0]);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetRelationsByRelNameHasMany()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -144,6 +169,11 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertEquals($expected, $result[0]);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetRelationsByRelNameBelongsToMany()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -169,6 +199,11 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertEquals($expected, $result[0]);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetRelationsByRelNameBelongsToManyToMany()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -194,6 +229,11 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertEquals($expected, $result[0]);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetRelationsByRelNameBelongsToManyToManyReverse()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -219,6 +259,11 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertEquals($expected, $result[0]);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetRelationsByRelNameBelongsToIsKnownSide()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -235,6 +280,11 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertEquals(0, count($result));
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetRelationsByRelNameMorphOne()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -260,6 +310,11 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertEquals($expected, $result[0]);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetRelationsByRelNameMorphMany()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -285,6 +340,11 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertEquals($expected, $result[0]);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetRelationsByRelNameMorphToMany()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -310,6 +370,11 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertEquals($expected, $result[0]);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetRelationsByRelNameMorphedByMany()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -326,6 +391,11 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertEquals(0, count($result));
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetRelationsTwoArmedPolymorphicRelation()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -347,6 +417,11 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertTrue($result[0]->getLast() instanceof AssociationStubPolymorphic, get_class($result[0]->getLast()));
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetGubbinsIncludingHasManyThroughRelation()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -360,6 +435,11 @@ class MetadataGubbinsHolderTest extends TestCase
         $this->assertTrue(array_key_exists('monomorphicChildren', $stubs));
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetBidirectionalHasManyThroughRelation()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];

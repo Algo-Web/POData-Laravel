@@ -1,6 +1,6 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models;
+namespace Tests\AlgoWeb\PODataLaravel\Models;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;

@@ -1,15 +1,17 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Serialisers;
+namespace Tests\AlgoWeb\PODataLaravel\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
-use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
-use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
-use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
-use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
-use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
-use AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
-use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
+use AlgoWeb\PODataLaravel\Serialisers\ModelSerialiser;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphOneSourceAlternate;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Carbon\Carbon;
@@ -574,8 +576,8 @@ class IronicSerialiserTest extends SerialiserTestBase
         $foo->shouldReceive('getRequest')->andReturn($request);
         $foo->shouldReceive('getService->getProvidersWrapper->resolveResourceType')->andReturn($targType);
 
-        $expected = 'Concrete resource type not selected for payload'.
-                    ' AlgoWeb\PODataLaravel\Models\TestMorphTarget';
+        $expected = 'Concrete resource type not selected for payload '.
+                     \Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget::class;
         $actual = null;
 
         try {

@@ -1,8 +1,8 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models;
+namespace Tests\AlgoWeb\PODataLaravel\Models;
 
-use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
+use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase;
 use Mockery as m;
@@ -92,6 +92,11 @@ class AssociationTest extends TestCase
         $this->assertTrue($foo->isOk());
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetAssociationTwoRelsOnSameModelPair()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -126,6 +131,11 @@ class AssociationTest extends TestCase
         $this->assertTrue(in_array($assoc2, $result));
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetAssociationsWithOnlyOneModelHookedUp()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
@@ -140,6 +150,11 @@ class AssociationTest extends TestCase
         $this->assertEquals(0, count($result));
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testGetAssociationsWithTwoRelatedModels()
     {
         $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];

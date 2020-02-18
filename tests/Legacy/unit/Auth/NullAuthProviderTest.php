@@ -1,10 +1,10 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Providers;
+namespace Tests\AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
-use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 
 class NullAuthProviderTest extends TestCase
 {

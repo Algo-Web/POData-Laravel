@@ -1,18 +1,20 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Query;
+namespace Tests\AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
-use AlgoWeb\PODataLaravel\Controllers\TestController;
+use AlgoWeb\PODataLaravel\Query\LaravelBulkQuery;
+use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use Tests\AlgoWeb\PODataLaravel\Controllers\TestController;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
-use AlgoWeb\PODataLaravel\Models\LaravelBulkQueryDummy;
-use AlgoWeb\PODataLaravel\Models\LaravelQueryDummy;
-use AlgoWeb\PODataLaravel\Models\TestBulkCreateRequest;
-use AlgoWeb\PODataLaravel\Models\TestBulkUpdateRequest;
-use AlgoWeb\PODataLaravel\Models\TestCase;
-use AlgoWeb\PODataLaravel\Models\TestModel;
+use Tests\AlgoWeb\PODataLaravel\Models\LaravelBulkQueryDummy;
+use Tests\AlgoWeb\PODataLaravel\Models\LaravelQueryDummy;
+use Tests\AlgoWeb\PODataLaravel\Models\TestBulkCreateRequest;
+use Tests\AlgoWeb\PODataLaravel\Models\TestBulkUpdateRequest;
+use Tests\AlgoWeb\PODataLaravel\Models\TestCase;
+use Tests\AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
-use AlgoWeb\PODataLaravel\Requests\TestRequest;
+use Tests\AlgoWeb\PODataLaravel\Requests\TestRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
@@ -201,7 +203,7 @@ class LaravelQueryBulkTest extends TestCase
         $foo->shouldReceive('getControllerContainer')->andReturn($container);
         $foo->shouldReceive('getBulk')->andReturn($bulk);
 
-        $expected = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel].';
+        $expected = 'No query results for model ['.\Tests\AlgoWeb\PODataLaravel\Models\TestModel::class.'].';
         $actual = null;
 
         try {
@@ -478,7 +480,7 @@ class LaravelQueryBulkTest extends TestCase
         $foo->shouldReceive('getBulk')->andReturn($bulk);
         $foo->shouldReceive('getControllerContainer')->andReturn($container);
 
-        $expected = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel].';
+        $expected = 'No query results for model ['.\Tests\AlgoWeb\PODataLaravel\Models\TestModel::class.'].';
         $actual = null;
 
         try {

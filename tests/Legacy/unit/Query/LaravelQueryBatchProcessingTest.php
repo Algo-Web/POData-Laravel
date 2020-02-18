@@ -1,18 +1,20 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Query;
+namespace Tests\AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
-use AlgoWeb\PODataLaravel\Controllers\TestController;
+use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use AlgoWeb\PODataLaravel\Query\LaravelWriteQuery;
+use Tests\AlgoWeb\PODataLaravel\Controllers\TestController;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
-use AlgoWeb\PODataLaravel\Models\LaravelBulkQueryDummy;
-use AlgoWeb\PODataLaravel\Models\LaravelQueryDummy;
-use AlgoWeb\PODataLaravel\Models\TestBulkCreateRequest;
-use AlgoWeb\PODataLaravel\Models\TestBulkUpdateRequest;
-use AlgoWeb\PODataLaravel\Models\TestCase;
-use AlgoWeb\PODataLaravel\Models\TestModel;
+use Tests\AlgoWeb\PODataLaravel\Models\LaravelBulkQueryDummy;
+use Tests\AlgoWeb\PODataLaravel\Models\LaravelQueryDummy;
+use Tests\AlgoWeb\PODataLaravel\Models\TestBulkCreateRequest;
+use Tests\AlgoWeb\PODataLaravel\Models\TestBulkUpdateRequest;
+use Tests\AlgoWeb\PODataLaravel\Models\TestCase;
+use Tests\AlgoWeb\PODataLaravel\Models\TestModel;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
-use AlgoWeb\PODataLaravel\Requests\TestRequest;
+use Tests\AlgoWeb\PODataLaravel\Requests\TestRequest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;

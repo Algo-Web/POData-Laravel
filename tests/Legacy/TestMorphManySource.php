@@ -1,6 +1,6 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models;
+namespace Tests\AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Connection as Connection;
@@ -68,6 +68,6 @@ class TestMorphManySource extends Model
 
     public function morphTarget()
     {
-        return $this->morphMany('AlgoWeb\PODataLaravel\Models\TestMorphTarget', 'morph');
+        return $this->morphMany(\Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget::class, 'morph');
     }
 }

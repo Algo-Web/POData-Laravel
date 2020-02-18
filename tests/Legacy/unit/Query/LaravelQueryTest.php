@@ -1,22 +1,26 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Query;
+namespace Tests\AlgoWeb\PODataLaravel\Query;
 
 use AlgoWeb\PODataLaravel\Auth\NullAuthProvider;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
-use AlgoWeb\PODataLaravel\Controllers\TestController;
+use AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider;
+use AlgoWeb\PODataLaravel\Query\LaravelHookQuery;
+use AlgoWeb\PODataLaravel\Query\LaravelQuery;
+use AlgoWeb\PODataLaravel\Query\LaravelReadQuery;
+use Tests\AlgoWeb\PODataLaravel\Controllers\TestController;
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
-use AlgoWeb\PODataLaravel\Models\LaravelHookQueryDummy;
-use AlgoWeb\PODataLaravel\Models\LaravelQueryDummy;
-use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
-use AlgoWeb\PODataLaravel\Models\TestModel;
-use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
-use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
-use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
-use AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
-use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
-use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
-use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use Tests\AlgoWeb\PODataLaravel\Models\LaravelHookQueryDummy;
+use Tests\AlgoWeb\PODataLaravel\Models\LaravelQueryDummy;
+use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use Tests\AlgoWeb\PODataLaravel\Models\TestModel;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphManySource;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
@@ -977,7 +981,7 @@ class LaravelQueryTest extends TestCase
         $key = m::mock(KeyDescriptor::class);
 
         $foo = new LaravelQuery();
-        $expected = 'No query results for model [AlgoWeb\\PODataLaravel\\Models\\TestModel]';
+        $expected = 'No query results for model ['. \Tests\AlgoWeb\PODataLaravel\Models\TestModel::class . ']';
         $actual = null;
         $expectedCode = 500;
         $actualCode = null;
@@ -1347,7 +1351,7 @@ class LaravelQueryTest extends TestCase
         $model->id = null;
 
         $foo = new LaravelQuery();
-        $expected = 'Controller mapping missing for class AlgoWeb\PODataLaravel\Models\TestModel.';
+        $expected = 'Controller mapping missing for class ' . \Tests\AlgoWeb\PODataLaravel\Models\TestModel::class . '.';
         $actual = null;
 
         try {
@@ -1388,7 +1392,7 @@ class LaravelQueryTest extends TestCase
         $model->id = null;
 
         $foo = new LaravelQuery();
-        $expected = 'Controller mapping missing for delete verb on class AlgoWeb\PODataLaravel\Models\TestModel.';
+        $expected = 'Controller mapping missing for delete verb on class ' . \Tests\AlgoWeb\PODataLaravel\Models\TestModel::class . '.';
         $actual = null;
 
         try {
@@ -1893,7 +1897,7 @@ class LaravelQueryTest extends TestCase
         $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $expected = 'Bad navigation property, manySource, on source model '
-                    .'AlgoWeb\PODataLaravel\Models\TestMonomorphicSource';
+                    .\Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource::class;
         $actual = null;
 
         try {

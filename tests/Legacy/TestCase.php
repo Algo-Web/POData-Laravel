@@ -1,8 +1,8 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models;
+namespace Tests\AlgoWeb\PODataLaravel\Models;
 
-use AlgoWeb\PODataLaravel\Kernels\ConsoleKernel;
+use Tests\AlgoWeb\PODataLaravel\Kernels\ConsoleKernel;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Processors\Processor;

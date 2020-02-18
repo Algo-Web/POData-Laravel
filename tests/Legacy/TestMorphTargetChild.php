@@ -1,11 +1,10 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models;
+namespace Tests\AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Connection as Connection;
 use Illuminate\Database\Eloquent\Model as Model;
-use Mockery\Mockery;
 
 class TestMorphTargetChild extends Model
 {
