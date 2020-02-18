@@ -1,22 +1,23 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Providers;
+namespace Tests\AlgoWeb\PODataLaravel\Providers;
 
-use AlgoWeb\PODataLaravel\Models\MetadataProviderDummy;
+use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use Tests\AlgoWeb\PODataLaravel\Models\MetadataProviderDummy;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
-use AlgoWeb\PODataLaravel\Models\TestCase;
-use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
-use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
-use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
-use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
-use AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate;
-use AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
-use AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
-use AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
-use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use Tests\AlgoWeb\PODataLaravel\Models\TestCase;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphManyToManySource;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphManyToManyTarget;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphOneSource;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -355,10 +356,10 @@ class MetadataProviderUriTest extends TestCase
         MetadataProvider::setAfterVerify(function (Map $objectMap) use ($classen) {
             $entities = $objectMap->getEntities();
             $this->assertEquals(count($classen), count($entities), 'The object map contained to many entities');
-            $this->assertArrayHasKey('AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate', $entities);
-            $this->assertArrayHasKey('AlgoWeb\PODataLaravel\Models\TestMorphTarget', $entities);
-            $morphTarget = $entities['AlgoWeb\PODataLaravel\Models\TestMorphTarget'];
-            $MorphManySourceAlternate = $entities['AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate'];
+            $this->assertArrayHasKey(\Tests\AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate::class, $entities);
+            $this->assertArrayHasKey(\Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget::class, $entities);
+            $morphTarget = $entities[\Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget::class];
+            $MorphManySourceAlternate = $entities[\Tests\AlgoWeb\PODataLaravel\Models\TestMorphManySourceAlternate::class];
             $morphTargetStubs = $morphTarget->getStubs();
             $this->assertEquals(4, count($morphTargetStubs));
             $MorphManySourceAlternateStubs = $MorphManySourceAlternate->getStubs();

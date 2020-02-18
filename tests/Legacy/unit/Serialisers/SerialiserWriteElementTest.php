@@ -1,17 +1,19 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Serialisers;
+namespace Tests\AlgoWeb\PODataLaravel\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
-use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
-use AlgoWeb\PODataLaravel\Models\TestModel;
-use AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
-use AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
-use AlgoWeb\PODataLaravel\Models\TestMonomorphicParentOfMorphTarget;
-use AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
-use AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
-use AlgoWeb\PODataLaravel\Models\TestMorphManySource;
-use AlgoWeb\PODataLaravel\Models\TestMorphTarget;
+use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
+use AlgoWeb\PODataLaravel\Serialisers\ModelSerialiser;
+use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use Tests\AlgoWeb\PODataLaravel\Models\TestModel;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicManySource;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicManyTarget;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicParentOfMorphTarget;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicSource;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMonomorphicTarget;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphManySource;
+use Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Carbon\Carbon;
@@ -1232,7 +1234,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $foo->shouldReceive('getRequest->getTargetResourceType->getName')->andReturn('TestModel');
 
         $expected = 'Object being serialised not instance of expected class, ' .TestMonomorphicSource::class
-                    .', is actually AlgoWeb\PODataLaravel\Models\TestModel';
+                    .', is actually ' . \Tests\AlgoWeb\PODataLaravel\Models\TestModel::class;
         $actual = null;
 
         try {

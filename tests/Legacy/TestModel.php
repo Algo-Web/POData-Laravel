@@ -1,6 +1,6 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models;
+namespace Tests\AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerTrait;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;

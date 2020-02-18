@@ -1,8 +1,8 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Controllers;
+namespace Tests\AlgoWeb\PODataLaravel\Controllers;
 
-use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

@@ -1,11 +1,10 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models;
+namespace Tests\AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Connection as Connection;
 use Illuminate\Database\Eloquent\Model as Model;
-use Mockery\Mockery;
 
 class TestMorphOneSource extends Model
 {
@@ -68,6 +67,6 @@ class TestMorphOneSource extends Model
 
     public function morphTarget()
     {
-        return $this->morphOne('AlgoWeb\PODataLaravel\Models\TestMorphTarget', 'morph');
+        return $this->morphOne(\Tests\AlgoWeb\PODataLaravel\Models\TestMorphTarget::class, 'morph');
     }
 }

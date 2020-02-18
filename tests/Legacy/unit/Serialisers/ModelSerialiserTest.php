@@ -1,11 +1,12 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Serialisers;
+namespace Tests\AlgoWeb\PODataLaravel\Serialisers;
 
-use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
-use AlgoWeb\PODataLaravel\Models\TestCastModel;
-use AlgoWeb\PODataLaravel\Models\TestGetterModel;
-use AlgoWeb\PODataLaravel\Models\TestModel;
+use AlgoWeb\PODataLaravel\Serialisers\ModelSerialiser;
+use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use Tests\AlgoWeb\PODataLaravel\Models\TestCastModel;
+use Tests\AlgoWeb\PODataLaravel\Models\TestGetterModel;
+use Tests\AlgoWeb\PODataLaravel\Models\TestModel;
 use Mockery as m;
 
 class ModelSerialiserTest extends TestCase

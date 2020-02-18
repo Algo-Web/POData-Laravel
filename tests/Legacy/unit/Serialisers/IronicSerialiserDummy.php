@@ -1,7 +1,8 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Serialisers;
+namespace Tests\AlgoWeb\PODataLaravel\Serialisers;
 
+use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
 use POData\Providers\Metadata\ResourceEntityType;
 
 class IronicSerialiserDummy extends IronicSerialiser

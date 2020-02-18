@@ -1,6 +1,6 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Requests;
+namespace Tests\AlgoWeb\PODataLaravel\Requests;
 
 use Illuminate\Foundation\Http\FormRequest as Request;
 

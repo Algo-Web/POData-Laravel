@@ -1,8 +1,9 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Providers;
+namespace Tests\AlgoWeb\PODataLaravel\Providers;
 
-use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use AlgoWeb\PODataLaravel\Providers\QueryProvider;
+use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use Illuminate\Support\Facades\App;
 

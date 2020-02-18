@@ -1,6 +1,6 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Models;
+namespace Tests\AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use AlgoWeb\PODataLaravel\Query\LaravelBulkQuery;

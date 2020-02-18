@@ -1,6 +1,8 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Providers;
+namespace Tests\AlgoWeb\PODataLaravel\Providers;
+
+use AlgoWeb\PODataLaravel\Providers\MetadataBaseProvider;
 
 class TestProvider extends MetadataBaseProvider
 {

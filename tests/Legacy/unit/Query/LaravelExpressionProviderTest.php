@@ -1,8 +1,8 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Query;
+namespace Tests\AlgoWeb\PODataLaravel\Query;
 
-use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider as LaravelExpressionProvider;
 use POData\Common\ODataConstants;
 use POData\Providers\Metadata\ResourceType;

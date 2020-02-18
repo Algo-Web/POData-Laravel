@@ -1,8 +1,9 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Providers;
+namespace Tests\AlgoWeb\PODataLaravel\Providers;
 
-use AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
+use AlgoWeb\PODataLaravel\Providers\MetadataRouteProvider;
+use Tests\AlgoWeb\PODataLaravel\Models\TestCase as TestCase;
 use Illuminate\Config\Repository;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;

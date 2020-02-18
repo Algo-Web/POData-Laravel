@@ -1,17 +1,17 @@
 <?php
 
-namespace AlgoWeb\PODataLaravel\Controllers;
+namespace Tests\AlgoWeb\PODataLaravel\Controllers;
 
-use AlgoWeb\PODataLaravel\Models\TestBulkCreateRequest;
-use AlgoWeb\PODataLaravel\Models\TestBulkUpdateRequest;
-use AlgoWeb\PODataLaravel\Models\TestModel;
-use AlgoWeb\PODataLaravel\Requests\TestRequest;
+use Tests\AlgoWeb\PODataLaravel\Models\TestBulkCreateRequest;
+use Tests\AlgoWeb\PODataLaravel\Models\TestBulkUpdateRequest;
+use Tests\AlgoWeb\PODataLaravel\Models\TestModel;
+use Tests\AlgoWeb\PODataLaravel\Requests\TestRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class TestController extends \Illuminate\Routing\Controller
 {
-    use MetadataControllerTrait;
+    use \AlgoWeb\PODataLaravel\Controllers\MetadataControllerTrait;
 
     public function __construct()
     {
@@ -57,7 +57,7 @@ class TestController extends \Illuminate\Routing\Controller
             if ($isSuccess) {
                 return response()->json(['status' => 'success', 'id' => 1, 'errors' => null]);
             }
-            $error = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] 0';
+            $error = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] 0';
             $errors = new \Illuminate\Support\MessageBag([$error]);
             return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
         }
@@ -85,7 +85,7 @@ class TestController extends \Illuminate\Routing\Controller
                 return response()->json(['status' => 'success', 'id' => $idList, 'errors' => null]);
             }
 
-            $error = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] 0';
+            $error = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] 0';
             $errors = new \Illuminate\Support\MessageBag([$error]);
             return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
         }
@@ -106,7 +106,7 @@ class TestController extends \Illuminate\Routing\Controller
         if ($isSuccess) {
             return response()->json(['status' => 'success', 'id' => $id, 'errors' => null]);
         }
-        $error = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
+        $error = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
         $errors = new \Illuminate\Support\MessageBag([$error]);
         return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
     }
@@ -132,7 +132,7 @@ class TestController extends \Illuminate\Routing\Controller
             if ($isSuccess) {
                 return response()->json(['status' => 'success', 'id' => $id, 'errors' => null]);
             }
-            $err = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
+            $err = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
             $errors = new \Illuminate\Support\MessageBag([$err]);
             return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
         }
@@ -166,7 +166,7 @@ class TestController extends \Illuminate\Routing\Controller
                 return response()->json(['status' => 'success', 'id' => $idList, 'errors' => null]);
             }
 
-            $error = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] 0';
+            $error = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] 0';
             $errors = new \Illuminate\Support\MessageBag([$error]);
             return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
         }
@@ -187,7 +187,7 @@ class TestController extends \Illuminate\Routing\Controller
         if ($isSuccess) {
             return response()->json(['status' => 'success', 'id' => $id, 'errors' => null]);
         }
-        $error = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
+        $error = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
         $errors = new \Illuminate\Support\MessageBag([$error]);
         return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
     }
