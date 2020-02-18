@@ -53,7 +53,6 @@ class IronicSerialiser implements IObjectSerialiser
     use SerialiseNavigationTrait;
     use SerialiseLowLevelWritersTrait;
     use SerialiseNextPageLinksTrait;
-    use SerialiseUtilitiesTrait;
 
     /**
      * Update time to insert into ODataEntry/ODataFeed fields.
@@ -100,7 +99,7 @@ class IronicSerialiser implements IObjectSerialiser
             array_pop($this->lightStack);
             return null;
         }
-        $this->checkSingleElementInput($entryObject);
+        SerialiserUtilities::checkSingleElementInput($entryObject);
 
         $this->loadStackIfEmpty();
         $baseURI = $this->isBaseWritten ? null : $this->absoluteServiceUriWithSlash;
@@ -115,7 +114,11 @@ class IronicSerialiser implements IObjectSerialiser
         $resourceType = $this->getService()->getProvidersWrapper()->resolveResourceType($topOfStack['type']);
 
         // need gubbinz to unpack an abstract resource type
-        $resourceType = $this->getConcreteTypeFromAbstractType($resourceType, $this->getMetadata(), $payloadClass);
+        $resourceType = SerialiserUtilities::getConcreteTypeFromAbstractType(
+            $resourceType,
+            $this->getMetadata(),
+            $payloadClass
+        );
 
         // make sure we're barking up right tree
         if (!$resourceType instanceof ResourceEntityType) {
@@ -144,7 +147,7 @@ class IronicSerialiser implements IObjectSerialiser
         $title = $resourceType->getName();
         $type = $resourceType->getFullName();
 
-        $relativeUri = $this->getEntryInstanceKey(
+        $relativeUri = SerialiserUtilities::getEntryInstanceKey(
             $res,
             $resourceType,
             $resourceSet->getName()
@@ -206,7 +209,7 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeTopLevelElements(QueryResult &$entryObjects)
     {
-        $this->checkElementsInput($entryObjects);
+        SerialiserUtilities::checkElementsInput($entryObjects);
 
         $this->loadStackIfEmpty();
 
@@ -261,7 +264,7 @@ class IronicSerialiser implements IObjectSerialiser
         $res = $entryObject->results;
         if (null !== $res) {
             $currentResourceType = $this->getCurrentResourceSetWrapper()->getResourceType();
-            $relativeUri = $this->getEntryInstanceKey(
+            $relativeUri = SerialiserUtilities::getEntryInstanceKey(
                 $res,
                 $currentResourceType,
                 $this->getCurrentResourceSetWrapper()->getName()

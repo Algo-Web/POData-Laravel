@@ -129,7 +129,7 @@ trait SerialiseLowLevelWritersTrait
             $propName = $prop->getName();
             $internalProperty = new ODataProperty();
             $internalProperty->name = $propName;
-            if (static::isMatchPrimitive($resourceKind)) {
+            if (SerialiserUtilities::isMatchPrimitive($resourceKind)) {
                 $iType = $prop->getInstanceType();
                 if (!$iType instanceof IType) {
                     throw new InvalidOperationException(get_class($iType));

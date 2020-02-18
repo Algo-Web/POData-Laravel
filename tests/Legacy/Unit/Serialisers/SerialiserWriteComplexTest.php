@@ -6,6 +6,7 @@ use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
+use AlgoWeb\PODataLaravel\Serialisers\SerialiserUtilities;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Mockery as m;
@@ -371,8 +372,8 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
 
     public function testMatchPrimitiveHighball()
     {
-        $this->assertFalse(IronicSerialiser::isMatchPrimitive(29));
-        $this->assertTrue(IronicSerialiser::isMatchPrimitive(28));
+        $this->assertFalse(SerialiserUtilities::isMatchPrimitive(29));
+        $this->assertTrue(SerialiserUtilities::isMatchPrimitive(28));
     }
 
     /**

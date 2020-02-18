@@ -26,6 +26,7 @@ use POData\ObjectModel\ODataPropertyContent;
 use POData\ObjectModel\ODataTitle;
 use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
+use POData\Providers\Metadata\IMetadataProvider;
 use POData\Providers\Metadata\ResourceComplexType;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Query\QueryResult;
@@ -1194,9 +1195,16 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $entryObject->results = new TestModel();
 
         $firstType = m::mock(ResourceEntityType::class)->makePartial();
+        $firstType->shouldReceive('isAbstract')->andReturn(true);
         $secondType = m::mock(ResourceComplexType::class)->makePartial();
+        $secondType->shouldReceive('isAbstract')->andReturn(false);
+        $secondType->shouldReceive('getInstanceType->getName')->andReturn(TestModel::class);
+
+        $meta = m::mock(IMetadataProvider::class);
+        $meta->shouldReceive('getDerivedTypes')->andReturn([$secondType]);
 
         $foo = m::mock(IronicSerialiser::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getMetadata')->andReturn($meta);
         $foo->shouldReceive('getService->getProvidersWrapper->resolveResourceType')->andReturn($firstType)->once();
         $foo->shouldReceive('getConcreteTypeFromAbstractType')->andReturn($secondType)->once();
         $foo->shouldReceive('getRequest->getTargetResourceType->getName')->andReturn('TestModel');
@@ -1218,12 +1226,20 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $entryObject->results = new TestModel();
 
         $firstType = m::mock(ResourceEntityType::class)->makePartial();
+        $firstType->shouldReceive('isAbstract')->andReturn(true);
         $secondType = m::mock(ResourceEntityType::class)->makePartial();
-        $secondType->shouldReceive('getInstanceType->getName')->andReturn(TestMonomorphicSource::class);
+        $secondType->shouldReceive('isAbstract')->andReturn(false);
+        $secondType->shouldReceive('getInstanceType->getName')->andReturn(
+            TestModel::class,
+            TestMonomorphicSource::class
+        );
+
+        $meta = m::mock(IMetadataProvider::class);
+        $meta->shouldReceive('getDerivedTypes')->andReturn([$secondType]);
 
         $foo = m::mock(IronicSerialiser::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getMetadata')->andReturn($meta);
         $foo->shouldReceive('getService->getProvidersWrapper->resolveResourceType')->andReturn($firstType)->once();
-        $foo->shouldReceive('getConcreteTypeFromAbstractType')->andReturn($secondType)->once();
         $foo->shouldReceive('getRequest->getTargetResourceType->getName')->andReturn('TestModel');
 
         $expected = 'Object being serialised not instance of expected class, ' .TestMonomorphicSource::class

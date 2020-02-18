@@ -3,6 +3,7 @@
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Serialisers;
 
 use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
+use AlgoWeb\PODataLaravel\Serialisers\SerialiserUtilities;
 use POData\Providers\Metadata\IMetadataProvider;
 use POData\Providers\Metadata\ResourceEntityType;
 
@@ -54,6 +55,6 @@ class IronicSerialiserDummy extends IronicSerialiser
         IMetadataProvider $metadata,
         $payloadClass
     ) {
-        return parent::getConcreteTypeFromAbstractType($resourceType, $metadata, $payloadClass);
+        return SerialiserUtilities::getConcreteTypeFromAbstractType($resourceType, $metadata, $payloadClass);
     }
 }

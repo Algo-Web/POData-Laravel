@@ -18,7 +18,7 @@ use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\Type\IType;
 use POData\Providers\Query\QueryResult;
 
-trait SerialiseUtilitiesTrait
+abstract class SerialiserUtilities
 {
     /**
      * @param  int  $resourceKind
@@ -39,7 +39,7 @@ trait SerialiseUtilitiesTrait
      * @param  QueryResult               $entryObjects
      * @throws InvalidOperationException
      */
-    public function checkElementsInput(QueryResult &$entryObjects)
+    public static function checkElementsInput(QueryResult &$entryObjects)
     {
         $res = $entryObjects->results;
         if (!(is_array($res) || $res instanceof Collection)) {
@@ -57,7 +57,7 @@ trait SerialiseUtilitiesTrait
      * @param  QueryResult               $entryObject
      * @throws InvalidOperationException
      */
-    public function checkSingleElementInput(QueryResult $entryObject)
+    public static function checkSingleElementInput(QueryResult $entryObject)
     {
         if (!$entryObject->results instanceof Model) {
             $res = $entryObject->results;
@@ -75,7 +75,7 @@ trait SerialiseUtilitiesTrait
      * @throws \ReflectionException
      * @return string
      */
-    public function getEntryInstanceKey($entityInstance, ResourceType $resourceType, $containerName)
+    public static function getEntryInstanceKey($entityInstance, ResourceType $resourceType, $containerName)
     {
         $typeName = $resourceType->getName();
         $keyProperties = $resourceType->getKeyProperties();
@@ -115,7 +115,7 @@ trait SerialiseUtilitiesTrait
      * @throws \ReflectionException
      * @return ResourceEntityType|ResourceType
      */
-    public function getConcreteTypeFromAbstractType(
+    public static function getConcreteTypeFromAbstractType(
         ResourceEntityType $resourceType,
         IMetadataProvider $metadata,
         $payloadClass
