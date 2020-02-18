@@ -33,9 +33,9 @@ class TestCase extends BaseTestCase
         $reflec = new \ReflectionClass($app);
         $prop = $reflec->getProperty('namespace');
         $prop->setAccessible(true);
-            $regretionName = explode('\\', get_class($this))[4];
-        $prop->setValue($app, __NAMESPACE__ . '\\' . $regretionName);
-        $app['config']->set('testRegressionName', $regretionName);
+        $regressionName = explode('\\', get_class($this))[4];
+        $prop->setValue($app, __NAMESPACE__ . '\\' . $regressionName);
+        $app['config']->set('testRegressionName', $regressionName);
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [

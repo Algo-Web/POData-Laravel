@@ -3,7 +3,6 @@
 
 namespace Tests\Regression\AlgoWeb\PODataLaravel;
 
-
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 class TestServiceProvider extends BaseServiceProvider
@@ -14,6 +13,9 @@ class TestServiceProvider extends BaseServiceProvider
     {
     }
 
+    /**
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
     public function boot()
     {
         $this->loadMigrationsFrom(
@@ -21,6 +23,10 @@ class TestServiceProvider extends BaseServiceProvider
         );
     }
 
+    /**
+     * @param array|string $path
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
     protected function loadMigrationsFrom($path)
     {
         $migrator = $this->app->make('migrator');
