@@ -33,15 +33,16 @@ trait SerialiseLowLevelWritersTrait
     protected $complexTypeInstanceCollection;
 
     /**
-     * @param $entryObject
+     * @param Model $entryObject
+     * @param ModelSerialiser $modelSerialiser
      * @param $nonRelProp
-     * @throws InvalidOperationException
      * @return ODataPropertyContent
+     * @throws InvalidOperationException
      */
-    protected function writePrimitiveProperties(Model $entryObject, $nonRelProp)
+    protected function writePrimitiveProperties(Model $entryObject, ModelSerialiser $modelSerialiser, $nonRelProp)
     {
         $propertyContent = new ODataPropertyContent();
-        $cereal = $this->getModelSerialiser()->bulkSerialise($entryObject);
+        $cereal = $modelSerialiser->bulkSerialise($entryObject);
         $cereal = array_intersect_key($cereal, $nonRelProp);
 
         foreach ($cereal as $corn => $flake) {
@@ -190,9 +191,4 @@ trait SerialiseLowLevelWritersTrait
 
         return $stringValue;
     }
-
-    /**
-     * @return ModelSerialiser
-     */
-    abstract public function getModelSerialiser();
 }
