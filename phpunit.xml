@@ -15,7 +15,7 @@
         <testsuite name="Application Test Suite">
             <directory suffix="Test.php">./tests/Legacy</directory>
             <directory suffix="Test.php">./tests/Regression</directory>
-            <directory suffix="Test.php">./testsorchestra</directory>
+            <directory suffix="Test.php">./tests/Orchestra</directory>
         </testsuite>
     </testsuites>
     <filter>
