@@ -28,7 +28,8 @@
   "autoload-dev": {
     "psr-4": {
       "AlgoWeb\\PODataLaravel\\Orchestra\\Tests\\": "testsorchestra/",
-      "Tests\\Legacy\\AlgoWeb\\PODataLaravel\\": "tests/Legacy/"
+      "Tests\\Legacy\\AlgoWeb\\PODataLaravel\\": "tests/Legacy/",
+      "Tests\\Regression\\AlgoWeb\\PODataLaravel\\": "tests/Regression/"
     }
   },
     "minimum-stability": "dev"
