@@ -48,6 +48,5 @@ class RelationTestDummyModel extends Model
     public function bigReset()
     {
         $this->reset();
-        $this->resetKeyMethod();
     }
 }

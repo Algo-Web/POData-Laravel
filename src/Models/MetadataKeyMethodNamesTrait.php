@@ -147,10 +147,4 @@ trait MetadataKeyMethodNamesTrait
 
         return $methods;
     }
-
-    protected function resetKeyMethod()
-    {
-        static::$methodPrimary = [];
-        static::$methodAlternate = [];
-    }
 }
