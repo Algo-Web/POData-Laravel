@@ -350,7 +350,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         $sourceEntityInstance,
         bool $nullFilter,
         array $rawLoad = [],
-        int $top = 0,
+        int $top = PHP_INT_MAX,
         int $skip = 0,
         callable $isvalid = null
     ) {
@@ -369,7 +369,7 @@ class LaravelReadQuery extends LaravelBaseQuery
             }
             $resultSet = new Collection([]);
             $rawCount = 0;
-            $rawTop = null === $top ? $bulkSetCount : $top;
+            $rawTop = min($top, $bulkSetCount);
 
             // loop thru, chunk by chunk, to reduce chances of exhausting memory
             $sourceEntityInstance->chunk(
