@@ -90,7 +90,7 @@ trait SerialiseNavigationTrait
      * @throws InvalidOperationException
      * @return bool                      True if the given navigation should be expanded, otherwise false
      */
-    protected function shouldExpandSegment($navigationPropertyName)
+    protected function shouldExpandSegment(string $navigationPropertyName)
     {
         $expandedProjectionNode = $this->getCurrentExpandedProjectionNode();
         if (null === $expandedProjectionNode) {

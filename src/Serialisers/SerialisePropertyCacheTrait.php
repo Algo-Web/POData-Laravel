@@ -19,7 +19,7 @@ trait SerialisePropertyCacheTrait
      * @throws \ReflectionException
      * @return void
      */
-    protected function checkRelationPropertiesCached($targClass, ResourceEntityType $resourceType)
+    protected function checkRelationPropertiesCached(string $targClass, ResourceEntityType $resourceType)
     {
         if (!array_key_exists($targClass, $this->propertiesCache)) {
             $rawProp = $resourceType->getAllProperties();
