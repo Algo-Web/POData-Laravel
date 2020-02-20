@@ -85,8 +85,12 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @throws \Exception
      * @return Model|null
      */
-    protected function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $data, $verb, Model $source = null)
-    {
+    protected function createUpdateCoreWrapper(
+        ResourceSet $sourceResourceSet,
+        array $data,
+        string $verb,
+        Model $source = null
+    ) {
         $lastWord = 'update' == $verb ? 'updated' : 'created';
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
         if (!$this->getAuth()->canAuth($this->getVerbMap()[$verb], $class, $source)) {
