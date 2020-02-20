@@ -16,8 +16,6 @@ use POData\Common\InvalidOperationException;
 
 trait MetadataKeyMethodNamesTrait
 {
-    protected static $methodPrimary = [];
-
     /**
      * @param  Relation                  $foo
      * @throws InvalidOperationException
@@ -59,28 +57,20 @@ trait MetadataKeyMethodNamesTrait
         $fkMethodName = null;
         $rkMethodName = null;
 
-        if (array_key_exists(get_class($foo), static::$methodPrimary)) {
-            $line = static::$methodPrimary[get_class($foo)];
-            $fkMethodName = $line['fk'];
-            $rkMethodName = $line['rk'];
-        } else {
-            $methodList = $this->getRelationClassMethods($foo);
-            $fkMethodName = 'getQualifiedForeignPivotKeyName';
-            $fkIntersect = array_values(array_intersect($fkList, $methodList));
-            $fkMethodName = (0 < count($fkIntersect)) ? $fkIntersect[0] : $fkMethodName;
-            if (!(in_array($fkMethodName, $methodList))) {
-                $msg = 'Selected method, ' . $fkMethodName . ', not in method list';
-                throw new InvalidOperationException($msg);
-            }
-            $rkMethodName = 'getQualifiedRelatedPivotKeyName';
-            $rkIntersect = array_values(array_intersect($rkList, $methodList));
-            $rkMethodName = (0 < count($rkIntersect)) ? $rkIntersect[0] : $rkMethodName;
-            if (!(in_array($rkMethodName, $methodList))) {
-                $msg = 'Selected method, ' . $rkMethodName . ', not in method list';
-                throw new InvalidOperationException($msg);
-            }
-            $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
-            static::$methodPrimary[get_class($foo)] = $line;
+        $methodList = $this->getRelationClassMethods($foo);
+        $fkMethodName = 'getQualifiedForeignPivotKeyName';
+        $fkIntersect = array_values(array_intersect($fkList, $methodList));
+        $fkMethodName = (0 < count($fkIntersect)) ? $fkIntersect[0] : $fkMethodName;
+        if (!(in_array($fkMethodName, $methodList))) {
+            $msg = 'Selected method, ' . $fkMethodName . ', not in method list';
+            throw new InvalidOperationException($msg);
+        }
+        $rkMethodName = 'getQualifiedRelatedPivotKeyName';
+        $rkIntersect = array_values(array_intersect($rkList, $methodList));
+        $rkMethodName = (0 < count($rkIntersect)) ? $rkIntersect[0] : $rkMethodName;
+        if (!(in_array($rkMethodName, $methodList))) {
+            $msg = 'Selected method, ' . $rkMethodName . ', not in method list';
+            throw new InvalidOperationException($msg);
         }
         return [$fkMethodName, $rkMethodName];
     }
