@@ -16,7 +16,6 @@ use POData\Common\InvalidOperationException;
 
 trait MetadataKeyMethodNamesTrait
 {
-    protected static $methodAlternate = [];
     protected static $methodPrimary = [];
 
     /**
@@ -105,27 +104,19 @@ trait MetadataKeyMethodNamesTrait
         $fkMethodName = null;
         $rkMethodName = null;
 
-        if (array_key_exists(get_class($foo), static::$methodAlternate)) {
-            $line = static::$methodAlternate[get_class($foo)];
-            $fkMethodName = $line['fk'];
-            $rkMethodName = $line['rk'];
-        } else {
-            $methodList = $this->getRelationClassMethods($foo);
-            $fkCombo = array_values(array_intersect($fkList, $methodList));
-            if (!(1 <= count($fkCombo))) {
-                $msg = 'Expected at least 1 element in foreign-key list, got ' . count($fkCombo);
-                throw new InvalidOperationException($msg);
-            }
-            $fkMethodName = $fkCombo[0];
-            $rkCombo = array_values(array_intersect($rkList, $methodList));
-            if (!(1 <= count($rkCombo))) {
-                $msg = 'Expected at least 1 element in related-key list, got ' . count($rkCombo);
-                throw new InvalidOperationException($msg);
-            }
-            $rkMethodName = $rkCombo[0];
-            $line = ['fk' => $fkMethodName, 'rk' => $rkMethodName];
-            static::$methodAlternate[get_class($foo)] = $line;
+        $methodList = $this->getRelationClassMethods($foo);
+        $fkCombo = array_values(array_intersect($fkList, $methodList));
+        if (!(1 <= count($fkCombo))) {
+            $msg = 'Expected at least 1 element in foreign-key list, got ' . count($fkCombo);
+            throw new InvalidOperationException($msg);
         }
+        $fkMethodName = $fkCombo[0];
+        $rkCombo = array_values(array_intersect($rkList, $methodList));
+        if (!(1 <= count($rkCombo))) {
+            $msg = 'Expected at least 1 element in related-key list, got ' . count($rkCombo);
+            throw new InvalidOperationException($msg);
+        }
+        $rkMethodName = $rkCombo[0];
         return [$fkMethodName, $rkMethodName];
     }
 
