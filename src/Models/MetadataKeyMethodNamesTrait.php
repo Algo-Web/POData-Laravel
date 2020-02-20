@@ -156,15 +156,4 @@ trait MetadataKeyMethodNamesTrait
 
         return $methods;
     }
-
-    /**
-     * @param  Relation $rel
-     * @return array
-     */
-    protected function getRelationClassMethods(Relation $rel)
-    {
-        $methods = get_class_methods($rel);
-
-        return $methods;
-    }
 }

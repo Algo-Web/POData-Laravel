@@ -16,7 +16,6 @@ class RelationTestDummyModel extends Model
     use MetadataTrait {
         MetadataTrait::polyglotKeyMethodNames as parentPolyglot;
         MetadataTrait::polyglotKeyMethodBackupNames as parentPolyglotBackup;
-        MetadataTrait::getRelationClassMethods as relateMethods;
     }
 
     protected $relMethods = [];
@@ -48,5 +47,17 @@ class RelationTestDummyModel extends Model
     public function bigReset()
     {
         $this->reset();
+    }
+
+
+    /**
+     * @param  Relation $rel
+     * @return array
+     */
+    protected function relateMethods(Relation $rel)
+    {
+        $methods = get_class_methods($rel);
+
+        return $methods;
     }
 }
