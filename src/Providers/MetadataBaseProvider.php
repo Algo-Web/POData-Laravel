@@ -18,12 +18,12 @@ abstract class MetadataBaseProvider extends ServiceProvider
     }
 
     /**
-     * @param $isCaching
-     * @param $hasCache
-     * @param $key
+     * @param bool $isCaching
+     * @param bool|null $hasCache
+     * @param string $key
      * @param $meta
      */
-    protected function handlePostBoot($isCaching, $hasCache, $key, $meta)
+    protected function handlePostBoot(bool $isCaching, $hasCache, string $key, $meta)
     {
         if (!$isCaching) {
             Cache::forget($key);
