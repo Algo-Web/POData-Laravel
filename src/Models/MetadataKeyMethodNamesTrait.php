@@ -94,19 +94,28 @@ trait MetadataKeyMethodNamesTrait
         $fkMethodName = null;
         $rkMethodName = null;
 
-        $methodList = $this->getRelationClassMethods($foo);
-        $fkCombo = array_values(array_intersect($fkList, $methodList));
-        if (!(1 <= count($fkCombo))) {
-            $msg = 'Expected at least 1 element in foreign-key list, got ' . count($fkCombo);
+        foreach ($fkList as $methodName) {
+            if (method_exists($foo, $methodName)) {
+                $fkMethodName = $methodName;
+                break;
+            }
+        }
+
+        if (null === $fkMethodName) {
+            $msg = 'Expected at least 1 element in foreign-key list, got 0';
             throw new InvalidOperationException($msg);
         }
-        $fkMethodName = $fkCombo[0];
-        $rkCombo = array_values(array_intersect($rkList, $methodList));
-        if (!(1 <= count($rkCombo))) {
-            $msg = 'Expected at least 1 element in related-key list, got ' . count($rkCombo);
+
+        foreach ($rkList as $methodName) {
+            if (method_exists($foo, $methodName)) {
+                $rkMethodName = $methodName;
+                break;
+            }
+        }
+        if (null === $rkMethodName) {
+            $msg = 'Expected at least 1 element in related-key list, got 0';
             throw new InvalidOperationException($msg);
         }
-        $rkMethodName = $rkCombo[0];
         return [$fkMethodName, $rkMethodName];
     }
 
