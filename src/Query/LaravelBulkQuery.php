@@ -137,13 +137,13 @@ class LaravelBulkQuery
      * Prepare bulk request from supplied data.  If $keyDescriptors is not null, its elements are assumed to
      * correspond 1-1 to those in $data.
      *
-     * @param $paramList
+     * @param  array                     $paramList
      * @param  array                     $data
      * @param  KeyDescriptor[]|null      $keyDescriptors
      * @throws InvalidOperationException
      * @return array
      */
-    protected function prepareBulkRequestInput($paramList, array $data, array $keyDescriptors = null)
+    protected function prepareBulkRequestInput(array $paramList, array $data, array $keyDescriptors = null)
     {
         $parms = [];
         $isCreate = null === $keyDescriptors;
@@ -184,8 +184,8 @@ class LaravelBulkQuery
     /**
      * @param ResourceSet $sourceResourceSet
      * @param array       $data
-     * @param $mapping
-     * @param $pastVerb
+     * @param array       $mapping
+     * @param string      $pastVerb
      * @param  KeyDescriptor[]|null      $keyDescriptor
      * @throws ODataException
      * @throws \ReflectionException
@@ -195,8 +195,8 @@ class LaravelBulkQuery
     protected function processBulkCustom(
         ResourceSet $sourceResourceSet,
         array $data,
-        $mapping,
-        $pastVerb,
+        array $mapping,
+        string $pastVerb,
         array $keyDescriptor = null
     ) {
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
@@ -233,7 +233,7 @@ class LaravelBulkQuery
      * @throws \ReflectionException
      * @return array|null
      */
-    protected function getOptionalVerbMapping(ResourceSet $sourceResourceSet, $verbName)
+    protected function getOptionalVerbMapping(ResourceSet $sourceResourceSet, string $verbName)
     {
         // dig up target class name
         $type = $sourceResourceSet->getResourceType()->getInstanceType();

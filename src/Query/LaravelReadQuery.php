@@ -76,7 +76,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         $result->results = null;
         $result->count   = null;
 
-        $sourceEntityInstance = $this->buildOrderBy($orderBy, $sourceEntityInstance, $tableName);
+        $sourceEntityInstance = $this->buildOrderBy($sourceEntityInstance, $tableName, $orderBy);
 
         // throttle up for trench run
         if (null != $skipToken) {
@@ -102,12 +102,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         }
 
         list($bulkSetCount, $resultSet, $resultCount, $skip) = $this->applyFiltering(
-            $top,
-            $skip,
-            $sourceEntityInstance,
-            $nullFilter,
-            $rawLoad,
-            $isvalid
+            $sourceEntityInstance, $nullFilter, $rawLoad, $top, $skip, $isvalid
         );
 
         if (isset($top)) {
@@ -342,21 +337,21 @@ class LaravelReadQuery extends LaravelBaseQuery
     }
 
     /**
-     * @param $top
-     * @param $skip
      * @param Model|Builder $sourceEntityInstance
-     * @param $nullFilter
-     * @param $rawLoad
-     * @param  callable|null             $isvalid
-     * @throws InvalidOperationException
+     * @param bool $nullFilter
+     * @param array $rawLoad
+     * @param int $top
+     * @param int $skip
+     * @param  callable|null $isvalid
      * @return array
+     * @throws InvalidOperationException
      */
     protected function applyFiltering(
-        $top,
-        $skip,
         $sourceEntityInstance,
-        $nullFilter,
-        $rawLoad,
+        bool $nullFilter,
+        array $rawLoad = [],
+        int $top = PHP_INT_MAX,
+        int $skip = 0,
         callable $isvalid = null
     ) {
         $bulkSetCount = $sourceEntityInstance->count();
@@ -374,7 +369,7 @@ class LaravelReadQuery extends LaravelBaseQuery
             }
             $resultSet = new Collection([]);
             $rawCount = 0;
-            $rawTop = null === $top ? $bulkSetCount : $top;
+            $rawTop = min($top, $bulkSetCount);
 
             // loop thru, chunk by chunk, to reduce chances of exhausting memory
             $sourceEntityInstance->chunk(
@@ -404,20 +399,18 @@ class LaravelReadQuery extends LaravelBaseQuery
             $resultSet = $resultSet->filter($isvalid);
             $resultCount = $resultSet->count();
 
-            if (isset($skip)) {
-                $resultSet = $resultSet->slice($skip);
-            }
+            $resultSet = $resultSet->slice($skip);
         }
         return [$bulkSetCount, $resultSet, $resultCount, $skip];
     }
 
     /**
-     * @param $orderBy
      * @param $sourceEntityInstance
-     * @param $tableName
+     * @param string $tableName
+     * @param InternalOrderByInfo|null $orderBy
      * @return mixed
      */
-    protected function buildOrderBy($orderBy, $sourceEntityInstance, $tableName)
+    protected function buildOrderBy($sourceEntityInstance, string $tableName, InternalOrderByInfo $orderBy = null)
     {
         if (null != $orderBy) {
             foreach ($orderBy->getOrderByInfo()->getOrderByPathSegments() as $order) {
@@ -436,19 +429,19 @@ class LaravelReadQuery extends LaravelBaseQuery
 
     /**
      * @param QueryType $queryType
-     * @param $skip
+     * @param int $skip
      * @param QueryResult $result
      * @param $resultSet
-     * @param $resultCount
-     * @param $bulkSetCount
+     * @param int $resultCount
+     * @param int $bulkSetCount
      */
     protected function packageResourceSetResults(
         QueryType $queryType,
-        $skip,
+        int $skip,
         QueryResult $result,
         $resultSet,
-        $resultCount,
-        $bulkSetCount
+        int $resultCount,
+        int $bulkSetCount
     ) {
         $qVal = $queryType;
         if (QueryType::ENTITIES() == $qVal || QueryType::ENTITIES_WITH_COUNT() == $qVal) {

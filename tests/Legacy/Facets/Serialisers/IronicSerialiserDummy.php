@@ -16,7 +16,7 @@ class IronicSerialiserDummy extends IronicSerialiser
         return parent::getCurrentExpandedProjectionNode();
     }
 
-    public function shouldExpandSegment($navigationPropertyName)
+    public function shouldExpandSegment(string $navigationPropertyName)
     {
         if (array_key_exists($navigationPropertyName, $this->expand)) {
             return $this->expand[$navigationPropertyName];
@@ -30,7 +30,7 @@ class IronicSerialiserDummy extends IronicSerialiser
         return parent::getProjectionNodes();
     }
 
-    public function needNextPageLink($resultSetCount)
+    public function needNextPageLink(int $resultSetCount)
     {
         return parent::needNextPageLink($resultSetCount);
     }

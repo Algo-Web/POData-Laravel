@@ -184,7 +184,7 @@ trait SerialiseDepWrapperTrait
     /**
      * @param int $newCount
      */
-    protected function updateLightStack($newCount)
+    protected function updateLightStack(int $newCount)
     {
         $this->lightStack[$newCount - 1]['count']--;
         if (0 == $this->lightStack[$newCount - 1]['count']) {

@@ -139,7 +139,7 @@ trait LaravelReadQueryUtilityTrait
      * @param  string $odataProperty
      * @return string
      */
-    protected function getLaravelRelationName($odataProperty)
+    protected function getLaravelRelationName(string $odataProperty)
     {
         $laravelProperty = $odataProperty;
         $pos = strrpos($laravelProperty, '_');

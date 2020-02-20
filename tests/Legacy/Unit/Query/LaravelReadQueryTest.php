@@ -324,7 +324,7 @@ class LaravelReadQueryTest extends TestCase
         $actual = null;
 
         try {
-            $foo->applyFiltering($top, $skip, $sourceEntityInstance, $nullFilter, $rawLoad, $isValid);
+            $foo->applyFiltering($sourceEntityInstance, $nullFilter, $rawLoad, $top, $skip, $isValid);
         } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }

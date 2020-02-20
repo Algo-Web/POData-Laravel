@@ -319,7 +319,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      *
      * @return string
      */
-    private function prepareBinaryExpression($operator, $left, $right)
+    private function prepareBinaryExpression(string $operator, string $left, string $right)
     {
         return self::OPEN_BRACKET . $left . ' ' . $operator . ' ' . $right . self::CLOSE_BRACKET;
     }
@@ -331,7 +331,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      *
      * @return string
      */
-    private function prepareUnaryExpression($operator, $child)
+    private function prepareUnaryExpression(string $operator, string $child)
     {
         return $operator . self::OPEN_BRACKET . $child . self::CLOSE_BRACKET;
     }

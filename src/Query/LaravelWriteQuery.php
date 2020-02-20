@@ -20,12 +20,12 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 class LaravelWriteQuery extends LaravelBaseQuery
 {
     /**
-     * @param $data
-     * @param $paramList
+     * @param array $data
+     * @param array $paramList
      * @param  Model|null $sourceEntityInstance
      * @return array
      */
-    protected function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance)
+    protected function createUpdateDeleteProcessInput(array $data, array $paramList, Model $sourceEntityInstance)
     {
         $parms = [];
 
@@ -85,8 +85,12 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @throws \Exception
      * @return Model|null
      */
-    protected function createUpdateCoreWrapper(ResourceSet $sourceResourceSet, $data, $verb, Model $source = null)
-    {
+    protected function createUpdateCoreWrapper(
+        ResourceSet $sourceResourceSet,
+        array $data,
+        string $verb,
+        Model $source = null
+    ) {
         $lastWord = 'update' == $verb ? 'updated' : 'created';
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
         if (!$this->getAuth()->canAuth($this->getVerbMap()[$verb], $class, $source)) {
@@ -111,14 +115,14 @@ class LaravelWriteQuery extends LaravelBaseQuery
     /**
      * @param $sourceEntityInstance
      * @param $data
-     * @param $class
+     * @param string $class
      * @param string $verb
      *
      * @throws ODataException
      * @throws InvalidOperationException
      * @return array|mixed
      */
-    protected function createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb)
+    protected function createUpdateDeleteCore($sourceEntityInstance, array $data, string $class, string $verb)
     {
         $raw = $this->getControllerContainer();
         $map = $raw->getMetadata();
@@ -133,18 +137,11 @@ class LaravelWriteQuery extends LaravelBaseQuery
             );
         }
 
-        $arrayData = is_object($data) ? (array)$data : $data;
-        if (!is_array($arrayData)) {
-            throw ODataException::createPreConditionFailedError(
-                'Data not resolvable to key-value array.'
-            );
-        }
-
         $controlClass = $goal['controller'];
         $method = $goal['method'];
         $paramList = $goal['parameters'];
         $controller = App::make($controlClass);
-        $parms = $this->createUpdateDeleteProcessInput($arrayData, $paramList, $sourceEntityInstance);
+        $parms = $this->createUpdateDeleteProcessInput($data, $paramList, $sourceEntityInstance);
         unset($data);
 
         $result = call_user_func_array(array($controller, $method), $parms);
@@ -201,6 +198,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
         $data
     ) {
         $verb = 'create';
+        $data = (array) $data;
         return $this->createUpdateMainWrapper($resourceSet, $sourceEntityInstance, $data, $verb);
     }
 
@@ -224,6 +222,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
         $shouldUpdate = false
     ) {
         $verb = 'update';
+        $data = (array) $data;
         return $this->createUpdateMainWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb);
     }
 
@@ -255,8 +254,12 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @throws ODataException
      * @return Model|null
      */
-    protected function createUpdateMainWrapper(ResourceSet $resourceSet, $sourceEntityInstance, $data, $verb)
-    {
+    protected function createUpdateMainWrapper(
+        ResourceSet $resourceSet,
+        $sourceEntityInstance,
+        array $data,
+        string $verb
+    ) {
         /** @var Model|null $source */
         $source = $this->unpackSourceEntity($sourceEntityInstance);
 

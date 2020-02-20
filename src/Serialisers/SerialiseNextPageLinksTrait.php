@@ -53,7 +53,7 @@ trait SerialiseNextPageLinksTrait
      * @throws InvalidOperationException
      * @return bool                      true if the feed must have a next page link
      */
-    protected function needNextPageLink($resultSetCount)
+    protected function needNextPageLink(int $resultSetCount)
     {
         $currentResourceSet = $this->getCurrentResourceSetWrapper();
         $recursionLevel = count($this->getStack()->getSegmentNames());

@@ -94,11 +94,11 @@ class MetadataControllerProvider extends MetadataBaseProvider
     }
 
     /**
-     * @param $classes
+     * @param array $classes
      * @throws \Exception
      * @return array
      */
-    protected function getCandidateControllers($classes)
+    protected function getCandidateControllers(array $classes)
     {
         $ends = [];
         $startName = $this->getAppNamespace();

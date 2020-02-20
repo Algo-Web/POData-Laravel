@@ -832,6 +832,7 @@ class LaravelQueryTest extends TestCase
         $data->weight = 0;
         $data->code = 'Enigma';
         $data->success = false;
+        $data = (array) $data;
         $shouldUpdate = false;
 
         $foo = new LaravelQuery();
@@ -901,6 +902,7 @@ class LaravelQueryTest extends TestCase
         $data->code = 'Enigma';
         $data->success = false;
         $shouldUpdate = false;
+        $data = (array) $data;
 
         $foo = new LaravelQuery();
         $expected = 'Target model not successfully created';
@@ -932,19 +934,13 @@ class LaravelQueryTest extends TestCase
         $model = new TestModel();
         $model->id = 42;
         $keyDesc = \Mockery::mock(KeyDescriptor::class);
-        $data = new \StdClass;
         $data = 'Wibble';
         $shouldUpdate = false;
 
+        $this->expectException(\Throwable::class);
+
         $foo = new LaravelQuery();
-        $expected = 'Data not resolvable to key-value array.';
-        $actual = null;
-        try {
-            $result = $foo->createResourceForResourceSet($mockResource, $model, $data);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
+        $result = $foo->createResourceForResourceSet($mockResource, $model, $data);
     }
 
     public function testAttemptUpdateBadIdThrowException()
@@ -978,6 +974,7 @@ class LaravelQueryTest extends TestCase
         $data->weight = 0;
         $data->code = 'Enigma';
         $data->success = false;
+        $data = (array) $data;
         $key = m::mock(KeyDescriptor::class);
 
         $foo = new LaravelQuery();
@@ -1458,98 +1455,6 @@ class LaravelQueryTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testHookSingleModelWithBothModelsNull()
-    {
-        $source = m::mock(ResourceSet::class);
-        $target = m::mock(ResourceSet::class);
-        $srcInstance = null;
-        $targInstance = null;
-        $navPropName = 'metadata';
-
-        $hook = m::mock(LaravelHookQuery::class)->makePartial();
-        $foo = m::mock(LaravelQuery::class)->makePartial();
-        $foo->shouldReceive('getModelHook')->andReturn($hook);
-
-        $expected = 'Both input entities must be Eloquent models';
-        $actual = null;
-
-        try {
-            $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
-        } catch (InvalidOperationException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testHookSingleModelWithTargModelNull()
-    {
-        $source = m::mock(ResourceSet::class);
-        $target = m::mock(ResourceSet::class);
-        $srcInstance = m::mock(Model::class);
-        $targInstance = null;
-        $navPropName = 'metadata';
-
-        $hook = m::mock(LaravelHookQuery::class)->makePartial();
-        $foo = m::mock(LaravelQuery::class)->makePartial();
-        $foo->shouldReceive('getModelHook')->andReturn($hook);
-
-        $expected = 'Both input entities must be Eloquent models';
-        $actual = null;
-
-        try {
-            $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
-        } catch (InvalidOperationException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testHookSingleModelWithSourceModelNull()
-    {
-        $source = m::mock(ResourceSet::class);
-        $target = m::mock(ResourceSet::class);
-        $srcInstance = null;
-        $targInstance = m::mock(Model::class);
-        $navPropName = 'metadata';
-
-        $hook = m::mock(LaravelHookQuery::class)->makePartial();
-        $foo = m::mock(LaravelQuery::class)->makePartial();
-        $foo->shouldReceive('getModelHook')->andReturn($hook);
-
-        $expected = 'Both input entities must be Eloquent models';
-        $actual = null;
-
-        try {
-            $foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
-        } catch (InvalidOperationException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testUnhookSingleModelWithBothModelsNull()
-    {
-        $source = m::mock(ResourceSet::class);
-        $target = m::mock(ResourceSet::class);
-        $srcInstance = null;
-        $targInstance = null;
-        $navPropName = 'metadata';
-
-        $hook = m::mock(LaravelHookQuery::class)->makePartial();
-        $foo = m::mock(LaravelQuery::class)->makePartial();
-        $foo->shouldReceive('getModelHook')->andReturn($hook);
-
-        $expected = 'Both input entities must be Eloquent models';
-        $actual = null;
-
-        try {
-            $foo->unhookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName);
-        } catch (InvalidOperationException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
     public function testHookSingleModelWithBadRelation()
     {
         $source = m::mock(ResourceSet::class);
@@ -1719,114 +1624,6 @@ class LaravelQueryTest extends TestCase
         $this->assertTrue($foo->hookSingleModel($source, $srcInstance, $target, $targInstance, $navPropName));
     }
 
-    public function testHookSingleModelBothInputsNotModel()
-    {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-
-        $source = m::mock(ResourceSet::class);
-        $target = m::mock(ResourceSet::class);
-
-        $relInstance = new TestMorphOneSource($meta);
-        $morphOne = m::mock(MorphTo::class)->makePartial();
-        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
-        $morphOne->shouldReceive('associate')->andReturn(null)->never();
-        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
-        $targInstance = new TestMorphOneSource($meta);
-        $navPropName = 'morphTarget';
-
-        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-
-        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getModelHook')->andReturn($hook);
-
-        $expected = 'Both input entities must be Eloquent models';
-        $actual = null;
-
-        try {
-            $foo->hookSingleModel($source, null, $target, null, $navPropName);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testHookSingleModelFirstInputNotModel()
-    {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-
-        $source = m::mock(ResourceSet::class);
-        $target = m::mock(ResourceSet::class);
-
-        $relInstance = new TestMorphOneSource($meta);
-        $morphOne = m::mock(MorphTo::class)->makePartial();
-        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
-        $morphOne->shouldReceive('associate')->andReturn(null)->never();
-        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
-        $targInstance = new TestMorphOneSource($meta);
-        $navPropName = 'morphTarget';
-
-        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-
-        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getModelHook')->andReturn($hook);
-
-        $expected = 'Both input entities must be Eloquent models';
-        $actual = null;
-
-        try {
-            $foo->hookSingleModel($source, null, $target, $targInstance, $navPropName);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testHookSingleModelSecondInputNotModel()
-    {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-
-        $source = m::mock(ResourceSet::class);
-        $target = m::mock(ResourceSet::class);
-
-        $relInstance = new TestMorphOneSource($meta);
-        $morphOne = m::mock(MorphTo::class)->makePartial();
-        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
-        $morphOne->shouldReceive('associate')->andReturn(null)->never();
-        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
-        $targInstance = new TestMorphOneSource($meta);
-        $navPropName = 'morphTarget';
-
-        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-
-        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getModelHook')->andReturn($hook);
-
-        $expected = 'Both input entities must be Eloquent models';
-        $actual = null;
-
-        try {
-            $foo->hookSingleModel($source, $srcInstance, $target, null, $navPropName);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
     public function testUnhookSingleModelFromParentSide()
     {
         $meta = [];
@@ -1933,114 +1730,6 @@ class LaravelQueryTest extends TestCase
         $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $this->assertTrue($foo->unhookSingleModel($source, $srcInstance, $target, $targInstance, 'manySource'));
-    }
-
-    public function testUnhookSingleModelBothInputsNotModel()
-    {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-
-        $source = m::mock(ResourceSet::class);
-        $target = m::mock(ResourceSet::class);
-
-        $relInstance = new TestMorphOneSource($meta);
-        $morphOne = m::mock(MorphTo::class)->makePartial();
-        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
-        $morphOne->shouldReceive('associate')->andReturn(null)->never();
-        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
-        $targInstance = new TestMorphOneSource($meta);
-        $navPropName = 'morphTarget';
-
-        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-
-        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getModelHook')->andReturn($hook);
-
-        $expected = 'Both input entities must be Eloquent models';
-        $actual = null;
-
-        try {
-            $foo->unhookSingleModel($source, null, $target, null, $navPropName);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testUnhookSingleModelFirstInputNotModel()
-    {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-
-        $source = m::mock(ResourceSet::class);
-        $target = m::mock(ResourceSet::class);
-
-        $relInstance = new TestMorphOneSource($meta);
-        $morphOne = m::mock(MorphTo::class)->makePartial();
-        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
-        $morphOne->shouldReceive('associate')->andReturn(null)->never();
-        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
-        $targInstance = new TestMorphOneSource($meta);
-        $navPropName = 'morphTarget';
-
-        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-
-        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getModelHook')->andReturn($hook);
-
-        $expected = 'Both input entities must be Eloquent models';
-        $actual = null;
-
-        try {
-            $foo->unhookSingleModel($source, null, $target, $targInstance, $navPropName);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testUnhookSingleModelSecondInputNotModel()
-    {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-
-        $source = m::mock(ResourceSet::class);
-        $target = m::mock(ResourceSet::class);
-
-        $relInstance = new TestMorphOneSource($meta);
-        $morphOne = m::mock(MorphTo::class)->makePartial();
-        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
-        $morphOne->shouldReceive('associate')->andReturn(null)->never();
-        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
-        $targInstance = new TestMorphOneSource($meta);
-        $navPropName = 'morphTarget';
-
-        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-
-        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getModelHook')->andReturn($hook);
-
-        $expected = 'Both input entities must be Eloquent models';
-        $actual = null;
-
-        try {
-            $foo->unhookSingleModel($source, $srcInstance, $target, null, $navPropName);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
     }
 
     public function testStartTransaction()

@@ -117,12 +117,11 @@ class LaravelHookQuery extends LaravelBaseQuery
      * @throws InvalidOperationException
      * @return Relation
      */
-    protected function isModelHookInputsOk($sourceEntityInstance, $targetEntityInstance, $navPropName)
-    {
-        if (!$sourceEntityInstance instanceof Model || !$targetEntityInstance instanceof Model) {
-            $msg = 'Both input entities must be Eloquent models';
-            throw new InvalidOperationException($msg);
-        }
+    protected function isModelHookInputsOk(
+        Model $sourceEntityInstance,
+        Model $targetEntityInstance,
+        string $navPropName
+    ) {
         $relation = $sourceEntityInstance->$navPropName();
         if (!$relation instanceof Relation) {
             $msg = 'Navigation property must be an Eloquent relation';
