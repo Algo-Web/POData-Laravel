@@ -122,17 +122,12 @@ trait MetadataKeyMethodNamesTrait
      */
     protected function checkMethodNameList(Relation $foo, array $methodList)
     {
-        $rkMethodName = null;
         foreach ($methodList as $methodName) {
             if (method_exists($foo, $methodName)) {
-                $rkMethodName = $methodName;
-                break;
+                return $methodName;
             }
         }
-        if (null === $rkMethodName) {
-            $msg = 'Expected at least 1 element in related-key list, got 0';
-            throw new InvalidOperationException($msg);
-        }
-        return $rkMethodName;
+        $msg = 'Expected at least 1 element in related-key list, got 0';
+        throw new InvalidOperationException($msg);
     }
 }
