@@ -5,7 +5,7 @@ namespace Tests\System\AlgoWeb\PODataLaravel\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class StringModel
+ * Class StringModel.
  */
 class StringModel extends Model
 {

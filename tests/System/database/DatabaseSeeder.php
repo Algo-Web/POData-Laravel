@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
@@ -14,8 +14,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         Model::unguard();
-        foreach (glob(__DIR__ . "/seeds/*.php") as $filename)
-        {
+        foreach (glob(__DIR__ . '/seeds/*.php') as $filename) {
             require_once($filename);
         }
         // $this->call(UserTableSeeder::class);

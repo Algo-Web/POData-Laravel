@@ -6,7 +6,7 @@ class EmployeesTableSeeder extends Seeder
 {
 
     /**
-     * Auto generated seed file
+     * Auto generated seed file.
      *
      * @return void
      */
@@ -14,9 +14,9 @@ class EmployeesTableSeeder extends Seeder
     {
         \DB::table('employees')->delete();
         
-        \DB::table('employees')->insert(array (
+        \DB::table('employees')->insert(array(
             0 =>
-            array (
+            array(
                 'id' => 1,
                 'company' => 'Northwind Traders',
                 'last_name' => 'Freehafer',
@@ -37,7 +37,7 @@ class EmployeesTableSeeder extends Seeder
                 'attachments' => '',
             ),
             1 =>
-            array (
+            array(
                 'id' => 2,
                 'company' => 'Northwind Traders',
                 'last_name' => 'Cencini',
@@ -59,7 +59,7 @@ class EmployeesTableSeeder extends Seeder
                 'attachments' => '',
             ),
             2 =>
-            array (
+            array(
                 'id' => 3,
                 'company' => 'Northwind Traders',
                 'last_name' => 'Kotas',
@@ -80,7 +80,7 @@ class EmployeesTableSeeder extends Seeder
                 'attachments' => '',
             ),
             3 =>
-            array (
+            array(
                 'id' => 4,
                 'company' => 'Northwind Traders',
                 'last_name' => 'Sergienko',
@@ -101,7 +101,7 @@ class EmployeesTableSeeder extends Seeder
                 'attachments' => '',
             ),
             4 =>
-            array (
+            array(
                 'id' => 5,
                 'company' => 'Northwind Traders',
                 'last_name' => 'Thorpe',
@@ -123,7 +123,7 @@ class EmployeesTableSeeder extends Seeder
                 'attachments' => '',
             ),
             5 =>
-            array (
+            array(
                 'id' => 6,
                 'company' => 'Northwind Traders',
                 'last_name' => 'Neipper',
@@ -144,7 +144,7 @@ class EmployeesTableSeeder extends Seeder
                 'attachments' => '',
             ),
             6 =>
-            array (
+            array(
                 'id' => 7,
                 'company' => 'Northwind Traders',
                 'last_name' => 'Zare',
@@ -165,7 +165,7 @@ class EmployeesTableSeeder extends Seeder
                 'attachments' => '',
             ),
             7 =>
-            array (
+            array(
                 'id' => 8,
                 'company' => 'Northwind Traders',
                 'last_name' => 'Giussani',
@@ -186,7 +186,7 @@ class EmployeesTableSeeder extends Seeder
                 'attachments' => '',
             ),
             8 =>
-            array (
+            array(
                 'id' => 9,
                 'company' => 'Northwind Traders',
                 'last_name' => 'Hellung-Larsen',

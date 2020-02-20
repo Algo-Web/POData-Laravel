@@ -3,7 +3,6 @@
 
 namespace Tests\System\AlgoWeb\PODataLaravel;
 
-
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
@@ -64,24 +63,24 @@ class TestCase extends BaseTestCase
     {
         switch ($version) {
             case 1:
-                $version = "1.0;";
+                $version = '1.0;';
                 break;
             case 2:
-                $version = "2.0;";
+                $version = '2.0;';
                 break;
             case 3:
-                $version = "3.0;";
+                $version = '3.0;';
                 break;
             case 4:
-                $this->markTestSkipped("Odata Version 4 not implomented yet");
-                $version = "4.0;";
+                $this->markTestSkipped('Odata Version 4 not implomented yet');
+                $version = '4.0;';
                 break;
             default:
-                $this->fail("Requested a version not between 1 and 4");
+                $this->fail('Requested a version not between 1 and 4');
         }
-        $headers = [ "DataServiceVersion" => $version, "MaxDataServiceVersion" => $version];
-        if($jsonLevel !== null){
-            $headers["HTTP_ACCEPT"] = "application/json;odata=" . $jsonLevel;
+        $headers = [ 'DataServiceVersion' => $version, 'MaxDataServiceVersion' => $version];
+        if ($jsonLevel !== null) {
+            $headers['HTTP_ACCEPT'] = 'application/json;odata=' . $jsonLevel;
         }
         $response = $this->call(
             'GET',
@@ -92,27 +91,27 @@ class TestCase extends BaseTestCase
             $headers
         );
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals($version, $response->headers->get("DataServiceVersion"));
+        $this->assertEquals($version, $response->headers->get('DataServiceVersion'));
         return $response;
     }
     public function getMetadataDocument($version)
     {
         switch ($version) {
             case 1:
-                $version = "1.0;";
+                $version = '1.0;';
                 break;
             case 2:
-                $version = "2.0;";
+                $version = '2.0;';
                 break;
             case 3:
-                $version = "3.0;";
+                $version = '3.0;';
                 break;
             case 4:
-                $this->markTestSkipped("Odata Version 4 not implomented yet");
-                $version = "4.0;";
+                $this->markTestSkipped('Odata Version 4 not implomented yet');
+                $version = '4.0;';
                 break;
             default:
-                $this->fail("Requested a version not between 1 and 4");
+                $this->fail('Requested a version not between 1 and 4');
         }
         $response = $this->call(
             'GET',
@@ -120,10 +119,10 @@ class TestCase extends BaseTestCase
             [],
             [],
             [],
-            [ "DataServiceVersion" => $version, "MaxDataServiceVersion" => $version]
+            [ 'DataServiceVersion' => $version, 'MaxDataServiceVersion' => $version]
         );
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals($version, $response->headers->get("DataServiceVersion"));
+        $this->assertEquals($version, $response->headers->get('DataServiceVersion'));
         return $response;
     }
 }

@@ -5,7 +5,7 @@ namespace Tests\System\AlgoWeb\PODataLaravel\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class Privilege
+ * Class Privilege.
  */
 class Privilege extends Model
 {

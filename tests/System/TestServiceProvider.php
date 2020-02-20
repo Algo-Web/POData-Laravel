@@ -3,7 +3,6 @@
 
 namespace Tests\System\AlgoWeb\PODataLaravel;
 
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
@@ -28,7 +27,7 @@ class TestServiceProvider extends BaseServiceProvider
     }
 
     /**
-     * @param array|string $path
+     * @param  array|string                                               $path
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function loadMigrationsFrom($path)
@@ -40,8 +39,8 @@ class TestServiceProvider extends BaseServiceProvider
         $migrator->run($path);
     }
 
-    protected function seed(){
-
+    protected function seed()
+    {
         Model::unguarded(function () {
             $this->getSeeder()->__invoke();
         });

@@ -7,10 +7,6 @@
  */
 namespace Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Tests\Functional;
 
-use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\Address;
-use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\City;
-use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\Person;
-use Tests\Regression\AlgoWeb\PODataLaravel\TestCase;
 use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\Request;
@@ -20,6 +16,10 @@ use POData\OperationContext\ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext;
 use POData\Providers\Query\QueryResult;
 use POData\SimpleDataService;
+use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\Address;
+use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\City;
+use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\Person;
+use Tests\Regression\AlgoWeb\PODataLaravel\TestCase;
 
 class IronicSerialiserTest extends TestCase
 {

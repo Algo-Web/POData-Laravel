@@ -5,7 +5,7 @@ namespace Tests\System\AlgoWeb\PODataLaravel\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class OrderDetailsStatus
+ * Class OrderDetailsStatus.
  */
 class OrderDetailsStatus extends Model
 {

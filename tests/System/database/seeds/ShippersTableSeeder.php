@@ -6,7 +6,7 @@ class ShippersTableSeeder extends Seeder
 {
 
     /**
-     * Auto generated seed file
+     * Auto generated seed file.
      *
      * @return void
      */

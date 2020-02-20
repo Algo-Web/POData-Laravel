@@ -7,11 +7,11 @@
  */
 namespace Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Tests\Functional;
 
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\Address;
 use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\City;
 use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\Person;
 use Tests\Regression\AlgoWeb\PODataLaravel\TestCase;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class ExpandTest extends TestCase
 {
