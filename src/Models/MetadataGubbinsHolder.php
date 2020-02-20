@@ -168,9 +168,9 @@ class MetadataGubbinsHolder
     }
 
     /**
-     * @param $className
+     * @param string $className
      */
-    protected function checkClassExists($className)
+    protected function checkClassExists(string $className)
     {
         if (!$this->hasClass($className)) {
             $msg = $className . ' does not exist in holder';
