@@ -15,8 +15,6 @@ use POData\Providers\Metadata\Type\StringType;
 
 class SerialiserLowLevelWritersTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testUTF8StringNotMangled()
     {
         $expected = 'Müller';
