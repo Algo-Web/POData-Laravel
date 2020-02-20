@@ -20,12 +20,12 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 class LaravelWriteQuery extends LaravelBaseQuery
 {
     /**
-     * @param $data
-     * @param $paramList
+     * @param array $data
+     * @param array $paramList
      * @param  Model|null $sourceEntityInstance
      * @return array
      */
-    protected function createUpdateDeleteProcessInput($data, $paramList, Model $sourceEntityInstance)
+    protected function createUpdateDeleteProcessInput(array $data, array $paramList, Model $sourceEntityInstance)
     {
         $parms = [];
 
