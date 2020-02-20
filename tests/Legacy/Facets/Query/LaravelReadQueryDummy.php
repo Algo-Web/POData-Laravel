@@ -13,13 +13,13 @@ class LaravelReadQueryDummy extends LaravelReadQuery
     }
 
     public function applyFiltering(
-        $top,
-        $skip,
         $sourceEntityInstance,
-        $nullFilter,
-        $rawLoad,
+        bool $nullFilter,
+        array $rawLoad = [],
+        int $top = 0,
+        int $skip = 0,
         callable $isvalid = null
     ) {
-        return parent::applyFiltering($top, $skip, $sourceEntityInstance, $nullFilter, $rawLoad, $isvalid);
+        return parent::applyFiltering($sourceEntityInstance, $nullFilter, $rawLoad, $top, $skip, $isvalid);
     }
 }

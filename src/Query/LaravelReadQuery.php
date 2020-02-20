@@ -102,12 +102,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         }
 
         list($bulkSetCount, $resultSet, $resultCount, $skip) = $this->applyFiltering(
-            $top,
-            $skip,
-            $sourceEntityInstance,
-            $nullFilter,
-            $rawLoad,
-            $isvalid
+            $sourceEntityInstance, $nullFilter, $rawLoad, $top, $skip, $isvalid
         );
 
         if (isset($top)) {
@@ -342,21 +337,21 @@ class LaravelReadQuery extends LaravelBaseQuery
     }
 
     /**
-     * @param $top
-     * @param $skip
      * @param Model|Builder $sourceEntityInstance
-     * @param $nullFilter
-     * @param $rawLoad
-     * @param  callable|null             $isvalid
-     * @throws InvalidOperationException
+     * @param bool $nullFilter
+     * @param array $rawLoad
+     * @param int $top
+     * @param int $skip
+     * @param  callable|null $isvalid
      * @return array
+     * @throws InvalidOperationException
      */
     protected function applyFiltering(
-        $top,
-        $skip,
         $sourceEntityInstance,
-        $nullFilter,
-        $rawLoad,
+        bool $nullFilter,
+        array $rawLoad = [],
+        int $top = 0,
+        int $skip = 0,
         callable $isvalid = null
     ) {
         $bulkSetCount = $sourceEntityInstance->count();
@@ -404,9 +399,7 @@ class LaravelReadQuery extends LaravelBaseQuery
             $resultSet = $resultSet->filter($isvalid);
             $resultCount = $resultSet->count();
 
-            if (isset($skip)) {
-                $resultSet = $resultSet->slice($skip);
-            }
+            $resultSet = $resultSet->slice($skip);
         }
         return [$bulkSetCount, $resultSet, $resultCount, $skip];
     }
