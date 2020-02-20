@@ -429,19 +429,19 @@ class LaravelReadQuery extends LaravelBaseQuery
 
     /**
      * @param QueryType $queryType
-     * @param $skip
+     * @param int $skip
      * @param QueryResult $result
      * @param $resultSet
-     * @param $resultCount
-     * @param $bulkSetCount
+     * @param int $resultCount
+     * @param int $bulkSetCount
      */
     protected function packageResourceSetResults(
         QueryType $queryType,
-        $skip,
+        int $skip,
         QueryResult $result,
         $resultSet,
-        $resultCount,
-        $bulkSetCount
+        int $resultCount,
+        int $bulkSetCount
     ) {
         $qVal = $queryType;
         if (QueryType::ENTITIES() == $qVal || QueryType::ENTITIES_WITH_COUNT() == $qVal) {
