@@ -84,15 +84,16 @@ trait MetadataKeyMethodNamesTrait
         return [$fkMethodName, $rkMethodName];
     }
 
+    /**
+     * @param HasManyThrough $foo
+     * @return string
+     * @throws InvalidOperationException
+     */
     protected function polyglotThroughKeyMethodNames(HasManyThrough $foo)
     {
         $thruList = ['getThroughKey', 'getQualifiedFirstKeyName'];
 
-        foreach ($thruList as $methodName) {
-            if (method_exists($foo, $methodName)) {
-                return $methodName;
-            }
-        }
+        return $this->checkMethodNameList($foo, $thruList);
     }
 
     /**
@@ -116,7 +117,7 @@ trait MetadataKeyMethodNamesTrait
     /**
      * @param Relation $foo
      * @param array $methodList
-     * @return mixed|null
+     * @return string
      * @throws InvalidOperationException
      */
     protected function checkMethodNameList(Relation $foo, array $methodList)
