@@ -76,7 +76,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         $result->results = null;
         $result->count   = null;
 
-        $sourceEntityInstance = $this->buildOrderBy($orderBy, $sourceEntityInstance, $tableName);
+        $sourceEntityInstance = $this->buildOrderBy($sourceEntityInstance, $tableName, $orderBy);
 
         // throttle up for trench run
         if (null != $skipToken) {
@@ -405,12 +405,12 @@ class LaravelReadQuery extends LaravelBaseQuery
     }
 
     /**
-     * @param $orderBy
      * @param $sourceEntityInstance
-     * @param $tableName
+     * @param string $tableName
+     * @param InternalOrderByInfo|null $orderBy
      * @return mixed
      */
-    protected function buildOrderBy($orderBy, $sourceEntityInstance, $tableName)
+    protected function buildOrderBy($sourceEntityInstance, string $tableName, InternalOrderByInfo $orderBy = null)
     {
         if (null != $orderBy) {
             foreach ($orderBy->getOrderByInfo()->getOrderByPathSegments() as $order) {
