@@ -51,27 +51,36 @@ trait MetadataKeyMethodNamesTrait
             return [null, null];
         }
 
-        $fkList = ['getQualifiedForeignKeyName', 'getForeignKey'];
-        $rkList = ['getQualifiedRelatedKeyName', 'getOtherKey', 'getOwnerKey', 'getQualifiedOwnerKeyName'];
+        $fkList = ['getQualifiedForeignPivotKeyName', 'getQualifiedForeignKeyName', 'getForeignKey'];
+        $rkList = ['getQualifiedRelatedPivotKeyName', 'getQualifiedRelatedKeyName', 'getOtherKey', 'getOwnerKey',
+            'getQualifiedOwnerKeyName'];
 
         $fkMethodName = null;
         $rkMethodName = null;
 
-        $methodList = $this->getRelationClassMethods($foo);
-        $fkMethodName = 'getQualifiedForeignPivotKeyName';
-        $fkIntersect = array_values(array_intersect($fkList, $methodList));
-        $fkMethodName = (0 < count($fkIntersect)) ? $fkIntersect[0] : $fkMethodName;
-        if (!(in_array($fkMethodName, $methodList))) {
-            $msg = 'Selected method, ' . $fkMethodName . ', not in method list';
+        foreach ($fkList as $methodName) {
+            if (method_exists($foo, $methodName)) {
+                $fkMethodName = $methodName;
+                break;
+            }
+        }
+
+        if (null === $fkMethodName) {
+            $msg = 'Expected at least 1 element in foreign-key list, got 0';
             throw new InvalidOperationException($msg);
         }
-        $rkMethodName = 'getQualifiedRelatedPivotKeyName';
-        $rkIntersect = array_values(array_intersect($rkList, $methodList));
-        $rkMethodName = (0 < count($rkIntersect)) ? $rkIntersect[0] : $rkMethodName;
-        if (!(in_array($rkMethodName, $methodList))) {
-            $msg = 'Selected method, ' . $rkMethodName . ', not in method list';
+
+        foreach ($rkList as $methodName) {
+            if (method_exists($foo, $methodName)) {
+                $rkMethodName = $methodName;
+                break;
+            }
+        }
+        if (null === $rkMethodName) {
+            $msg = 'Expected at least 1 element in related-key list, got 0';
             throw new InvalidOperationException($msg);
         }
+
         return [$fkMethodName, $rkMethodName];
     }
 
