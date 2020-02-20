@@ -56,7 +56,6 @@ trait MetadataKeyMethodNamesTrait
             'getQualifiedOwnerKeyName'];
 
         $fkMethodName = null;
-        $rkMethodName = null;
 
         foreach ($fkList as $methodName) {
             if (method_exists($foo, $methodName)) {
@@ -70,16 +69,7 @@ trait MetadataKeyMethodNamesTrait
             throw new InvalidOperationException($msg);
         }
 
-        foreach ($rkList as $methodName) {
-            if (method_exists($foo, $methodName)) {
-                $rkMethodName = $methodName;
-                break;
-            }
-        }
-        if (null === $rkMethodName) {
-            $msg = 'Expected at least 1 element in related-key list, got 0';
-            throw new InvalidOperationException($msg);
-        }
+        $rkMethodName = $this->checkMethodNameList($foo, $rkList);
 
         return [$fkMethodName, $rkMethodName];
     }
@@ -101,7 +91,6 @@ trait MetadataKeyMethodNamesTrait
         $rkList = ['getOtherKey', 'getQualifiedParentKeyName'];
 
         $fkMethodName = null;
-        $rkMethodName = null;
 
         foreach ($fkList as $methodName) {
             if (method_exists($foo, $methodName)) {
@@ -115,16 +104,7 @@ trait MetadataKeyMethodNamesTrait
             throw new InvalidOperationException($msg);
         }
 
-        foreach ($rkList as $methodName) {
-            if (method_exists($foo, $methodName)) {
-                $rkMethodName = $methodName;
-                break;
-            }
-        }
-        if (null === $rkMethodName) {
-            $msg = 'Expected at least 1 element in related-key list, got 0';
-            throw new InvalidOperationException($msg);
-        }
+        $rkMethodName = $this->checkMethodNameList($foo, $rkList);
         return [$fkMethodName, $rkMethodName];
     }
 
@@ -155,5 +135,27 @@ trait MetadataKeyMethodNamesTrait
         $methods = array_filter($methods, $filter);
 
         return $methods;
+    }
+
+    /**
+     * @param Relation $foo
+     * @param array $methodList
+     * @return mixed|null
+     * @throws InvalidOperationException
+     */
+    protected function checkMethodNameList(Relation $foo, array $methodList)
+    {
+        $rkMethodName = null;
+        foreach ($methodList as $methodName) {
+            if (method_exists($foo, $methodName)) {
+                $rkMethodName = $methodName;
+                break;
+            }
+        }
+        if (null === $rkMethodName) {
+            $msg = 'Expected at least 1 element in related-key list, got 0';
+            throw new InvalidOperationException($msg);
+        }
+        return $rkMethodName;
     }
 }
