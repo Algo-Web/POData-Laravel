@@ -937,8 +937,8 @@ class LaravelQueryTest extends TestCase
         $data = 'Wibble';
         $shouldUpdate = false;
 
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('must be of the type array, string given');
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Call to a member function load() on null');
 
         $foo = new LaravelQuery();
         $result = $foo->createResourceForResourceSet($mockResource, $model, $data);

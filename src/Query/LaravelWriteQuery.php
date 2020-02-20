@@ -194,6 +194,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
         $data
     ) {
         $verb = 'create';
+        $data = (array) $data;
         return $this->createUpdateMainWrapper($resourceSet, $sourceEntityInstance, $data, $verb);
     }
 
@@ -217,6 +218,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
         $shouldUpdate = false
     ) {
         $verb = 'update';
+        $data = (array) $data;
         return $this->createUpdateMainWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb);
     }
 
@@ -248,8 +250,12 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @throws ODataException
      * @return Model|null
      */
-    protected function createUpdateMainWrapper(ResourceSet $resourceSet, $sourceEntityInstance, $data, $verb)
-    {
+    protected function createUpdateMainWrapper(
+        ResourceSet $resourceSet,
+        $sourceEntityInstance,
+        array $data,
+        string $verb
+    ) {
         /** @var Model|null $source */
         $source = $this->unpackSourceEntity($sourceEntityInstance);
 
