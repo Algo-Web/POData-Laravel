@@ -132,9 +132,11 @@ trait MetadataKeyMethodNamesTrait
     {
         $thruList = ['getThroughKey', 'getQualifiedFirstKeyName'];
 
-        $methodList = $this->getRelationClassMethods($foo);
-        $thruCombo = array_values(array_intersect($thruList, $methodList));
-        return $thruCombo[0];
+        foreach ($thruList as $methodName) {
+            if (method_exists($foo, $methodName)) {
+                return $methodName;
+            }
+        }
     }
 
     /**
