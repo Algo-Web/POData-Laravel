@@ -151,11 +151,11 @@ trait MetadataControllerTrait
     }
 
     /**
-     * @param $result
+     * @param string $result
      * @throws \ReflectionException
      * @return array
      */
-    protected function getParameterNames($result)
+    protected function getParameterNames(string $result)
     {
         $parmArray = [];
         $reflec = new \ReflectionMethod($this, $result);
@@ -184,7 +184,7 @@ trait MetadataControllerTrait
      *
      * @throws \Exception
      */
-    private function checkCrudVerbDefined($crudVerb)
+    private function checkCrudVerbDefined(string $crudVerb)
     {
         $lowVerb = strtolower($crudVerb);
         if (!in_array($lowVerb, $this->crudVerbs) && !in_array($crudVerb, $this->optionalVerbs)) {
