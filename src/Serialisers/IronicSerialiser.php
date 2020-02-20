@@ -481,9 +481,9 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * @param QueryResult      $entryObject
      * @param ResourceProperty $prop
-     * @param $nuLink
-     * @param $propKind
-     * @param $propName
+     * @param OdataLink $nuLink
+     * @param int $propKind
+     * @param string $propName
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \ReflectionException
@@ -491,9 +491,9 @@ class IronicSerialiser implements IObjectSerialiser
     private function expandNavigationProperty(
         QueryResult $entryObject,
         ResourceProperty $prop,
-        $nuLink,
-        $propKind,
-        $propName
+        ODataLink $nuLink,
+        int $propKind,
+        string $propName
     ) {
         $nextName = $prop->getResourceType()->getName();
         $nuLink->isExpanded = true;
@@ -552,13 +552,13 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * @param QueryResult $entryObject
      * @param array       $relProp
-     * @param $relativeUri
+     * @param string      $relativeUri
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \ReflectionException
      * @return array
      */
-    protected function buildLinksFromRels(QueryResult $entryObject, array $relProp, $relativeUri)
+    protected function buildLinksFromRels(QueryResult $entryObject, array $relProp, string $relativeUri)
     {
         $links = [];
         foreach ($relProp as $prop) {
@@ -598,7 +598,7 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param $res
+     * @param  array|object              $res
      * @param  ODataFeed                 $odata
      * @throws InvalidOperationException
      * @throws ODataException
