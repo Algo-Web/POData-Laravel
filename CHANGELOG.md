@@ -9,6 +9,8 @@ Unreleased
    * PHP 7.0 is no longer officially supported
    * Laravel 5.8 can now be used
    * Laravel 6.x can now be used
+   * Avoid UTF8 encoding strings that are already UTF8 encoded
+     - Thank you to bgoak for finding this and helping to fix it
 
 0.3.5 (2018-07-17)
 ------------------
