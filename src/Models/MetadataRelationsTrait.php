@@ -86,7 +86,7 @@ trait MetadataRelationsTrait
      * @throws \ReflectionException
      * @return array
      */
-    protected function getRelationshipsFromMethods($biDir = false)
+    protected function getRelationshipsFromMethods(bool $biDir = false)
     {
         $biDirVal = intval($biDir);
         $isCached = isset(static::$relationCategories[$biDirVal]) && !empty(static::$relationCategories[$biDirVal]);
@@ -167,11 +167,11 @@ trait MetadataRelationsTrait
     }
 
     /**
-     * @param $rels
-     * @param $hooks
+     * @param array $rels
+     * @param array $hooks
      * @throws InvalidOperationException
      */
-    protected function getRelationshipsHasMany($rels, &$hooks)
+    protected function getRelationshipsHasMany(array $rels, array &$hooks)
     {
         /**
          * @var string   $property
@@ -203,11 +203,11 @@ trait MetadataRelationsTrait
     }
 
     /**
-     * @param $rels
-     * @param $hooks
+     * @param array $rels
+     * @param array $hooks
      * @throws InvalidOperationException
      */
-    protected function getRelationshipsHasOne($rels, &$hooks)
+    protected function getRelationshipsHasOne(array $rels, array &$hooks)
     {
         /**
          * @var string   $property
@@ -237,11 +237,11 @@ trait MetadataRelationsTrait
     }
 
     /**
-     * @param $rels
-     * @param $hooks
+     * @param array $rels
+     * @param array $hooks
      * @throws InvalidOperationException
      */
-    protected function getRelationshipsKnownPolyMorph($rels, &$hooks)
+    protected function getRelationshipsKnownPolyMorph(array $rels, array &$hooks)
     {
         /**
          * @var string   $property
@@ -269,11 +269,11 @@ trait MetadataRelationsTrait
     }
 
     /**
-     * @param $rels
-     * @param $hooks
+     * @param array $rels
+     * @param array $hooks
      * @throws InvalidOperationException
      */
-    protected function getRelationshipsUnknownPolyMorph($rels, &$hooks)
+    protected function getRelationshipsUnknownPolyMorph(array $rels, array &$hooks)
     {
         /**
          * @var string   $property
@@ -310,7 +310,7 @@ trait MetadataRelationsTrait
      * @param mixed|null  $type
      * @param mixed|null  $through
      */
-    protected function addRelationsHook(&$hooks, $first, $property, $last, $mult, $targ, $type = null, $through = null)
+    protected function addRelationsHook(array &$hooks, $first, $property, $last, $mult, $targ, $type = null, $through = null)
     {
         if (!isset($hooks[$first])) {
             $hooks[$first] = [];
