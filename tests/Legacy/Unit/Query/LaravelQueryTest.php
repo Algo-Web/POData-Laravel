@@ -832,6 +832,7 @@ class LaravelQueryTest extends TestCase
         $data->weight = 0;
         $data->code = 'Enigma';
         $data->success = false;
+        $data = (array) $data;
         $shouldUpdate = false;
 
         $foo = new LaravelQuery();
@@ -901,6 +902,7 @@ class LaravelQueryTest extends TestCase
         $data->code = 'Enigma';
         $data->success = false;
         $shouldUpdate = false;
+        $data = (array) $data;
 
         $foo = new LaravelQuery();
         $expected = 'Target model not successfully created';
@@ -932,19 +934,14 @@ class LaravelQueryTest extends TestCase
         $model = new TestModel();
         $model->id = 42;
         $keyDesc = \Mockery::mock(KeyDescriptor::class);
-        $data = new \StdClass;
         $data = 'Wibble';
         $shouldUpdate = false;
 
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('must be of the type array, string given');
+
         $foo = new LaravelQuery();
-        $expected = 'Data not resolvable to key-value array.';
-        $actual = null;
-        try {
-            $result = $foo->createResourceForResourceSet($mockResource, $model, $data);
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
+        $result = $foo->createResourceForResourceSet($mockResource, $model, $data);
     }
 
     public function testAttemptUpdateBadIdThrowException()
@@ -978,6 +975,7 @@ class LaravelQueryTest extends TestCase
         $data->weight = 0;
         $data->code = 'Enigma';
         $data->success = false;
+        $data = (array) $data;
         $key = m::mock(KeyDescriptor::class);
 
         $foo = new LaravelQuery();

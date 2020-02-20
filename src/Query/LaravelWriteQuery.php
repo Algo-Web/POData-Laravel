@@ -111,14 +111,14 @@ class LaravelWriteQuery extends LaravelBaseQuery
     /**
      * @param $sourceEntityInstance
      * @param $data
-     * @param $class
+     * @param string $class
      * @param string $verb
      *
      * @throws ODataException
      * @throws InvalidOperationException
      * @return array|mixed
      */
-    protected function createUpdateDeleteCore($sourceEntityInstance, $data, $class, $verb)
+    protected function createUpdateDeleteCore($sourceEntityInstance, array $data, string $class, string $verb)
     {
         $raw = $this->getControllerContainer();
         $map = $raw->getMetadata();
@@ -133,18 +133,11 @@ class LaravelWriteQuery extends LaravelBaseQuery
             );
         }
 
-        $arrayData = is_object($data) ? (array)$data : $data;
-        if (!is_array($arrayData)) {
-            throw ODataException::createPreConditionFailedError(
-                'Data not resolvable to key-value array.'
-            );
-        }
-
         $controlClass = $goal['controller'];
         $method = $goal['method'];
         $paramList = $goal['parameters'];
         $controller = App::make($controlClass);
-        $parms = $this->createUpdateDeleteProcessInput($arrayData, $paramList, $sourceEntityInstance);
+        $parms = $this->createUpdateDeleteProcessInput($data, $paramList, $sourceEntityInstance);
         unset($data);
 
         $result = call_user_func_array(array($controller, $method), $parms);
