@@ -55,19 +55,7 @@ trait MetadataKeyMethodNamesTrait
         $rkList = ['getQualifiedRelatedPivotKeyName', 'getQualifiedRelatedKeyName', 'getOtherKey', 'getOwnerKey',
             'getQualifiedOwnerKeyName'];
 
-        $fkMethodName = null;
-
-        foreach ($fkList as $methodName) {
-            if (method_exists($foo, $methodName)) {
-                $fkMethodName = $methodName;
-                break;
-            }
-        }
-
-        if (null === $fkMethodName) {
-            $msg = 'Expected at least 1 element in foreign-key list, got 0';
-            throw new InvalidOperationException($msg);
-        }
+        $fkMethodName = $this->checkMethodNameList($foo, $fkList);
 
         $rkMethodName = $this->checkMethodNameList($foo, $rkList);
 
@@ -90,19 +78,7 @@ trait MetadataKeyMethodNamesTrait
         $fkList = ['getForeignKey', 'getForeignKeyName', 'getQualifiedFarKeyName'];
         $rkList = ['getOtherKey', 'getQualifiedParentKeyName'];
 
-        $fkMethodName = null;
-
-        foreach ($fkList as $methodName) {
-            if (method_exists($foo, $methodName)) {
-                $fkMethodName = $methodName;
-                break;
-            }
-        }
-
-        if (null === $fkMethodName) {
-            $msg = 'Expected at least 1 element in foreign-key list, got 0';
-            throw new InvalidOperationException($msg);
-        }
+        $fkMethodName = $this->checkMethodNameList($foo, $fkList);
 
         $rkMethodName = $this->checkMethodNameList($foo, $rkList);
         return [$fkMethodName, $rkMethodName];
