@@ -182,10 +182,10 @@ class LaravelBulkQuery
     }
 
     /**
-     * @param ResourceSet $sourceResourceSet
-     * @param array       $data
-     * @param array       $mapping
-     * @param string      $pastVerb
+     * @param  ResourceSet               $sourceResourceSet
+     * @param  array                     $data
+     * @param  array                     $mapping
+     * @param  string                    $pastVerb
      * @param  KeyDescriptor[]|null      $keyDescriptor
      * @throws ODataException
      * @throws \ReflectionException

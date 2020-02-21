@@ -20,8 +20,8 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 class LaravelWriteQuery extends LaravelBaseQuery
 {
     /**
-     * @param array $data
-     * @param array $paramList
+     * @param  array      $data
+     * @param  array      $paramList
      * @param  Model|null $sourceEntityInstance
      * @return array
      */

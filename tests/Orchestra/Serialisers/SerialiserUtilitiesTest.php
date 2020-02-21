@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 21/02/20
- * Time: 2:15 AM
+ * Time: 2:15 AM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Serialisers;
 
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraTestModel;
@@ -26,7 +25,7 @@ class SerialiserUtilitiesTest extends TestCase
     public function testGetEntryInstanceKeyWhenNoKeyProperties()
     {
         $rType = m::mock(ResourceType::class)->makePartial();
-        $rType->shouldReceive("getName")->andReturn('name');
+        $rType->shouldReceive('getName')->andReturn('name');
         $rType->shouldReceive('getKeyProperties')->andReturn([])->once();
 
         $model = new OrchestraTestModel();
@@ -48,7 +47,7 @@ class SerialiserUtilitiesTest extends TestCase
         $keyProp->shouldReceive('getInstanceType')->andReturnNull();
 
         $rType = m::mock(ResourceType::class)->makePartial();
-        $rType->shouldReceive("getName")->andReturn('name');
+        $rType->shouldReceive('getName')->andReturn('name');
         $rType->shouldReceive('getKeyProperties')->andReturn(['id' => $keyProp])->once();
 
         $model = new OrchestraTestModel();
