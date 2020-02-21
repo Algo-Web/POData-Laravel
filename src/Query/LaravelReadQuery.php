@@ -337,14 +337,14 @@ class LaravelReadQuery extends LaravelBaseQuery
     }
 
     /**
-     * @param Model|Builder $sourceEntityInstance
-     * @param bool $nullFilter
-     * @param array $rawLoad
-     * @param int $top
-     * @param int $skip
-     * @param  callable|null $isvalid
-     * @return array
+     * @param  Model|Builder             $sourceEntityInstance
+     * @param  bool                      $nullFilter
+     * @param  array                     $rawLoad
+     * @param  int                       $top
+     * @param  int                       $skip
+     * @param  callable|null             $isvalid
      * @throws InvalidOperationException
+     * @return array
      */
     protected function applyFiltering(
         $sourceEntityInstance,
@@ -406,8 +406,8 @@ class LaravelReadQuery extends LaravelBaseQuery
 
     /**
      * @param $sourceEntityInstance
-     * @param string $tableName
-     * @param InternalOrderByInfo|null $orderBy
+     * @param  string                   $tableName
+     * @param  InternalOrderByInfo|null $orderBy
      * @return mixed
      */
     protected function buildOrderBy($sourceEntityInstance, string $tableName, InternalOrderByInfo $orderBy = null)
@@ -428,8 +428,8 @@ class LaravelReadQuery extends LaravelBaseQuery
     }
 
     /**
-     * @param QueryType $queryType
-     * @param int $skip
+     * @param QueryType   $queryType
+     * @param int         $skip
      * @param QueryResult $result
      * @param $resultSet
      * @param int $resultCount

@@ -94,7 +94,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
     }
 
     /**
-     * @param array $classes
+     * @param  array      $classes
      * @throws \Exception
      * @return array
      */

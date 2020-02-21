@@ -167,8 +167,8 @@ trait MetadataRelationsTrait
     }
 
     /**
-     * @param array $rels
-     * @param array $hooks
+     * @param  array                     $rels
+     * @param  array                     $hooks
      * @throws InvalidOperationException
      */
     protected function getRelationshipsHasMany(array $rels, array &$hooks)
@@ -203,8 +203,8 @@ trait MetadataRelationsTrait
     }
 
     /**
-     * @param array $rels
-     * @param array $hooks
+     * @param  array                     $rels
+     * @param  array                     $hooks
      * @throws InvalidOperationException
      */
     protected function getRelationshipsHasOne(array $rels, array &$hooks)
@@ -237,8 +237,8 @@ trait MetadataRelationsTrait
     }
 
     /**
-     * @param array $rels
-     * @param array $hooks
+     * @param  array                     $rels
+     * @param  array                     $hooks
      * @throws InvalidOperationException
      */
     protected function getRelationshipsKnownPolyMorph(array $rels, array &$hooks)
@@ -269,8 +269,8 @@ trait MetadataRelationsTrait
     }
 
     /**
-     * @param array $rels
-     * @param array $hooks
+     * @param  array                     $rels
+     * @param  array                     $hooks
      * @throws InvalidOperationException
      */
     protected function getRelationshipsUnknownPolyMorph(array $rels, array &$hooks)

@@ -18,9 +18,9 @@ abstract class MetadataBaseProvider extends ServiceProvider
     }
 
     /**
-     * @param bool $isCaching
+     * @param bool      $isCaching
      * @param bool|null $hasCache
-     * @param string $key
+     * @param string    $key
      * @param $meta
      */
     protected function handlePostBoot(bool $isCaching, $hasCache, string $key, $meta)

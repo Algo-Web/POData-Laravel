@@ -26,11 +26,11 @@ use POData\Providers\Metadata\Type\StringType;
 abstract class SerialiserLowLevelWriters
 {
     /**
-     * @param Model $entryObject
+     * @param Model           $entryObject
      * @param ModelSerialiser $modelSerialiser
      * @param $nonRelProp
-     * @return ODataPropertyContent
      * @throws InvalidOperationException
+     * @return ODataPropertyContent
      */
     public static function writePrimitiveProperties(Model $entryObject, ModelSerialiser $modelSerialiser, $nonRelProp)
     {

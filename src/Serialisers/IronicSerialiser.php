@@ -479,11 +479,11 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param QueryResult      $entryObject
-     * @param ResourceProperty $prop
-     * @param OdataLink $nuLink
-     * @param int $propKind
-     * @param string $propName
+     * @param  QueryResult               $entryObject
+     * @param  ResourceProperty          $prop
+     * @param  OdataLink                 $nuLink
+     * @param  int                       $propKind
+     * @param  string                    $propName
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \ReflectionException
@@ -550,9 +550,9 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param QueryResult $entryObject
-     * @param array       $relProp
-     * @param string      $relativeUri
+     * @param  QueryResult               $entryObject
+     * @param  array                     $relProp
+     * @param  string                    $relativeUri
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \ReflectionException
