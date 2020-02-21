@@ -24,7 +24,7 @@ class TestServiceProvider extends BaseServiceProvider
     }
 
     /**
-     * @param array|string $path
+     * @param  array|string                                               $path
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function loadMigrationsFrom($path)

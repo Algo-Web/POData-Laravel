@@ -151,7 +151,7 @@ trait MetadataControllerTrait
     }
 
     /**
-     * @param string $result
+     * @param  string               $result
      * @throws \ReflectionException
      * @return array
      */

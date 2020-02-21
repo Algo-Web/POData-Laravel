@@ -18,9 +18,9 @@ abstract class MetadataBaseProvider extends ServiceProvider
     }
 
     /**
-     * @param bool $isCaching
+     * @param bool      $isCaching
      * @param bool|null $hasCache
-     * @param string $key
+     * @param string    $key
      * @param $meta
      */
     protected function handlePostBoot(bool $isCaching, $hasCache, string $key, $meta)
@@ -51,7 +51,16 @@ abstract class MetadataBaseProvider extends ServiceProvider
         }
 
         $classes = $autoClass::$classMap;
+        $this->checkClassMap($classes);
         return array_keys($classes);
+    }
+
+    protected function checkClassMap($classMap)
+    {
+        if (!isset($classMap[__CLASS__])) {
+            throw new \Exception(sprintf('%s was not found in autoload class map, this usually indicates you '.
+            'need to dump an opimized autoloader (`composer dump-autoload -o`)', __CLASS__));
+        }
     }
 
     protected function getAppNamespace()

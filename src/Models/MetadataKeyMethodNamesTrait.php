@@ -85,9 +85,9 @@ trait MetadataKeyMethodNamesTrait
     }
 
     /**
-     * @param HasManyThrough $foo
-     * @return string
+     * @param  HasManyThrough            $foo
      * @throws InvalidOperationException
+     * @return string
      */
     protected function polyglotThroughKeyMethodNames(HasManyThrough $foo)
     {
@@ -115,10 +115,10 @@ trait MetadataKeyMethodNamesTrait
     }
 
     /**
-     * @param Relation $foo
-     * @param array $methodList
-     * @return string
+     * @param  Relation                  $foo
+     * @param  array                     $methodList
      * @throws InvalidOperationException
+     * @return string
      */
     protected function checkMethodNameList(Relation $foo, array $methodList)
     {
