@@ -42,7 +42,12 @@ class TestServiceProvider extends BaseServiceProvider
     protected function seed()
     {
         Model::unguarded(function () {
-            $this->getSeeder()->__invoke();
+            $seeder = $this->getSeeder();
+            if (method_exists($seeder, 'run')) {
+                $seeder->run();
+            } else {
+                $seeder->__invoke();
+            }
         });
     }
 
