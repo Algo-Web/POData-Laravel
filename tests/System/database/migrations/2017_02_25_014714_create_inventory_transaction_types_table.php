@@ -15,7 +15,7 @@ class CreateInventoryTransactionTypesTable extends Migration
     public function up()
     {
         Schema::create('inventory_transaction_types', function (Blueprint $table) {
-            $table->integer('id')->primary();
+            $table->integer('id', true);
             $table->string('type_name', 50);
         });
     }

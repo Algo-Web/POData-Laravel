@@ -15,7 +15,7 @@ class CreateOrdersTaxStatusTable extends Migration
     public function up()
     {
         Schema::create('orders_tax_status', function (Blueprint $table) {
-            $table->integer('id')->primary();
+            $table->integer('id', true);
             $table->string('tax_status_name', 50);
         });
     }

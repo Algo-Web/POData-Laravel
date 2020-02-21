@@ -15,7 +15,7 @@ class CreateOrdersStatusTable extends Migration
     public function up()
     {
         Schema::create('orders_status', function (Blueprint $table) {
-            $table->integer('id')->primary();
+            $table->integer('id', true);
             $table->string('status_name', 50);
         });
     }

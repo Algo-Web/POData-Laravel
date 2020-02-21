@@ -15,7 +15,7 @@ class CreatePurchaseOrderStatusTable extends Migration
     public function up()
     {
         Schema::create('purchase_order_status', function (Blueprint $table) {
-            $table->integer('id')->primary();
+            $table->integer('id', true);
             $table->string('status', 50)->nullable();
         });
     }
