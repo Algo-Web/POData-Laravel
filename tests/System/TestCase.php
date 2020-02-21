@@ -7,6 +7,16 @@ use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
+    public static function setUpBeforeClass() : void
+    {
+        putenv('APP_DISABLE_AUTH=true');
+    }
+
+    public static function tearDownAfterClass() : void
+    {
+        putenv('APP_DISABLE_AUTH=false');
+    }
+
     protected function getPackageProviders($app)
     {
         return [
