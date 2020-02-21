@@ -34,7 +34,7 @@ class MetadataKeyMethodNamesTraitTest extends TestCase
         $foo->setRelationClassMethods([$class => []]);
 
         $this->expectException(InvalidOperationException::class);
-        $this->expectExceptionMessage('Selected method, getQualifiedForeignPivotKeyName, not in method list');
+        $this->expectExceptionMessage('Expected at least 1 element in related-key list, got 0');
 
         $foo->polyglotKeyMethodNames($rel, true);
     }
@@ -54,48 +54,8 @@ class MetadataKeyMethodNamesTraitTest extends TestCase
         $foo->setRelationClassMethods([$class => ['getForeignKey']]);
 
         $this->expectException(InvalidOperationException::class);
-        $this->expectExceptionMessage('Selected method, getQualifiedRelatedPivotKeyName, not in method list');
-
-        $foo->polyglotKeyMethodNames($rel, true);
-    }
-
-    /**
-     * @throws InvalidOperationException
-     */
-    public function testPolyglotKeyMethodBackupNamesForeignKeyNameNotFound()
-    {
-        $bar = new Address();
-
-        $rel = $bar->Person();
-        $class = get_class($rel);
-
-        $foo = new RelationTestDummyModel();
-        $foo->bigReset();
-        $foo->setRelationClassMethods([$class => []]);
-
-        $this->expectException(InvalidOperationException::class);
-        $this->expectExceptionMessage('Expected at least 1 element in foreign-key list, got 0');
-
-        $foo->polyglotKeyMethodBackupNames($rel, true);
-    }
-
-    /**
-     * @throws InvalidOperationException
-     */
-    public function testPolyglotKeyMethodBackupNamesRelatedKeyNameNotFound()
-    {
-        $bar = new Address();
-
-        $rel = $bar->Person();
-        $class = get_class($rel);
-
-        $foo = new RelationTestDummyModel();
-        $foo->bigReset();
-        $foo->setRelationClassMethods([$class => ['getForeignKey']]);
-
-        $this->expectException(InvalidOperationException::class);
         $this->expectExceptionMessage('Expected at least 1 element in related-key list, got 0');
 
-        $foo->polyglotKeyMethodBackupNames($rel, true);
+        $foo->polyglotKeyMethodNames($rel, true);
     }
 }
