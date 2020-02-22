@@ -54,6 +54,9 @@ class MetadataTraitTest extends TestCase
         $meta->shouldReceive('addResourceReferenceProperty')->andThrow(new \Exception($msg))->never();
         $meta->shouldReceive('addResourceSetReferenceProperty')->andThrow(new \Exception($msg))->never();
         App::instance('metadata', $meta);
+        // Clear any residual metadata bitz from previous runs
+        $foo = new TestModel();
+        $foo->reset();
     }
 
     /**

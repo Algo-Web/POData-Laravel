@@ -10,6 +10,7 @@
          stopOnFailure="false"
          stopOnError="false"
          verbose="true"
+         executionOrder="random"
 >
     <testsuites>
         <testsuite name="Application Test Suite">
@@ -17,7 +18,6 @@
             <directory suffix="Test.php">./tests/Regression</directory>
             <directory suffix="Test.php">./tests/Orchestra</directory>
             <directory suffix="Test.php">./tests/System</directory>
-
         </testsuite>
     </testsuites>
     <filter>

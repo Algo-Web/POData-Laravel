@@ -64,6 +64,9 @@ class MetadataProviderTest extends TestCase
         $this->object = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $this->object->shouldReceive('getRelationHolder')->andReturn($holder);
         $this->object->reset();
+
+        $foo = new TestModel();
+        $foo->reset();
     }
 
     /**
@@ -124,6 +127,11 @@ class MetadataProviderTest extends TestCase
         $this->assertEquals('wombat', $result);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testBootHasMigrationsShouldBeCached()
     {
         $metaRaw = [];

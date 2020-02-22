@@ -19,6 +19,16 @@ use Tests\Legacy\AlgoWeb\PODataLaravel\TestCase;
 
 class MetadataTraitExtractionTest extends TestCase
 {
+    /**
+     * @throws \Exception
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+        $foo = new TestGetterModel();
+        $foo->reset();
+    }
+
     public function testExtractGubbinsMonomorphicSource()
     {
         $metaRaw = [];
@@ -128,6 +138,9 @@ class MetadataTraitExtractionTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testExcludedGetterIsActuallyExcluded()
     {
         $expected = [];
@@ -167,7 +180,7 @@ class MetadataTraitExtractionTest extends TestCase
         $foo->shouldReceive('getCasts')->passthru();
         $foo->shouldReceive('getConnection')->andReturn($connect);
         // exclude the WeightCode getter from results
-        $foo->shouldReceive('getHidden')->andReturn(['WeightCode']);
+        $foo->shouldReceive('getHidden')->andReturn(['WeightCode', 'weightCode']);
         $foo->weight = 10;
         $foo->name = 'name';
         $foo->added_at = '2017-10-11T00:00:00';
