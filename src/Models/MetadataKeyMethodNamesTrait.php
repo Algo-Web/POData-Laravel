@@ -51,9 +51,8 @@ trait MetadataKeyMethodNamesTrait
             return [null, null];
         }
 
-        $fkList = ['getQualifiedForeignPivotKeyName', 'getQualifiedForeignKeyName', 'getForeignKey'];
-        $rkList = ['getQualifiedRelatedPivotKeyName', 'getQualifiedRelatedKeyName', 'getOtherKey', 'getOwnerKey',
-            'getQualifiedOwnerKeyName'];
+        $fkList = ['getQualifiedForeignPivotKeyName', 'getForeignKey'];
+        $rkList = ['getQualifiedRelatedPivotKeyName', 'getQualifiedOwnerKeyName'];
 
         $fkMethodName = $this->checkMethodNameList($foo, $fkList);
 
