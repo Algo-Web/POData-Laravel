@@ -26,14 +26,17 @@
             "AlgoWeb\\PODataLaravel\\": "src/"
         }
     },
-  "autoload-dev": {
-    "psr-4": {
-      "AlgoWeb\\PODataLaravel\\Orchestra\\Tests\\": "tests/Orchestra/",
-      "Tests\\Legacy\\AlgoWeb\\PODataLaravel\\": "tests/Legacy/",
-      "Tests\\Regression\\AlgoWeb\\PODataLaravel\\": "tests/Regression/",
-      "Tests\\System\\AlgoWeb\\PODataLaravel\\": "tests/System/"
+    "autoload-dev": {
+        "psr-4": {
+            "AlgoWeb\\PODataLaravel\\Orchestra\\Tests\\": "tests/Orchestra/",
+            "Tests\\Legacy\\AlgoWeb\\PODataLaravel\\": "tests/Legacy/",
+            "Tests\\Regression\\AlgoWeb\\PODataLaravel\\": "tests/Regression/",
+            "Tests\\System\\AlgoWeb\\PODataLaravel\\": "tests/System/"
 
-    }
-  },
+        }
+    },
+    "scripts": {
+        "mutate": "vendor/bin/infection --threads=4"
+    },
     "minimum-stability": "dev"
 }
