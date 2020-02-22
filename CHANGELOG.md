@@ -1,5 +1,8 @@
 Unreleased
 ----------
+
+0.3.6 (2020-02-22)
+------------------
    * Fix up test infrastructure - it had rotted somewhat
    * Wring out plain filtering
      - Thank you to bgoak for finding this and helping to fix it

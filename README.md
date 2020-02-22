@@ -10,6 +10,8 @@
 # POData-Laravel
 Composer Package to provide Odata functionality to Laravel
 
+* PHP 5.6 support has been dropped *
+
 To install, run
 ```
 composer require algo-web/podata-laravel
@@ -129,6 +131,3 @@ See CONTRIBUTING.md for the details.
 * [x] $skiptoken
 * [x] $orderby
 * [x] $expand
-
-The capabilities under $filter currently rely on the deprecated-in-PHP-7.2
-create_function capability.
