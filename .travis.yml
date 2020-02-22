@@ -13,7 +13,6 @@ before_script:
   - ls -al bootstrap/
   - ls -al bootstrap/cache
   - composer global require hirak/prestissimo
-  - if [ "$LARAVEL_DEP" == "5.1.*" ]; then composer require phpunit/phpunit "^5.6" --no-update --dev; fi;
   - composer require laravel/framework:${LARAVEL_DEP} --no-update
   - COMPOSER_MEMORY_LIMIT=-1 travis_retry composer install --prefer-dist --no-interaction -o
   - cat composer.lock
@@ -21,7 +20,7 @@ before_script:
 
 script:
   - mkdir -p build/logs
-  - php vendor/bin/paratest -p 3 --coverage-clover build/logs/clover.xml
+  - php vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 
 after_script:
   - php vendor/bin/php-coveralls --exclude-no-stmt
@@ -30,8 +29,8 @@ after_success:
   - coveralls
 
 env: # important!
-  - LARAVEL_DEP=5.1.*
-  - LARAVEL_DEP=">5.1.11|^6.0"
+  - LARAVEL_DEP=5.5.*
+  - LARAVEL_DEP="^5.5|^6.0"
 matrix:
   allow_failures:
   - php: nightly
