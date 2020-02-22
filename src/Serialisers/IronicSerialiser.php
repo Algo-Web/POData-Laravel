@@ -165,7 +165,11 @@ class IronicSerialiser implements IObjectSerialiser
             $mediaLinks
         );
 
-        $propertyContent = SerialiserLowLevelWriters::writePrimitiveProperties($res, $this->getModelSerialiser(), $nonRelProp);
+        $propertyContent = SerialiserLowLevelWriters::writePrimitiveProperties(
+            $res,
+            $this->getModelSerialiser(),
+            $nonRelProp
+        );
 
         $links = $this->buildLinksFromRels($entryObject, $relProp, $relativeUri);
 

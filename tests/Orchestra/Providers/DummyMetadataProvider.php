@@ -14,12 +14,10 @@ class DummyMetadataProvider extends MetadataBaseProvider
 {
     public function register()
     {
-
     }
 
     public function boot()
     {
-
     }
 
     public function handlePostBoot(bool $isCaching, $hasCache, string $key, $meta)
