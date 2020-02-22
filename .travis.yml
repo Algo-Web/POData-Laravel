@@ -8,6 +8,7 @@ php:
   - nightly
   
 before_script:
+  - pecl install pcov
   - mkdir -p bootstrap/cache
   - chmod 777 bootstrap/cache
   - ls -al bootstrap/
