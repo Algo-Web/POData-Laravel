@@ -102,7 +102,12 @@ class LaravelReadQuery extends LaravelBaseQuery
         }
 
         list($bulkSetCount, $resultSet, $resultCount, $skip) = $this->applyFiltering(
-            $sourceEntityInstance, $nullFilter, $rawLoad, $top, $skip, $isvalid
+            $sourceEntityInstance,
+            $nullFilter,
+            $rawLoad,
+            $top,
+            $skip,
+            $isvalid
         );
 
         if (isset($top)) {

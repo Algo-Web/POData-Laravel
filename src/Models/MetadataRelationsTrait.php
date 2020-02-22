@@ -310,8 +310,16 @@ trait MetadataRelationsTrait
      * @param mixed|null  $type
      * @param mixed|null  $through
      */
-    protected function addRelationsHook(array &$hooks, $first, $property, $last, $mult, $targ, $type = null, $through = null)
-    {
+    protected function addRelationsHook(
+        array &$hooks,
+        $first,
+        $property,
+        $last,
+        $mult,
+        $targ,
+        $type = null,
+        $through = null
+    ) {
         if (!isset($hooks[$first])) {
             $hooks[$first] = [];
         }

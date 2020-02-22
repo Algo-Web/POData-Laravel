@@ -364,7 +364,8 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      *
      * @throws InvalidOperationException
      * @throws \ReflectionException
-     * @return object[]                  returns the newly created model if successful, or throws an exception if model creation failed
+     * @return object[]                  returns the newly created model if successful,
+     *                                   or throws an exception if model creation failed
      * @throw  \Exception
      */
     public function createBulkResourceforResourceSet(

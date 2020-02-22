@@ -55,11 +55,16 @@ abstract class MetadataBaseProvider extends ServiceProvider
         return array_keys($classes);
     }
 
+    /**
+     * @param $classMap
+     * @throws \Exception
+     */
     protected function checkClassMap($classMap)
     {
-        if (!isset($classMap[__CLASS__])) {
+        $class = __CLASS__;
+        if (!isset($classMap[$class])) {
             throw new \Exception(sprintf('%s was not found in autoload class map, this usually indicates you '.
-            'need to dump an opimized autoloader (`composer dump-autoload -o`)', __CLASS__));
+            'need to dump an optimised autoloader (`composer dump-autoload -o`)', $class));
         }
     }
 
