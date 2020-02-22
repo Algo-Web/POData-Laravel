@@ -18,7 +18,8 @@
         "php-coveralls/php-coveralls": ">=v2.1",
         "phpunit/phpunit": "^6.0|^7.0|^8.0",
         "orchestra/database": "3.5.*|3.6.*|3.7.*|3.8.*|^4.0",
-        "orchestra/testbench": "3.5.*|3.6.*|3.7.*|3.8.*|^4.0"
+        "orchestra/testbench": "3.5.*|3.6.*|3.7.*|3.8.*|^4.0",
+        "infection/infection": "dev-master"
     },
     "autoload": {
         "psr-4": {
