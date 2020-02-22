@@ -2,6 +2,8 @@ Unreleased
 ----------
    * Minimum PHP version is now 7.1
    * Minimum Laravel version is now 5.5
+   * Laundry list of obsolete deps cleaned up
+   * Travis builds now using pcov instead of xdebug
 
 0.3.6 (2020-02-22)
 ------------------
