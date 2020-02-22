@@ -9,11 +9,13 @@ namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Serialisers;
 
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
+use AlgoWeb\PODataLaravel\Serialisers\SerialiserLowLevelWriters;
 use AlgoWeb\PODataLaravel\Serialisers\SerialiserUtilities;
 use Mockery as m;
 use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceType;
+use POData\Providers\Metadata\Type\StringType;
 
 class SerialiserUtilitiesTest extends TestCase
 {
@@ -56,5 +58,48 @@ class SerialiserUtilitiesTest extends TestCase
         $this->expectExceptionMessage('$keyType not instanceof IType');
 
         SerialiserUtilities::getEntryInstanceKey($model, $rType, 'container');
+    }
+
+    public function testWriteComplexValueBadPropertyType()
+    {
+        $keyProp = m::mock(ResourceProperty::class);
+        $keyProp->shouldReceive('getInstanceType')->andReturn(new \stdClass);
+        $keyProp->shouldReceive('getKind')->andReturn(16);
+        $keyProp->shouldReceive('getName')->andReturn('property');
+
+        $rType = m::mock(ResourceType::class)->makePartial();
+        $rType->shouldReceive('getName')->andReturn('name');
+        $rType->shouldReceive('getAllProperties')->andReturn(['property' => $keyProp])->once();
+
+        $result = new \stdClass();
+        $instanceColl = [];
+
+        $this->expectException(InvalidOperationException::class);
+        $this->expectExceptionMessage('stdClass');
+
+        SerialiserLowLevelWriters::writeComplexValue($rType, $result, 'property', $instanceColl);
+    }
+
+    public function testWriteComplexValueBadResourcePropertyType()
+    {
+        $iType = new StringType();
+
+        $keyProp = m::mock(ResourceProperty::class);
+        $keyProp->shouldReceive('getInstanceType')->andReturn($iType);
+        $keyProp->shouldReceive('getKind')->andReturn(16);
+        $keyProp->shouldReceive('getName')->andReturn('property');
+        $keyProp->shouldReceive('getResourceType->getInstanceType')->andReturn(new \stdClass)->once();
+
+        $rType = m::mock(ResourceType::class)->makePartial();
+        $rType->shouldReceive('getName')->andReturn('name');
+        $rType->shouldReceive('getAllProperties')->andReturn(['property' => $keyProp])->once();
+
+        $result = new \stdClass();
+        $instanceColl = [];
+
+        $this->expectException(InvalidOperationException::class);
+        $this->expectExceptionMessage('stdClass');
+
+        SerialiserLowLevelWriters::writeComplexValue($rType, $result, 'property', $instanceColl);
     }
 }

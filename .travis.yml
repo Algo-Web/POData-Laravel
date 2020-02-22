@@ -8,20 +8,23 @@ php:
   - nightly
   
 before_script:
+  - pecl install pcov
+  - phpenv config-rm xdebug.ini
   - mkdir -p bootstrap/cache
   - chmod 777 bootstrap/cache
   - ls -al bootstrap/
   - ls -al bootstrap/cache
   - composer global require hirak/prestissimo
-  - if [ "$LARAVEL_DEP" == "5.1.*" ]; then composer require phpunit/phpunit "^5.6" --no-update --dev; fi;
   - composer require laravel/framework:${LARAVEL_DEP} --no-update
+  - if [ "$TRAVIS_PHP_VERSION" == "7.1" ]; then composer require pcov/clobber --no-update --dev; fi;
   - COMPOSER_MEMORY_LIMIT=-1 travis_retry composer install --prefer-dist --no-interaction -o
+  - if [ "$TRAVIS_PHP_VERSION" == "7.1" ]; then vendor/bin/pcov clobber; fi;
   - cat composer.lock
 
 
 script:
   - mkdir -p build/logs
-  - php vendor/bin/paratest -p 3 --coverage-clover build/logs/clover.xml
+  - php vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 
 after_script:
   - php vendor/bin/php-coveralls --exclude-no-stmt
@@ -30,8 +33,8 @@ after_success:
   - coveralls
 
 env: # important!
-  - LARAVEL_DEP=5.1.*
-  - LARAVEL_DEP=">5.1.11|^6.0"
+  - LARAVEL_DEP=5.5.*
+  - LARAVEL_DEP="^5.5|^6.0"
 matrix:
   allow_failures:
   - php: nightly
