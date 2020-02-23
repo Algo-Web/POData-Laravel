@@ -10,7 +10,7 @@ namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Providers;
 
 use AlgoWeb\PODataLaravel\Providers\MetadataBaseProvider;
 
-class DummyMetadataProvider extends MetadataBaseProvider
+class DummyMetadataBaseProvider extends MetadataBaseProvider
 {
     public function register()
     {
