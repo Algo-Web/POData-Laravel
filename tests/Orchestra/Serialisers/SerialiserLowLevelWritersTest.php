@@ -6,7 +6,7 @@
  * Time: 12:35 PM
  */
 
-namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Serialisers;
+namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Serialisers;
 
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use AlgoWeb\PODataLaravel\Serialisers\SerialiserLowLevelWriters;
