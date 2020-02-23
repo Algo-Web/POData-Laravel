@@ -9,6 +9,7 @@ namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 class RelationTestDummyModel extends Model
@@ -16,6 +17,7 @@ class RelationTestDummyModel extends Model
     use MetadataTrait {
         MetadataTrait::polyglotKeyMethodNames as parentPolyglot;
         MetadataTrait::polyglotKeyMethodBackupNames as parentPolyglotBackup;
+        MetadataTrait::polyglotThroughKeyMethodNames as parentThruNames;
     }
 
     protected $relMethods = [];
@@ -42,6 +44,16 @@ class RelationTestDummyModel extends Model
     public function polyglotKeyMethodBackupNames(Relation $foo, $condition = false)
     {
         return $this->parentPolyglotBackup($foo, $condition);
+    }
+
+    public function polyglotKeyMethodBackupNamesDefault(Relation $foo)
+    {
+        return $this->parentPolyglotBackup($foo);
+    }
+
+    public function polyglotThroughKeyMethodNames(HasManyThrough $foo)
+    {
+        return $this->parentThruNames($foo);
     }
 
     public function bigReset()
