@@ -175,24 +175,24 @@ trait MetadataRelationsTrait
     {
         /**
          * @var string   $property
-         * @var Relation $foo
+         * @var Relation $relation
          */
-        foreach ($rels['HasMany'] as $property => $foo) {
-            if ($foo instanceof MorphMany || $foo instanceof MorphToMany) {
+        foreach ($rels['HasMany'] as $property => $relation) {
+            if ($relation instanceof MorphMany || $relation instanceof MorphToMany) {
                 continue;
             }
             $mult = '*';
-            $targ = get_class($foo->getRelated());
-            list($thruName, $fkMethodName, $rkMethodName) = $this->getRelationsHasManyKeyNames($foo);
+            $targ = get_class($relation->getRelated());
+            list($thruName, $fkMethodName, $rkMethodName) = $this->getRelationsHasManyKeyNames($relation);
 
-            $keyRaw = $foo->$fkMethodName();
+            $keyRaw = $relation->$fkMethodName();
             $keySegments = explode('.', $keyRaw);
             $keyName = $keySegments[count($keySegments) - 1];
-            $localRaw = $foo->$rkMethodName();
+            $localRaw = $relation->$rkMethodName();
             $localSegments = explode('.', $localRaw);
             $localName = $localSegments[count($localSegments) - 1];
             if (null !== $thruName) {
-                $thruRaw = $foo->$thruName();
+                $thruRaw = $relation->$thruName();
                 $thruSegments = explode('.', $thruRaw);
                 $thruName = $thruSegments[count($thruSegments) - 1];
             }
@@ -222,7 +222,7 @@ trait MetadataRelationsTrait
             $targ = get_class($foo->getRelated());
 
             list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isBelong);
-            list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, !$isBelong);
+            list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodNames($foo, !$isBelong);
 
             $keyName = $isBelong ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
             $keySegments = explode('.', $keyName);
@@ -254,7 +254,7 @@ trait MetadataRelationsTrait
             $mult = $foo instanceof MorphOne ? '0..1' : $mult;
 
             list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isMany);
-            list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, !$isMany);
+            list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodNames($foo, !$isMany);
 
             $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
             $keySegments = explode('.', $keyRaw);
@@ -285,7 +285,7 @@ trait MetadataRelationsTrait
             $mult = $isMany ? '*' : '1';
 
             list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isMany);
-            list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodBackupNames($foo, !$isMany);
+            list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodNames($foo, !$isMany);
 
             $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
             $keySegments = explode('.', $keyRaw);
@@ -302,33 +302,33 @@ trait MetadataRelationsTrait
 
     /**
      * @param             $hooks
-     * @param             $first
-     * @param             $property
-     * @param             $last
+     * @param             $foreignField
+     * @param             $RelationName
+     * @param             $localKey
      * @param             $mult
-     * @param string|null $targ
+     * @param string|null $relatedObject
      * @param mixed|null  $type
      * @param mixed|null  $through
      */
     protected function addRelationsHook(
         array &$hooks,
-        $first,
-        $property,
-        $last,
+        $foreignField,
+        $RelationName,
+        $localKey,
         $mult,
-        $targ,
+        $relatedObject,
         $type = null,
         $through = null
     ) {
-        if (!isset($hooks[$first])) {
-            $hooks[$first] = [];
+        if (!isset($hooks[$foreignField])) {
+            $hooks[$foreignField] = [];
         }
-        if (!isset($hooks[$first][$targ])) {
-            $hooks[$first][$targ] = [];
+        if (!isset($hooks[$foreignField][$relatedObject])) {
+            $hooks[$foreignField][$relatedObject] = [];
         }
-        $hooks[$first][$targ][$property] = [
-            'property' => $property,
-            'local' => $last,
+        $hooks[$foreignField][$relatedObject][$RelationName] = [
+            'property' => $RelationName,
+            'local' => $localKey,
             'through' => $through,
             'multiplicity' => $mult,
             'type' => $type

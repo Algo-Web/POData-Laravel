@@ -16,8 +16,6 @@ class RelationTestDummyModel extends Model
 {
     use MetadataTrait {
         MetadataTrait::polyglotKeyMethodNames as parentPolyglot;
-        MetadataTrait::polyglotKeyMethodBackupNames as parentPolyglotBackup;
-        MetadataTrait::polyglotThroughKeyMethodNames as parentThruNames;
     }
 
     protected $relMethods = [];
@@ -39,21 +37,6 @@ class RelationTestDummyModel extends Model
     public function polyglotKeyMethodNames(Relation $foo, $condition = false)
     {
         return $this->parentPolyglot($foo, $condition);
-    }
-
-    public function polyglotKeyMethodBackupNames(Relation $foo, $condition = false)
-    {
-        return $this->parentPolyglotBackup($foo, $condition);
-    }
-
-    public function polyglotKeyMethodBackupNamesDefault(Relation $foo)
-    {
-        return $this->parentPolyglotBackup($foo);
-    }
-
-    public function polyglotThroughKeyMethodNames(HasManyThrough $foo)
-    {
-        return $this->parentThruNames($foo);
     }
 
     public function bigReset()
