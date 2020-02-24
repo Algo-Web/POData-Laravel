@@ -106,7 +106,7 @@ trait MetadataKeyMethodNamesTrait
                 return $methodName;
             }
         }
-        $msg = 'Expected at least 1 element in related-key list, got 0';
-        throw new InvalidOperationException($msg);
+        $msg = 'Expected at least 1 element in related-key list, got 0 for relation %s';
+        throw new InvalidOperationException(sprintf($msg,get_class($foo)));
     }
 }
