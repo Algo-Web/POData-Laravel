@@ -14,9 +14,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 
 class RelationTestDummyModel extends Model
 {
-    use MetadataTrait {
-        MetadataTrait::polyglotKeyMethodNames as parentPolyglot;
-    }
+    use MetadataTrait;
 
     protected $relMethods = [];
 
@@ -32,11 +30,6 @@ class RelationTestDummyModel extends Model
     public function setRelationClassMethods(array $methods)
     {
         $this->relMethods = $methods;
-    }
-
-    public function polyglotKeyMethodNames(Relation $foo, $condition = false)
-    {
-        return $this->parentPolyglot($foo, $condition);
     }
 
     public function bigReset()

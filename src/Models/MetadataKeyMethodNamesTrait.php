@@ -18,39 +18,6 @@ use POData\Common\InvalidOperationException;
 
 trait MetadataKeyMethodNamesTrait
 {
-    /**
-     * @param Relation $foo
-     * @param mixed    $condition
-     *
-     * @throws InvalidOperationException
-     * @return array
-     */
-    protected function polyglotKeyMethodNames(Relation $foo)
-    {
-        if ($foo instanceof BelongsTo) {
-            // getForeignKey for laravel 5.5
-            $fkList = ['getForeignKeyName', 'getForeignKey'];
-            // getOwnerKeyName for laravel 5.5
-            $rkList = ['getOwnerKey', 'getOwnerKeyName'];
-        }elseif ($foo instanceof BelongsToMany) {
-            $fkList = ['getForeignPivotKeyName'];
-            $rkList = ['getRelatedPivotKeyName'];
-        }elseif($foo instanceof HasOneOrMany){
-            $fkList = ['getForeignKeyName'];
-            $rkList = ['getLocalKeyName', 'getQualifiedParentKeyName'];
-        }elseif($foo instanceof HasManyThrough) {
-            $fkList = ['getQualifiedFarKeyName'];
-            $rkList = ['getQualifiedParentKeyName'];
-        }else{
-            $msg = sprintf('Unknown Relationship Type %s', get_class($foo));
-            throw new InvalidOperationException($msg);
-        }
-        $fkMethodName = $this->checkMethodNameList($foo, $fkList);
-
-        $rkMethodName = $this->checkMethodNameList($foo, $rkList);
-
-        return [$fkMethodName, $rkMethodName];
-    }
     protected function polyglotFkKey(Relation $rel)
     {
         switch (true) {
@@ -93,18 +60,6 @@ trait MetadataKeyMethodNamesTrait
         }
         $segments = explode('.', $rel->{$this->checkMethodNameList($rel, ['getThroughKey', 'getQualifiedFirstKeyName'])}());
         return end($segments);
-    }
-
-    /**
-     * @param  HasManyThrough            $foo
-     * @throws InvalidOperationException
-     * @return string
-     */
-    protected function polyglotThroughKeyMethodNames(HasManyThrough $foo)
-    {
-        $thruList = ['getThroughKey', 'getQualifiedFirstKeyName'];
-
-        return $this->checkMethodNameList($foo, $thruList);
     }
 
     /**

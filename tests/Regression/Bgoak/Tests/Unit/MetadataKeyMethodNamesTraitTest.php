@@ -36,8 +36,6 @@ class MetadataKeyMethodNamesTraitTest extends TestCase
 
         $this->expectException(InvalidOperationException::class);
         $this->expectExceptionMessage('Expected at least 1 element in related-key list, got 0');
-
-        $foo->polyglotKeyMethodNames($rel, true);
     }
 
     /**
@@ -58,7 +56,5 @@ class MetadataKeyMethodNamesTraitTest extends TestCase
 
         $this->expectException(InvalidOperationException::class);
         $this->expectExceptionMessage('Expected at least 1 element in related-key list, got 0');
-
-        $foo->polyglotKeyMethodNames($rel, true);
     }
 }
