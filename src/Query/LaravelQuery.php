@@ -32,7 +32,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     protected $bulk;
     protected $writer;
     public $queryProviderClassName;
-    private static $touchList = [];
+    protected static $touchList = [];
     private static $inBatch;
 
     public function __construct(AuthInterface $auth = null)

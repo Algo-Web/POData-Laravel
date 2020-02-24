@@ -11,6 +11,7 @@ namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Query;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Controllers\OrchestraTestController;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Query\DummyBulkQuery;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Query\DummyQuery;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Requests\TestBulkCreateRequest;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Requests\TestRequest;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
@@ -131,6 +132,47 @@ class LaravelBulkQueryTest extends TestCase
         } catch (ODataException $e) {
             $this->assertEquals(500, $e->getStatusCode());
         }
+    }
+
+    /**
+     * @throws InvalidOperationException
+     * @throws ODataException
+     * @throws \ReflectionException
+     */
+    public function testBulkCustomActuallyQueuesTwoModels()
+    {
+        $over = new DummyQuery();
+        $this->assertEquals(0, count($over->getTouchList()));
+        $over->startTransaction(true);
+
+        $paramList = [
+            'method' => 'storeBulkTestModel',
+            'controller' => OrchestraTestController::class,
+            'parameters' => ['request' =>
+                ['name' => 'request', 'type' => TestBulkCreateRequest::class, 'isRequest' => true]]
+        ];
+
+        $date = new \DateTime('2017-01-01');
+
+        $rawData = [];
+        $rawData[] = ['name' => 'name', 'added_at' => $date, 'weight' => 0, 'code' => '42', 'success' => true];
+        $rawData[] = ['name' => 'name', 'added_at' => $date, 'weight' => 0, 'code' => '42', 'success' => true];
+
+        $query = m::mock(LaravelQuery::class)->makePartial();
+        $foo = new DummyBulkQuery($query);
+
+        $rSet = m::mock(ResourceSet::class);
+        $rSet->shouldReceive('getResourceType->getInstanceType->getName')->andReturn(OrchestraTestModel::class);
+
+        $one = new OrchestraTestModel();
+        $two = new OrchestraTestModel();
+
+        $model = m::mock(OrchestraTestModel::class)->makePartial();
+        $model->shouldReceive('findMany->flatten->all')->andReturn([$one, $two]);
+        App::instance(OrchestraTestModel::class, $model);
+
+        $foo->processBulkCustom($rSet, $rawData, $paramList, 'bulkCreated');
+        $this->assertEquals(2, count($over->getTouchList()));
     }
 
     public function testProcessOutputEmptyResponse()
