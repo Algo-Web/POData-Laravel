@@ -65,6 +65,49 @@ trait MetadataKeyMethodNamesTrait
 
         return [$fkMethodName, $rkMethodName];
     }
+    protected function polyglotFkKey(Relation $rel)
+    {
+        switch (true) {
+            case $rel instanceof BelongsTo:
+                return $rel->{$this->checkMethodNameList($rel, ['getForeignKeyName', 'getForeignKey'])}();
+            case $rel instanceof BelongsToMany:
+                return $rel->getForeignPivotKeyName();
+            case $rel instanceof HasOneOrMany:
+                return $rel->getForeignKeyName();
+            case $rel instanceof HasManyThrough:
+                $segments = explode('.', $rel->getQualifiedFarKeyName());
+                return end($segments);
+            default:
+                $msg = sprintf('Unknown Relationship Type %s', get_class($rel));
+                throw new InvalidOperationException($msg);
+        }
+    }
+    protected function polyglotRkKey(Relation $rel)
+    {
+        switch (true) {
+            case $rel instanceof BelongsTo:
+                return $rel->{$this->checkMethodNameList($rel, ['getOwnerKey', 'getOwnerKeyName'])}();
+            case $rel instanceof BelongsToMany:
+                return $rel->getRelatedPivotKeyName();
+            case $rel instanceof HasOneOrMany:
+                $segments = explode('.', $rel->{$this->checkMethodNameList($rel, ['getLocalKeyName', 'getQualifiedParentKeyName'])}());
+                return end($segments);
+            case $rel instanceof HasManyThrough:
+                $segments = explode('.', $rel->getQualifiedParentKeyName());
+                return end($segments);
+            default:
+                $msg = sprintf('Unknown Relationship Type %s', get_class($rel));
+                throw new InvalidOperationException($msg);
+        }
+    }
+
+    protected function polyglotThroughKey(Relation $rel){
+        if(! $rel instanceof HasManyThrough){
+            return null;
+        }
+        $segments = explode('.', $rel->{$this->checkMethodNameList($rel, ['getThroughKey', 'getQualifiedFirstKeyName'])}());
+        return end($segments);
+    }
 
     /**
      * @param  HasManyThrough            $foo

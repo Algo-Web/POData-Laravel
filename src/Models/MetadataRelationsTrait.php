@@ -183,19 +183,10 @@ trait MetadataRelationsTrait
             }
             $mult = '*';
             $targ = get_class($relation->getRelated());
-            list($thruName, $fkMethodName, $rkMethodName) = $this->getRelationsHasManyKeyNames($relation);
+            $keyName = $this->polyglotFkKey($relation);
+            $localName = $this->polyglotRkKey($relation);
+            $thruName = $this->polyglotThroughKey($relation);
 
-            $keyRaw = $relation->$fkMethodName();
-            $keySegments = explode('.', $keyRaw);
-            $keyName = $keySegments[count($keySegments) - 1];
-            $localRaw = $relation->$rkMethodName();
-            $localSegments = explode('.', $localRaw);
-            $localName = $localSegments[count($localSegments) - 1];
-            if (null !== $thruName) {
-                $thruRaw = $relation->$thruName();
-                $thruSegments = explode('.', $thruRaw);
-                $thruName = $thruSegments[count($thruSegments) - 1];
-            }
             $first = $keyName;
             $last = $localName;
             $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, null, $thruName);
@@ -221,15 +212,8 @@ trait MetadataRelationsTrait
             $mult = $isBelong ? '1' : '0..1';
             $targ = get_class($foo->getRelated());
 
-            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isBelong);
-            list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodNames($foo, !$isBelong);
-
-            $keyName = $isBelong ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
-            $keySegments = explode('.', $keyName);
-            $keyName = $keySegments[count($keySegments) - 1];
-            $localRaw = $isBelong ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
-            $localSegments = explode('.', $localRaw);
-            $localName = $localSegments[count($localSegments) - 1];
+            $keyName = $this->polyglotFkKey($foo);
+            $localName = $this->polyglotRkKey($foo);
             $first = $isBelong ? $localName : $keyName;
             $last = $isBelong ? $keyName : $localName;
             $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
@@ -253,15 +237,8 @@ trait MetadataRelationsTrait
             $mult = $isMany ? '*' : ($foo instanceof MorphMany ? '*' : '1');
             $mult = $foo instanceof MorphOne ? '0..1' : $mult;
 
-            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isMany);
-            list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodNames($foo, !$isMany);
-
-            $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
-            $keySegments = explode('.', $keyRaw);
-            $keyName = $keySegments[count($keySegments) - 1];
-            $localRaw = $isMany ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
-            $localSegments = explode('.', $localRaw);
-            $localName = $localSegments[count($localSegments) - 1];
+            $keyName = $this->polyglotFkKey($foo);
+            $localName = $this->polyglotRkKey($foo);
             $first = $isMany ? $keyName : $localName;
             $last = $isMany ? $localName : $keyName;
             $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, 'unknown');
@@ -283,16 +260,9 @@ trait MetadataRelationsTrait
             $isMany = $foo instanceof MorphToMany;
             $targ = get_class($foo->getRelated());
             $mult = $isMany ? '*' : '1';
-
-            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, $isMany);
-            list($fkMethodAlternate, $rkMethodAlternate) = $this->polyglotKeyMethodNames($foo, !$isMany);
-
-            $keyRaw = $isMany ? $foo->$fkMethodName() : $foo->$fkMethodAlternate();
-            $keySegments = explode('.', $keyRaw);
-            $keyName = $keySegments[count($keySegments) - 1];
-            $localRaw = $isMany ? $foo->$rkMethodName() : $foo->$rkMethodAlternate();
-            $localSegments = explode('.', $localRaw);
-            $localName = $localSegments[count($localSegments) - 1];
+            
+            $keyName = $this->polyglotFkKey($foo);
+            $localName = $this->polyglotRkKey($foo);
 
             $first = $keyName;
             $last = (isset($localName) && '' != $localName) ? $localName : $foo->getRelated()->getKeyName();
