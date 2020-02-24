@@ -84,7 +84,7 @@ trait MetadataRelationsTrait
      * @return string
      * @throws InvalidOperationException
      */
-    protected function GetCodeForMethod(\ReflectionMethod $method) : string
+    protected function getCodeForMethod(\ReflectionMethod $method) : string
     {
         $fileName = $method->getFileName();
 
@@ -136,7 +136,7 @@ trait MetadataRelationsTrait
         foreach ($methods as $method) {
             //Use reflection to inspect the code, based on Illuminate/Support/SerializableClosure.php
             $reflection = new \ReflectionMethod($model, $method);
-            $code = $this->GetCodeForMethod($reflection);
+            $code = $this->getCodeForMethod($reflection);
             foreach (static::$relTypes as $relation) {
                 $search = '$this->' . $relation . '(';
                 $found = stripos($code, $search);
