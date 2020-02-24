@@ -121,7 +121,7 @@ trait MetadataRelationsTrait
     protected function getRelationshipsFromMethods(bool $biDir = false)
     {
         $biDirVal = intval($biDir);
-        $isCached = isset(static::$relationCategories[$biDirVal]) & !empty(static::$relationCategories[$biDirVal]);
+        $isCached = isset(static::$relationCategories[$biDirVal]) && !empty(static::$relationCategories[$biDirVal]);
         if ($isCached) {
             return static::$relationCategories[$biDirVal];
         }
