@@ -13,54 +13,43 @@ use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Mockery as m;
+use POData\Common\InvalidOperationException;
 
 class MetadataKeyMethodNamesTraitTest extends TestCase
 {
-    /**
-     * @throws \POData\Common\InvalidOperationException
-     */
-    public function testBackupMethodNamesWithFalseReturnsNulls()
+    public function testFKKeyName()
     {
-        $expected = [null, null];
+        $rel = m::mock(Relation::class)->makePartial();
 
         $foo = new RelationTestDummyModel();
 
-        $rel = m::mock(Relation::class)->makePartial();
+        $this->expectException(InvalidOperationException::class);
+        $this->expectExceptionMessage('Unknown Relationship Type');
 
-        $actual = $foo->polyglotKeyMethodBackupNamesDefault($rel);
-        $this->assertEquals($expected, $actual);
+        $foo->polyglotFkKeyAccess($rel);
     }
 
-    public function testMethodNameListsLandUnaltered()
+    public function testRKKeyName()
     {
-        $expectedFk = ['getForeignKey', 'getForeignKeyName', 'getQualifiedFarKeyName'];
-        $expectedRk = ['getOtherKey', 'getQualifiedParentKeyName'];
-
         $rel = m::mock(Relation::class)->makePartial();
 
-        $expected = ['STOP!', 'HAMMER TIME!'];
+        $foo = new RelationTestDummyModel();
 
-        $foo = m::mock(RelationTestDummyModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('checkMethodNameList')->withArgs([$rel, $expectedFk])->andReturn('STOP!')->once();
-        $foo->shouldReceive('checkMethodNameList')->withArgs([$rel, $expectedRk])->andReturn('HAMMER TIME!')->once();
+        $this->expectException(InvalidOperationException::class);
+        $this->expectExceptionMessage('Unknown Relationship Type');
 
-        $actual = $foo->polyglotKeyMethodBackupNames($rel, true);
-        $this->assertEquals($expected, $actual);
+        $foo->polyglotRkKeyAccess($rel);
     }
 
-    public function testThruNameListLandsUnaltered()
+    public function testcheckMethodNameListWithEmptyList()
     {
-        $expectedThru = ['getThroughKey', 'getQualifiedFirstKeyName'];
+        $rel = m::mock(Relation::class)->makePartial();
 
-        $rel = m::mock(HasManyThrough::class)->makePartial();
+        $foo = new RelationTestDummyModel();
 
-        $expected = 'LARGE HAM UNITED!!';
+        $this->expectException(InvalidOperationException::class);
+        $this->expectExceptionMessage('Expected at least 1 element in related-key list');
 
-        $foo = m::mock(RelationTestDummyModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('checkMethodNameList')->withArgs([$rel, $expectedThru])
-            ->andReturn('LARGE HAM UNITED!!')->once();
-
-        $actual = $foo->polyglotThroughKeyMethodNames($rel);
-        $this->assertEquals($expected, $actual);
+        $foo->checkMethodNameListAccess($rel, []);
     }
 }

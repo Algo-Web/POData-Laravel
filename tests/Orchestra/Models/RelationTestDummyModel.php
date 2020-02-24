@@ -48,4 +48,19 @@ class RelationTestDummyModel extends Model
 
         return $methods;
     }
+
+    public function polyglotFkKeyAccess(Relation $rel)
+    {
+        return $this->polyglotFkKey($rel);
+    }
+
+    public function polyglotRkKeyAccess(Relation $rel)
+    {
+        return $this->polyglotRkKey($rel);
+    }
+
+    public function checkMethodNameListAccess(Relation $rel, array $methodList)
+    {
+        return $this->checkMethodNameList($rel, $methodList);
+    }
 }
