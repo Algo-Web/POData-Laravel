@@ -56,11 +56,11 @@ class LaravelBulkQueryTest extends TestCase
 
     public function testOnlyRequestInputIsUpdate()
     {
-        $bitz = ['name' => 'name',
-            'added_at' => '2012-11-10',
-            'weight' => 11,
-            'code' => 'up to 11',
-            'success' => true];
+        $bitz = ['name' => ['name'],
+            'added_at' => ['2012-11-10'],
+            'weight' => [11],
+            'code' => ['up to 11'],
+            'success' => [true]];
 
         $rawDesc = m::mock(KeyDescriptor::class);
         $rawDesc->shouldReceive('getNamedValues')->andReturn($bitz);
@@ -74,8 +74,8 @@ class LaravelBulkQueryTest extends TestCase
         $query = m::mock(LaravelQuery::class)->makePartial();
         $foo = new DummyBulkQuery($query);
 
-        $bulkData = ['data' => [11], 'keys' => [['name' => 'n', 'added_at' => '2', 'weight' => null, 'code' => 'u',
-            'success' => null]]];
+        $bulkData = ['data' => [11], 'keys' => [['name' => 'name', 'added_at' => '2012-11-10', 'weight' => 11,
+            'code' => 'up to 11', 'success' => true]]];
         $exp = new TestRequest();
         $exp->setMethod('PUT');
         $exp->request = new \Symfony\Component\HttpFoundation\ParameterBag($bulkData);
