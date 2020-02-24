@@ -54,8 +54,9 @@ trait MetadataKeyMethodNamesTrait
         }
     }
 
-    protected function polyglotThroughKey(Relation $rel){
-        if(! $rel instanceof HasManyThrough){
+    protected function polyglotThroughKey(Relation $rel)
+    {
+        if (! $rel instanceof HasManyThrough) {
             return null;
         }
         $segments = explode('.', $rel->{$this->checkMethodNameList($rel, ['getThroughKey', 'getQualifiedFirstKeyName'])}());
@@ -91,6 +92,6 @@ trait MetadataKeyMethodNamesTrait
             }
         }
         $msg = 'Expected at least 1 element in related-key list, got 0 for relation %s';
-        throw new InvalidOperationException(sprintf($msg,get_class($foo)));
+        throw new InvalidOperationException(sprintf($msg, get_class($foo)));
     }
 }
