@@ -9,6 +9,7 @@ namespace AlgoWeb\PODataLaravel\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -185,7 +186,9 @@ trait MetadataRelationsTrait
             $targ = get_class($relation->getRelated());
             $keyName = $this->polyglotFkKey($relation);
             $localName = $this->polyglotRkKey($relation);
-            $thruName = $this->polyglotThroughKey($relation);
+            $thruName = $relation instanceof HasManyThrough ?
+                $this->polyglotThroughKey($relation) :
+                null;
 
             $first = $keyName;
             $last = $localName;
@@ -260,7 +263,7 @@ trait MetadataRelationsTrait
             $isMany = $foo instanceof MorphToMany;
             $targ = get_class($foo->getRelated());
             $mult = $isMany ? '*' : '1';
-            
+
             $keyName = $this->polyglotFkKey($foo);
             $localName = $this->polyglotRkKey($foo);
 
