@@ -110,6 +110,7 @@ trait MetadataRelationsTrait
         }
         return $code;
     }
+
     /**
      * @param bool $biDir
      *
@@ -147,22 +148,33 @@ trait MetadataRelationsTrait
                     continue;
                 }
                 $targObject = $biDir ? $relationObj : '\\' . get_class($relObject);
-                if (in_array($relation, static::$manyRelTypes)) {
-                    //Collection or array of models (because Collection is Arrayable)
-                    $relationships['HasMany'][$method] = $targObject;
-                } elseif ('morphTo' === $relation) {
-                    // Model isn't specified because relation is polymorphic
-                    $relationships['UnknownPolyMorphSide'][$method] =
-                        $biDir ? $relationObj : '\Illuminate\Database\Eloquent\Model|\Eloquent';
-                } else {
-                    //Single model is returned
-                    $relationships['HasOne'][$method] = $targObject;
-                }
-                if (in_array($relation, ['morphMany', 'morphOne', 'morphToMany'])) {
-                    $relationships['KnownPolyMorphSide'][$method] = $targObject;
-                }
-                if (in_array($relation, ['morphedByMany'])) {
-                    $relationships['UnknownPolyMorphSide'][$method] = $targObject;
+                switch ($relation) {
+                    case 'morphedByMany':
+                        $relationships['UnknownPolyMorphSide'][$method] = $targObject;
+                        $relationships['HasMany'][$method] = $targObject;
+                        break;
+                    case 'morphMany':
+                        // fall thru
+                    case 'morphToMany':
+                        $relationships['KnownPolyMorphSide'][$method] = $targObject;
+                        // fall thru
+                    case 'hasMany':
+                    case 'hasManyThrough':
+                    case 'belongsToMany':
+                        //Collection or array of models (because Collection is Arrayable)
+                        $relationships['HasMany'][$method] = $targObject;
+                        break;
+                    case 'morphOne':
+                        $relationships['KnownPolyMorphSide'][$method] = $targObject;
+                        // fall thru
+                    case 'hasOne':
+                    case 'belongsTo':
+                        $relationships['HasOne'][$method] = $targObject;
+                        break;
+                    case 'morphTo':
+                        // Model isn't specified because relation is polymorphic
+                        $relationships['UnknownPolyMorphSide'][$method] =
+                            $biDir ? $relationObj : '\Illuminate\Database\Eloquent\Model|\Eloquent';
                 }
             }
         }
