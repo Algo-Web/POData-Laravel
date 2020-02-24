@@ -92,6 +92,8 @@ class LaravelQueryTest extends TestCase
                     'delete' => 'destroyTestModel'
                 ]
         ];
+
+        $foo = new LaravelQuery();
     }
 
     /**
