@@ -16,6 +16,7 @@ use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Mockery as m;
 use POData\Providers\Metadata\IMetadataProvider;
 use POData\Providers\Metadata\ResourceEntityType;
@@ -100,5 +101,39 @@ class MetadataProviderTest extends TestCase
 
         $actual = $foo->isRunningInArtisan();
         $this->assertEquals($expected, $actual, 'Expected ' . $expected . ', actual ' . $actual);
+    }
+
+    public function testBootFromCache()
+    {
+        $app = m::mock(Application::class);
+        $foo = new DummyMetadataProvider($app);
+        $foo->setIsCaching(true);
+        $this->assertTrue($foo->getIsCaching());
+        $this->assertFalse($foo->isBooted());
+
+        Cache::put('metadata', 'foo', 60);
+        Cache::put('objectmap', 'bar', 60);
+
+        $foo->boot();
+        $this->assertTrue($foo->isBooted());
+        $this->assertEquals('foo', App::make('metadata'));
+        $this->assertEquals('bar', App::make('objectmap'));
+    }
+
+    public function testDontBootFromCacheMetadataNull()
+    {
+        $app = m::mock(Application::class);
+        $foo = new DummyMetadataProvider($app);
+        $foo->setIsCaching(true);
+        $this->assertTrue($foo->getIsCaching());
+        $this->assertFalse($foo->isBooted());
+
+        Cache::put('metadata', null, 60);
+        Cache::put('objectmap', 'bar', 60);
+
+        $foo->boot();
+        $this->assertTrue($foo->isBooted());
+        $this->assertTrue(App::make('metadata') instanceof SimpleMetadataProvider);
+        $this->assertTrue(App::make('objectmap') instanceof Map);
     }
 }

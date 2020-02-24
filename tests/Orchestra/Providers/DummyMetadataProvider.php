@@ -12,8 +12,24 @@ use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 
 class DummyMetadataProvider extends MetadataProvider
 {
+    /** @var bool|null */
+    protected $caching = null;
+
     public function isBooted() : bool
     {
         return static::$isBooted;
+    }
+
+    public function getIsCaching()
+    {
+        if (null !== $this->caching) {
+            return $this->caching;
+        }
+        return parent::getIsCaching();
+    }
+
+    public function setIsCaching($caching)
+    {
+        $this->caching = (null === $caching) ? null : boolval($caching);
     }
 }
