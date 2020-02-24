@@ -2,12 +2,15 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 
 abstract class MetadataBaseProvider extends ServiceProvider
 {
+    /** @var Application */
+    protected $app;
 
     /**
      * @return bool
