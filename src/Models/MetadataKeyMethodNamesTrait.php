@@ -19,20 +19,6 @@ use POData\Common\InvalidOperationException;
 trait MetadataKeyMethodNamesTrait
 {
     /**
-     * @param  Relation                  $foo
-     * @throws InvalidOperationException
-     * @return array|null
-     */
-    protected function getRelationsHasManyKeyNames(Relation $foo)
-    {
-        $thruName = $foo instanceof HasManyThrough ?
-            $this->polyglotThroughKeyMethodNames($foo) :
-            null;
-        list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo);
-        return [$thruName, $fkMethodName, $rkMethodName];
-    }
-
-    /**
      * @param Relation $foo
      * @param mixed    $condition
      *
