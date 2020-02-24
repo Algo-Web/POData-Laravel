@@ -147,34 +147,24 @@ trait MetadataRelationsTrait
                 ) {
                     continue;
                 }
-                $targObject = $biDir ? $relationObj : '\\' . get_class($relObject);
-                switch ($relation) {
-                    case 'morphedByMany':
-                        $relationships['UnknownPolyMorphSide'][$method] = $targObject;
-                        $relationships['HasMany'][$method] = $targObject;
-                        break;
-                    case 'morphMany':
-                        // fall thru
-                    case 'morphToMany':
-                        $relationships['KnownPolyMorphSide'][$method] = $targObject;
-                        // fall thru
-                    case 'hasMany':
-                    case 'hasManyThrough':
-                    case 'belongsToMany':
-                        //Collection or array of models (because Collection is Arrayable)
-                        $relationships['HasMany'][$method] = $targObject;
-                        break;
-                    case 'morphOne':
-                        $relationships['KnownPolyMorphSide'][$method] = $targObject;
-                        // fall thru
-                    case 'hasOne':
-                    case 'belongsTo':
-                        $relationships['HasOne'][$method] = $targObject;
-                        break;
-                    case 'morphTo':
-                        // Model isn't specified because relation is polymorphic
-                        $relationships['UnknownPolyMorphSide'][$method] =
-                            $biDir ? $relationObj : '\Illuminate\Database\Eloquent\Model|\Eloquent';
+                $targetClass = $relation == 'morphTo' ?
+                    '\Illuminate\Database\Eloquent\Model|\Eloquent' :
+                    '\\' . get_class($relObject);
+                $targObject = $biDir ? $relationObj : $targetClass;
+                $relToKeyMap = [
+                    'morphedByMany' => ['UnknownPolyMorphSide','HasMany'],
+                    'morphToMany' => ['KnownPolyMorphSide', 'HasMany'],
+                    'morphMany' => ['KnownPolyMorphSide', 'HasMany'],
+                    'hasMany' => ['HasMany'],
+                    'hasManyThrough' => ['HasMany'],
+                    'belongsToMany' => ['HasMany'],
+                    'morphOne' => ['KnownPolyMorphSide', 'HasOne'],
+                    'hasOne' => ['HasOne'],
+                    'belongsTo' => ['HasOne'],
+                    'morphTo' => ['UnknownPolyMorphSide'],
+                ];
+                foreach ($relToKeyMap[$relation] as $key) {
+                    $relationships[$key][$method] = $targObject;
                 }
             }
         }
