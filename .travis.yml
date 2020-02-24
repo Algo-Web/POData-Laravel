@@ -16,16 +16,27 @@ before_script:
   - ls -al bootstrap/cache
   - composer global require hirak/prestissimo
   - composer require laravel/framework:${LARAVEL_DEP} --no-update
-  - if [ "$TRAVIS_PHP_VERSION" == "7.1" ]; then composer require pcov/clobber --no-update --dev; fi;
+  - echo $TRAVIS_PHP_VERSION
+  - if [[ "$TRAVIS_PHP_VERSION" = "7.1" || "$LARAVEL_DEP" = "5.5.*" ]]; then composer require pcov/clobber --no-update --dev; fi;
   - COMPOSER_MEMORY_LIMIT=-1 travis_retry composer install --prefer-dist --no-interaction -o
-  - if [ "$TRAVIS_PHP_VERSION" == "7.1" ]; then vendor/bin/pcov clobber; fi;
+  - if [[ "$TRAVIS_PHP_VERSION" = "7.1" || "$LARAVEL_DEP" = "5.5.*" ]]; then vendor/bin/pcov clobber; fi;
   - cat composer.lock
 
 
 script:
   - mkdir -p build/logs
   - php vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+  - if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
+      INFECTION_FILTER="";
+    else
+      git remote set-branches --add origin $TRAVIS_BRANCH;
+      git fetch;
+      CHANGED_FILES=$(git diff origin/$TRAVIS_BRANCH --diff-filter=AM --name-only | grep src/ | paste -sd "," -);
+      INFECTION_FILTER="--filter=${CHANGED_FILES} --ignore-msi-with-no-mutations";
 
+      echo "CHANGED_FILES=$CHANGED_FILES";
+    fi
+  - php vendor/bin/infection --threads=4 --min-msi=89 --min-covered-msi=91 --log-verbosity=none $INFECTION_FILTER
 after_script:
   - php vendor/bin/php-coveralls --exclude-no-stmt
 
@@ -33,7 +44,7 @@ after_success:
   - coveralls
 
 env: # important!
-  - LARAVEL_DEP=5.5.*
+  - LARAVEL_DEP="5.5.*"
   - LARAVEL_DEP="^5.5|^6.0"
 matrix:
   allow_failures:

@@ -3,6 +3,10 @@
     "description": "Expose Odata services from laravel",
     "keywords": ["laravel", "Odata", "services", "POData"],
     "license": "MIT",
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
     "require": {
         "algo-web/podata": "0.3.*|dev-master",
         "doctrine/dbal": "^2.5",
@@ -18,21 +22,25 @@
         "php-coveralls/php-coveralls": ">=v2.1",
         "phpunit/phpunit": "^6.0|^7.0|^8.0",
         "orchestra/database": "3.5.*|3.6.*|3.7.*|3.8.*|^4.0",
-        "orchestra/testbench": "3.5.*|3.6.*|3.7.*|3.8.*|^4.0"
+        "orchestra/testbench": "3.5.*|3.6.*|3.7.*|3.8.*|^4.0",
+        "infection/infection": "^0.13|dev-master"
     },
     "autoload": {
         "psr-4": {
             "AlgoWeb\\PODataLaravel\\": "src/"
         }
     },
-  "autoload-dev": {
-    "psr-4": {
-      "AlgoWeb\\PODataLaravel\\Orchestra\\Tests\\": "tests/Orchestra/",
-      "Tests\\Legacy\\AlgoWeb\\PODataLaravel\\": "tests/Legacy/",
-      "Tests\\Regression\\AlgoWeb\\PODataLaravel\\": "tests/Regression/",
-      "Tests\\System\\AlgoWeb\\PODataLaravel\\": "tests/System/"
+    "autoload-dev": {
+        "psr-4": {
+            "AlgoWeb\\PODataLaravel\\Orchestra\\Tests\\": "tests/Orchestra/",
+            "Tests\\Legacy\\AlgoWeb\\PODataLaravel\\": "tests/Legacy/",
+            "Tests\\Regression\\AlgoWeb\\PODataLaravel\\": "tests/Regression/",
+            "Tests\\System\\AlgoWeb\\PODataLaravel\\": "tests/System/"
 
-    }
-  },
+        }
+    },
+    "scripts": {
+        "mutate": "vendor/bin/infection --threads=4"
+    },
     "minimum-stability": "dev"
 }

@@ -158,7 +158,7 @@ class LaravelBulkQuery
                 if ($spec['isRequest']) {
                     $var->setMethod($isCreate ? 'POST' : 'PUT');
                     $bulkData = ['data' => $data];
-                    if (null !== $keyDescriptors) {
+                    if (!$isCreate) {
                         $keys = [];
                         foreach ($keyDescriptors as $desc) {
                             if (!($desc instanceof KeyDescriptor)) {
@@ -214,7 +214,9 @@ class LaravelBulkQuery
         if ($success) {
             try {
                 // return array of Model objects underlying collection returned by findMany
-                $result = $class::findMany($payload['id'])->flatten()->all();
+                /** @var Model $actClass */
+                $actClass = App::make($class);
+                $result = $actClass->findMany($payload['id'])->flatten()->all();
                 foreach ($result as $model) {
                     LaravelQuery::queueModel($model);
                 }
@@ -275,10 +277,7 @@ class LaravelBulkQuery
      */
     protected function createUpdateDeleteProcessOutput(JsonResponse $result)
     {
-        $outData = $result->getData();
-        if (is_object($outData)) {
-            $outData = (array) $outData;
-        }
+        $outData = $result->getData(true);
 
         if (!is_array($outData)) {
             throw ODataException::createInternalServerError('Controller response does not have an array.');

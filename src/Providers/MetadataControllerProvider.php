@@ -118,14 +118,14 @@ class MetadataControllerProvider extends MetadataBaseProvider
         foreach ($rawClasses as $name) {
             try {
                 if (in_array(MetadataControllerTrait::class, class_uses($name, false))) {
-                    $result = App::make($name);
-                    $ends[] = $result;
+                    $result = $this->app->make($name);
                     if (!$result instanceof Controller) {
                         throw new InvalidOperationException('Resolved result not a controller');
                     }
+                    $ends[] = $result;
                 }
             } catch (\Exception $e) {
-                if (!App::runningInConsole()) {
+                if (!$this->app->runningInConsole()) {
                     throw $e;
                 }
                 // Squash exceptions thrown here when running from CLI so app can continue booting

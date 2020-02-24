@@ -2,31 +2,34 @@
 /**
  * Created by PhpStorm.
  * User: alex
- * Date: 22/02/20
- * Time: 4:22 AM
+ * Date: 23/02/20
+ * Time: 2:54 PM
  */
 
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Providers;
 
-use AlgoWeb\PODataLaravel\Providers\MetadataBaseProvider;
+use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 
-class DummyMetadataProvider extends MetadataBaseProvider
+class DummyMetadataProvider extends MetadataProvider
 {
-    public function register()
+    /** @var bool|null */
+    protected $caching = null;
+
+    public function isBooted() : bool
     {
+        return static::$isBooted;
     }
 
-    public function boot()
+    public function getIsCaching()
     {
+        if (null !== $this->caching) {
+            return $this->caching;
+        }
+        return parent::getIsCaching();
     }
 
-    public function handlePostBoot(bool $isCaching, $hasCache, string $key, $meta)
+    public function setIsCaching($caching)
     {
-        return parent::handlePostBoot($isCaching, $hasCache, $key, $meta);
-    }
-
-    public function checkClassMap($classMap)
-    {
-        parent::checkClassMap($classMap);
+        $this->caching = (null === $caching) ? null : boolval($caching);
     }
 }

@@ -8,7 +8,7 @@
 
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Providers;
 
-use AlgoWeb\PODataLaravel\Orchestra\Tests\Providers\DummyMetadataProvider;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Providers\DummyMetadataBaseProvider;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Cache;
@@ -22,7 +22,7 @@ class MetadataBaseProviderTest extends TestCase
 
         $app = m::mock(Application::class);
 
-        $foo = new DummyMetadataProvider($app);
+        $foo = new DummyMetadataBaseProvider($app);
 
         $foo->handlePostBoot(true, null, 'key', null);
     }
@@ -35,7 +35,7 @@ class MetadataBaseProviderTest extends TestCase
 
         $app = m::mock(Application::class);
 
-        $foo = new DummyMetadataProvider($app);
+        $foo = new DummyMetadataBaseProvider($app);
 
         $foo->handlePostBoot(true, null, 'key', null);
     }
@@ -44,7 +44,7 @@ class MetadataBaseProviderTest extends TestCase
     {
         $app = m::mock(Application::class);
 
-        $foo = new DummyMetadataProvider($app);
+        $foo = new DummyMetadataBaseProvider($app);
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('AlgoWeb\PODataLaravel\Providers\MetadataBaseProvider was not found in autoload class map, this usually indicates you need to dump an optimised autoloader (`composer dump-autoload -o`)');

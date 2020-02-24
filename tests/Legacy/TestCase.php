@@ -2,6 +2,7 @@
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel;
 
+use AlgoWeb\PODataLaravel\Serialisers\ModelSerialiser;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Processors\Processor;
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Kernels\ConsoleKernel;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel;
 
 class TestCase extends BaseTestCase
 {
@@ -98,8 +100,13 @@ class TestCase extends BaseTestCase
         $builder = $this->getBuilder();
         $database = $this->getDatabase($builder);
         App::instance('db', $database);
+        // Clear any residual metadata bitz from previous runs
+        $foo = new TestModel();
+        $foo->reset();
 
-
+        $foo = new ModelSerialiser();
+        $foo->reset();
+        putenv('APP_METADATA_CACHE_DURATION=10');
 
         //Schema::swap($builder);
     }

@@ -47,6 +47,7 @@ class LaravelHookQuery extends LaravelBaseQuery
         } elseif ($relation instanceof HasOneOrMany) {
             $relation->save($targetEntityInstance);
         }
+
         LaravelQuery::queueModel($sourceEntityInstance);
         LaravelQuery::queueModel($targetEntityInstance);
         return true;
