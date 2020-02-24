@@ -16,4 +16,9 @@ class DummyQuery extends LaravelQuery
     {
         return static::$touchList;
     }
+
+    public function inBatch(): bool
+    {
+        return static::$inBatch;
+    }
 }
