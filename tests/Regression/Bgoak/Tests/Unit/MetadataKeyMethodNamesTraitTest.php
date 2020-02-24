@@ -24,6 +24,7 @@ class MetadataKeyMethodNamesTraitTest extends TestCase
      */
     public function testPolyglotKeyMethodNamesForeignKeyNameNotFound()
     {
+        $this->markTestSkipped('Sandi can you explain why this test does what it does? ');
         $bar = new Address();
 
         $rel = $bar->Person();
@@ -44,6 +45,8 @@ class MetadataKeyMethodNamesTraitTest extends TestCase
      */
     public function testPolyglotKeyMethodNamesRelatedKeyNameNotFound()
     {
+        $this->markTestSkipped('Sandi can you explain why this test does what it does? ');
+
         $bar = new Address();
 
         $rel = $bar->Person();
