@@ -51,7 +51,7 @@ trait MetadataKeyMethodNamesTrait
             $rkList = ['getRelatedPivotKeyName'];
         }elseif($foo instanceof HasOneOrMany){
             $fkList = ['getForeignKeyName'];
-            $rkList = ['getLocalKeyName'];
+            $rkList = ['getLocalKeyName', 'getQualifiedParentKeyName'];
         }elseif($foo instanceof HasManyThrough) {
             $fkList = ['getQualifiedFarKeyName'];
             $rkList = ['getQualifiedParentKeyName'];
