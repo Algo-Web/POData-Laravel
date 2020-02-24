@@ -138,22 +138,15 @@ trait MetadataRelationsTrait
             $reflection = new \ReflectionMethod($model, $method);
             $code = $this->getCodeForMethod($reflection);
             foreach (static::$relTypes as $relation) {
-                $search = '$this->' . $relation . '(';
-                $found = stripos($code, $search);
-                if (!$found) {
-                    continue;
-                }
                 //Resolve the relation's model to a Relation object.
-                $relationObj = $model->$method();
-                if (!($relationObj instanceof Relation)) {
+                if (
+                    !stripos($code, sprintf('$this->%s(', $relation)) ||
+                    !(($relationObj = $model->$method()) instanceof Relation) ||
+                    !in_array(MetadataTrait::class, class_uses($relObject = $relationObj->getRelated()))
+                ) {
                     continue;
                 }
-                $relObject = $relationObj->getRelated();
-                $relatedModel = '\\' . get_class($relObject);
-                if (!in_array(MetadataTrait::class, class_uses($relatedModel))) {
-                    continue;
-                }
-                $targObject = $biDir ? $relationObj : $relatedModel;
+                $targObject = $biDir ? $relationObj : '\\' . get_class($relObject);
                 if (in_array($relation, static::$manyRelTypes)) {
                     //Collection or array of models (because Collection is Arrayable)
                     $relationships['HasMany'][$method] = $targObject;
