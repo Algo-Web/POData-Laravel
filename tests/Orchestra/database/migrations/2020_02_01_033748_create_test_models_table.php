@@ -26,6 +26,49 @@ class CreateTestModelsTable extends Migration
             $table->increments('id');
             $table->timestamps();
         });
+
+        Schema::create('test_has_many_through_models', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
+            $table->string('name')->default('');
+            $table->timestamp('added_at')->useCurrent();
+            $table->float('weight')->default(0);
+            $table->string('code')->default('');
+        });
+
+        Schema::create('test_has_many_models', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
+            $table->string('name')->default('');
+            $table->timestamp('added_at')->useCurrent();
+            $table->float('weight')->default(0);
+            $table->string('code')->default('');
+            $table->integer('parent_id')->index()->nullable();
+        });
+
+        Schema::create('test_belongs_to_models', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
+            $table->string('name')->default('');
+            $table->timestamp('added_at')->useCurrent();
+            $table->float('weight')->default(0);
+            $table->string('code')->default('');
+            $table->integer('parent_id')->index()->nullable();
+        });
+
+        Schema::create('test_belongs_to_many_models', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
+            $table->string('name')->default('');
+            $table->timestamp('added_at')->useCurrent();
+            $table->float('weight')->default(0);
+            $table->string('code')->default('');
+        });
+
+        Schema::create('test_belongs_to_many_pivot', function (Blueprint $table) {
+            $table->integer('left_id')->index();
+            $table->integer('right_id')->index();
+        });
     }
 
     /**
