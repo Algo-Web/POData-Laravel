@@ -173,7 +173,7 @@ trait MetadataRelationsTrait
                 }
             }
         }
-        static::$relationCategories[$biDirVal] = $relationships;
+        return static::$relationCategories[$biDirVal] = $relationships;
     }
 
     /**
