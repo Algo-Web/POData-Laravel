@@ -28,10 +28,7 @@ trait MetadataKeyMethodNamesTrait
         $thruName = $foo instanceof HasManyThrough ?
             $this->polyglotThroughKeyMethodNames($foo) :
             null;
-        list($fkMethodName, $rkMethodName) = $foo instanceof BelongsToMany ?
-             $this->polyglotKeyMethodNames($foo, true ):
-             $this->polyglotKeyMethodNames($foo, true);
-
+        list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo);
         return [$thruName, $fkMethodName, $rkMethodName];
     }
 
@@ -42,7 +39,7 @@ trait MetadataKeyMethodNamesTrait
      * @throws InvalidOperationException
      * @return array
      */
-    protected function polyglotKeyMethodNames(Relation $foo, $condition = false)
+    protected function polyglotKeyMethodNames(Relation $foo)
     {
         if ($foo instanceof BelongsTo) {
             // getForeignKey for laravel 5.5
@@ -87,16 +84,13 @@ trait MetadataKeyMethodNamesTrait
      */
     protected function getModelClassMethods(Model $model)
     {
-        $methods = get_class_methods($model);
-        $filter = function ($method) {
-            return (!method_exists('Illuminate\Database\Eloquent\Model', $method)
-                    && !method_exists(Mock::class, $method)
-                    && !method_exists(MetadataTrait::class, $method)
-            );
-        };
-        $methods = array_filter($methods, $filter);
-
-        return $methods;
+        return array_diff(
+            get_class_methods($model),
+            get_class_methods(\Illuminate\Database\Eloquent\Model::class),
+            //TODO: sandi what will happen if Mock is not installed (I.e. Production?)
+            get_class_methods(Mock::class),
+            get_class_methods(MetadataTrait::class)
+        );
     }
 
     /**
