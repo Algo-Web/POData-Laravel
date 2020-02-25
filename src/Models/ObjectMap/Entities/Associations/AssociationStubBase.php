@@ -230,7 +230,7 @@ abstract class AssociationStubBase
      */
     public function setThroughFieldChain(?array $foreignField)
     {
-        ///    $this->throughFieldChain = $foreignField;
+        $this->throughFieldChain = $foreignField;
     }
     /**
      * Supply a canonical sort ordering to determine order in associations.
