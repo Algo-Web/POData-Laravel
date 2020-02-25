@@ -324,12 +324,6 @@ trait MetadataTrait
      */
     public function extractGubbins()
     {
-        $multArray = [
-            '*' => AssociationStubRelationType::MANY(),
-            '1' => AssociationStubRelationType::ONE(),
-            '0..1' => AssociationStubRelationType::NULL_ONE()
-        ];
-
         $gubbins = new EntityGubbins();
         $gubbins->setName($this->getEndpointName());
         $gubbins->setClassName(get_class($this));
@@ -360,7 +354,7 @@ trait MetadataTrait
             $gubbins->setFields($entityFields);
         }
 
-        $rawRels = $this->getRelationships(true);
+        $rawRels = $this->getRelationships();
         $stubs = [];
         foreach ($rawRels as $propertyName) {
             if (in_array(strtolower($propertyName), $lowerNames)) {

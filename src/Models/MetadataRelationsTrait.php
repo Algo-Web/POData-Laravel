@@ -14,53 +14,25 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Mockery\Mock;
 use POData\Common\InvalidOperationException;
 
 trait MetadataRelationsTrait
 {
-    use MetadataKeyMethodNamesTrait;
-
-    protected static $relationHooks = [];
-    protected static $relationCategories = [];
-
-
     /**
      * Get model's relationships.
      *
-     * @param  mixed                     $temping
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @return array
      */
-    public function getRelationships($temping = false)
+    public function getRelationships()
     {
-        if ($temping) {
-            $rels = $this->getRelationshipsFromMethods(true);
-            return array_unique(array_merge(
-                array_keys($rels['UnknownPolyMorphSide']),
-                array_keys($rels['KnownPolyMorphSide']),
-                array_keys($rels['HasOne']),
-                array_keys($rels['HasMany'])
-            ));
-        }
-        if (empty(static::$relationHooks)) {
-            $hooks = [];
-
-            $rels = $this->getRelationshipsFromMethods(true);
-
-            $this->getRelationshipsUnknownPolyMorph($rels, $hooks);
-
-            $this->getRelationshipsKnownPolyMorph($rels, $hooks);
-
-            $this->getRelationshipsHasOne($rels, $hooks);
-
-            $this->getRelationshipsHasMany($rels, $hooks);
-
-            static::$relationHooks = $hooks;
-        }
-
-        return static::$relationHooks;
+        return $this->getRelationshipsFromMethods();
     }
+
+    private $hasUnknownPolymorphic = false;
+    private $hasKnownPolymorphic = false;
 
     /**
      * Is this model the known side of at least one polymorphic relation?
@@ -73,7 +45,7 @@ trait MetadataRelationsTrait
         // isKnownPolymorph needs to be checking KnownPolymorphSide results - if you're checking UnknownPolymorphSide,
         // you're turned around
         $rels = $this->getRelationshipsFromMethods();
-        return !empty($rels['KnownPolyMorphSide']);
+        return $this->hasKnownPolymorphic;
     }
 
     /**
@@ -87,7 +59,7 @@ trait MetadataRelationsTrait
         // isUnknownPolymorph needs to be checking UnknownPolymorphSide results - if you're checking KnownPolymorphSide,
         // you're turned around
         $rels = $this->getRelationshipsFromMethods();
-        return !empty($rels['UnknownPolyMorphSide']);
+        return $this->hasUnknownPolymorphic;
     }
     /**
      * @param  \ReflectionMethod         $method
@@ -120,7 +92,20 @@ trait MetadataRelationsTrait
         }
         return $code;
     }
-
+    /**
+     * @param  Model $model
+     * @return array
+     */
+    protected function getModelClassMethods(Model $model)
+    {
+        // TODO: Handle case when Mock::class not present
+        return array_diff(
+            get_class_methods($model),
+            get_class_methods(Model::class),
+            get_class_methods(Mock::class),
+            get_class_methods(MetadataTrait::class)
+        );
+    }
     /**
      * @param bool $biDir
      *
@@ -128,21 +113,16 @@ trait MetadataRelationsTrait
      * @throws \ReflectionException
      * @return array
      */
-    protected function getRelationshipsFromMethods(bool $biDir = false)
+    protected function getRelationshipsFromMethods()
     {
-        $biDirVal = intval($biDir);
+        /*$biDirVal = true;
         $isCached = isset(static::$relationCategories[$biDirVal]) && !empty(static::$relationCategories[$biDirVal]);
         if ($isCached) {
             return static::$relationCategories[$biDirVal];
-        }
+        }*/
+        $relationships = [];
         /** @var Model $model */
         $model = $this;
-        $relationships = [
-            'HasOne' => [],
-            'UnknownPolyMorphSide' => [],
-            'HasMany' => [],
-            'KnownPolyMorphSide' => []
-        ];
         $methods = $this->getModelClassMethods($model);
         foreach ($methods as $method) {
             //Use reflection to inspect the code, based on Illuminate/Support/SerializableClosure.php
@@ -153,172 +133,18 @@ trait MetadataRelationsTrait
                 if (
                     !stripos($code, sprintf('$this->%s(', $relation)) ||
                     !(($relationObj = $model->$method()) instanceof Relation) ||
-                    !in_array(MetadataTrait::class, class_uses($relObject = $relationObj->getRelated()))
+                    !in_array(MetadataTrait::class, class_uses($relationObj->getRelated()))
                 ) {
                     continue;
                 }
-                $targetClass = $relation == 'morphTo' ?
-                    '\Illuminate\Database\Eloquent\Model|\Eloquent' :
-                    '\\' . get_class($relObject);
-                $targObject = $biDir ? $relationObj : $targetClass;
-                $relToKeyMap = [
-                    'morphedByMany' => ['UnknownPolyMorphSide','HasMany'],
-                    'morphToMany' => ['KnownPolyMorphSide', 'HasMany'],
-                    'morphMany' => ['KnownPolyMorphSide', 'HasMany'],
-                    'hasMany' => ['HasMany'],
-                    'hasManyThrough' => ['HasMany'],
-                    'belongsToMany' => ['HasMany'],
-                    'morphOne' => ['KnownPolyMorphSide', 'HasOne'],
-                    'hasOne' => ['HasOne'],
-                    'belongsTo' => ['HasOne'],
-                    'morphTo' => ['UnknownPolyMorphSide'],
-                ];
-                foreach ($relToKeyMap[$relation] as $key) {
-                    $relationships[$key][$method] = $targObject;
+                if (in_array($relation, ['morphedByMany','morphTo'])) {
+                    $this->hasUnknownPolymorphic = true;
+                } elseif (in_array($relation, ['morphOne','morphMany','morphToMany'])) {
+                    $this->hasKnownPolymorphic = true;
                 }
+                $relationships[]= $method;
             }
         }
-        return static::$relationCategories[$biDirVal] = $relationships;
-    }
-
-    /**
-     * @param  array                     $rels
-     * @param  array                     $hooks
-     * @throws InvalidOperationException
-     */
-    protected function getRelationshipsHasMany(array $rels, array &$hooks)
-    {
-        /**
-         * @var string   $property
-         * @var Relation $relation
-         */
-        foreach ($rels['HasMany'] as $property => $relation) {
-            if ($relation instanceof MorphMany || $relation instanceof MorphToMany) {
-                continue;
-            }
-            $mult = '*';
-            $targ = get_class($relation->getRelated());
-            $keyName = $this->polyglotFkKey($relation);
-            $localName = $this->polyglotRkKey($relation);
-            $thruName = $relation instanceof HasManyThrough ?
-                $this->polyglotThroughKey($relation) :
-                null;
-
-            $first = $keyName;
-            $last = $localName;
-            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, null, $thruName);
-        }
-    }
-
-    /**
-     * @param  array                     $rels
-     * @param  array                     $hooks
-     * @throws InvalidOperationException
-     */
-    protected function getRelationshipsHasOne(array $rels, array &$hooks)
-    {
-        /**
-         * @var string   $property
-         * @var Relation $foo
-         */
-        foreach ($rels['HasOne'] as $property => $foo) {
-            if ($foo instanceof MorphOne) {
-                continue;
-            }
-            $isBelong = $foo instanceof BelongsTo;
-            $mult = $isBelong ? '1' : '0..1';
-            $targ = get_class($foo->getRelated());
-
-            $keyName = $this->polyglotFkKey($foo);
-            $localName = $this->polyglotRkKey($foo);
-            $first = $isBelong ? $localName : $keyName;
-            $last = $isBelong ? $keyName : $localName;
-            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ);
-        }
-    }
-
-    /**
-     * @param  array                     $rels
-     * @param  array                     $hooks
-     * @throws InvalidOperationException
-     */
-    protected function getRelationshipsKnownPolyMorph(array $rels, array &$hooks)
-    {
-        /**
-         * @var string   $property
-         * @var Relation $foo
-         */
-        foreach ($rels['KnownPolyMorphSide'] as $property => $foo) {
-            $isMany = $foo instanceof MorphToMany;
-            $targ = get_class($foo->getRelated());
-            $mult = $isMany || $foo instanceof MorphMany ? '*' : '1';
-            $mult = $foo instanceof MorphOne ? '0..1' : $mult;
-
-            $keyName = $this->polyglotFkKey($foo);
-            $localName = $this->polyglotRkKey($foo);
-            $first = $isMany ? $keyName : $localName;
-            $last = $isMany ? $localName : $keyName;
-            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, 'unknown');
-        }
-    }
-
-    /**
-     * @param  array                     $rels
-     * @param  array                     $hooks
-     * @throws InvalidOperationException
-     */
-    protected function getRelationshipsUnknownPolyMorph(array $rels, array &$hooks)
-    {
-        /**
-         * @var string   $property
-         * @var Relation $foo
-         */
-        foreach ($rels['UnknownPolyMorphSide'] as $property => $foo) {
-            $isMany = $foo instanceof MorphToMany;
-            $targ = get_class($foo->getRelated());
-            $mult = $isMany ? '*' : '1';
-
-            $keyName = $this->polyglotFkKey($foo);
-            $localName = $this->polyglotRkKey($foo);
-
-            $first = $keyName;
-            $last = (isset($localName) && '' != $localName) ? $localName : $foo->getRelated()->getKeyName();
-            $this->addRelationsHook($hooks, $first, $property, $last, $mult, $targ, 'known');
-        }
-    }
-
-    /**
-     * @param             $hooks
-     * @param             $foreignField
-     * @param             $RelationName
-     * @param             $localKey
-     * @param             $mult
-     * @param string|null $relatedObject
-     * @param mixed|null  $type
-     * @param mixed|null  $through
-     */
-    protected function addRelationsHook(
-        array &$hooks,
-        $foreignField,
-        $RelationName,
-        $localKey,
-        $mult,
-        $relatedObject,
-        $type = null,
-        $through = null
-    ) {
-        if (!isset($hooks[$foreignField])) {
-            $hooks[$foreignField] = [];
-        }
-        if (!isset($hooks[$foreignField][$relatedObject])) {
-            $hooks[$foreignField][$relatedObject] = [];
-        }
-        $hooks[$foreignField][$relatedObject][$RelationName] = [
-            'property' => $RelationName,
-            'local' => $localKey,
-            'through' => $through,
-            'multiplicity' => $mult,
-            'type' => $type
-        ];
+        return $relationships;
     }
 }
