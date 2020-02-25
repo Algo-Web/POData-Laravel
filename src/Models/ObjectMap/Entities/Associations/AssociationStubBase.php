@@ -226,11 +226,11 @@ abstract class AssociationStubBase
     }
 
     /**
-     * @param string[]|null $foreignField
+     * @param string[]|null $keyChain
      */
-    public function setThroughFieldChain(?array $foreignField)
+    public function setThroughFieldChain(?array $keyChain)
     {
-        $this->throughFieldChain = $foreignField;
+        $this->throughFieldChain = $keyChain;
     }
     /**
      * Supply a canonical sort ordering to determine order in associations.
