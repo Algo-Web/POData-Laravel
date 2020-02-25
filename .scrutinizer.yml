@@ -175,3 +175,7 @@ tools:
   php_pdepend: true
   php_sim: true
   php_changetracking: true
+
+build_failure_conditions:
+  - 'elements.rating(<= F).new.exists'
+  - 'issues.severity(>= CRITICAL).new.exists'

@@ -8,6 +8,7 @@ php:
   - nightly
   
 before_script:
+  - set -e & find ./src -type f -iname "*.php" -print0 | while IFS= read -r -d $'\0' line; do php -l "$line"; done;
   - pecl install pcov
   - phpenv config-rm xdebug.ini
   - mkdir -p bootstrap/cache

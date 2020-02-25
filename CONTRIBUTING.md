@@ -4,6 +4,14 @@ Contribution policies, workflows, etc
 
 **Development practice**
 
+* **Bring your work up to date**
+Merging changes based on old code is painful and annoying, at best.
+Please resolve merge conflicts and the like by rebasing atop the master
+HEAD commit.
+
+As you rebase, please roll in typo-fix commits, whoops-forgot-this commits,
+and the like to the commit that gave rise to them.
+
 * **Don't break the project**
 If the Travis build doesn't pass cleanly, that's broken enough for us.
 The PHP-nightly-version builds are permitted to fail - when someone manages
@@ -37,8 +45,14 @@ on this project.  We've hooked up Scrutinizer as part of our CI process
 and have found that it both finds bugs directly, and makes other bugs
 easier to find.
 
-Please don't introduce any new critical-severity issues - the one
-currently in codebase we do want to get rid of.
+Please don't introduce any new critical-severity issues.
+
+Likewise, please don't introduce any classes or methods that Scrutinizer rates
+F (D, C, B and A are fine).
+
+We've found, from bitter experience, that F-rated classes are very difficult
+to understand, and if it can't be understood, it can't be reviewed.  If it
+can't be reviewed, it's not going to be merged.
 
 For every new issue you end up introducing, please ensure that you
 resolve at least two others.
