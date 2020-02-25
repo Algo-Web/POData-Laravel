@@ -22,6 +22,12 @@ abstract class AssociationStubBase
      * @var string|null
      */
     protected $throughField;
+    /**
+     * A list of fields to Traverse between Keyfield and foreignField
+     *
+     * @var string[]
+     */
+    protected $throughFieldChain;
 
     /**
      * Foreign key field of other end of relation.
@@ -211,7 +217,21 @@ abstract class AssociationStubBase
     {
         $this->throughField = $foreignField;
     }
+    /**
+     * @return string[]|null
+     */
+    public function getThroughFieldChain(): array
+    {
+        return $this->throughFieldChain;
+    }
 
+    /**
+     * @param string[]|null $foreignField
+     */
+    public function setThroughFieldChain(?array $foreignField)
+    {
+    ///    $this->throughFieldChain = $foreignField;
+    }
     /**
      * Supply a canonical sort ordering to determine order in associations.
      *

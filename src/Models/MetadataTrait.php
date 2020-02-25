@@ -1,6 +1,7 @@
 <?php
 namespace AlgoWeb\PODataLaravel\Models;
 
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubFactory;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
@@ -359,36 +360,18 @@ trait MetadataTrait
             $gubbins->setFields($entityFields);
         }
 
-        $rawRels = $this->getRelationships();
+        $rawRels = $this->getRelationships(true);
         $stubs = [];
-        foreach ($rawRels as $key => $rel) {
-            foreach ($rel as $rawName => $deets) {
-                foreach ($deets as $relName => $relGubbins) {
-                    if (in_array(strtolower($relName), $lowerNames)) {
-                        $msg = 'Property names must be unique, without regard to case';
-                        throw new \Exception($msg);
-                    }
-                    $lowerNames[] = strtolower($relName);
-                    $gubbinsType = $relGubbins['type'];
-                    $property = $relGubbins['property'];
-                    $isPoly = isset($gubbinsType);
-                    $targType = 'known' != $gubbinsType ? $rawName : null;
-                    $stub = $isPoly ? new AssociationStubPolymorphic() : new AssociationStubMonomorphic();
-                    $stub->setBaseType(get_class($this));
-                    $stub->setRelationName($property);
-                    $stub->setKeyField($relGubbins['local']);
-                    $stub->setForeignField($targType ? $key : null);
-                    $stub->setMultiplicity($multArray[$relGubbins['multiplicity']]);
-                    $stub->setTargType($targType);
-                    if (null !== $relGubbins['through']) {
-                        $stub->setThroughField($relGubbins['through']);
-                    }
-                    if (!$stub->isOk()) {
-                        throw new InvalidOperationException('Generated stub not consistent');
-                    }
-                    $stubs[$property] = $stub;
-                }
+        foreach ($rawRels as $propertyName) {
+            if (in_array(strtolower($propertyName), $lowerNames)) {
+                $msg = 'Property names must be unique, without regard to case';
+                throw new \Exception($msg);
             }
+            $stub = AssociationStubFactory::associationStubFromRelation($propertyName, $this->{$propertyName}());
+            if (!$stub->isOk()) {
+                throw new InvalidOperationException('Generated stub not consistent');
+            }
+            $stubs[$propertyName] = $stub;
         }
         $gubbins->setStubs($stubs);
 
