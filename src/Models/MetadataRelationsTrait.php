@@ -31,8 +31,17 @@ trait MetadataRelationsTrait
      * @throws \ReflectionException
      * @return array
      */
-    public function getRelationships()
+    public function getRelationships($temping = false)
     {
+        if($temping) {
+            $rels = $this->getRelationshipsFromMethods(true);
+            return array_unique(array_merge(
+                array_keys($rels['UnknownPolyMorphSide']),
+                array_keys($rels['KnownPolyMorphSide']),
+                array_keys($rels['HasOne']),
+                array_keys($rels['HasMany'])
+            ));
+        }
         if (empty(static::$relationHooks)) {
             $hooks = [];
 
