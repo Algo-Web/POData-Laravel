@@ -42,9 +42,9 @@ trait MetadataKeyMethodNamesTrait
     }
 
     /**
-     * @param Relation $rel
-     * @return mixed
+     * @param  Relation                  $rel
      * @throws InvalidOperationException
+     * @return mixed
      */
     protected function polyglotRkKey(Relation $rel)
     {
@@ -70,9 +70,9 @@ trait MetadataKeyMethodNamesTrait
     }
 
     /**
-     * @param Relation $rel
-     * @return mixed
+     * @param  Relation                  $rel
      * @throws InvalidOperationException
+     * @return mixed
      */
     protected function polyglotThroughKey(Relation $rel)
     {

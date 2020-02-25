@@ -104,7 +104,7 @@ class ODataControllerTest extends TestCase
         $this->assertEquals(200, $result->getStatusCode());
         $actual = $result->getContent();
         //$this->assertEquals($expected, $actual);
-        $expectedContent = "application/atomsvc+xml;charset=utf-8;charset=UTF-8";
+        $expectedContent = 'application/atomsvc+xml;charset=utf-8;charset=UTF-8';
         $actualContent = $result->headers->get('content-type');
         $this->assertEquals($expectedContent, $actualContent);
     }

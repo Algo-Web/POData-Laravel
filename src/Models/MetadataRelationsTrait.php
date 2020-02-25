@@ -27,13 +27,14 @@ trait MetadataRelationsTrait
     /**
      * Get model's relationships.
      *
+     * @param  mixed                     $temping
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @return array
      */
     public function getRelationships($temping = false)
     {
-        if($temping) {
+        if ($temping) {
             $rels = $this->getRelationshipsFromMethods(true);
             return array_unique(array_merge(
                 array_keys($rels['UnknownPolyMorphSide']),
@@ -89,9 +90,9 @@ trait MetadataRelationsTrait
         return !empty($rels['UnknownPolyMorphSide']);
     }
     /**
-     * @param \ReflectionMethod $method
-     * @return string
+     * @param  \ReflectionMethod         $method
      * @throws InvalidOperationException
+     * @return string
      */
     protected function getCodeForMethod(\ReflectionMethod $method) : string
     {

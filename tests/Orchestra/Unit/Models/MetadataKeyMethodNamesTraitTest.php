@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 23/02/20
- * Time: 1:26 PM
+ * Time: 1:26 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Models;
 
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\RelationTestDummyModel;

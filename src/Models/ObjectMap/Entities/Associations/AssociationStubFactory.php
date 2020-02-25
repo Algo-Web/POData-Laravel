@@ -39,9 +39,9 @@ abstract class AssociationStubFactory
     }
 
     /**
-     * @param string $name
-     * @param Relation $relation
-     * @param string $cacheKey
+     * @param  string              $name
+     * @param  Relation            $relation
+     * @param  string              $cacheKey
      * @return AssociationStubBase
      */
     protected static function handleBelongsTo(string $name, Relation $relation, $cacheKey = 'BelongsTo'): AssociationStubBase
@@ -59,12 +59,12 @@ abstract class AssociationStubFactory
     }
 
     /**
-     * @param string $name
-     * @param Relation $relation
-     * @param string $cacheKey
+     * @param  string              $name
+     * @param  Relation            $relation
+     * @param  string              $cacheKey
      * @return AssociationStubBase
      */
-    protected static function handleMorphTo(string $name, Relation $relation, $cacheKey = 'BelongsTo') : AssociationStubBase
+    protected static function handleMorphTo(string $name, Relation $relation, $cacheKey = 'BelongsTo'): AssociationStubBase
     {
         $stub = new AssociationStubPolymorphic();
         $keyChain = self::getKeyChain($relation, $cacheKey);
@@ -80,9 +80,9 @@ abstract class AssociationStubFactory
 
 
     /**
-     * @param string $name
-     * @param Relation $relation
-     * @param string $cacheKey
+     * @param  string              $name
+     * @param  Relation            $relation
+     * @param  string              $cacheKey
      * @return AssociationStubBase
      */
     protected static function handleBelongsToMany(string $name, Relation $relation, $cacheKey = 'BelongsToMany'): AssociationStubBase
@@ -99,9 +99,9 @@ abstract class AssociationStubFactory
         return $stub;
     }
     /**
-     * @param string $name
-     * @param Relation $relation
-     * @param string $cacheKey
+     * @param  string              $name
+     * @param  Relation            $relation
+     * @param  string              $cacheKey
      * @return AssociationStubBase
      */
     protected static function handleHasManyThrough(string $name, Relation $relation, $cacheKey = 'HasManyThrough'): AssociationStubBase
@@ -124,9 +124,9 @@ abstract class AssociationStubFactory
     }
 
     /**
-     * @param string $name
-     * @param Relation $relation
-     * @param string $cacheKey
+     * @param  string              $name
+     * @param  Relation            $relation
+     * @param  string              $cacheKey
      * @return AssociationStubBase
      */
     protected static function handleMorphToMany(string $name, Relation $relation, $cacheKey = 'BelongsToMany'): AssociationStubBase
@@ -178,9 +178,9 @@ abstract class AssociationStubFactory
     }
 
     /**
-     * @param string $name
-     * @param MorphOne $relation
-     * @param string $cacheKey
+     * @param  string                     $name
+     * @param  MorphOne                   $relation
+     * @param  string                     $cacheKey
      * @return AssociationStubPolymorphic
      */
     protected static function handleMorphOne(string $name, Relation $relation, $cacheKey = 'HasOneOrMany')
@@ -198,9 +198,9 @@ abstract class AssociationStubFactory
     }
 
     /**
-     * @param string $name
-     * @param MorphMany $relation
-     * @param string $cacheKey
+     * @param  string                     $name
+     * @param  MorphMany                  $relation
+     * @param  string                     $cacheKey
      * @return AssociationStubPolymorphic
      */
     protected static function handleMorphMany(string $name, Relation $relation, $cacheKey = 'HasOneOrMany')
@@ -249,6 +249,5 @@ abstract class AssociationStubFactory
         'BelongsToMany' => ['parentKey','foreignPivotKey','relatedPivotKey','relatedKey'],
         'HasOneOrMany' => ['localKey', 'foreignKey' ],
         'HasManyThrough' => ['localKey', 'firstKey', 'secondLocalKey', 'secondKey'],
-
     ];
 }

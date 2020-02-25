@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 23/02/20
- * Time: 11:52 PM
+ * Time: 11:52 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Request;
 
 use Illuminate\Foundation\Http\FormRequest;

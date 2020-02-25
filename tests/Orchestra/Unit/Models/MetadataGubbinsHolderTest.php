@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 23/02/20
- * Time: 5:18 PM
+ * Time: 5:18 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;

@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 24/02/20
- * Time: 3:53 PM
+ * Time: 3:53 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Providers;
 
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Controllers\OrchestraBadTrait;
@@ -29,7 +28,7 @@ class MetadataControllerProviderTest extends TestCase
         $expected = [new OrchestraBallastController(), new OrchestraTestController()];
 
         $app = m::mock(Application::class);
-        $app->shouldReceive("runningInConsole")->andReturn(true);
+        $app->shouldReceive('runningInConsole')->andReturn(true);
         $app->shouldReceive('make')->withArgs([OrchestraTestController::class])
             ->andReturn(new OrchestraTestController());
         $app->shouldReceive('make')->withArgs([OrchestraBallastController::class])
@@ -47,7 +46,7 @@ class MetadataControllerProviderTest extends TestCase
         $expected = [new OrchestraTestController()];
 
         $app = m::mock(Application::class);
-        $app->shouldReceive("runningInConsole")->andReturn(true);
+        $app->shouldReceive('runningInConsole')->andReturn(true);
         $app->shouldReceive('make')->withArgs([OrchestraTestController::class])
             ->andReturn(new OrchestraTestController());
         $foo = new DummyMetadataControllerProvider($app);
@@ -62,7 +61,7 @@ class MetadataControllerProviderTest extends TestCase
         $expected = [new OrchestraTestController()];
 
         $app = m::mock(Application::class);
-        $app->shouldReceive("runningInConsole")->andReturn(true);
+        $app->shouldReceive('runningInConsole')->andReturn(true);
         $app->shouldReceive('make')->withArgs([OrchestraTestController::class])
             ->andReturn(new OrchestraTestController());
 
@@ -79,7 +78,7 @@ class MetadataControllerProviderTest extends TestCase
         $app = m::mock(\Illuminate\Foundation\Application::class)->makePartial();
         $app->shouldReceive('make')->withArgs([OrchestraTestController::class])
             ->andReturn(new OrchestraTestModel());
-        $app->shouldReceive("runningInConsole")->andReturn(false)->once();
+        $app->shouldReceive('runningInConsole')->andReturn(false)->once();
         $foo = new DummyMetadataControllerProvider($app);
 
         $this->expectException(InvalidOperationException::class);
