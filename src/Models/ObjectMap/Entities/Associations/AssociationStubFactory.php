@@ -135,22 +135,9 @@ abstract class AssociationStubFactory
      * @param  string              $cacheKey
      * @return AssociationStubPolymorphic
      */
-    protected static function handleMorphToMany(string $name, Relation $relation, $cacheKey = 'MorphToMany'): AssociationStubPolymorphic
+    protected static function handleMorphToMany(string $name, Relation $relation, $cacheKey = 'MorphToMany'): AssociationStubBase
     {
-        $inverseGetter = function () {
-            return $this->inverse;
-        };
-        $inverse = call_user_func($inverseGetter->bindTo($relation, MorphToMany::class));
-        $stub = new AssociationStubPolymorphic();
-        $keyChain = self::getKeyChain($relation, $cacheKey);
-        $stub->setRelationName($name);
-        $stub->setThroughFieldChain($keyChain);
-        $stub->setKeyField($keyChain[3]);
-        $stub->setForeignField($inverse ? null : $keyChain[1]);
-        $stub->setMultiplicity(AssociationStubRelationType::MANY());
-        $stub->setMorphType($keyChain[2]);
-        $stub->setTargType($inverse ? null : get_class($relation->getRelated()));
-        return $stub;
+        return self::handleBelongsToMany($name,$relation);
     }
 
     /**
