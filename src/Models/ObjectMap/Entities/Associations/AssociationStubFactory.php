@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,10 +17,22 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 
 abstract class AssociationStubFactory
 {
-    public static function associationStubFromRelation(string $name, Relation $relation): AssociationStubBase
+    /**
+     * @param Model $parent
+     * @param string $name
+     * @param Relation $relation
+     * @return AssociationStubBase
+     */
+    public static function associationStubFromRelation(Model $parent, string $name): AssociationStubBase
     {
+        $relation = $parent->{$name}();
         $handler = self::getHandlerMethod($relation);
-        return self::{'handle' . $handler}($name, $relation);
+        /**
+         * @var AssociationStubBase $stub
+         */
+        $stub = self::{'handle' . $handler}($name, $relation);
+        $stub->setBaseType(get_class($parent));
+        return $stub;
     }
 
     private static function getHandlerMethod(Relation $relation):string
@@ -42,13 +55,12 @@ abstract class AssociationStubFactory
      * @param  string              $name
      * @param  Relation            $relation
      * @param  string              $cacheKey
-     * @return AssociationStubBase
+     * @return AssociationStubMonomorphic
      */
-    protected static function handleBelongsTo(string $name, Relation $relation, $cacheKey = 'BelongsTo'): AssociationStubBase
+    protected static function handleBelongsTo(string $name, Relation $relation, $cacheKey = 'BelongsTo'): AssociationStubMonomorphic
     {
         $stub = new AssociationStubMonomorphic();
         $keyChain = self::getKeyChain($relation, $cacheKey);
-        $stub->setBaseType(get_class(self::getParent($relation)));
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
         $stub->setKeyField($keyChain[1]);
@@ -62,13 +74,12 @@ abstract class AssociationStubFactory
      * @param  string              $name
      * @param  Relation            $relation
      * @param  string              $cacheKey
-     * @return AssociationStubBase
+     * @return AssociationStubPolymorphic
      */
-    protected static function handleMorphTo(string $name, Relation $relation, $cacheKey = 'BelongsTo'): AssociationStubBase
+    protected static function handleMorphTo(string $name, Relation $relation, $cacheKey = 'BelongsTo'): AssociationStubPolymorphic
     {
         $stub = new AssociationStubPolymorphic();
         $keyChain = self::getKeyChain($relation, $cacheKey);
-        $stub->setBaseType(get_class(self::getParent($relation)));
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
         $stub->setKeyField($keyChain[0] ?: $relation->getRelated()->getKeyName());
@@ -83,13 +94,12 @@ abstract class AssociationStubFactory
      * @param  string              $name
      * @param  Relation            $relation
      * @param  string              $cacheKey
-     * @return AssociationStubBase
+     * @return AssociationStubMonomorphic
      */
-    protected static function handleBelongsToMany(string $name, Relation $relation, $cacheKey = 'BelongsToMany'): AssociationStubBase
+    protected static function handleBelongsToMany(string $name, Relation $relation, $cacheKey = 'BelongsToMany'): AssociationStubMonomorphic
     {
         $stub = new AssociationStubMonomorphic();
         $keyChain = self::getKeyChain($relation, $cacheKey);
-        $stub->setBaseType(get_class(self::getParent($relation)));
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
         $stub->setMultiplicity(AssociationStubRelationType::MANY());
@@ -102,17 +112,12 @@ abstract class AssociationStubFactory
      * @param  string              $name
      * @param  Relation            $relation
      * @param  string              $cacheKey
-     * @return AssociationStubBase
+     * @return AssociationStubMonomorphic
      */
-    protected static function handleHasManyThrough(string $name, Relation $relation, $cacheKey = 'HasManyThrough'): AssociationStubBase
+    protected static function handleHasManyThrough(string $name, Relation $relation, $cacheKey = 'HasManyThrough'): AssociationStubMonomorphic
     {
-        $farParentGetter = function () {
-            return $this->farParent;
-        };
-        $farParent = call_user_func($farParentGetter->bindTo($relation, HasManyThrough::class));
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub = new AssociationStubMonomorphic();
-        $stub->setBaseType(get_class($farParent));
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
         $stub->setMultiplicity(AssociationStubRelationType::MANY());
@@ -127,9 +132,9 @@ abstract class AssociationStubFactory
      * @param  string              $name
      * @param  Relation            $relation
      * @param  string              $cacheKey
-     * @return AssociationStubBase
+     * @return AssociationStubPolymorphic
      */
-    protected static function handleMorphToMany(string $name, Relation $relation, $cacheKey = 'BelongsToMany'): AssociationStubBase
+    protected static function handleMorphToMany(string $name, Relation $relation, $cacheKey = 'BelongsToMany'): AssociationStubPolymorphic
     {
         $inverseGetter = function () {
             return $this->inverse;
@@ -137,7 +142,6 @@ abstract class AssociationStubFactory
         $inverse = call_user_func($inverseGetter->bindTo($relation, MorphToMany::class));
         $stub = new AssociationStubPolymorphic();
         $keyChain = self::getKeyChain($relation, $cacheKey);
-        $stub->setBaseType(get_class(self::getParent($relation)));
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
         $stub->setKeyField($keyChain[2]);
@@ -147,13 +151,18 @@ abstract class AssociationStubFactory
         return $stub;
     }
 
-    protected static function handleHasOne(string $name, Relation $relation, $cacheKey = 'HasOneOrMany')
+    /**
+     * @param string $name
+     * @param Relation $relation
+     * @param string $cacheKey
+     * @return AssociationStubMonomorphic
+     */
+    protected static function handleHasOne(string $name, Relation $relation, $cacheKey = 'HasOneOrMany'): AssociationStubMonomorphic
     {
         $stub = new AssociationStubMonomorphic();
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
-        $stub->setBaseType(get_class(self::getParent($relation)));
         $stub->setKeyField($keyChain[0]);
         $stub->setForeignField($keyChain[1]);
         $stub->setTargType(get_class($relation->getRelated()));
@@ -161,33 +170,35 @@ abstract class AssociationStubFactory
         return $stub;
     }
 
-
-    protected static function handleHasMany(string $name, Relation $relation, $cacheKey = 'HasOneOrMany')
+    /**
+     * @param string $name
+     * @param Relation $relation
+     * @param string $cacheKey
+     * @return AssociationStubMonomorphic
+     */
+    protected static function handleHasMany(string $name, Relation $relation, $cacheKey = 'HasOneOrMany'): AssociationStubMonomorphic
     {
         $stub = new AssociationStubMonomorphic();
         $keyChain = self::getKeyChain($relation, $cacheKey);
-        $stub->setBaseType(get_class(self::getParent($relation)));
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
         $stub->setKeyField($keyChain[0]);
         $stub->setForeignField($keyChain[1]);
         $stub->setTargType(get_class($relation->getRelated()));
         $stub->setMultiplicity(AssociationStubRelationType::MANY());
-        $stub->setBaseType(get_class(self::getParent($relation)));
         return $stub;
     }
 
     /**
      * @param  string                     $name
-     * @param  MorphOne                   $relation
+     * @param  Relation                   $relation
      * @param  string                     $cacheKey
      * @return AssociationStubPolymorphic
      */
-    protected static function handleMorphOne(string $name, Relation $relation, $cacheKey = 'HasOneOrMany')
+    protected static function handleMorphOne(string $name, Relation $relation, $cacheKey = 'HasOneOrMany'):AssociationStubPolymorphic
     {
         $stub = new AssociationStubPolymorphic();
         $keyChain = self::getKeyChain($relation, $cacheKey);
-        $stub->setBaseType(get_class(self::getParent($relation)));
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
         $stub->setKeyField($keyChain[1]);
@@ -199,15 +210,14 @@ abstract class AssociationStubFactory
 
     /**
      * @param  string                     $name
-     * @param  MorphMany                  $relation
+     * @param  Relation                   $relation
      * @param  string                     $cacheKey
      * @return AssociationStubPolymorphic
      */
-    protected static function handleMorphMany(string $name, Relation $relation, $cacheKey = 'HasOneOrMany')
+    protected static function handleMorphMany(string $name, Relation $relation, $cacheKey = 'HasOneOrMany'): AssociationStubPolymorphic
     {
         $stub = new AssociationStubPolymorphic();
         $keyChain = self::getKeyChain($relation, $cacheKey);
-        $stub->setBaseType(get_class(self::getParent($relation)));
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
         $stub->setKeyField($keyChain[1]);
@@ -217,14 +227,11 @@ abstract class AssociationStubFactory
         return $stub;
     }
 
-    private static function getParent(Relation $relation)
-    {
-        $getter = function () {
-            return $this->parent;
-        };
-        return call_user_func($getter->bindTo($relation, Relation::class));
-    }
-
+    /**
+     * @param Relation $relation
+     * @param string $cacheKey
+     * @return array
+     */
     private static function getKeyChain(Relation $relation, string $cacheKey) : array
     {
         $fields = self::$fieldOrderCache[$cacheKey];

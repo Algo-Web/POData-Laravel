@@ -352,7 +352,7 @@ trait MetadataTrait
                 $msg = 'Property names must be unique, without regard to case';
                 throw new \Exception($msg);
             }
-            $stub = AssociationStubFactory::associationStubFromRelation($propertyName, $this->{$propertyName}());
+            $stub = AssociationStubFactory::associationStubFromRelation($this, $propertyName);
             if (!$stub->isOk()) {
                 throw new InvalidOperationException('Generated stub not consistent');
             }
