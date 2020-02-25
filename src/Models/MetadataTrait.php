@@ -22,6 +22,11 @@ use Mockery\Mock;
 use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\Type\IType;
 
+/**
+ * Trait MetadataTrait
+ * @package AlgoWeb\PODataLaravel\Models
+ * @mixin Model
+ */
 trait MetadataTrait
 {
     use MetadataRelationsTrait;
