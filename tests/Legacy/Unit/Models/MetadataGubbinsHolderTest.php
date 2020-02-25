@@ -116,7 +116,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $expected->setBaseType(TestMonomorphicTarget::class);
         $expected->setTargType(TestMonomorphicSource::class);
         $expected->setMultiplicity(AssociationStubRelationType::ONE());
-        $expected->setThroughFieldChain(['one_id', 'one_source']);
+        $expected->setThroughFieldChain(['one_source', 'one_id']);
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicSource::class, 'oneSource');
         $this->assertEquals(1, count($result));
@@ -177,7 +177,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $expected->setBaseType(TestMonomorphicTarget::class);
         $expected->setTargType(TestMonomorphicSource::class);
         $expected->setMultiplicity(AssociationStubRelationType::ONE());
-        $expected->setThroughFieldChain(['many_id','many_source']);
+        $expected->setThroughFieldChain(['many_source','many_id']);
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicSource::class, 'manySource');
         $this->assertEquals(1, count($result));
@@ -322,7 +322,8 @@ class MetadataGubbinsHolderTest extends TestCase
         $expected->setBaseType(TestMorphTarget::class);
         $expected->setTargType(null);
         $expected->setMultiplicity(AssociationStubRelationType::ONE());
-        $expected->setThroughFieldChain([null,'morph_id']);
+        $expected->setThroughFieldChain(['morph_id', 'morph_type', null]);
+        $expected->setMorphType('morph_type');
 
         $result = $foo->getRelationsByRelationName(TestMorphOneSource::class, 'morphTarget');
         $this->assertEquals(1, count($result));
@@ -353,7 +354,8 @@ class MetadataGubbinsHolderTest extends TestCase
         $expected->setBaseType(TestMorphTarget::class);
         $expected->setTargType(null);
         $expected->setMultiplicity(AssociationStubRelationType::ONE());
-        $expected->setThroughFieldChain([null, 'morph_id']);
+        $expected->setThroughFieldChain(['morph_id', 'morph_type', null]);
+        $expected->setMorphType('morph_type');
 
         $result = $foo->getRelationsByRelationName(TestMorphManySource::class, 'morphTarget');
         $this->assertEquals(1, count($result));
@@ -384,7 +386,8 @@ class MetadataGubbinsHolderTest extends TestCase
         $expected->setBaseType(TestMorphManyToManyTarget::class);
         $expected->setTargType(null);
         $expected->setMultiplicity(AssociationStubRelationType::MANY());
-        $expected->setThroughFieldChain(["id", "target_id", "source_id", "id"]);
+        $expected->setThroughFieldChain(["id", "target_id", 'manyable_type', "source_id", "id"]);
+        $expected->setMorphType('manyable_type');
 
         $result = $foo->getRelationsByRelationName(TestMorphManyToManySource::class, 'manySource');
         $this->assertEquals(1, count($result));
