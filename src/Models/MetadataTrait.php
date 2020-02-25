@@ -45,15 +45,6 @@ trait MetadataTrait
         'morphedByMany'
     ];
 
-    protected static $manyRelTypes = [
-        'hasManyThrough',
-        'belongsToMany',
-        'hasMany',
-        'morphMany',
-        'morphToMany',
-        'morphedByMany'
-    ];
-
     /**
      * Retrieve and assemble this model's metadata for OData packaging.
      * @throws InvalidOperationException
