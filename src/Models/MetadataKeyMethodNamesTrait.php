@@ -8,92 +8,77 @@
 namespace AlgoWeb\PODataLaravel\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Mockery\Mock;
 use POData\Common\InvalidOperationException;
 
 trait MetadataKeyMethodNamesTrait
 {
-    /**
-     * @param  Relation                  $foo
-     * @throws InvalidOperationException
-     * @return array|null
-     */
-    protected function getRelationsHasManyKeyNames(Relation $foo)
+    protected function polyglotFkKey(Relation $rel)
     {
-        $thruName = null;
-        if ($foo instanceof HasManyThrough) {
-            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodBackupNames($foo, true);
-            $thruName = $this->polyglotThroughKeyMethodNames($foo);
-            return [$thruName, $fkMethodName, $rkMethodName];
+        switch (true) {
+            case $rel instanceof BelongsTo:
+                $key =  $rel->{$this->checkMethodNameList($rel, ['getForeignKeyName', 'getForeignKey'])}();
+                break;
+            case $rel instanceof BelongsToMany:
+                $key = $rel->getForeignPivotKeyName();
+                break;
+            case $rel instanceof HasOneOrMany:
+                $key = $rel->getForeignKeyName();
+                break;
+            case $rel instanceof HasManyThrough:
+                $key =  $rel->getQualifiedFarKeyName();
+                break;
+            default:
+                $msg = sprintf('Unknown Relationship Type %s', get_class($rel));
+                throw new InvalidOperationException($msg);
         }
-        if ($foo instanceof BelongsToMany) {
-            list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodNames($foo, true);
-            return [$thruName, $fkMethodName, $rkMethodName];
-        }
-        list($fkMethodName, $rkMethodName) = $this->polyglotKeyMethodBackupNames($foo, true);
-        return [$thruName, $fkMethodName, $rkMethodName];
+        $segments = explode('.', $key);
+        return end($segments);
     }
 
     /**
-     * @param Relation $foo
-     * @param mixed    $condition
-     *
+     * @param Relation $rel
+     * @return mixed
      * @throws InvalidOperationException
-     * @return array
      */
-    protected function polyglotKeyMethodNames(Relation $foo, $condition = false)
+    protected function polyglotRkKey(Relation $rel)
     {
-        // if $condition is falsy, return quickly - don't muck around
-        if (!$condition) {
-            return [null, null];
+        switch (true) {
+            case $rel instanceof BelongsTo:
+                $key = $rel->{$this->checkMethodNameList($rel, ['getOwnerKey', 'getOwnerKeyName'])}();
+                break;
+            case $rel instanceof BelongsToMany:
+                $key = $rel->getRelatedPivotKeyName();
+                break;
+            case $rel instanceof HasOneOrMany:
+                $key = $rel->{$this->checkMethodNameList($rel, ['getLocalKeyName', 'getQualifiedParentKeyName'])}();
+                break;
+            case $rel instanceof HasManyThrough:
+                $key = $rel->getQualifiedParentKeyName();
+                break;
+            default:
+                $msg = sprintf('Unknown Relationship Type %s', get_class($rel));
+                throw new InvalidOperationException($msg);
         }
-
-        $fkList = ['getQualifiedForeignPivotKeyName', 'getQualifiedForeignKeyName', 'getForeignKey'];
-        $rkList = ['getQualifiedRelatedPivotKeyName', 'getQualifiedRelatedKeyName', 'getOtherKey', 'getOwnerKey',
-            'getQualifiedOwnerKeyName'];
-
-        $fkMethodName = $this->checkMethodNameList($foo, $fkList);
-
-        $rkMethodName = $this->checkMethodNameList($foo, $rkList);
-
-        return [$fkMethodName, $rkMethodName];
+        $segments = explode('.', $key);
+        return end($segments);
     }
 
     /**
-     * @param  Relation                  $foo
-     * @param  bool                      $condition
+     * @param Relation $rel
+     * @return mixed
      * @throws InvalidOperationException
-     * @return array
      */
-    protected function polyglotKeyMethodBackupNames(Relation $foo, $condition = false)
+    protected function polyglotThroughKey(Relation $rel)
     {
-        // if $condition is falsy, return quickly - don't muck around
-        if (!$condition) {
-            return [null, null];
-        }
-
-        $fkList = ['getForeignKey', 'getForeignKeyName', 'getQualifiedFarKeyName'];
-        $rkList = ['getOtherKey', 'getQualifiedParentKeyName'];
-
-        $fkMethodName = $this->checkMethodNameList($foo, $fkList);
-
-        $rkMethodName = $this->checkMethodNameList($foo, $rkList);
-        return [$fkMethodName, $rkMethodName];
-    }
-
-    /**
-     * @param  HasManyThrough            $foo
-     * @throws InvalidOperationException
-     * @return string
-     */
-    protected function polyglotThroughKeyMethodNames(HasManyThrough $foo)
-    {
-        $thruList = ['getThroughKey', 'getQualifiedFirstKeyName'];
-
-        return $this->checkMethodNameList($foo, $thruList);
+        $key = $rel->{$this->checkMethodNameList($rel, ['getThroughKey', 'getQualifiedFirstKeyName'])}();
+        $segments = explode('.', $key);
+        return end($segments);
     }
 
     /**
@@ -102,16 +87,13 @@ trait MetadataKeyMethodNamesTrait
      */
     protected function getModelClassMethods(Model $model)
     {
-        $methods = get_class_methods($model);
-        $filter = function ($method) {
-            return (!method_exists('Illuminate\Database\Eloquent\Model', $method)
-                    && !method_exists(Mock::class, $method)
-                    && !method_exists(MetadataTrait::class, $method)
-            );
-        };
-        $methods = array_filter($methods, $filter);
-
-        return $methods;
+        // TODO: Handle case when Mock::class not present
+        return array_diff(
+            get_class_methods($model),
+            get_class_methods(\Illuminate\Database\Eloquent\Model::class),
+            get_class_methods(Mock::class),
+            get_class_methods(MetadataTrait::class)
+        );
     }
 
     /**
@@ -127,7 +109,7 @@ trait MetadataKeyMethodNamesTrait
                 return $methodName;
             }
         }
-        $msg = 'Expected at least 1 element in related-key list, got 0';
-        throw new InvalidOperationException($msg);
+        $msg = 'Expected at least 1 element in related-key list, got 0 for relation %s';
+        throw new InvalidOperationException(sprintf($msg, get_class($foo)));
     }
 }

@@ -14,11 +14,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 
 class RelationTestDummyModel extends Model
 {
-    use MetadataTrait {
-        MetadataTrait::polyglotKeyMethodNames as parentPolyglot;
-        MetadataTrait::polyglotKeyMethodBackupNames as parentPolyglotBackup;
-        MetadataTrait::polyglotThroughKeyMethodNames as parentThruNames;
-    }
+    use MetadataTrait;
 
     protected $relMethods = [];
 
@@ -36,26 +32,6 @@ class RelationTestDummyModel extends Model
         $this->relMethods = $methods;
     }
 
-    public function polyglotKeyMethodNames(Relation $foo, $condition = false)
-    {
-        return $this->parentPolyglot($foo, $condition);
-    }
-
-    public function polyglotKeyMethodBackupNames(Relation $foo, $condition = false)
-    {
-        return $this->parentPolyglotBackup($foo, $condition);
-    }
-
-    public function polyglotKeyMethodBackupNamesDefault(Relation $foo)
-    {
-        return $this->parentPolyglotBackup($foo);
-    }
-
-    public function polyglotThroughKeyMethodNames(HasManyThrough $foo)
-    {
-        return $this->parentThruNames($foo);
-    }
-
     public function bigReset()
     {
         $this->reset();
@@ -71,5 +47,20 @@ class RelationTestDummyModel extends Model
         $methods = get_class_methods($rel);
 
         return $methods;
+    }
+
+    public function polyglotFkKeyAccess(Relation $rel)
+    {
+        return $this->polyglotFkKey($rel);
+    }
+
+    public function polyglotRkKeyAccess(Relation $rel)
+    {
+        return $this->polyglotRkKey($rel);
+    }
+
+    public function checkMethodNameListAccess(Relation $rel, array $methodList)
+    {
+        return $this->checkMethodNameList($rel, $methodList);
     }
 }
