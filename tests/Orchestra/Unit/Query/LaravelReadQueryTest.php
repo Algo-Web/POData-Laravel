@@ -8,9 +8,11 @@
 
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Query;
 
+use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraHasManyTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use AlgoWeb\PODataLaravel\Query\LaravelReadQuery;
+use Illuminate\Database\Eloquent\Model;
 use Mockery as m;
 use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceSet;
@@ -31,7 +33,14 @@ class LaravelReadQueryTest extends TestCase
         $foo = m::mock(LaravelReadQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('applyFiltering')->withArgs([$model, true, $combo, PHP_INT_MAX, 0, null])
             ->andThrow(InvalidOperationException::class);
-        $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
+
+        $input = function (ActionVerb $type, string $class, OrchestraHasManyTestModel $model) {
+            return ActionVerb::READ() == $type && OrchestraHasManyTestModel::class == $class;
+        };
+
+        $foo->shouldReceive('getAuth->canAuth')
+            ->withArgs($input)
+            ->andReturn(true)->once();
 
         $type = QueryType::ENTITIES();
         $rSet = m::mock(ResourceSet::class);
