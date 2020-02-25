@@ -496,8 +496,6 @@ class IronicSerialiserTest extends SerialiserTestBase
         $model = new TestMorphTarget($meta);
         $model->id = 42;
         $model->name = 'Hammer, M.C.';
-        $this->assertTrue($model->isKnownPolymorphSide());
-        $this->assertTrue($model->isUnknownPolymorphSide());
 
         $payload = new QueryResult();
         $payload->results = $model;

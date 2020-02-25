@@ -31,36 +31,6 @@ trait MetadataRelationsTrait
         return $this->getRelationshipsFromMethods();
     }
 
-    private $hasUnknownPolymorphic = false;
-    private $hasKnownPolymorphic = false;
-
-    /**
-     * Is this model the known side of at least one polymorphic relation?
-     *
-     * @throws InvalidOperationException
-     * @throws \ReflectionException
-     */
-    public function isKnownPolymorphSide()
-    {
-        // isKnownPolymorph needs to be checking KnownPolymorphSide results - if you're checking UnknownPolymorphSide,
-        // you're turned around
-        $rels = $this->getRelationshipsFromMethods();
-        return $this->hasKnownPolymorphic;
-    }
-
-    /**
-     * Is this model on the unknown side of at least one polymorphic relation?
-     *
-     * @throws InvalidOperationException
-     * @throws \ReflectionException
-     */
-    public function isUnknownPolymorphSide()
-    {
-        // isUnknownPolymorph needs to be checking UnknownPolymorphSide results - if you're checking KnownPolymorphSide,
-        // you're turned around
-        $rels = $this->getRelationshipsFromMethods();
-        return $this->hasUnknownPolymorphic;
-    }
     /**
      * @param  \ReflectionMethod         $method
      * @throws InvalidOperationException
@@ -136,11 +106,6 @@ trait MetadataRelationsTrait
                     !in_array(MetadataTrait::class, class_uses($relationObj->getRelated()))
                 ) {
                     continue;
-                }
-                if (in_array($relation, ['morphedByMany','morphTo'])) {
-                    $this->hasUnknownPolymorphic = true;
-                } elseif (in_array($relation, ['morphOne','morphMany','morphToMany'])) {
-                    $this->hasKnownPolymorphic = true;
                 }
                 $relationships[]= $method;
             }
