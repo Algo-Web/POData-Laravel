@@ -69,6 +69,30 @@ class CreateTestModelsTable extends Migration
             $table->integer('left_id')->index();
             $table->integer('right_id')->index();
         });
+
+        Schema::create('test_polymorph_to_many_target_models', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
+            $table->string('name')->default('');
+            $table->timestamp('added_at')->useCurrent();
+            $table->float('weight')->default(0);
+            $table->string('code')->default('');
+        });
+
+        Schema::create('test_manyables', function (Blueprint $table) {
+            $table->integer('many_id')->index();
+            $table->string('manyable_type')->index();
+            $table->integer('manyable_id')->index();
+        });
+
+        Schema::create('test_polymorph_to_many_source_models', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
+            $table->string('name')->default('');
+            $table->timestamp('added_at')->useCurrent();
+            $table->float('weight')->default(0);
+            $table->string('code')->default('');
+        });
     }
 
     /**

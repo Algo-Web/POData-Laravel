@@ -11,22 +11,22 @@ namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Models;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Eloquent\Model;
 
-class OrchestraPolymorphToManyTestModel extends Model
+class OrchestraPolymorphToManySourceModel extends Model
 {
     use MetadataTrait;
 
-    protected $table = 'test_polymorph_to_many_target_models';
+    protected $table = 'test_polymorph_to_many_source_models';
 
     protected $fillable = [ 'name', 'added_at', 'weight', 'code'];
 
-    public function sourceParents()
+    public function sourceChildren()
     {
-        return $this->morphedByMany(
-            OrchestraPolymorphToManySourceModel::class,
+        return $this->morphToMany(
+            OrchestraPolymorphToManyTestModel::class,
             'manyable',
             'test_manyables',
-            'many_id',
-            'manyable_id'
+            'manyable_id',
+            'many_id'
         );
     }
 }
