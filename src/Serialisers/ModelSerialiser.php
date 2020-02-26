@@ -66,10 +66,4 @@ class ModelSerialiser
 
         return $result;
     }
-
-    public function reset()
-    {
-        self::$mutatorCache = [];
-        self::$metadataCache = [];
-    }
 }

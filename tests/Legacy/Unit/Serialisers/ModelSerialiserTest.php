@@ -20,7 +20,7 @@ class ModelSerialiserTest extends TestCase
 
     public function tearDown() : void
     {
-        $this->serialiser->reset();
+        self::resetModelSerialiser($this->serialiser);
     }
 
 

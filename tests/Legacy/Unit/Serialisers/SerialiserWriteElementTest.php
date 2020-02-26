@@ -427,7 +427,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
     public function testCompareSingleModelWithOffWallMetadata()
     {
         $serialiser = new ModelSerialiser();
-        $serialiser->reset();
+        self::resetModelSerialiser($serialiser);
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestModels');
         $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestModels');
@@ -501,7 +501,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Carbon::setTestNow($known);
 
         $serialiser = new ModelSerialiser();
-        $serialiser->reset();
+        self::resetModelSerialiser($serialiser);
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicManySources');
         $request->shouldReceive('fullUrl')
@@ -599,7 +599,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Carbon::setTestNow($known);
 
         $serialiser = new ModelSerialiser();
-        $serialiser->reset();
+        self::resetModelSerialiser($serialiser);
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicSources');
         $request->shouldReceive('fullUrl')
@@ -790,7 +790,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Carbon::setTestNow($known);
 
         $serialiser = new ModelSerialiser();
-        $serialiser->reset();
+        self::resetModelSerialiser($serialiser);
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMorphManySources');
         $request->shouldReceive('fullUrl')
@@ -880,7 +880,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Carbon::setTestNow($known);
 
         $serialiser = new ModelSerialiser();
-        $serialiser->reset();
+        self::resetModelSerialiser($serialiser);
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicParentOfMorphTargets');
         $request->shouldReceive('fullUrl')

@@ -603,7 +603,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         Carbon::setTestNow($known);
 
         $serialiser = new ModelSerialiser();
-        $serialiser->reset();
+        self::resetModelSerialiser($serialiser);
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicManySources');
         $request->shouldReceive('fullUrl')
@@ -673,7 +673,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         Carbon::setTestNow($known);
 
         $serialiser = new ModelSerialiser();
-        $serialiser->reset();
+        self::resetModelSerialiser($serialiser);
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicSources');
         $request->shouldReceive('fullUrl')

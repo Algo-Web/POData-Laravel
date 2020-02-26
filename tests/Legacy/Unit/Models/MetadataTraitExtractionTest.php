@@ -222,7 +222,7 @@ class MetadataTraitExtractionTest extends TestCase
 
         $foo = m::mock(TestGetterModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getConnection')->andReturn($connect);
-        $foo->reset();
+        self::resetModel($foo);
         $foo->setCasts(['weight' => 'float']);
         $foo->weight = 10;
         $foo->name = 'name';
@@ -233,7 +233,7 @@ class MetadataTraitExtractionTest extends TestCase
         $this->assertEquals('float', $result['weight']['type']);
         // now reset metadata, change to an excluded cast type, and verify that weight drops back to its underlying
         // metadata type
-        $foo->reset();
+        self::resetModel($foo);
         $foo->setCasts(['weight' => 'ARRAY']);
         $result = $foo->metadata();
         $this->assertEquals('string', $result['weight']['type']);
@@ -277,7 +277,7 @@ class MetadataTraitExtractionTest extends TestCase
 
         $foo = m::mock(TestGetterModel::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getConnection')->andReturn($connect);
-        $foo->reset();
+        self::resetModel($foo);
         $foo->setCasts(['weight' => 'float']);
         $foo->weight = 10;
         $foo->name = 'name';

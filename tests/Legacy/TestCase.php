@@ -105,10 +105,19 @@ class TestCase extends BaseTestCase
         self::resetModel($foo);
 
         $foo = new ModelSerialiser();
-        $foo->reset();
+        self::resetModelSerialiser($foo);
         putenv('APP_METADATA_CACHE_DURATION=10');
 
         //Schema::swap($builder);
+    }
+
+    protected static function resetModelSerialiser($serialiser)
+    {
+        $reset = function () {
+            self::$mutatorCache = [];
+            self::$metadataCache = [];
+        };
+        return call_user_func($reset->bindTo($serialiser, get_class($serialiser)));
     }
 
     protected static function resetModel($model)
