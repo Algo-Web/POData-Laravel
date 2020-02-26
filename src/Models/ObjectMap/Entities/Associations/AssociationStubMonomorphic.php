@@ -14,17 +14,9 @@ class AssociationStubMonomorphic extends AssociationStubBase
         if (!parent::isCompatible($otherStub)) {
             return false;
         }
-        $thisChain = $this->getThroughFieldChain();
-        $otherChain = $otherStub->getThroughFieldChain();
-        $thisThroughCount = count($thisChain) - 1;
-        $otherThroughCount = count($otherChain) - 1;
-        if ($thisThroughCount !== $otherThroughCount) {
+
+        if ($this->getThroughFieldChain() !== array_reverse($otherStub->getThroughFieldChain())) {
             return false;
-        }
-        for ($i=0; $i <= $thisThroughCount;++$i) {
-            if ($thisChain[$i] !== $otherChain[$otherThroughCount -$i]) {
-                return false;
-            }
         }
 
         return ($this->getTargType() === $otherStub->getBaseType())
