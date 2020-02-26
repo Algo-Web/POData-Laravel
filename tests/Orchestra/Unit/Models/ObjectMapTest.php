@@ -40,4 +40,18 @@ class ObjectMapTest extends TestCase
         $this->assertEquals(0, count($foo->getEntities()));
         $this->assertEquals(0, count($foo->getAssociations()));
     }
+
+    public function testNotOkWhenComponentNotOk()
+    {
+        $foo = new Map();
+
+        $mockEntity = m::mock(EntityGubbins::class);
+        $mockEntity->shouldReceive('getClassName')->andReturn('name');
+        $mockEntity->shouldReceive('addAssociation')->andReturnNull();
+        $mockEntity->shouldReceive('isOK')->andReturn(false)->once();
+
+        $foo->addEntity($mockEntity);
+
+        $this->assertFalse($foo->isOK());
+    }
 }

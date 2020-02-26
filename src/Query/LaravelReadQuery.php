@@ -67,7 +67,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         $model = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : $sourceEntityInstance->getRelated();
         $modelLoad = $model->getEagerLoad();
         $tableName = $model->getTable();
-        $rawLoad = array_values(array_unique(array_merge($rawLoad, $modelLoad)));
+        $rawLoad = array_unique(array_merge($rawLoad, $modelLoad));
 
         $checkInstance = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : null;
         $this->checkAuth($sourceEntityInstance, $checkInstance);
@@ -237,13 +237,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         }
 
         $sourceEntityInstance = $sourceEntityInstance->get();
-        $sourceCount = $sourceEntityInstance->count();
-        if (0 == $sourceCount) {
-            return null;
-        }
-        $result = $sourceEntityInstance->first();
-
-        return $result;
+        return $sourceEntityInstance->first();
     }
 
     /**
@@ -364,7 +358,9 @@ class LaravelReadQuery extends LaravelBaseQuery
 
         if ($nullFilter) {
             // default no-filter case, palm processing off to database engine - is a lot faster
-            $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($rawLoad)
+            $resultSet = $sourceEntityInstance
+                ->skip($skip)
+                ->take($top)->with($rawLoad)
                 ->get();
             $resultCount = $bulkSetCount;
         } elseif ($bigSet) {
