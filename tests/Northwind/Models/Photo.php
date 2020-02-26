@@ -4,7 +4,9 @@
 namespace Tests\Northwind\AlgoWeb\PODataLaravel\Models;
 
 
-class Photo
+use Illuminate\Database\Eloquent\Model;
+
+class Photo extends Model
 {
     use \AlgoWeb\PODataLaravel\Models\MetadataTrait;
     protected $table = 'photos';
