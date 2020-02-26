@@ -105,8 +105,8 @@ abstract class AssociationStubFactory
         $stub->setThroughFieldChain($keyChain);
         $stub->setMultiplicity(AssociationStubRelationType::MANY());
         $stub->setTargType(get_class($relation->getRelated()));
-        $stub->setKeyField($keyChain[2]);
-        $stub->setForeignField($keyChain[1]);
+        $stub->setKeyField($keyChain[1]);
+        $stub->setForeignField($keyChain[2]);
         return $stub;
     }
     /**
