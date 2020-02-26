@@ -74,8 +74,13 @@ class TestMonomorphicChildOfMorphTarget extends Model
         return $this->hasManyThrough(
             TestMonomorphicParentOfMorphTarget::class,
             TestMorphTarget::class,
-            'child_id',
-            'id'
+            'child_id', // key on TestMorphTarget table that links to local key on us
+            'parent_id',   // Key on the TestMonomorphicParentOfMorphTarget table that links to TestMorphTarget
+            'id', // Key on this that links to first key on TestMorphTarget
+            'id' // key on TestMorphTarget that links to second key on TestMorphTarget
+             // localKey  on this                   ->   firstKey on TestMorphTarget
+             // firstKey  on TestMorphTarget        ->   secondLocalKey on TestMorphTarget
+             // secondLocalKey on TestMorphTarget   ->   secondKey on TestMonomorphicParentOfMorphTarget
         );
     }
 }
