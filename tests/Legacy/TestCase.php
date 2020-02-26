@@ -102,13 +102,44 @@ class TestCase extends BaseTestCase
         App::instance('db', $database);
         // Clear any residual metadata bitz from previous runs
         $foo = new TestModel();
-        $foo->reset();
+        self::resetModel($foo);
 
         $foo = new ModelSerialiser();
-        $foo->reset();
+        self::resetModelSerialiser($foo);
         putenv('APP_METADATA_CACHE_DURATION=10');
 
         //Schema::swap($builder);
+    }
+
+    protected static function resetMetadataProvider($provider)
+    {
+        $reset = function () {
+            self::$isBooted = false;
+            self::$afterExtract = null;
+            self::$afterUnify = null;
+            self::$afterVerify = null;
+            self::$afterImplement = null;
+        };
+        return call_user_func($reset->bindTo($provider, get_class($provider)));
+    }
+
+    protected static function resetModelSerialiser($serialiser)
+    {
+        $reset = function () {
+            self::$mutatorCache = [];
+            self::$metadataCache = [];
+        };
+        return call_user_func($reset->bindTo($serialiser, get_class($serialiser)));
+    }
+
+    protected static function resetModel($model)
+    {
+        $reset = function () {
+            self::$tableData = [];
+            self::$tableColumnsDoctrine = [];
+            self::$tableColumns = [];
+        };
+        return call_user_func($reset->bindTo($model, get_class($model)));
     }
 
     public function tearDown() : void

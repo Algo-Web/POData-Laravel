@@ -435,11 +435,4 @@ trait MetadataTrait
         }
         return self::$tableColumnsDoctrine;
     }
-
-    public function reset()
-    {
-        self::$tableData = [];
-        self::$tableColumnsDoctrine = [];
-        self::$tableColumns = [];
-    }
 }

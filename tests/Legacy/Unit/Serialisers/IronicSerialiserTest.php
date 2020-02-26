@@ -603,7 +603,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         Carbon::setTestNow($known);
 
         $serialiser = new ModelSerialiser();
-        $serialiser->reset();
+        self::resetModelSerialiser($serialiser);
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicManySources');
         $request->shouldReceive('fullUrl')
@@ -634,7 +634,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
-        $metaProv->reset();
+        self::resetMetadataProvider($metaProv);
         $metaProv->boot();
 
         $meta = App::make('metadata');
@@ -673,7 +673,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         Carbon::setTestNow($known);
 
         $serialiser = new ModelSerialiser();
-        $serialiser->reset();
+        self::resetModelSerialiser($serialiser);
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicSources');
         $request->shouldReceive('fullUrl')
@@ -704,7 +704,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
-        $metaProv->reset();
+        self::resetMetadataProvider($metaProv);
         $metaProv->boot();
 
         $targ = new TestMonomorphicTarget($metadata);

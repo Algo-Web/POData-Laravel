@@ -63,7 +63,7 @@ class MetadataProviderNewTest extends TestCase
         $holder = new MetadataGubbinsHolder();
         $this->object = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $this->object->shouldReceive('getRelationHolder')->andReturn($holder);
-        $this->object->reset();
+        self::resetMetadataProvider($this->object);
     }
 
     /**

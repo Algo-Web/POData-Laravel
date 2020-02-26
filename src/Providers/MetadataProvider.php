@@ -336,15 +336,6 @@ class MetadataProvider extends MetadataBaseProvider
         return $this->relationHolder;
     }
 
-    public function reset()
-    {
-        self::$isBooted = false;
-        self::$afterExtract = null;
-        self::$afterUnify = null;
-        self::$afterVerify = null;
-        self::$afterImplement = null;
-    }
-
     /**
      * Resolve possible reverse relation property names.
      *

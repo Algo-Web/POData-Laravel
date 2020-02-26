@@ -34,12 +34,14 @@ class RelationTestDummyModel extends Model
 
     public function bigReset()
     {
-        $this->reset();
+        self::$tableData = [];
+        self::$tableColumnsDoctrine = [];
+        self::$tableColumns = [];
     }
 
 
     /**
-     * @param  Relation $rel
+     * @param Relation $rel
      * @return array
      */
     protected function relateMethods(Relation $rel)
