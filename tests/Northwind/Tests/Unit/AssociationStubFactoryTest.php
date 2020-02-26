@@ -61,4 +61,27 @@ class AssociationStubFactoryTest extends TestCase
             ['customer', Invoice::class, Customer::class, 'order_id', 'id', ['order_id','id','customer_id','id']],
         ];
     }
+
+    /**
+     * @dataProvider associationStubFactoryProvider
+     * @param $oneModel
+     * @param $oneRel
+     * @param $twoModel
+     * @param $twoRel
+     * @param $compatable
+     */
+    public function testAssociationStubCompatabile($oneModel, $oneRel, $twoModel, $twoRel, $compatable)
+    {
+        $oneStub = AssociationStubFactory::associationStubFromRelation(new $oneModel(),$oneRel);
+        $twoStub = AssociationStubFactory::associationStubFromRelation(new $twoModel(),$twoRel);
+        $this->assertequals($compatable, $oneStub->isCompatible($twoStub));
+        $this->assertequals($compatable, $twoStub->isCompatible($oneStub));
+    }
+
+    public function associationStubCompatabileProvider(){
+        return [
+            [Customer::class, 'order', Order::class, 'customer',true],
+            [Customer::class, 'order', Employee::class, 'privileges',false],
+        ];
+    }
 }
