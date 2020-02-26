@@ -72,10 +72,18 @@ class AssociationStubFactoryTest extends TestCase
      */
     public function testAssociationStubCompatabile($oneModel, $oneRel, $twoModel, $twoRel, $compatable)
     {
-        $oneStub = AssociationStubFactory::associationStubFromRelation(new $oneModel(),$oneRel);
-        $twoStub = AssociationStubFactory::associationStubFromRelation(new $twoModel(),$twoRel);
-        $this->assertequals($compatable, $oneStub->isCompatible($twoStub));
-        $this->assertequals($compatable, $twoStub->isCompatible($oneStub));
+        $oneRelType = get_class((new $oneModel())->{$oneRel}());
+        $twoRelType = get_class((new $twoModel())->{$twoRel}());
+        $message = 'Relation: %s  ' . "\r\n" .
+            'On: %s ' . "\r\n" .
+            'of Type: %s' . "\r\n";
+        $oneMessage = sprintf($message, $oneRel, $oneModel, $oneRelType);
+        $twoMessage = sprintf($message, $twoRel, $twoModel, $twoRelType);
+        $message = sprintf($oneMessage . '%s' . "\r\n" . $twoMessage, $compatable ? 'SHOULD' : 'SHOULD NOT');
+        $oneStub = AssociationStubFactory::associationStubFromRelation(new $oneModel(), $oneRel);
+        $twoStub = AssociationStubFactory::associationStubFromRelation(new $twoModel(), $twoRel);
+        $this->assertequals($compatable, $oneStub->isCompatible($twoStub), $message);
+        $this->assertequals($compatable, $twoStub->isCompatible($oneStub), $message . 'espcally given the opposite is true');
     }
 
     public function associationStubCompatabileProvider(){
