@@ -24,4 +24,19 @@ class DummyReadQuery extends LaravelReadQuery
     ) {
         return parent::packageResourceSetResults($queryType, $skip, $result, $resultSet, $resultCount, $bulkSetCount);
     }
+
+    public function applyBasicFiltering(
+        $sourceEntityInstance,
+        bool $nullFilter
+    ) {
+        return parent::applyFiltering($sourceEntityInstance, $nullFilter, []);
+    }
+
+    public function applyFilterFiltering(
+        $sourceEntityInstance,
+        bool $nullFilter,
+        callable $isvalid = null
+    ) {
+        return parent::applyFiltering($sourceEntityInstance, $nullFilter, [], PHP_INT_MAX, 0, $isvalid);
+    }
 }

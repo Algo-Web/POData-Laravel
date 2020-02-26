@@ -16,6 +16,8 @@ use AlgoWeb\PODataLaravel\Orchestra\Tests\Query\DummyReadQuery;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use AlgoWeb\PODataLaravel\Query\LaravelReadQuery;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
@@ -229,5 +231,89 @@ class LaravelReadQueryTest extends TestCase
         $this->assertFalse($result->hasMore);
         $this->assertEquals(1, $result->count);
         $this->assertNull($result->results);
+    }
+
+    public function testNullFilteringHasZeroSkipDefault()
+    {
+        $nullModel = m::mock(OrchestraHasManyTestModel::class);
+        $nullModel->shouldReceive('count')->andReturn(0);
+        $nullModel->shouldReceive('skip')->withArgs([0])->andReturnSelf()->once();
+        $nullModel->shouldReceive('take')->andReturnSelf()->once();
+        $nullModel->shouldReceive('with')->andReturnSelf()->once();
+        $nullModel->shouldReceive('get')->andReturn(new Collection())->once();
+
+        $foo = new DummyReadQuery();
+
+        list($bulkSetCount, $resultSet, $resultCount, $skip) = $foo->applyBasicFiltering(
+            $nullModel,
+            true
+        );
+
+        $this->assertEquals(0, $bulkSetCount);
+        $this->assertEquals(0, $skip);
+        $this->assertEquals(0, $resultCount);
+    }
+
+    public function testLargeSetFilterBorderlineLow()
+    {
+        $collect = m::mock(Collection::class);
+        $collect->shouldReceive('slice')->withArgs([0])->andReturnSelf();
+        $collect->shouldReceive('filter')->andReturnSelf()->once();
+        $collect->shouldReceive('count')->andReturn(0);
+
+        $nullModel = m::mock(OrchestraHasManyTestModel::class);
+        $nullModel->shouldReceive('count')->andReturn(20000);
+        $nullModel->shouldReceive('with')->andReturnSelf()->once();
+        $nullModel->shouldReceive('get')->andReturn($collect)->once();
+
+        $foo = new DummyReadQuery();
+
+        list($bulkSetCount, $resultSet, $resultCount, $skip) = $foo->applyBasicFiltering(
+            $nullModel,
+            false
+        );
+
+        $this->assertEquals(20000, $bulkSetCount);
+        $this->assertEquals(0, $skip);
+        $this->assertEquals(0, $resultCount);
+    }
+
+    public function testLargeSetFilterBorderlineHigh()
+    {
+        $collect = m::mock(Collection::class);
+        $collect->shouldReceive('slice')->withArgs([0])->andReturnSelf();
+        $collect->shouldReceive('filter')->andReturnSelf();
+        $collect->shouldReceive('count')->andReturn(0);
+
+        $res = new OrchestraHasManyTestModel();
+        $res = new Collection([$res]);
+
+        $builder = m::mock(Builder::class)->shouldAllowMockingProtectedMethods();
+        $builder->shouldReceive('chunk')->withArgs([5000, m::any()])->passthru();
+        $builder->shouldReceive('enforceOrderBy')->andReturnNull();
+        $builder->shouldReceive('forPage->get')->andReturn($res)->once();
+
+        $nullModel = m::mock(OrchestraHasManyTestModel::class);
+        $nullModel->shouldReceive('count')->andReturn(20001);
+        $nullModel->shouldReceive('with')->andReturnSelf();
+        $nullModel->shouldReceive('get')->andReturn($collect);
+        $nullModel->shouldReceive('chunk')->withArgs([5000, m::any()])->passthru();
+        $nullModel->shouldReceive('newQuery')->andReturn($builder);
+
+        $foo = new DummyReadQuery();
+
+        $filter = function () {
+            return true;
+        };
+
+        list($bulkSetCount, $resultSet, $resultCount, $skip) = $foo->applyFilterFiltering(
+            $nullModel,
+            false,
+            $filter
+        );
+
+        $this->assertEquals(20001, $bulkSetCount);
+        $this->assertEquals(0, $skip);
+        $this->assertEquals(1, $resultCount);
     }
 }

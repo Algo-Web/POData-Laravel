@@ -358,7 +358,9 @@ class LaravelReadQuery extends LaravelBaseQuery
 
         if ($nullFilter) {
             // default no-filter case, palm processing off to database engine - is a lot faster
-            $resultSet = $sourceEntityInstance->skip($skip)->take($top)->with($rawLoad)
+            $resultSet = $sourceEntityInstance
+                ->skip($skip)
+                ->take($top)->with($rawLoad)
                 ->get();
             $resultCount = $bulkSetCount;
         } elseif ($bigSet) {
