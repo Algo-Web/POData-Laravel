@@ -6,12 +6,15 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStub
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use POData\Common\InvalidOperationException;
+use POData\Common\ODataException;
 use Tests\Northwind\AlgoWeb\PODataLaravel\Models\Customer;
 use Tests\Northwind\AlgoWeb\PODataLaravel\Models\Employee;
 use Tests\Northwind\AlgoWeb\PODataLaravel\Models\InventoryTransaction;
 use Tests\Northwind\AlgoWeb\PODataLaravel\Models\InventoryTransactionType;
 use Tests\Northwind\AlgoWeb\PODataLaravel\Models\Invoice;
 use Tests\Northwind\AlgoWeb\PODataLaravel\Models\Order;
+use Tests\Northwind\AlgoWeb\PODataLaravel\Models\Photo;
 use Tests\Northwind\AlgoWeb\PODataLaravel\Models\Privilege;
 use Tests\Northwind\AlgoWeb\PODataLaravel\TestCase;
 
@@ -26,30 +29,43 @@ class AssociationStubFactoryTest extends TestCase
      * @param $thatField
      * @param $throughField
      * @param $throughChain
+     * @throws InvalidOperationException
      */
     public function testAssociationStubFactory($relationName, $from, $to, $thisField, $thatField, $throughChain)
     {
-        $this->assertTrue(class_exists($from), '$from paramater must be a class');
-        $this->assertTrue(class_exists($from), '$to paramater must be a class');
-        $this->assertInstanceOf(Model::class, new $from(), sprintf('$from Should Be instance of %s', Model::class));
-        $this->assertInstanceOf(Model::class, new $to(), sprintf('$to Should Be instance of %s', Model::class));
-        $this->assertTrue(method_exists($from, $relationName), sprintf('%s is not a method on %s',$relationName,$from));
+        $this->assertTrue(class_exists($from), '$from parameter must be a class');
+        $this->assertTrue(class_exists($from), '$to parameter must be a class');
+        $this->assertInstanceOf(Model::class, new $from(), sprintf('$from should Be instance of %s', Model::class));
+        (is_null($to)) ?: $this->assertInstanceOf(Model::class, new $to(), sprintf('$to should Be instance of %s', Model::class));
+        $this->assertTrue(
+            method_exists($from, $relationName),
+            sprintf('%s is not a method on %s', $relationName, $from)
+        );
         $relationType = get_class((new $from())->{$relationName}());
         $relationXonY = sprintf('Relation: %s  ' . "\r\n" .
             'On: %s ' . "\r\n" .
-            'of Type: %s'  . "\r\n" .
-            'should ',$relationName, $from, $relationType);
-        $this->assertTrue(is_subclass_of($relationType,Relation::class), sprintf($relationXonY . 'be a subclass of: %s', Relation::class));
+            'of type: %s'  . "\r\n" .
+            'should ', $relationName, $from, $relationType);
+        $this->assertTrue(
+            is_subclass_of($relationType, Relation::class),
+            sprintf($relationXonY . 'be a subclass of: %s', Relation::class)
+        );
 
-        $stub =  AssociationStubFactory::associationStubFromRelation(new $from(),$relationName);
-        $this->assertEquals($from, $stub->getBaseType(), "the base type of a relationship should be the model on which the relation lives");
+        $stub = AssociationStubFactory::associationStubFromRelation(new $from(), $relationName);
+        $this->assertEquals(
+            $from,
+            $stub->getBaseType(),
+            "the base type of a relationship should be the model on which the relation lives"
+        );
         $this->assertEquals($to, $stub->getTargType(), sprintf($relationXonY . 'Target Type should be', $to));
         $this->assertEquals($relationName, $stub->getRelationName(), sprintf($relationXonY . " be named %s", $relationName));
-        $this->assertEquals($thisField, $stub->getKeyField(),sprintf($relationXonY . ' have a key field on %s side of the relation', $from));
-        $this->assertEquals($thatField, $stub->getForeignField(),sprintf($relationXonY . ' have a Foreign field on %s side of the relation', $to));
+        $this->assertEquals($thisField, $stub->getKeyField(), sprintf($relationXonY . ' have a key field on %s side of the relation', $from));
+        $this->assertEquals($thatField, $stub->getForeignField(), sprintf($relationXonY . ' have a foreign field on %s side of the relation', $to));
         $this->assertEquals($throughChain, $stub->getThroughFieldChain(), sprintf($relationXonY . 'should have through chain[' . implode(', ', $throughChain) . ']'));
     }
-    public function associationStubFactoryProvider(){
+
+    public function associationStubFactoryProvider()
+    {
         // string         string         string  string|null string|null string|null     array
         // $relationName, $from,          $to,   $thisField, $thatField, $throughField, $throughChain
         return [
@@ -59,18 +75,21 @@ class AssociationStubFactoryTest extends TestCase
             ['invoice', Order::class, Invoice::class, 'id', 'order_id',['id', 'order_id']], // Has one
             ['invoices', Customer::class, Invoice::class, 'id', 'order_id', ['id','customer_id','id','order_id']],
             ['customer', Invoice::class, Customer::class, 'order_id', 'id', ['order_id','id','customer_id','id']],
+            //TODO: the morphOneHandler Should do this... but doesnt ['photos', Customer::class, Photo::class, 'id', 'rel_id', ['id', 'rel_type','rel_id']], // Morph One
+            //TODO: the morphManyHandler should do this... but doesnt ['photos', Employee::class, Photo::class, 'id', 'rel_id', ['id', 'rel_type','rel_id']], // Morph Many
+            //TODO: the morphToHandler should do this... but doesnt ['photoOf', Photo::class,null, 'rel_id', null, ['rel_id', 'rel_type', null]]
         ];
     }
 
     /**
-     * @dataProvider associationStubCompatabileProvider
+     * @dataProvider associationStubCompatibleProvider
      * @param $oneModel
      * @param $oneRel
      * @param $twoModel
      * @param $twoRel
-     * @param $compatable
+     * @param $compatible
      */
-    public function testAssociationStubCompatabile($oneModel, $oneRel, $twoModel, $twoRel, $compatable)
+    public function testAssociationStubCompatible($oneModel, $oneRel, $twoModel, $twoRel, $compatible)
     {
         $oneRelType = get_class((new $oneModel())->{$oneRel}());
         $twoRelType = get_class((new $twoModel())->{$twoRel}());
@@ -79,17 +98,25 @@ class AssociationStubFactoryTest extends TestCase
             'of Type: %s' . "\r\n";
         $oneMessage = sprintf($message, $oneRel, $oneModel, $oneRelType);
         $twoMessage = sprintf($message, $twoRel, $twoModel, $twoRelType);
-        $message = sprintf($oneMessage . '%s' . "\r\n" . $twoMessage, $compatable ? 'SHOULD' : 'SHOULD NOT');
+        $message = sprintf($oneMessage . '%s' . "\r\n" . $twoMessage, $compatible ? 'SHOULD' : 'SHOULD NOT');
         $oneStub = AssociationStubFactory::associationStubFromRelation(new $oneModel(), $oneRel);
         $twoStub = AssociationStubFactory::associationStubFromRelation(new $twoModel(), $twoRel);
-        $this->assertequals($compatable, $oneStub->isCompatible($twoStub), $message);
-        $this->assertequals($compatable, $twoStub->isCompatible($oneStub), $message . 'espcally given the opposite is true');
+        $this->assertEquals($compatible, $oneStub->isCompatible($twoStub), $message);
+        $this->assertEquals(
+            $compatible,
+            $twoStub->isCompatible($oneStub),
+            $message . 'especially given the opposite is true'
+        );
     }
 
-    public function associationStubCompatabileProvider(){
+    public function associationStubCompatibleProvider()
+    {
         return [
             [Customer::class, 'orders', Order::class, 'customer',true],
             [Customer::class, 'orders', Employee::class, 'privileges',false],
+            [Customer::class, 'photos', Photo::class, 'photoOf',true],
+            [Employee::class, 'photos', Photo::class, 'photoOf',true],
+            [Customer::class, 'photos', Order::class, 'customer',false],
         ];
     }
 }
