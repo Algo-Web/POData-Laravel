@@ -1,16 +1,16 @@
 <?php
 
-namespace Tests\System\AlgoWeb\PODataLaravel\Models;
+namespace Tests\Northwind\AlgoWeb\PODataLaravel\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class Customer.
+ * Class Shipper.
  */
-class Customer extends Model
+class Shipper extends Model
 {
     use \AlgoWeb\PODataLaravel\Models\MetadataTrait;
-    protected $table = 'customers';
+    protected $table = 'shippers';
 
     public $timestamps = false;
 
@@ -38,6 +38,6 @@ class Customer extends Model
 
     public function orders()
     {
-        return $this->hasMany(Order::class, 'customer_id');
+        return $this->hasMany(Order::class, 'shipper_id');
     }
 }

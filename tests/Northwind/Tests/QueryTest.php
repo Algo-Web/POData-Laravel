@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\System\AlgoWeb\PODataLaravel\Tests;
+namespace Tests\Northwind\AlgoWeb\PODataLaravel\Tests;
 
-use Tests\System\AlgoWeb\PODataLaravel\TestCase;
+use Tests\Northwind\AlgoWeb\PODataLaravel\TestCase;
 
 class QueryTest extends TestCase
 {

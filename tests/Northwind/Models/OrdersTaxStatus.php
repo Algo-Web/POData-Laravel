@@ -1,27 +1,27 @@
 <?php
 
-namespace Tests\System\AlgoWeb\PODataLaravel\Models;
+namespace Tests\Northwind\AlgoWeb\PODataLaravel\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class OrdersStatus.
+ * Class OrdersTaxStatus.
  */
-class OrdersStatus extends Model
+class OrdersTaxStatus extends Model
 {
     use \AlgoWeb\PODataLaravel\Models\MetadataTrait;
-    protected $table = 'orders_status';
+    protected $table = 'orders_tax_status';
 
     public $timestamps = false;
 
     protected $fillable = [
-        'status_name'
+        'tax_status_name'
     ];
 
     protected $guarded = [];
 
     public function orders()
     {
-        return $this->hasMany(Order::class, 'status_id');
+        return $this->hasMany(Order::class, 'tax_status_id');
     }
 }

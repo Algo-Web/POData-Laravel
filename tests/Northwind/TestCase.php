@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Tests\System\AlgoWeb\PODataLaravel;
+namespace Tests\Northwind\AlgoWeb\PODataLaravel;
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
 

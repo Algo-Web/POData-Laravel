@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Tests\System\AlgoWeb\PODataLaravel;
+namespace Tests\Northwind\AlgoWeb\PODataLaravel;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
