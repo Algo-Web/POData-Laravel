@@ -237,13 +237,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         }
 
         $sourceEntityInstance = $sourceEntityInstance->get();
-        $sourceCount = $sourceEntityInstance->count();
-        if (0 == $sourceCount) {
-            return null;
-        }
-        $result = $sourceEntityInstance->first();
-
-        return $result;
+        return $sourceEntityInstance->first();
     }
 
     /**

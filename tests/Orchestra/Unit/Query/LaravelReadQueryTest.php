@@ -18,6 +18,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
 use POData\Common\InvalidOperationException;
+use POData\Common\ODataException;
+use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Query\QueryType;
@@ -126,5 +128,67 @@ class LaravelReadQueryTest extends TestCase
         $result = $foo->getRelatedResourceReference($parentSource, $child, $targSource, $property);
         $this->assertTrue($result instanceof OrchestraPolymorphToManySourceModel);
         $this->assertEquals($parent->getKey(), $result->getKey());
+    }
+
+    public function testGetRelatedResourceSetBadAuthKabooms()
+    {
+        $model = new OrchestraHasManyTestModel();
+        $model->setEagerLoad(['parent']);
+
+        $combo = [];
+
+        $foo = m::mock(LaravelReadQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('applyFiltering')->withArgs([$model, true, $combo, PHP_INT_MAX, 0, null])
+            ->andThrow(InvalidOperationException::class);
+
+        $input = function (ActionVerb $type, ?string $class, ?OrchestraHasManyTestModel $model) {
+            return ActionVerb::READ() == $type;
+        };
+
+        $foo->shouldReceive('getAuth->canAuth')
+            ->withArgs($input)
+            ->andReturn(false)->once();
+
+        $type = QueryType::ENTITIES();
+        $rSet = m::mock(ResourceSet::class);
+        $tSet = m::mock(ResourceSet::class);
+        $targProp = m::mock(ResourceProperty::class);
+
+        $this->expectException(ODataException::class);
+
+        $foo->getRelatedResourceSet(QueryType::COUNT(), $rSet, $model, $tSet, $targProp);
+    }
+
+    public function testGetNullResource()
+    {
+        $src = new OrchestraHasManyTestModel(['name' => 'notfoobar']);
+        $this->assertTrue($src->save());
+
+        $model = new OrchestraHasManyTestModel();
+        $model->setEagerLoad(['parent']);
+
+        /** @var LaravelReadQuery $foo */
+        $foo = App::make(LaravelReadQuery::class);
+
+        $result = $foo->getResource(null, null, ['name' => 'foobar'], null, $model);
+
+        $this->assertNull($result);
+    }
+
+    public function testGetNullModelLoadOnGetResourceKabooms()
+    {
+        $model = new OrchestraHasManyTestModel();
+        $model->setEagerLoad(['parent']);
+
+        $nullModel = m::mock(OrchestraHasManyTestModel::class)->makePartial();
+        $nullModel->shouldReceive('getEagerLoad')->andReturnNull()->once();
+
+        $foo = m::mock(LaravelReadQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
+        $foo->shouldReceive('checkSourceInstance')->andReturn($nullModel)->once();
+
+        $this->expectException(InvalidOperationException::class);
+
+        $foo->getResource(null, null, [], null, $model);
     }
 }
