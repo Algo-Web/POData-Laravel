@@ -11,7 +11,6 @@ class TestMonomorphicOneAndManySource extends Model
     use MetadataTrait {
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
         // not bury ourselves under a stack overflow and segfault
-        getRelationshipsFromMethods as getRel;
     }
     protected $metaArray;
     protected $connect;
@@ -49,11 +48,6 @@ class TestMonomorphicOneAndManySource extends Model
     public function getConnection()
     {
         return $this->connect;
-    }
-
-    public function getRelationshipsFromMethods($biDir = false)
-    {
-        return $this->getRel($biDir);
     }
 
     public function oneTarget()

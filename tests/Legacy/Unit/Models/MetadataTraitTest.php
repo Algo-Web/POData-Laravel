@@ -2,6 +2,7 @@
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Models;
 
+use AlgoWeb\PODataLaravel\Models\ModelReflectionHelper;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
@@ -300,63 +301,31 @@ class MetadataTraitTest extends TestCase
         $this->assertEquals(0, count($expResDiff) + count($resExpDiff)); // if all keys are common, arrays are equal
     }
 
-
-
     /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
+     * @dataProvider getRelationshipsFromMethodsProvider
+     * @param $model
+     * @param $relation
+     * @throws \ReflectionException
      */
-    public function testGetRelationshipsForMorphTarget()
+    public function testGetRelationshipsFromMethods($model, $relation)
     {
-        $foo = new TestMorphTarget();
-
-        $result = $foo->getRelationshipsFromMethods();
-        $this->assertTrue(in_array('morph', $result));
+        $foo = new $model();
+        $result = ModelReflectionHelper::getRelationshipsFromMethods($foo);
+        $message = sprintf('%s relation not found on %s', $relation, $model);
+        $this->assertTrue(in_array($relation, $result), $message);
     }
 
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
-     */
-    public function testGetRelationshipsForMorphManySource()
+    public function getRelationshipsFromMethodsProvider()
     {
-        $foo = new TestMorphManySource();
+        return [
+            [TestMorphManyToManyTarget::class, 'manyTarget'],
+            [TestMorphManyToManySource::class, 'manySource'],
+            [TestMorphOneSource::class, 'morphTarget'],
+            [TestMorphManySource::class, 'morphTarget'],
+            [TestMorphTarget::class, 'morph'],
 
-        $result = $foo->getRelationshipsFromMethods();
-
-        $this->assertTrue(in_array('morphTarget', $result));
+        ];
     }
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
-     */
-    public function testGetRelationshipsForMorphOneSource()
-    {
-        $foo = new TestMorphOneSource();
-
-        $result = $foo->getRelationshipsFromMethods();
-        $this->assertTrue(in_array('morphTarget', $result));
-    }
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
-     */
-    public function testGetRelationshipsForMorphManyToManySource()
-    {
-        $foo = new TestMorphManyToManySource();
-        $result = $foo->getRelationshipsFromMethods();
-        $this->assertTrue(in_array('manySource', $result));
-    }
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
-     */
-    public function testGetRelationshipsForMorphManyToManyTarget()
-    {
-        $foo = new TestMorphManyToManyTarget();
-        $result = $foo->getRelationshipsFromMethods();
-
-        $this->assertTrue(in_array('manyTarget', $result));
-    }
-
     public function testGetDefaultEndpointName()
     {
         $foo = new TestModel();

@@ -37,19 +37,6 @@ trait MetadataTrait
     protected static $tableData = [];
     protected static $dontCastTypes = ['object', 'array', 'collection', 'int'];
 
-    protected static $relTypes = [
-        'hasMany',
-        'hasManyThrough',
-        'belongsToMany',
-        'hasOne',
-        'belongsTo',
-        'morphOne',
-        'morphTo',
-        'morphMany',
-        'morphToMany',
-        'morphedByMany'
-    ];
-
     /**
      * Retrieve and assemble this model's metadata for OData packaging.
      * @throws InvalidOperationException
