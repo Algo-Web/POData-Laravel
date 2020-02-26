@@ -63,7 +63,7 @@ class AssociationStubFactoryTest extends TestCase
     }
 
     /**
-     * @dataProvider associationStubFactoryProvider
+     * @dataProvider associationStubCompatabileProvider
      * @param $oneModel
      * @param $oneRel
      * @param $twoModel
@@ -88,8 +88,8 @@ class AssociationStubFactoryTest extends TestCase
 
     public function associationStubCompatabileProvider(){
         return [
-            [Customer::class, 'order', Order::class, 'customer',true],
-            [Customer::class, 'order', Employee::class, 'privileges',false],
+            [Customer::class, 'orders', Order::class, 'customer',true],
+            [Customer::class, 'orders', Employee::class, 'privileges',false],
         ];
     }
 }

@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         // $this->call(UserTableSeeder::class);
         //DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 //        $this->call('CustomerTableSeeder');
-//        $this->call('PhotoTableSeeder');
+        $this->call('PhotoTableSeeder');
 //        $this->call('ProductTableSeeder');
 //        $this->call('StaffTableSeeder');
 //        $this->call('PasswordResetsTableSeeder');
