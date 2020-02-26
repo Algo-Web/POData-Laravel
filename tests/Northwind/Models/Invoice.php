@@ -29,4 +29,15 @@ class Invoice extends Model
     {
         return $this->belongsTo(Order::class);
     }
+    public function customer()
+    {
+        return $this->hasManyThrough(
+            Customer::class,
+            Order::class,
+            'id',
+            'id',
+            'order_id',
+            'customer_id'
+        );
+    }
 }

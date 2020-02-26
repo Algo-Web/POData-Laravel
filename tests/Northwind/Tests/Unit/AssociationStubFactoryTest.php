@@ -56,8 +56,9 @@ class AssociationStubFactoryTest extends TestCase
             ['orders', Customer::class, Order::class, 'id', 'customer_id', ['id','customer_id']], // Has Many
             ['privileges', Employee::class, Privilege::class, 'id', 'id', ['id','employee_id', 'privilege_id', 'id']], //Belongs To Many
             ['inventoryTransactionType', InventoryTransaction::class, InventoryTransactionType::class, 'transaction_type', 'id',['transaction_type', 'id']], // BelongsTo
-            ['invoice', Order::class, Invoice::class, 'id', 'order_id',['id', 'order_id']] // Has one
-
+            ['invoice', Order::class, Invoice::class, 'id', 'order_id',['id', 'order_id']], // Has one
+            ['invoices', Customer::class, Invoice::class, 'id', 'order_id', ['id','customer_id','id','order_id']],
+            ['customer', Invoice::class, Customer::class, 'order_id', 'id', ['order_id','id','customer_id','id']],
         ];
     }
 }
