@@ -177,7 +177,7 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
-        $metaProv->reset();
+        self::resetMetadataProvider($metaProv);
         App::instance('objectmap', $map);
         return $metaProv;
     }

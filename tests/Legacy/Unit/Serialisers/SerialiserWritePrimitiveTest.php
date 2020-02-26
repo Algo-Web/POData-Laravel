@@ -294,7 +294,7 @@ class SerialiserWritePrimitiveTest extends SerialiserTestBase
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
-        $metaProv->reset();
+        self::resetMetadataProvider($metaProv);
         $metaProv->boot();
 
         $meta = App::make('metadata');

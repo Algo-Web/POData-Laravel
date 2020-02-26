@@ -37,7 +37,7 @@ class MetadataProviderRelationTest extends TestCase
         $map = new Map();
         App::instance('objectmap', $map);
         $foo = m::mock(MetadataProvider::class)->makePartial();
-        $foo->reset();
+        self::resetMetadataProvider($foo);
     }
 
     public function testBootFromTwoArmedPolymorphicRelationBothOneToMany()

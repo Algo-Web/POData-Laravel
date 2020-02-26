@@ -67,7 +67,7 @@ class MetadataProviderTest extends TestCase
         $foo->boot();
         $this->assertTrue($foo->isBooted());
 
-        $foo->reset();
+        self::resetMetadataProvider($foo);
         $this->assertFalse($foo->isBooted());
     }
 

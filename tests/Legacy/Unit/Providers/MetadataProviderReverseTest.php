@@ -33,7 +33,7 @@ class MetadataProviderReverseTest extends TestCase
         $this->metadataProvider = m::mock(MetadataProvider::class)
             ->makePartial()->shouldAllowMockingProtectedMethods();
         $this->metadataProvider->shouldReceive('getRelationHolder')->andReturn($holder);
-        $this->metadataProvider->reset();
+        self::resetMetadataProvider($this->metadataProvider);
     }
 
     public function testReverseAcrossSingleRelation()
