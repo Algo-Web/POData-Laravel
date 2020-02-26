@@ -12,8 +12,10 @@ use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraHasManyTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraPolymorphToManySourceModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraPolymorphToManyTestModel;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Query\DummyReadQuery;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use AlgoWeb\PODataLaravel\Query\LaravelReadQuery;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
@@ -22,6 +24,7 @@ use POData\Common\ODataException;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\SimpleMetadataProvider;
+use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
 
 class LaravelReadQueryTest extends TestCase
@@ -190,5 +193,41 @@ class LaravelReadQueryTest extends TestCase
         $this->expectException(InvalidOperationException::class);
 
         $foo->getResource(null, null, [], null, $model);
+    }
+
+    public function testPackageResultsFlagHasMore()
+    {
+        $qType = QueryType::COUNT();
+        $resultCount = 1;
+        $resultSet = ['a'];
+        $skip = 0;
+        $bulkCount = 11;
+        $result = new QueryResult();
+        $this->assertNull($result->hasMore);
+
+        $foo = new DummyReadQuery();
+        $foo->packageResourceSetResults($qType, $skip, $result, $resultSet, $resultCount, $bulkCount);
+
+        $this->assertTrue($result->hasMore);
+        $this->assertEquals(1, $result->count);
+        $this->assertNull($result->results);
+    }
+
+    public function testPackageResultsFlagHasNoMore()
+    {
+        $qType = QueryType::COUNT();
+        $resultCount = 1;
+        $resultSet = ['a'];
+        $skip = 0;
+        $bulkCount = 1;
+        $result = new QueryResult();
+        $this->assertNull($result->hasMore);
+
+        $foo = new DummyReadQuery();
+        $foo->packageResourceSetResults($qType, $skip, $result, $resultSet, $resultCount, $bulkCount);
+
+        $this->assertFalse($result->hasMore);
+        $this->assertEquals(1, $result->count);
+        $this->assertNull($result->results);
     }
 }
