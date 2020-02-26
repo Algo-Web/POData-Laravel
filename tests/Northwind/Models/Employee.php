@@ -51,7 +51,8 @@ class Employee extends Model
         return $this->belongsToMany(Privilege::class, 'employee_privileges');
     }
 
-    public function photos(){
-        return $this->morphMany(Photo::class,'rel');
+    public function photos()
+    {
+        return $this->morphMany(Photo::class, 'rel');
     }
 }

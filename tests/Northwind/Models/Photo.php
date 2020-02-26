@@ -3,7 +3,6 @@
 
 namespace Tests\Northwind\AlgoWeb\PODataLaravel\Models;
 
-
 use Illuminate\Database\Eloquent\Model;
 
 class Photo extends Model

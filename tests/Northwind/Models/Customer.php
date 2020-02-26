@@ -53,7 +53,8 @@ class Customer extends Model
         );
     }
 
-    public function photos(){
-        return $this->morphOne(Photo::class,'rel');
+    public function photos()
+    {
+        return $this->morphOne(Photo::class, 'rel');
     }
 }

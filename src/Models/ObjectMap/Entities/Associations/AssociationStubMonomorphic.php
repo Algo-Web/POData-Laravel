@@ -27,8 +27,8 @@ class AssociationStubMonomorphic extends AssociationStubBase
         if ($thisThroughCount !== $otherThroughCount) {
             return false;
         }
-        for($i=0; $i <= $thisThroughCount;++$i ){
-            if($thisChain[$i] !== $otherChain[$otherThroughCount -$i]){
+        for ($i=0; $i <= $thisThroughCount;++$i) {
+            if ($thisChain[$i] !== $otherChain[$otherThroughCount -$i]) {
                 return false;
             }
         }
