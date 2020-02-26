@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use POData\Common\InvalidOperationException;
 
 abstract class AssociationStubFactory
 {
@@ -22,6 +23,7 @@ abstract class AssociationStubFactory
      * @param string $name
      * @param Relation $relation
      * @return AssociationStubBase
+     * @throws InvalidOperationException
      */
     public static function associationStubFromRelation(Model $parent, string $name): AssociationStubBase
     {
@@ -32,6 +34,9 @@ abstract class AssociationStubFactory
          */
         $stub = self::{'handle' . $handler}($name, $relation);
         $stub->setBaseType(get_class($parent));
+        if (!$stub->isOk()) {
+            throw new InvalidOperationException('Generated stub not consistent');
+        }
         return $stub;
     }
 

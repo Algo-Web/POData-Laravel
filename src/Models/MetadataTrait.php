@@ -358,9 +358,6 @@ trait MetadataTrait
                 throw new \Exception($msg);
             }
             $stub = AssociationStubFactory::associationStubFromRelation(/** @scrutinizer ignore-type */$this, $propertyName);
-            if (!$stub->isOk()) {
-                throw new InvalidOperationException('Generated stub not consistent');
-            }
             $stubs[$propertyName] = $stub;
         }
         $gubbins->setStubs($stubs);
