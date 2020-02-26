@@ -26,7 +26,7 @@ class MetadataTraitExtractionTest extends TestCase
     {
         parent::setUp();
         $foo = new TestGetterModel();
-        $foo->reset();
+        self::resetModel($foo);
     }
 
     public function testExtractGubbinsMonomorphicSource()

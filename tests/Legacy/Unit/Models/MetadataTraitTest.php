@@ -56,7 +56,7 @@ class MetadataTraitTest extends TestCase
         App::instance('metadata', $meta);
         // Clear any residual metadata bitz from previous runs
         $foo = new TestModel();
-        $foo->reset();
+        self::resetModel($foo);
     }
 
     /**

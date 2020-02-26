@@ -66,7 +66,7 @@ class MetadataProviderTest extends TestCase
         $this->object->reset();
 
         $foo = new TestModel();
-        $foo->reset();
+        self::resetModel($foo);
     }
 
     /**
