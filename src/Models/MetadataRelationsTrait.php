@@ -56,7 +56,6 @@ trait MetadataRelationsTrait
         $code = trim(preg_replace('/\s\s+/', '', $code));
         $begin = strpos($code, 'function(');
         $code = substr($code, $begin, strrpos($code, '}') - $begin + 1);
-        $lastCode = $code[strlen($code) - 1];
 
         return $code;
     }
@@ -83,11 +82,7 @@ trait MetadataRelationsTrait
      */
     protected function getRelationshipsFromMethods()
     {
-        /*$biDirVal = true;
-        $isCached = isset(static::$relationCategories[$biDirVal]) && !empty(static::$relationCategories[$biDirVal]);
-        if ($isCached) {
-            return static::$relationCategories[$biDirVal];
-        }*/
+
         $relationships = [];
         /** @var Model $model */
         $model = $this;
