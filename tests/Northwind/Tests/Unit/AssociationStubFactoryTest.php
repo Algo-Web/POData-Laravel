@@ -16,6 +16,7 @@ use Tests\Northwind\AlgoWeb\PODataLaravel\Models\Invoice;
 use Tests\Northwind\AlgoWeb\PODataLaravel\Models\Order;
 use Tests\Northwind\AlgoWeb\PODataLaravel\Models\Photo;
 use Tests\Northwind\AlgoWeb\PODataLaravel\Models\Privilege;
+use Tests\Northwind\AlgoWeb\PODataLaravel\Models\Tag;
 use Tests\Northwind\AlgoWeb\PODataLaravel\TestCase;
 
 class AssociationStubFactoryTest extends TestCase
@@ -88,6 +89,7 @@ class AssociationStubFactoryTest extends TestCase
      * @param $twoModel
      * @param $twoRel
      * @param $compatible
+     * @throws InvalidOperationException
      */
     public function testAssociationStubCompatible($oneModel, $oneRel, $twoModel, $twoRel, $compatible)
     {
@@ -117,6 +119,10 @@ class AssociationStubFactoryTest extends TestCase
             [Customer::class, 'photos', Photo::class, 'photoOf',true],
             [Employee::class, 'photos', Photo::class, 'photoOf',true],
             [Customer::class, 'photos', Order::class, 'customer',false],
+            [Employee::class, 'tags', Tag::class, 'taggedEmployees',true],
+            [Employee::class, 'tags', Tag::class, 'taggedCustomer',false],
+            [Customer::class, 'tags', Tag::class, 'taggedEmployees',false],
+            [Customer::class, 'tags', Tag::class, 'taggedCustomer',true],
         ];
     }
 }

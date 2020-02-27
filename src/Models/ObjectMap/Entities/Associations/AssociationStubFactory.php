@@ -34,9 +34,6 @@ abstract class AssociationStubFactory
          */
         $stub = self::{'handle' . $handler}($name, $relation);
         $stub->setBaseType(get_class($parent));
-        if (!$stub->isOk()) {
-            throw new InvalidOperationException('Generated stub not consistent');
-        }
         return $stub;
     }
 
