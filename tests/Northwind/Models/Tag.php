@@ -20,12 +20,12 @@ class Tag extends Model
 
     public function taggedEmployees()
     {
-        return $this->morphToMany(Employee::class,'taggable', 'taggable_pivot');
+        return $this->morphedByMany(Employee::class,'taggable', 'taggable_pivot');
     }
 
     public function taggedCustomer()
     {
-        return $this->morphToMany(Customer::class,'taggable', 'taggable_pivot');
+        return $this->morphedByMany(Customer::class,'taggable', 'taggable_pivot');
     }
 
 }

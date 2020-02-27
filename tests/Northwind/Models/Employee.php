@@ -58,6 +58,6 @@ class Employee extends Model
 
     public function tags()
     {
-        return $this->morphedByMany(Tag::class, 'taggable', 'taggable_pivot');
+        return $this->morphToMany(Tag::class, 'taggable', 'taggable_pivot');
     }
 }

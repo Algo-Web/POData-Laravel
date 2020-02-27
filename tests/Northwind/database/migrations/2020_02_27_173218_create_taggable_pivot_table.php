@@ -15,9 +15,9 @@ class CreateTaggablePivotTable extends Migration
     public function up()
     {
         Schema::create('taggable_pivot', function (Blueprint $table) {
-            $table->integer('id', true);
+            $table->integer('tag_id');
             $table->string('taggable_type', 50)->nullable();
-            $table->string('taggable_id', 50)->nullable();
+            $table->integer('taggable_id', 50)->nullable();
         });
     }
 
