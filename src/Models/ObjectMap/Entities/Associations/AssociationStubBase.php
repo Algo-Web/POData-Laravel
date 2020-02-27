@@ -232,8 +232,8 @@ abstract class AssociationStubBase
         if (0 !== $baseComp) {
             return $baseComp / abs($baseComp);
         }
-        $thisMethod  = $this->getRelationName();
-        $otherMethod = $other->getRelationName();
+        $thisMethod  = $this->getRelationName() ?? '';
+        $otherMethod = $other->getRelationName() ?? '';
         $methodComp  = strcmp($thisMethod, $otherMethod);
         return 0 === $methodComp ? 0 : $methodComp / abs($methodComp);
     }
