@@ -195,7 +195,7 @@ class LaravelExpressionProvider implements IExpressionProvider
     {
         $left  = strval($left);
         $right = strval($right);
-        $type = $this->unpackExpressionType($expressionType);
+        $type  = $this->unpackExpressionType($expressionType);
         switch ($type) {
             case ExpressionType::MULTIPLY:
                 return $this->prepareBinaryExpression(self::MULTIPLY, $left, $right);
