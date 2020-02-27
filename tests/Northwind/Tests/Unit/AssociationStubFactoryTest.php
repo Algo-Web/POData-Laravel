@@ -58,7 +58,7 @@ class AssociationStubFactoryTest extends TestCase
             $stub->getBaseType(),
             "the base type of a relationship should be the model on which the relation lives"
         );
-        $this->assertEquals($to, $stub->getTargType(), sprintf($relationXonY . 'Target Type should be', $to));
+        $this->assertEquals($to, $stub->getTargType(), sprintf($relationXonY . ' have a Target Type of %s', $to));
         $this->assertEquals($relationName, $stub->getRelationName(), sprintf($relationXonY . " be named %s", $relationName));
         $this->assertEquals($thisField, $stub->getKeyField(), sprintf($relationXonY . ' have a key field on %s side of the relation', $from));
         $this->assertEquals($thatField, $stub->getForeignField(), sprintf($relationXonY . ' have a foreign field on %s side of the relation', $to));
