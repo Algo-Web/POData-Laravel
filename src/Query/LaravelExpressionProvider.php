@@ -221,17 +221,17 @@ class LaravelExpressionProvider implements IExpressionProvider
         $type = $this->unpackExpressionType($expressionType);
         switch ($type) {
             case ExpressionType::GREATERTHAN:
-                return $this->prepareBinaryExpression(self::GREATER_THAN, $left, $right);
+                return $this->prepareBinaryExpression(self::GREATER_THAN, strval($left), strval($right));
             case ExpressionType::GREATERTHAN_OR_EQUAL:
-                return $this->prepareBinaryExpression(self::GREATER_THAN_OR_EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::GREATER_THAN_OR_EQUAL, strval($left), strval($right));
             case ExpressionType::LESSTHAN:
-                return $this->prepareBinaryExpression(self::LESS_THAN, $left, $right);
+                return $this->prepareBinaryExpression(self::LESS_THAN, strval($left), strval($right));
             case ExpressionType::LESSTHAN_OR_EQUAL:
-                return $this->prepareBinaryExpression(self::LESS_THAN_OR_EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::LESS_THAN_OR_EQUAL, strval($left), strval($right));
             case ExpressionType::EQUAL:
-                return $this->prepareBinaryExpression(self::EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::EQUAL, strval($left), strval($right));
             case ExpressionType::NOTEQUAL:
-                return $this->prepareBinaryExpression(self::NOT_EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::NOT_EQUAL, strval($left), strval($right));
             default:
                 throw new \InvalidArgumentException('onRelationalExpression');
         }
