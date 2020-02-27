@@ -79,6 +79,9 @@ class AssociationStubFactoryTest extends TestCase
             //TODO: the morphOneHandler Should do this... but doesnt ['photos', Customer::class, Photo::class, 'id', 'rel_id', ['id', 'rel_type','rel_id']], // Morph One
             //TODO: the morphManyHandler should do this... but doesnt ['photos', Employee::class, Photo::class, 'id', 'rel_id', ['id', 'rel_type','rel_id']], // Morph Many
             //TODO: the morphToHandler should do this... but doesnt ['photoOf', Photo::class,null, 'rel_id', null, ['rel_id', 'rel_type', null]]
+            //TODO: the morphToManyHandler should do this... but doesnt ['tags', Customer::class, Tag::class, 'id', 'id', ['id','taggable_id','taggable_type','tag_id', 'id']],
+            //TODO: the morphedByManyHandler should do this... but doesnt['taggedCustomer', Tag::class, Customer::class, 'id', 'id', ['id','tag_id','taggable_type','taggable_id', 'id']],
+            //TODO: the morphedByManyHandler should do this... but doesnt['taggedEmployees', Tag::class, Employee::class, 'id', 'id', ['id','tag_id','taggable_type','taggable_id', 'id']],
         ];
     }
 
@@ -114,15 +117,17 @@ class AssociationStubFactoryTest extends TestCase
     public function associationStubCompatibleProvider()
     {
         return [
-            [Customer::class, 'orders', Order::class, 'customer',true],
+            [Customer::class, 'orders', Order::class, 'customer',true], //  HasMany -> BelongsTo
+            [Customer::class, 'photos', Photo::class, 'photoOf',true], // MorphOne -> MorphTo
+            [Employee::class, 'photos', Photo::class, 'photoOf',true], // MorphMany -> MorphTo
+            [Employee::class, 'tags', Tag::class, 'taggedEmployees',true], // MorphToMany -> MorphedByMany
+            [Customer::class, 'tags', Tag::class, 'taggedCustomer',true], // MorphToMany -> MorphedByMany
+            [Order::class, 'invoice', Invoice::class, 'order',true], // HasOne -> BelongsTo
+            [Customer::class, 'invoices', Invoice::class, 'customer',true], // HasManyThrough -> HasManyThrough
             [Customer::class, 'orders', Employee::class, 'privileges',false],
-            [Customer::class, 'photos', Photo::class, 'photoOf',true],
-            [Employee::class, 'photos', Photo::class, 'photoOf',true],
             [Customer::class, 'photos', Order::class, 'customer',false],
-            [Employee::class, 'tags', Tag::class, 'taggedEmployees',true],
             [Employee::class, 'tags', Tag::class, 'taggedCustomer',false],
             [Customer::class, 'tags', Tag::class, 'taggedEmployees',false],
-            [Customer::class, 'tags', Tag::class, 'taggedCustomer',true],
         ];
     }
 }
