@@ -226,8 +226,8 @@ abstract class AssociationStubBase
         if (0 !== $classComp) {
             return $classComp / abs($classComp);
         }
-        $thisBase  = $this->getBaseType();
-        $otherBase = $other->getBaseType();
+        $thisBase  = $this->getBaseType() ?? '';
+        $otherBase = $other->getBaseType() ?? '';
         $baseComp  = strcmp($thisBase, $otherBase);
         if (0 !== $baseComp) {
             return $baseComp / abs($baseComp);
