@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
@@ -45,7 +45,7 @@ abstract class MetadataBaseProvider extends ServiceProvider
      */
     protected function getClassMap()
     {
-        $classes = get_declared_classes();
+        $classes   = get_declared_classes();
         $autoClass = null;
         foreach ($classes as $class) {
             if (\Illuminate\Support\Str::startsWith($class, 'Composer\\Autoload\\ComposerStaticInit')) {

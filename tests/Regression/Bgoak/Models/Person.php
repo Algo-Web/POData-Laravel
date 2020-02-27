@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -18,12 +18,12 @@ use Illuminate\Database\Eloquent\Model;
 class Person extends Model
 {
     use \AlgoWeb\PODataLaravel\Models\MetadataTrait;
-    protected $table = 'test_people';
-    public $timestamps = false;
-    public $incrementing = false;
-    protected $keyType = 'string';
+    protected $table      = 'test_people';
+    public $timestamps    = false;
+    public $incrementing  = false;
+    protected $keyType    = 'string';
     protected $primaryKey = 'personId';
-    protected $fillable = [
+    protected $fillable   = [
         'name',
         'givenname',
         'addressid',

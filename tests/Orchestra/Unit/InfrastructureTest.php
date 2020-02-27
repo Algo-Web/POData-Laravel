@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -58,7 +58,7 @@ class InfrastructureTest extends TestCase
         $foo = new MetadataProvider($app);
 
         $reflec = new \ReflectionClass($foo);
-        $prop = new \ReflectionMethod($foo, 'getCandidateModels');
+        $prop   = new \ReflectionMethod($foo, 'getCandidateModels');
         $prop->setAccessible(true);
         $cand = $prop->invoke($foo);
         $this->assertTrue(0 < count($cand), 'Candidate model list empty');

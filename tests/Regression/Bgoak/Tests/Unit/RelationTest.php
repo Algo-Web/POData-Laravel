@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Unit\Models;
 
 use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\Address;
@@ -19,16 +19,16 @@ class RelationTest extends TestCase
 {
     public function testCityAddressRelationRoundTrip()
     {
-        $foo = new City();
-        $foo->cityId = 'foo';
-        $foo->name = 'foo';
+        $foo           = new City();
+        $foo->cityId   = 'foo';
+        $foo->name     = 'foo';
         $foo->postcode = 'WTF 0MG';
-        $foo->country = 'The Old Dart';
+        $foo->country  = 'The Old Dart';
         $this->assertTrue($foo->save());
-        $bar = new Address();
+        $bar            = new Address();
         $bar->addressId = 'bar';
-        $bar->cityid = 'foo';
-        $bar->street = 'street';
+        $bar->cityid    = 'foo';
+        $bar->street    = 'street';
         $this->assertTrue($bar->save());
 
         /** @var Address $nuBar */
@@ -41,23 +41,23 @@ class RelationTest extends TestCase
 
     public function testAddressPersonRelationRoundTrip()
     {
-        $baz = new City();
-        $baz->cityId = 'baz';
-        $baz->name = 'baz';
+        $baz           = new City();
+        $baz->cityId   = 'baz';
+        $baz->name     = 'baz';
         $baz->postcode = 'WTF 0MG';
-        $baz->country = 'The Old Dart';
+        $baz->country  = 'The Old Dart';
         $this->assertTrue($baz->save());
 
-        $foo = new Address();
+        $foo            = new Address();
         $foo->addressId = 'foo';
-        $foo->cityid = 'baz';
-        $foo->street = 'street';
+        $foo->cityid    = 'baz';
+        $foo->street    = 'street';
         $this->assertTrue($foo->save());
 
-        $bar = new Person();
-        $bar->personId = 'bar';
+        $bar            = new Person();
+        $bar->personId  = 'bar';
         $bar->addressid = 'foo';
-        $bar->name = 'Zoidberg';
+        $bar->name      = 'Zoidberg';
         $bar->givenname = 'John';
         $this->assertTrue($bar->save());
 

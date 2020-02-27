@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
@@ -11,7 +11,7 @@ class ModelSerialiser
     // Upstream POData implementation has an N+1 lookup problem that interacts badly with how
     // Eloquent handles property accesses
 
-    private static $mutatorCache = [];
+    private static $mutatorCache  = [];
     private static $metadataCache = [];
 
     public function __construct()
@@ -52,16 +52,16 @@ class ModelSerialiser
             }
             self::$mutatorCache[$class] = $getterz;
         }
-        $getterz = self::$mutatorCache[$class];
+        $getterz     = self::$mutatorCache[$class];
         $modelAttrib = $model->getAttributes();
-        $result = array_intersect_key($modelAttrib, $meta);
+        $result      = array_intersect_key($modelAttrib, $meta);
         foreach ($keys as $key) {
             if (!isset($result[$key])) {
                 $result[$key] = null;
             }
         }
         foreach ($getterz as $getter) {
-            $result[$getter] = $model->$getter;
+            $result[$getter] = $model->{$getter};
         }
 
         return $result;

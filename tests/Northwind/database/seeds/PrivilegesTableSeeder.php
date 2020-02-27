@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Seeder;
 
@@ -16,11 +16,11 @@ class PrivilegesTableSeeder extends Seeder
         
         \DB::table('privileges')->insert(
             [
-            0 =>
-            [
-                'id' => 2,
-                'privilege_name' => 'Purchase Approvals',
-            ],
+                0 =>
+                [
+                    'id' => 2,
+                    'privilege_name' => 'Purchase Approvals',
+                ],
             ]
         );
     }

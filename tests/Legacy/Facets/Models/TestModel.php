@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models;
 
@@ -34,12 +34,12 @@ class TestModel extends Model
         }
         parent::__construct();
         $this->processor = \Mockery::mock(\Illuminate\Database\Query\Processors\Processor::class)->makePartial();
-        $this->grammar = \Mockery::mock(\Illuminate\Database\Query\Grammars\Grammar::class)->makePartial();
-        $connect = \Mockery::mock(Connection::class)->makePartial();
+        $this->grammar   = \Mockery::mock(\Illuminate\Database\Query\Grammars\Grammar::class)->makePartial();
+        $connect         = \Mockery::mock(Connection::class)->makePartial();
         $connect->shouldReceive('getQueryGrammar')->andReturn($this->grammar);
         $connect->shouldReceive('getPostProcessor')->andReturn($this->processor);
         $this->connect = $connect;
-        $builder = new Builder($this->connect, $this->grammar, $this->processor);
+        $builder       = new Builder($this->connect, $this->grammar, $this->processor);
         $this->setQuery($builder);
         $this->dateFormat = 'Y-m-d H:i:s.u';
     }
@@ -85,9 +85,9 @@ class TestModel extends Model
         } else {
             $result = [];
             for ($i = 0; $i < count($id); $i++) {
-                $model = new self;
+                $model     = new self;
                 $model->id = $id[$i];
-                $result[] = $model;
+                $result[]  = $model;
             }
             return collect([$result]);
         }

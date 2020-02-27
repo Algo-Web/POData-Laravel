@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -37,7 +37,7 @@ trait SerialiseNavigationTrait
             return null;
         }
         $segmentNames = $this->getLightStack();
-        $depth = count($segmentNames);
+        $depth        = count($segmentNames);
         // $depth == 1 means serialization of root entry
         //(the resource identified by resource path) is going on,
         //so control won't get into the below for loop.
@@ -46,7 +46,7 @@ trait SerialiseNavigationTrait
         // for resource identified by resource path.
         if (0 != $depth) {
             for ($i = 1; $i < $depth; ++$i) {
-                $segName = $segmentNames[$i]['prop'];
+                $segName                = $segmentNames[$i]['prop'];
                 $expandedProjectionNode = $expandedProjectionNode->findNode($segName);
                 if (null === $expandedProjectionNode) {
                     throw new InvalidOperationException('is_null($expandedProjectionNode)');

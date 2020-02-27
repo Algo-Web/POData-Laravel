@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Providers;
 
@@ -29,7 +29,7 @@ class MetadataProviderReverseTest extends TestCase
         parent::setUp();
         $map = new Map();
         App::instance('objectmap', $map);
-        $holder = new MetadataGubbinsHolder();
+        $holder                 = new MetadataGubbinsHolder();
         $this->metadataProvider = m::mock(MetadataProvider::class)
             ->makePartial()->shouldAllowMockingProtectedMethods();
         $this->metadataProvider->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -38,9 +38,9 @@ class MetadataProviderReverseTest extends TestCase
 
     public function testReverseAcrossSingleRelation()
     {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta          = [];
+        $meta['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -71,7 +71,7 @@ class MetadataProviderReverseTest extends TestCase
         $foo->boot();
 
         $source = new TestMonomorphicSource($meta);
-        $targ = new TestMonomorphicTarget($meta);
+        $targ   = new TestMonomorphicTarget($meta);
 
         $forwardOne = $foo->resolveReverseProperty($source, 'oneSource');
         $this->assertEquals('oneTarget', $forwardOne);
@@ -85,11 +85,11 @@ class MetadataProviderReverseTest extends TestCase
 
     public function testReverseAcrossTwoArmedPolymorphicRelation()
     {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta                 = [];
+        $meta['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
 
@@ -118,9 +118,9 @@ class MetadataProviderReverseTest extends TestCase
 
         $foo->boot();
 
-        $left = new TestMorphManySource($meta);
+        $left  = new TestMorphManySource($meta);
         $right = new TestMorphManySourceAlternate($meta);
-        $base = new TestMorphTarget($meta);
+        $base  = new TestMorphTarget($meta);
 
         $leftForward = $foo->resolveReverseProperty($left, 'morphTarget');
         $this->assertEquals('morph_TestMorphManySource', $leftForward);
@@ -134,9 +134,9 @@ class MetadataProviderReverseTest extends TestCase
 
     public function testReverseAcrossNoRelations()
     {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta          = [];
+        $meta['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -174,11 +174,11 @@ class MetadataProviderReverseTest extends TestCase
 
     public function testReverseAcrossMissingProperty()
     {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta                 = [];
+        $meta['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
 
@@ -207,9 +207,9 @@ class MetadataProviderReverseTest extends TestCase
 
         $foo->boot();
 
-        $left = new TestMorphManySource($meta);
+        $left  = new TestMorphManySource($meta);
         $right = new TestMorphManySourceAlternate($meta);
-        $base = new TestMorphTarget($meta);
+        $base  = new TestMorphTarget($meta);
 
         $leftForward = $foo->resolveReverseProperty($left, 'property');
         $this->assertNull($leftForward);
@@ -221,7 +221,7 @@ class MetadataProviderReverseTest extends TestCase
         $foo->shouldReceive('getObjectMap->resolveEntity')->andReturn(null)->once();
 
         $expected = 'Source model not defined';
-        $actual = null;
+        $actual   = null;
 
         $left = new TestMorphManySource([]);
 
@@ -239,7 +239,7 @@ class MetadataProviderReverseTest extends TestCase
         $foo->shouldReceive('getObjectMap->resolveEntity')->andReturn(null)->never();
 
         $expected = 'Property name must be string';
-        $actual = null;
+        $actual   = null;
 
         $left = new TestMorphManySource([]);
 
@@ -264,7 +264,7 @@ class MetadataProviderReverseTest extends TestCase
         $foo->shouldReceive('getObjectMap->resolveEntity')->andReturn($gubbins)->once();
 
         $expected = '';
-        $actual = null;
+        $actual   = null;
 
         $left = new TestMorphManySource([]);
 

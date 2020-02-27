@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets;
 
@@ -25,7 +25,7 @@ class TestApplication extends Application
     public function registerConfiguredProviders()
     {
         $this->basePath = dirname(__DIR__);
-        $manifestPath = $this->getCachedServicesPath();
+        $manifestPath   = $this->getCachedServicesPath();
 
         (new ProviderRepository($this, $this->filesys, $manifestPath))
             ->load($this->config['app.providers']);

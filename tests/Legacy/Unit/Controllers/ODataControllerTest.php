@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Controllers;
 
@@ -34,7 +34,7 @@ class ODataControllerTest extends TestCase
         $this->object  = \Mockery::mock('\AlgoWeb\PODataLaravel\Controllers\ODataController')
             ->makePartial()->shouldAllowMockingProtectedMethods();
         $this->query = m::mock(LaravelQuery::class)->makePartial();
-        $this->meta = m::mock(SimpleMetadataProvider::class)->makePartial();
+        $this->meta  = m::mock(SimpleMetadataProvider::class)->makePartial();
         App::instance('odataquery', $this->query);
         App::instance('metadata', $this->meta);
     }
@@ -105,7 +105,7 @@ class ODataControllerTest extends TestCase
         $actual = $result->getContent();
         //$this->assertEquals($expected, $actual);
         $expectedContent = 'application/atomsvc+xml;charset=utf-8;charset=UTF-8';
-        $actualContent = $result->headers->get('content-type');
+        $actualContent   = $result->headers->get('content-type');
         $this->assertEquals($expectedContent, $actualContent);
     }
 }

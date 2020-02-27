@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Query;
 
@@ -11,26 +11,26 @@ use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\PropertyAcce
 
 class LaravelExpressionProvider implements IExpressionProvider
 {
-    const ADD = '+';
-    const CLOSE_BRACKET = ')';
-    const COMMA = ',';
-    const DIVIDE = '/';
-    const SUBTRACT = '-';
-    const EQUAL = '==';
-    const GREATER_THAN = '>';
+    const ADD                   = '+';
+    const CLOSE_BRACKET         = ')';
+    const COMMA                 = ',';
+    const DIVIDE                = '/';
+    const SUBTRACT              = '-';
+    const EQUAL                 = '==';
+    const GREATER_THAN          = '>';
     const GREATER_THAN_OR_EQUAL = '>=';
-    const LESS_THAN = '<';
-    const LESS_THAN_OR_EQUAL = '<=';
-    const LOGICAL_AND = '&&';
-    const LOGICAL_NOT = '!';
-    const LOGICAL_OR = '||';
-    const MEMBER_ACCESS = '->';
-    const MODULO = '%';
-    const MULTIPLY = '*';
-    const NEGATE = '-';
-    const NOT_EQUAL = '!=';
-    const OPEN_BRACKET = '(';
-    const TYPE_NAMESPACE = 'POData\\Providers\\Metadata\\Type\\';
+    const LESS_THAN             = '<';
+    const LESS_THAN_OR_EQUAL    = '<=';
+    const LOGICAL_AND           = '&&';
+    const LOGICAL_NOT           = '!';
+    const LOGICAL_OR            = '||';
+    const MEMBER_ACCESS         = '->';
+    const MODULO                = '%';
+    const MULTIPLY              = '*';
+    const NEGATE                = '-';
+    const NOT_EQUAL             = '!=';
+    const OPEN_BRACKET          = '(';
+    const TYPE_NAMESPACE        = 'POData\\Providers\\Metadata\\Type\\';
 
     private $functionDescriptionParsers;
 
@@ -282,11 +282,11 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onPropertyAccessExpression(PropertyAccessExpression $expression)
     {
-        $parent = $expression;
+        $parent   = $expression;
         $variable = null;
         do {
             $variable = $parent->getResourceProperty()->getName() . self::MEMBER_ACCESS . $variable;
-            $parent = $parent->getParent();
+            $parent   = $parent->getParent();
         } while ($parent != null);
         $variable = rtrim($variable, self::MEMBER_ACCESS);
         $variable = $this->getIteratorName() . self::MEMBER_ACCESS . $variable;

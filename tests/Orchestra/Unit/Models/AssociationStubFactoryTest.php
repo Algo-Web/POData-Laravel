@@ -1,11 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
  * Date: 27/02/20
- * Time: 11:41 AM
+ * Time: 11:41 AM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Models;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubFactory;
@@ -20,7 +19,7 @@ class AssociationStubFactoryTest extends TestCase
 {
     /**
      * This test tests the current "wrongness" of the factory. if failing review
-     * Tests\Northwind\AlgoWeb\PODataLaravel\Tests\Unit\AssociationStubFactoryTest
+     * Tests\Northwind\AlgoWeb\PODataLaravel\Tests\Unit\AssociationStubFactoryTest.
      *
      * @throws \POData\Common\InvalidOperationException
      */
@@ -41,7 +40,7 @@ class AssociationStubFactoryTest extends TestCase
 
     /**
      * This test tests the current "wrongness" of the factory. if failing review
-     * Tests\Northwind\AlgoWeb\PODataLaravel\Tests\Unit\AssociationStubFactoryTest
+     * Tests\Northwind\AlgoWeb\PODataLaravel\Tests\Unit\AssociationStubFactoryTest.
      *
      * @throws \POData\Common\InvalidOperationException
      */
@@ -63,7 +62,7 @@ class AssociationStubFactoryTest extends TestCase
 
     /**
      * This test tests the current "wrongness" of the factory. if failing review
-     * Tests\Northwind\AlgoWeb\PODataLaravel\Tests\Unit\AssociationStubFactoryTest
+     * Tests\Northwind\AlgoWeb\PODataLaravel\Tests\Unit\AssociationStubFactoryTest.
      *
      * @throws \POData\Common\InvalidOperationException
      */
@@ -85,7 +84,7 @@ class AssociationStubFactoryTest extends TestCase
 
     /**
      * This test tests the current "wrongness" of the factory. if failing review
-     * Tests\Northwind\AlgoWeb\PODataLaravel\Tests\Unit\AssociationStubFactoryTest
+     * Tests\Northwind\AlgoWeb\PODataLaravel\Tests\Unit\AssociationStubFactoryTest.
      *
      * @throws \POData\Common\InvalidOperationException
      */

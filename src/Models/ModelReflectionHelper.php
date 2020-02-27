@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 
 namespace AlgoWeb\PODataLaravel\Models;
@@ -27,7 +27,7 @@ abstract class ModelReflectionHelper
     ];
 
     /**
-     * @param  ReflectionMethod         $method
+     * @param  ReflectionMethod $method
      * @return string
      */
     public static function getCodeForMethod(ReflectionMethod $method): string
@@ -42,9 +42,9 @@ abstract class ModelReflectionHelper
             $file->next();
         }
 
-        $code = trim(preg_replace('/\s\s+/', '', $code));
+        $code  = trim(preg_replace('/\s\s+/', '', $code));
         $begin = strpos($code, 'function(');
-        $code = substr($code, $begin, strrpos($code, '}') - $begin + 1);
+        $code  = substr($code, $begin, strrpos($code, '}') - $begin + 1);
         return $code;
     }
 
@@ -64,23 +64,23 @@ abstract class ModelReflectionHelper
     }
 
     /**
-     * @param Model $model
-     * @return array|string[]
+     * @param  Model               $model
      * @throws ReflectionException
+     * @return array|string[]
      */
     public static function getRelationshipsFromMethods(Model $model): array
     {
         $relationships = [];
-        $methods = self::getModelClassMethods($model);
+        $methods       = self::getModelClassMethods($model);
         foreach ($methods as $method) {
             //Use reflection to inspect the code, based on Illuminate/Support/SerializableClosure.php
             $reflection = new ReflectionMethod($model, $method);
-            $code = self::getCodeForMethod($reflection);
+            $code       = self::getCodeForMethod($reflection);
             foreach (static::$relTypes as $relation) {
                 //Resolve the relation's model to a Relation object.
                 if (
                     !stripos($code, sprintf('$this->%s(', $relation)) ||
-                    !(($relationObj = $model->$method()) instanceof Relation) ||
+                    !(($relationObj = $model->{$method}()) instanceof Relation) ||
                     !in_array(MetadataTrait::class, class_uses($relationObj->getRelated()))
                 ) {
                     continue;

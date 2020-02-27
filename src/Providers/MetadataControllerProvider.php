@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
@@ -26,7 +26,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
     public function boot()
     {
         $isCaching = true === $this->getIsCaching();
-        $hasCache = null;
+        $hasCache  = null;
 
         if ($isCaching) {
             $hasCache = Cache::has('metadataControllers');
@@ -41,7 +41,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
         $meta = App::make('metadataControllers');
 
         $classes = $this->getClassMap();
-        $ends = $this->getCandidateControllers($classes);
+        $ends    = $this->getCandidateControllers($classes);
 
         // now process each class that uses the metadata controller trait and stick results in $metamix
         $metamix = [];
@@ -100,8 +100,8 @@ class MetadataControllerProvider extends MetadataBaseProvider
      */
     protected function getCandidateControllers(array $classes)
     {
-        $ends = [];
-        $startName = $this->getAppNamespace();
+        $ends       = [];
+        $startName  = $this->getAppNamespace();
         $rawClasses = [];
         foreach ($classes as $name) {
             // not in app namespace, keep moving

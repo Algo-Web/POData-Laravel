@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models;
 
@@ -23,10 +23,10 @@ class TestGetterModel extends Model
             $this->endpoint = $endpoint;
         }
         $this->dateFormat = 'Y-m-d H:i:s.u';
-        $this->name = 'Name';
-        $this->added_at = new \DateTime();
-        $this->weight = 42;
-        $this->code = 'ABC';
+        $this->name       = 'Name';
+        $this->added_at   = new \DateTime();
+        $this->weight     = 42;
+        $this->code       = 'ABC';
         parent::__construct();
     }
 

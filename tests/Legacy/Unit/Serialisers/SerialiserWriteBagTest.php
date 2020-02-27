@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Serialisers;
 
@@ -34,20 +34,20 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
 
         // default data service
-        $service = new TestDataService($query, $meta, $host);
-        $processor = $service->handleRequest();
+        $service                            = new TestDataService($query, $meta, $host);
+        $processor                          = $service->handleRequest();
         $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
         $processor->getRequest()->setCountValue(1);
         $object = new ObjectModelSerializer($service, $processor->getRequest());
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
         $propName = 'makeItPhunkee';
-        $rType = m::mock(ResourceType::class);
+        $rType    = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
         $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
 
-        $collection = new QueryResult();
+        $collection          = new QueryResult();
         $collection->results = null;
 
         $objectResult = $object->writeTopLevelBagObject($collection, $propName, $rType);
@@ -66,38 +66,38 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
 
         // default data service
-        $service = new TestDataService($query, $meta, $host);
-        $processor = $service->handleRequest();
+        $service                            = new TestDataService($query, $meta, $host);
+        $processor                          = $service->handleRequest();
         $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
         $processor->getRequest()->setCountValue(1);
         $object = new ObjectModelSerializer($service, $processor->getRequest());
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
         $propName = 'makeItPhunkee';
-        $rType = m::mock(ResourceType::class);
+        $rType    = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
         $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
 
-        $collection = new QueryResult();
+        $collection          = new QueryResult();
         $collection->results = 'NARF!';
 
-        $expected = null;
+        $expected               = null;
         $expectedExceptionClass = null;
-        $actual = null;
-        $actualExceptionClass = null;
+        $actual                 = null;
+        $actualExceptionClass   = null;
 
         try {
             $object->writeTopLevelBagObject($collection, $propName, $rType);
         } catch (\Exception $e) {
             $expectedExceptionClass = get_class($e);
-            $expected = $e->getMessage();
+            $expected               = $e->getMessage();
         }
         try {
             $ironic->writeTopLevelBagObject($collection, $propName, $rType);
         } catch (\Exception $e) {
             $actualExceptionClass = get_class($e);
-            $actual = $e->getMessage();
+            $actual               = $e->getMessage();
         }
 
         $this->assertEquals($expectedExceptionClass, $actualExceptionClass);
@@ -113,38 +113,38 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
 
         // default data service
-        $service = new TestDataService($query, $meta, $host);
-        $processor = $service->handleRequest();
+        $service                            = new TestDataService($query, $meta, $host);
+        $processor                          = $service->handleRequest();
         $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
         $processor->getRequest()->setCountValue(1);
         $object = new ObjectModelSerializer($service, $processor->getRequest());
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
         $propName = 'makeItPhunkee';
-        $rType = m::mock(ResourceType::class);
+        $rType    = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
         $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::ENTITY());
 
-        $collection = new QueryResult();
+        $collection          = new QueryResult();
         $collection->results = null;
 
-        $expected = null;
+        $expected               = null;
         $expectedExceptionClass = null;
-        $actual = null;
-        $actualExceptionClass = null;
+        $actual                 = null;
+        $actualExceptionClass   = null;
 
         try {
             $object->writeTopLevelBagObject($collection, $propName, $rType);
         } catch (\Exception $e) {
             $expectedExceptionClass = get_class($e);
-            $expected = $e->getMessage();
+            $expected               = $e->getMessage();
         }
         try {
             $ironic->writeTopLevelBagObject($collection, $propName, $rType);
         } catch (\Exception $e) {
             $actualExceptionClass = get_class($e);
-            $actual = $e->getMessage();
+            $actual               = $e->getMessage();
         }
 
         $this->assertEquals($expectedExceptionClass, $actualExceptionClass);
@@ -160,20 +160,20 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
 
         // default data service
-        $service = new TestDataService($query, $meta, $host);
-        $processor = $service->handleRequest();
+        $service                            = new TestDataService($query, $meta, $host);
+        $processor                          = $service->handleRequest();
         $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
         $processor->getRequest()->setCountValue(1);
         $object = new ObjectModelSerializer($service, $processor->getRequest());
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
         $propName = 'makeItPhunkee';
-        $rType = m::mock(ResourceType::class);
+        $rType    = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
         $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE());
 
-        $collection = new QueryResult();
+        $collection          = new QueryResult();
         $collection->results = [];
 
         $objectResult = $object->writeTopLevelBagObject($collection, $propName, $rType);
@@ -192,8 +192,8 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
 
         // default data service
-        $service = new TestDataService($query, $meta, $host);
-        $processor = $service->handleRequest();
+        $service                            = new TestDataService($query, $meta, $host);
+        $processor                          = $service->handleRequest();
         $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
         $processor->getRequest()->setCountValue(1);
         $object = new ObjectModelSerializer($service, $processor->getRequest());
@@ -202,13 +202,13 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         $iType = new StringType();
 
         $propName = 'makeItPhunkee';
-        $rType = m::mock(ResourceType::class);
+        $rType    = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
         $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE());
         $rType->shouldReceive('getInstanceType')->andReturn($iType);
 
-        $collection = new QueryResult();
+        $collection          = new QueryResult();
         $collection->results = ['eins', 'zwei', 'polizei'];
 
         $objectResult = $object->writeTopLevelBagObject($collection, $propName, $rType);
@@ -227,8 +227,8 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
 
         // default data service
-        $service = new TestDataService($query, $meta, $host);
-        $processor = $service->handleRequest();
+        $service                            = new TestDataService($query, $meta, $host);
+        $processor                          = $service->handleRequest();
         $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
         $processor->getRequest()->setCountValue(1);
         $object = new ObjectModelSerializer($service, $processor->getRequest());
@@ -237,13 +237,13 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         $iType = new StringType();
 
         $propName = 'makeItPhunkee';
-        $rType = m::mock(ResourceType::class);
+        $rType    = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
         $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE());
         $rType->shouldReceive('getInstanceType')->andReturn($iType);
 
-        $collection = new QueryResult();
+        $collection          = new QueryResult();
         $collection->results = ['eins', null, 'zwei', null, 'polizei'];
 
         $objectResult = $object->writeTopLevelBagObject($collection, $propName, $rType);
@@ -262,8 +262,8 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
 
         // default data service
-        $service = new TestDataService($query, $meta, $host);
-        $processor = $service->handleRequest();
+        $service                            = new TestDataService($query, $meta, $host);
+        $processor                          = $service->handleRequest();
         $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
         $processor->getRequest()->setCountValue(1);
         $object = new ObjectModelSerializer($service, $processor->getRequest());
@@ -288,17 +288,17 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         $rProp2->shouldReceive('getResourceType')->andReturn($subType1);
 
         $propName = 'makeItPhunkee';
-        $rType = m::mock(ResourceType::class);
+        $rType    = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
         $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
         $rType->shouldReceive('getAllProperties')->andReturn([$rProp1, $rProp2]);
 
-        $model = new reusableEntityClass1();
+        $model       = new reusableEntityClass1();
         $model->name = 'name';
         $model->type = 'type';
 
-        $collection = new QueryResult();
+        $collection          = new QueryResult();
         $collection->results = [$model];
 
         $objectResult = $object->writeTopLevelBagObject($collection, $propName, $rType);
@@ -314,16 +314,16 @@ class SerialiserWriteBagTest extends SerialiserTestBase
      */
     private function setUpDataServiceDeps($request)
     {
-        $holder = new MetadataGubbinsHolder();
-        $metadata = [];
-        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $holder            = new MetadataGubbinsHolder();
+        $metadata          = [];
+        $metadata['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $testModel = new TestModel($metadata, null);
         App::instance(TestModel::class, $testModel);
 
-        $op = new OperationContextAdapter($request);
+        $op   = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
 
         Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
@@ -332,7 +332,7 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $classen = [TestModel::class];
+        $classen  = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);

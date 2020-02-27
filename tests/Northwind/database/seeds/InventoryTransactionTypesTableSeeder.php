@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Seeder;
 
@@ -16,26 +16,26 @@ class InventoryTransactionTypesTableSeeder extends Seeder
         
         \DB::table('inventory_transaction_types')->insert(
             [
-            0 =>
-            [
-                'id' => 1,
-                'type_name' => 'Purchased',
-            ],
-            1 =>
-            [
-                'id' => 2,
-                'type_name' => 'Sold',
-            ],
-            2 =>
-            [
-                'id' => 3,
-                'type_name' => 'On Hold',
-            ],
-            3 =>
-            [
-                'id' => 4,
-                'type_name' => 'Waste',
-            ],
+                0 =>
+                [
+                    'id' => 1,
+                    'type_name' => 'Purchased',
+                ],
+                1 =>
+                [
+                    'id' => 2,
+                    'type_name' => 'Sold',
+                ],
+                2 =>
+                [
+                    'id' => 3,
+                    'type_name' => 'On Hold',
+                ],
+                3 =>
+                [
+                    'id' => 4,
+                    'type_name' => 'Waste',
+                ],
             ]
         );
     }

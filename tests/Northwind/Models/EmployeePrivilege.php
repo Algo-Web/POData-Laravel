@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Northwind\AlgoWeb\PODataLaravel\Models;
 
@@ -12,8 +12,8 @@ class EmployeePrivilege extends Model
 //    use \AlgoWeb\PODataLaravel\Models\MetadataTrait;
     protected $table = 'employee_privileges';
 
-    public $timestamps = false;
-    public $incrementing = false;
+    public $timestamps    = false;
+    public $incrementing  = false;
     protected $primaryKey = null;
 
     protected $fillable = [

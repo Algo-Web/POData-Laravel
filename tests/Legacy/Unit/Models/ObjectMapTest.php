@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Models;
 
@@ -12,11 +12,11 @@ class ObjectMapTest extends TestCase
 {
     public function testAddBadAssociation()
     {
-        $foo = new Map();
+        $foo   = new Map();
         $assoc = m::mock(Association::class);
 
         $expected = 'Association type not yet handled';
-        $actual = null;
+        $actual   = null;
 
         try {
             $foo->addAssociation($assoc);
@@ -36,7 +36,7 @@ class ObjectMapTest extends TestCase
 
     public function testSetEntitiesGood()
     {
-        $foo = new Map();
+        $foo     = new Map();
         $gubbins = new EntityGubbins();
         $gubbins->setClassName('SpaceJam');
 
@@ -53,7 +53,7 @@ class ObjectMapTest extends TestCase
         $foo = new Map();
 
         $expected = 'Entities array must contain only EntityGubbins objects';
-        $actual = null;
+        $actual   = null;
 
         try {
             $foo->setEntities([null, 'abc']);

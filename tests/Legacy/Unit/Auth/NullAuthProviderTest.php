@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Auth;
 
@@ -10,7 +10,7 @@ class NullAuthProviderTest extends TestCase
 {
     public function testCanAuth()
     {
-        $foo = new NullAuthProvider();
+        $foo    = new NullAuthProvider();
         $result = $foo->canAuth(ActionVerb::CREATE(), 'model');
         $this->assertTrue($result);
     }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -30,23 +30,23 @@ class ExpandTest extends TestCase
     public function setUp() : void
     {
         parent::setUp();
-        $baz = new City();
-        $baz->cityId = 'baz';
-        $baz->name = 'baz';
+        $baz           = new City();
+        $baz->cityId   = 'baz';
+        $baz->name     = 'baz';
         $baz->postcode = 'WTF 0MG';
-        $baz->country = 'The Old Dart';
+        $baz->country  = 'The Old Dart';
         $this->assertTrue($baz->save());
 
-        $foo = new Address();
+        $foo            = new Address();
         $foo->addressId = 'foo';
-        $foo->cityid = 'baz';
-        $foo->street = 'street';
+        $foo->cityid    = 'baz';
+        $foo->street    = 'street';
         $this->assertTrue($foo->save());
 
-        $bar = new Person();
-        $bar->personId = 'bar';
+        $bar            = new Person();
+        $bar->personId  = 'bar';
         $bar->addressid = 'foo';
-        $bar->name = 'Zoidberg';
+        $bar->name      = 'Zoidberg';
         $bar->givenname = 'John';
         $this->assertTrue($bar->save());
     }
@@ -56,8 +56,8 @@ class ExpandTest extends TestCase
         $url = 'odata.svc/People?$expand=Address';
 
         $expectedLink = '<link rel="edit" title="Address" href="Addresses(addressId=\'foo\')"/>';
-        $expectedId = '<d:addressId m:type="Edm.String">foo</d:addressId>';
-        $result = $this->get($url);
+        $expectedId   = '<d:addressId m:type="Edm.String">foo</d:addressId>';
+        $result       = $this->get($url);
         $this->assertSeeShim($result, $expectedLink);
         $this->assertSeeShim($result, $expectedId);
     }
@@ -67,8 +67,8 @@ class ExpandTest extends TestCase
         $url = 'odata.svc/Addresses?$expand=City';
 
         $expectedLink = '<link rel="edit" title="City" href="Cities(cityId=\'baz\')"/>';
-        $expectedId = '<d:cityId m:type="Edm.String">baz</d:cityId>';
-        $result = $this->get($url);
+        $expectedId   = '<d:cityId m:type="Edm.String">baz</d:cityId>';
+        $result       = $this->get($url);
         $this->assertSeeShim($result, $expectedLink);
         $this->assertSeeShim($result, $expectedId);
     }
@@ -78,8 +78,8 @@ class ExpandTest extends TestCase
         $url = 'odata.svc/Addresses?$expand=Person';
 
         $expectedLink = '<link rel="edit" title="Person" href="People(personId=\'bar\')"/>';
-        $expectedId = '<d:personId m:type="Edm.String">bar</d:personId>';
-        $result = $this->get($url);
+        $expectedId   = '<d:personId m:type="Edm.String">bar</d:personId>';
+        $result       = $this->get($url);
         $this->assertSeeShim($result, $expectedLink);
         $this->assertSeeShim($result, $expectedId);
     }
@@ -89,8 +89,8 @@ class ExpandTest extends TestCase
         $url = 'odata.svc/Cities?$expand=Address';
 
         $expectedLink = '<link rel="edit" title="Address" href="Addresses(addressId=\'foo\')"/>';
-        $expectedId = '<d:addressId m:type="Edm.String">foo</d:addressId>';
-        $result = $this->get($url);
+        $expectedId   = '<d:addressId m:type="Edm.String">foo</d:addressId>';
+        $result       = $this->get($url);
         $this->assertSeeShim($result, $expectedLink);
         $this->assertSeeShim($result, $expectedId);
     }
@@ -100,8 +100,8 @@ class ExpandTest extends TestCase
         $url = 'odata.svc/Addresses(addressId=\'foo\')/City';
 
         $expectedLink = '<link rel="edit" title="City" href="Cities(cityId=\'baz\')"/>';
-        $expectedId = '<d:cityId m:type="Edm.String">baz</d:cityId>';
-        $result = $this->get($url);
+        $expectedId   = '<d:cityId m:type="Edm.String">baz</d:cityId>';
+        $result       = $this->get($url);
         $this->assertSeeShim($result, $expectedLink);
         $this->assertSeeShim($result, $expectedId);
     }
@@ -111,8 +111,8 @@ class ExpandTest extends TestCase
         $url = 'odata.svc/People?$expand=Address/City';
 
         $expectedLink = '<link rel="edit" title="City" href="Cities(cityId=\'baz\')"/>';
-        $expectedId = '<d:personId m:type="Edm.String">bar</d:personId>';
-        $result = $this->get($url);
+        $expectedId   = '<d:personId m:type="Edm.String">bar</d:personId>';
+        $result       = $this->get($url);
         $this->assertSeeShim($result, $expectedLink);
         $this->assertSeeShim($result, $expectedId);
     }
@@ -122,8 +122,8 @@ class ExpandTest extends TestCase
         $url = 'odata.svc/Cities?$expand=Address/Person';
 
         $expectedLink = '<link rel="edit" title="Person" href="People(personId=\'bar\')"/>';
-        $expectedId = '<d:personId m:type="Edm.String">bar</d:personId>';
-        $result = $this->get($url);
+        $expectedId   = '<d:personId m:type="Edm.String">bar</d:personId>';
+        $result       = $this->get($url);
         $this->assertSeeShim($result, $expectedLink);
         $this->assertSeeShim($result, $expectedId);
     }

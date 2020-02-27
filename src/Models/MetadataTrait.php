@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace AlgoWeb\PODataLaravel\Models;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubFactory;
@@ -23,7 +23,7 @@ use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\Type\IType;
 
 /**
- * Trait MetadataTrait
+ * Trait MetadataTrait.
  * @package AlgoWeb\PODataLaravel\Models
  * @mixin Model
  */
@@ -31,11 +31,11 @@ trait MetadataTrait
 {
     use MetadataRelationsTrait;
 
-    protected $loadEagerRelations = [];
-    protected static $tableColumns = [];
+    protected $loadEagerRelations          = [];
+    protected static $tableColumns         = [];
     protected static $tableColumnsDoctrine = [];
-    protected static $tableData = [];
-    protected static $dontCastTypes = ['object', 'array', 'collection', 'int'];
+    protected static $tableData            = [];
+    protected static $dontCastTypes        = ['object', 'array', 'collection', 'int'];
 
     /**
      * Retrieve and assemble this model's metadata for OData packaging.
@@ -68,21 +68,21 @@ trait MetadataTrait
         /** @var array $columns */
         $columns = $this->getTableColumns();
         /** @var array $mask */
-        $mask = $this->metadataMask();
+        $mask    = $this->metadataMask();
         $columns = array_intersect($columns, $mask);
 
         $tableData = [];
 
         $rawFoo = $this->getTableDoctrineColumns();
-        $foo = [];
+        $foo    = [];
         /** @var array $getters */
         $getters = $this->collectGetters();
         $getters = array_intersect($getters, $mask);
-        $casts = $this->retrieveCasts();
+        $casts   = $this->retrieveCasts();
 
         foreach ($rawFoo as $key => $val) {
             // Work around glitch in Doctrine when reading from MariaDB which added ` characters to root key value
-            $key = trim($key, '`"');
+            $key       = trim($key, '`"');
             $foo[$key] = $val;
         }
 
@@ -90,9 +90,9 @@ trait MetadataTrait
             // Doctrine schema manager returns columns with lowercased names
             $rawColumn = $foo[strtolower($column)];
             /** @var IType $rawType */
-            $rawType = $rawColumn->getType();
-            $type = $rawType->getName();
-            $default = $this->$column;
+            $rawType            = $rawColumn->getType();
+            $type               = $rawType->getName();
+            $default            = $this->{$column};
             $tableData[$column] = ['type' => $type,
                 'nullable' => !($rawColumn->getNotNull()),
                 'fillable' => in_array($column, $this->getFillable()),
@@ -104,7 +104,7 @@ trait MetadataTrait
             if (isset($tableData[$get])) {
                 continue;
             }
-            $default = $this->$get;
+            $default         = $this->{$get};
             $tableData[$get] = ['type' => 'text', 'nullable' => true, 'fillable' => false, 'default' => $default];
         }
 
@@ -131,7 +131,7 @@ trait MetadataTrait
         $attribs = array_keys($this->getAllAttributes());
 
         $visible = $this->getVisible();
-        $hidden = $this->getHidden();
+        $hidden  = $this->getHidden();
         if (0 < count($visible)) {
             $attribs = array_intersect($visible, $attribs);
         } elseif (0 < count($hidden)) {
@@ -152,7 +152,7 @@ trait MetadataTrait
 
         if (!isset($endpoint)) {
             $bitter = get_class($this);
-            $name = substr($bitter, strrpos($bitter, '\\')+1);
+            $name   = substr($bitter, strrpos($bitter, '\\')+1);
             return ($name);
         }
         return ($endpoint);
@@ -260,8 +260,8 @@ trait MetadataTrait
         $methods = [];
 
         foreach ($getterz as $getter) {
-            $residual = substr($getter, 3);
-            $residual = substr(/* @scrutinizer ignore-type */$residual, 0, -9);
+            $residual  = substr($getter, 3);
+            $residual  = substr(/* @scrutinizer ignore-type */$residual, 0, -9);
             $methods[] = $residual;
         }
         return $methods;
@@ -314,7 +314,7 @@ trait MetadataTrait
 
         $lowerNames = [];
 
-        $fields = $this->metadata();
+        $fields       = $this->metadata();
         $entityFields = [];
         foreach ($fields as $name => $field) {
             if (in_array(strtolower($name), $lowerNames)) {
@@ -322,7 +322,7 @@ trait MetadataTrait
                 throw new \Exception($msg);
             }
             $lowerNames[] = strtolower($name);
-            $nuField = new EntityField();
+            $nuField      = new EntityField();
             $nuField->setName($name);
             $nuField->setIsNullable($field['nullable']);
             $nuField->setReadOnly(false);
@@ -339,13 +339,13 @@ trait MetadataTrait
         }
 
         $rawRels = $this->getRelationships();
-        $stubs = [];
+        $stubs   = [];
         foreach ($rawRels as $propertyName) {
             if (in_array(strtolower($propertyName), $lowerNames)) {
                 $msg = 'Property names must be unique, without regard to case';
                 throw new \Exception($msg);
             }
-            $stub = AssociationStubFactory::associationStubFromRelation(/** @scrutinizer ignore-type */$this, $propertyName);
+            $stub                 = AssociationStubFactory::associationStubFromRelation(/* @scrutinizer ignore-type */$this, $propertyName);
             $stubs[$propertyName] = $stub;
         }
         $gubbins->setStubs($stubs);
@@ -366,7 +366,7 @@ trait MetadataTrait
     protected function getTableColumns()
     {
         if (0 === count(self::$tableColumns)) {
-            $table = $this->getTable();
+            $table   = $this->getTable();
             $connect = $this->getConnection();
             $builder = $connect->getSchemaBuilder();
             $columns = $builder->getColumnListing($table);
@@ -385,7 +385,7 @@ trait MetadataTrait
     protected function getTableDoctrineColumns()
     {
         if (0 === count(self::$tableColumnsDoctrine)) {
-            $table = $this->getTable();
+            $table   = $this->getTable();
             $connect = $this->getConnection();
             $columns = $connect->getDoctrineSchemaManager()->listTableColumns($table);
 

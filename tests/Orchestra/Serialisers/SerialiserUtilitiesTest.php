@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -65,7 +65,7 @@ class SerialiserUtilitiesTest extends TestCase
 
     public function testCheckElementsInputEmptyArray()
     {
-        $entry = new QueryResult();
+        $entry          = new QueryResult();
         $entry->results = [];
         $entry->hasMore = true;
 
@@ -75,7 +75,7 @@ class SerialiserUtilitiesTest extends TestCase
 
     public function testCheckElementsInputEmptyCollection()
     {
-        $entry = new QueryResult();
+        $entry          = new QueryResult();
         $entry->results = collect([]);
         $entry->hasMore = true;
 
@@ -113,7 +113,7 @@ class SerialiserUtilitiesTest extends TestCase
         $rType->shouldReceive('getName')->andReturn('name');
         $rType->shouldReceive('getAllProperties')->andReturn(['property' => $keyProp])->once();
 
-        $result = new \stdClass();
+        $result       = new \stdClass();
         $instanceColl = [];
 
         $this->expectException(InvalidOperationException::class);
@@ -136,7 +136,7 @@ class SerialiserUtilitiesTest extends TestCase
         $rType->shouldReceive('getName')->andReturn('name');
         $rType->shouldReceive('getAllProperties')->andReturn(['property' => $keyProp])->once();
 
-        $result = new \stdClass();
+        $result       = new \stdClass();
         $instanceColl = [];
 
         $this->expectException(InvalidOperationException::class);

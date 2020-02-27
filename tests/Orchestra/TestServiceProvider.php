@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -32,7 +32,7 @@ class TestServiceProvider extends BaseServiceProvider
 
     protected function loadMigrationsFrom($path)
     {
-        $migrator = $this->app->make('migrator');
+        $migrator            = $this->app->make('migrator');
         $migrationRepository = $migrator->getRepository();
         $migrationRepository->setSource('testbench');
         $migrationRepository->createRepository();

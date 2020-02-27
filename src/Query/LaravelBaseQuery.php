@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -34,8 +34,8 @@ abstract class LaravelBaseQuery
      */
     public function __construct(AuthInterface $auth = null)
     {
-        $this->auth = isset($auth) ? $auth : new NullAuthProvider();
-        $this->metadataProvider = new MetadataProvider(App::make('app'));
+        $this->auth                = isset($auth) ? $auth : new NullAuthProvider();
+        $this->metadataProvider    = new MetadataProvider(App::make('app'));
         $this->controllerContainer = App::make('metadataControllers');
     }
 

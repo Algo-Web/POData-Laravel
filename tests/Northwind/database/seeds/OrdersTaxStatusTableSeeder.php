@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Seeder;
 
@@ -16,16 +16,16 @@ class OrdersTaxStatusTableSeeder extends Seeder
         
         \DB::table('orders_tax_status')->insert(
             [
-            0 =>
-            [
-                'id' => 0,
-                'tax_status_name' => 'Tax Exempt',
-            ],
-            1 =>
-            [
-                'id' => 1,
-                'tax_status_name' => 'Taxable',
-            ],
+                0 =>
+                [
+                    'id' => 0,
+                    'tax_status_name' => 'Tax Exempt',
+                ],
+                1 =>
+                [
+                    'id' => 1,
+                    'tax_status_name' => 'Taxable',
+                ],
             ]
         );
     }

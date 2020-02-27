@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Providers;
 
@@ -57,9 +57,9 @@ class MetadataProviderUriTest extends TestCase
 
     public function testUriOfMonomorphicOneToOneRelation()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -67,7 +67,7 @@ class MetadataProviderUriTest extends TestCase
         $reqUrlString = 'http://localhost/odata.svc/TestMonomorphicSources(id=1)/oneSource';
 
         $baseUrl = new Url('http://localhost/odata.svc');
-        $reqUrl = new Url($reqUrlString);
+        $reqUrl  = new Url($reqUrlString);
 
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicSources(id=1)/oneSource');
@@ -125,9 +125,9 @@ class MetadataProviderUriTest extends TestCase
 
     public function testUriOfMonomorphicOneToManyRelation()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -135,7 +135,7 @@ class MetadataProviderUriTest extends TestCase
         $reqUrlString = 'http://localhost/odata.svc/TestMonomorphicSources(id=1)/manySource';
 
         $baseUrl = new Url('http://localhost/odata.svc');
-        $reqUrl = new Url($reqUrlString);
+        $reqUrl  = new Url($reqUrlString);
 
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicSources(id=1)/manySource');
@@ -193,9 +193,9 @@ class MetadataProviderUriTest extends TestCase
 
     public function testUriOfMonomorphicManyToManyRelation()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -203,7 +203,7 @@ class MetadataProviderUriTest extends TestCase
         $reqUrlString = 'http://localhost/odata.svc/TestMonomorphicManySources(id=1)/manySource';
 
         $baseUrl = new Url('http://localhost/odata.svc');
-        $reqUrl = new Url($reqUrlString);
+        $reqUrl  = new Url($reqUrlString);
 
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')
@@ -255,9 +255,9 @@ class MetadataProviderUriTest extends TestCase
 
     public function testUriOfPolymorphicOneToOneRelation()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -265,7 +265,7 @@ class MetadataProviderUriTest extends TestCase
         $reqUrlString = 'http://localhost/odata.svc/TestMorphOneSources(id=1)/morphTarget';
 
         $baseUrl = new Url('http://localhost/odata.svc');
-        $reqUrl = new Url($reqUrlString);
+        $reqUrl  = new Url($reqUrlString);
 
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')
@@ -317,11 +317,11 @@ class MetadataProviderUriTest extends TestCase
 
     public function testUriOfPolymorphicOneToManyRelation()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw                 = [];
+        $metaRaw['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
 
@@ -335,7 +335,7 @@ class MetadataProviderUriTest extends TestCase
         $reqUrlString = 'http://localhost/odata.svc/TestMorphManySourceAlternates(alternate_id=1)/morphTarget';
 
         $baseUrl = new Url('http://localhost/odata.svc');
-        $reqUrl = new Url($reqUrlString);
+        $reqUrl  = new Url($reqUrlString);
 
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')
@@ -420,9 +420,9 @@ class MetadataProviderUriTest extends TestCase
      */
     public function testUriOfPolymorphicManyToManyRelation()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -437,7 +437,7 @@ class MetadataProviderUriTest extends TestCase
         $reqUrlString = 'http://localhost/odata.svc/TestMorphManyToManySources(id=1)/manySource';
 
         $baseUrl = new Url('http://localhost/odata.svc');
-        $reqUrl = new Url($reqUrlString);
+        $reqUrl  = new Url($reqUrlString);
 
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')

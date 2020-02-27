@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Serialisers;
 
@@ -26,20 +26,20 @@ class ModelSerialiserTest extends TestCase
 
     public function testBulkSerialiseBasicModel()
     {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta          = [];
+        $meta['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
-        $bar = new TestModel($meta, null);
-        $bar->id = 1;
+        $bar       = new TestModel($meta, null);
+        $bar->id   = 1;
         $bar->name = 'model';
 
         $foo = new ModelSerialiser();
 
         $expected = [];
         foreach ($meta as $key => $val) {
-            $expected[$key] = $bar->$key;
+            $expected[$key] = $bar->{$key};
         }
 
         $actual = $foo->bulkSerialise($bar);
@@ -48,12 +48,12 @@ class ModelSerialiserTest extends TestCase
 
     public function testBulkSerialiseWithSimpleGetter()
     {
-        $meta = [];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['weight'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta               = [];
+        $meta['name']       = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['weight']     = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['code']       = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['WeightCode'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['added_at'] = ['type' => 'datetime', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at']   = ['type' => 'datetime', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $bar = new TestGetterModel($meta, null);
 
@@ -61,7 +61,7 @@ class ModelSerialiserTest extends TestCase
 
         $expected = [];
         foreach ($meta as $key => $val) {
-            $expected[$key] = $bar->$key;
+            $expected[$key] = $bar->{$key};
         }
 
         $actual = $foo->bulkSerialise($bar);
@@ -70,22 +70,22 @@ class ModelSerialiserTest extends TestCase
 
     public function testBulkSerialiseWithDateTimeAsDateTime()
     {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta               = [];
+        $meta['id']         = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name']       = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo']      = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $meta['created_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
 
-        $bar = new TestGetterModel($meta, null);
-        $bar->id = 1;
-        $bar->name = 'model';
+        $bar             = new TestGetterModel($meta, null);
+        $bar->id         = 1;
+        $bar->name       = 'model';
         $bar->created_at = new \DateTime('2015-11-10 09:08:07');
 
         $foo = new ModelSerialiser();
 
         $expected = [];
         foreach ($meta as $key => $val) {
-            $expected[$key] = $bar->$key;
+            $expected[$key] = $bar->{$key};
         }
         $actual = $foo->bulkSerialise($bar);
         $this->assertEquals($expected, $actual);
@@ -93,22 +93,22 @@ class ModelSerialiserTest extends TestCase
 
     public function testBulkSerialiseWithCast()
     {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta            = [];
+        $meta['id']      = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name']    = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo']   = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $meta['is_bool'] = ['type' => 'boolean', 'nullable' => true, 'fillable' => true, 'default' => null];
 
-        $bar = new TestCastModel($meta, null);
-        $bar->id = 1;
-        $bar->name = 'model';
+        $bar          = new TestCastModel($meta, null);
+        $bar->id      = 1;
+        $bar->name    = 'model';
         $bar->is_bool = 1;
 
         $foo = new ModelSerialiser();
 
         $expected = [];
         foreach ($meta as $key => $val) {
-            $expected[$key] = $bar->$key;
+            $expected[$key] = $bar->{$key};
         }
         $actual = $foo->bulkSerialise($bar);
         $this->assertEquals($expected, $actual);
@@ -116,13 +116,13 @@ class ModelSerialiserTest extends TestCase
 
     public function testBulkSerialiseWithCastFromRawAttributes()
     {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta            = [];
+        $meta['id']      = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name']    = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo']   = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $meta['is_bool'] = ['type' => 'boolean', 'nullable' => true, 'fillable' => true, 'default' => null];
 
-        $bar = new TestCastModel($meta, null);
+        $bar     = new TestCastModel($meta, null);
         $attribs = ['id' => '1', 'name' => 'model', 'is_bool' => 1];
         $bar->setRawAttributes($attribs);
 
@@ -130,7 +130,7 @@ class ModelSerialiserTest extends TestCase
 
         $expected = [];
         foreach ($meta as $key => $val) {
-            $expected[$key] = $bar->$key;
+            $expected[$key] = $bar->{$key};
         }
         $actual = $foo->bulkSerialise($bar);
         $this->assertEquals($expected, $actual);
