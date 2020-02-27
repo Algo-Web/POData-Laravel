@@ -246,7 +246,7 @@ abstract class AssociationStubFactory
             $carry = [];
             foreach ($fields as $item) {
                 $v = $this->{$item};
-                if ($v == null && $item == 'ownerKey') {
+                if (null == $v && 'ownerKey' == $item) {
                     $carry[] = null;
                     continue;
                 }
