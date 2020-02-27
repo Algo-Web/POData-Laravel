@@ -55,4 +55,9 @@ class Employee extends Model
     {
         return $this->morphMany(Photo::class, 'rel');
     }
+
+    public function tags()
+    {
+        return $this->morphedByMany(Tag::class, 'taggable', 'taggable_pivot');
+    }
 }

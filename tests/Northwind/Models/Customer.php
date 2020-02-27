@@ -57,4 +57,9 @@ class Customer extends Model
     {
         return $this->morphOne(Photo::class, 'rel');
     }
+
+    public function tags()
+    {
+        return $this->morphedByMany(Tag::class, 'taggable', 'taggable_pivot');
+    }
 }
