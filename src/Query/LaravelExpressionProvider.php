@@ -170,7 +170,9 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onLogicalExpression(ExpressionType $expressionType, $left, $right)
     {
-        $type = $this->unpackExpressionType($expressionType);
+        $left  = strval($left);
+        $right = strval($right);
+        $type  = $this->unpackExpressionType($expressionType);
         switch ($type) {
             case ExpressionType::AND_LOGICAL:
                 return $this->prepareBinaryExpression(self::LOGICAL_AND, $left, $right);
@@ -191,6 +193,8 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onArithmeticExpression(ExpressionType $expressionType, $left, $right)
     {
+        $left  = strval($left);
+        $right = strval($right);
         $type = $this->unpackExpressionType($expressionType);
         switch ($type) {
             case ExpressionType::MULTIPLY:
@@ -249,9 +253,9 @@ class LaravelExpressionProvider implements IExpressionProvider
         $type = $this->unpackExpressionType($expressionType);
         switch ($type) {
             case ExpressionType::NEGATE:
-                return $this->prepareUnaryExpression(self::NEGATE, $child);
+                return $this->prepareUnaryExpression(self::NEGATE, strval($child));
             case ExpressionType::NOT_LOGICAL:
-                return $this->prepareUnaryExpression(self::LOGICAL_NOT, $child);
+                return $this->prepareUnaryExpression(self::LOGICAL_NOT, strval($child));
             default:
                 throw new \InvalidArgumentException('onUnaryExpression');
         }
