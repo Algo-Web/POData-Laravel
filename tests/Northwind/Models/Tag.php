@@ -3,7 +3,6 @@
 
 namespace Tests\Northwind\AlgoWeb\PODataLaravel\Models;
 
-
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Eloquent\Model;
 
