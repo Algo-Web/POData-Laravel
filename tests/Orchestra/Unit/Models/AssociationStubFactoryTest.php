@@ -18,6 +18,12 @@ use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 
 class AssociationStubFactoryTest extends TestCase
 {
+    /**
+     * This test tests the current "wrongness" of the factory. if failing review
+     * Tests\Northwind\AlgoWeb\PODataLaravel\Tests\Unit\AssociationStubFactoryTest
+     *
+     * @throws \POData\Common\InvalidOperationException
+     */
     public function testMorphToStub()
     {
         $model = new OrchestraMorphToTestModel();
@@ -33,6 +39,12 @@ class AssociationStubFactoryTest extends TestCase
         $this->assertEquals($fieldChain, $result->getThroughFieldChain());
     }
 
+    /**
+     * This test tests the current "wrongness" of the factory. if failing review
+     * Tests\Northwind\AlgoWeb\PODataLaravel\Tests\Unit\AssociationStubFactoryTest
+     *
+     * @throws \POData\Common\InvalidOperationException
+     */
     public function testMorphToManyStub()
     {
         $model = new OrchestraPolymorphToManySourceModel();
@@ -49,6 +61,12 @@ class AssociationStubFactoryTest extends TestCase
         $this->assertEquals('manyable_type', $result->getMorphType());
     }
 
+    /**
+     * This test tests the current "wrongness" of the factory. if failing review
+     * Tests\Northwind\AlgoWeb\PODataLaravel\Tests\Unit\AssociationStubFactoryTest
+     *
+     * @throws \POData\Common\InvalidOperationException
+     */
     public function testMorphOneStub()
     {
         $model = new OrchestraMorphOneTestModel();
@@ -65,6 +83,12 @@ class AssociationStubFactoryTest extends TestCase
         $this->assertEquals('morph_type', $result->getMorphType());
     }
 
+    /**
+     * This test tests the current "wrongness" of the factory. if failing review
+     * Tests\Northwind\AlgoWeb\PODataLaravel\Tests\Unit\AssociationStubFactoryTest
+     *
+     * @throws \POData\Common\InvalidOperationException
+     */
     public function testMorphManyStub()
     {
         $model = new OrchestraMorphManyTestModel();
