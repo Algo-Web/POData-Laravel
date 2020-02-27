@@ -93,6 +93,35 @@ class CreateTestModelsTable extends Migration
             $table->float('weight')->default(0);
             $table->string('code')->default('');
         });
+
+        Schema::create('test_morph_to_target_models', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
+            $table->string('name')->default('');
+            $table->timestamp('added_at')->useCurrent();
+            $table->float('weight')->default(0);
+            $table->string('code')->default('');
+        });
+
+        Schema::create('test_morph_one_models', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
+            $table->string('name')->default('');
+            $table->timestamp('added_at')->useCurrent();
+            $table->float('weight')->nullable();
+            $table->string('code')->nullable();
+            $table->morphs('morph');
+        });
+
+        Schema::create('test_morph_many_models', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
+            $table->string('name')->default('');
+            $table->timestamp('added_at')->useCurrent();
+            $table->float('weight')->nullable();
+            $table->string('code')->nullable();
+            $table->morphs('morph');
+        });
     }
 
     /**

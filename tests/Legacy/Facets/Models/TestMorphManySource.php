@@ -12,7 +12,6 @@ class TestMorphManySource extends Model
     use MetadataTrait {
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
         // not bury ourselves under a stack overflow and segfault
-        getRelationshipsFromMethods as getRel;
     }
     protected $metaArray;
     protected $connect;
@@ -59,11 +58,6 @@ class TestMorphManySource extends Model
             return $this->metaArray;
         }
         return $this->traitmetadata();
-    }
-
-    public function getRelationshipsFromMethods($biDir = false)
-    {
-        return $this->getRel($biDir);
     }
 
     public function morphTarget()

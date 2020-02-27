@@ -1,6 +1,7 @@
 <?php
 namespace AlgoWeb\PODataLaravel\Models;
 
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubFactory;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
@@ -21,6 +22,11 @@ use Mockery\Mock;
 use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\Type\IType;
 
+/**
+ * Trait MetadataTrait
+ * @package AlgoWeb\PODataLaravel\Models
+ * @mixin Model
+ */
 trait MetadataTrait
 {
     use MetadataRelationsTrait;
@@ -30,28 +36,6 @@ trait MetadataTrait
     protected static $tableColumnsDoctrine = [];
     protected static $tableData = [];
     protected static $dontCastTypes = ['object', 'array', 'collection', 'int'];
-
-    protected static $relTypes = [
-        'hasMany',
-        'hasManyThrough',
-        'belongsToMany',
-        'hasOne',
-        'belongsTo',
-        'morphOne',
-        'morphTo',
-        'morphMany',
-        'morphToMany',
-        'morphedByMany'
-    ];
-
-    protected static $manyRelTypes = [
-        'hasManyThrough',
-        'belongsToMany',
-        'hasMany',
-        'morphMany',
-        'morphToMany',
-        'morphedByMany'
-    ];
 
     /**
      * Retrieve and assemble this model's metadata for OData packaging.
@@ -255,6 +239,8 @@ trait MetadataTrait
      */
     abstract public function getFillable();
 
+    abstract public function getCasts();
+
     /**
      * Dig up all defined getters on the model.
      *
@@ -282,14 +268,13 @@ trait MetadataTrait
     }
 
     /**
-     * Supplemental function to retrieve cast array for Laravel versions that do not supply hasCasts.
+     * Used to be supplemental function to retrieve cast array for Laravel versions that do not supply hasCasts.
      *
      * @return array
      */
     public function retrieveCasts()
     {
-        $exists = method_exists($this, 'getCasts');
-        return $exists ? (array)$this->getCasts() : (array)$this->casts;
+        return $this->getCasts();
     }
 
     /**
@@ -323,12 +308,6 @@ trait MetadataTrait
      */
     public function extractGubbins()
     {
-        $multArray = [
-            '*' => AssociationStubRelationType::MANY(),
-            '1' => AssociationStubRelationType::ONE(),
-            '0..1' => AssociationStubRelationType::NULL_ONE()
-        ];
-
         $gubbins = new EntityGubbins();
         $gubbins->setName($this->getEndpointName());
         $gubbins->setClassName(get_class($this));
@@ -361,34 +340,13 @@ trait MetadataTrait
 
         $rawRels = $this->getRelationships();
         $stubs = [];
-        foreach ($rawRels as $key => $rel) {
-            foreach ($rel as $rawName => $deets) {
-                foreach ($deets as $relName => $relGubbins) {
-                    if (in_array(strtolower($relName), $lowerNames)) {
-                        $msg = 'Property names must be unique, without regard to case';
-                        throw new \Exception($msg);
-                    }
-                    $lowerNames[] = strtolower($relName);
-                    $gubbinsType = $relGubbins['type'];
-                    $property = $relGubbins['property'];
-                    $isPoly = isset($gubbinsType);
-                    $targType = 'known' != $gubbinsType ? $rawName : null;
-                    $stub = $isPoly ? new AssociationStubPolymorphic() : new AssociationStubMonomorphic();
-                    $stub->setBaseType(get_class($this));
-                    $stub->setRelationName($property);
-                    $stub->setKeyField($relGubbins['local']);
-                    $stub->setForeignField($targType ? $key : null);
-                    $stub->setMultiplicity($multArray[$relGubbins['multiplicity']]);
-                    $stub->setTargType($targType);
-                    if (null !== $relGubbins['through']) {
-                        $stub->setThroughField($relGubbins['through']);
-                    }
-                    if (!$stub->isOk()) {
-                        throw new InvalidOperationException('Generated stub not consistent');
-                    }
-                    $stubs[$property] = $stub;
-                }
+        foreach ($rawRels as $propertyName) {
+            if (in_array(strtolower($propertyName), $lowerNames)) {
+                $msg = 'Property names must be unique, without regard to case';
+                throw new \Exception($msg);
             }
+            $stub = AssociationStubFactory::associationStubFromRelation(/** @scrutinizer ignore-type */$this, $propertyName);
+            $stubs[$propertyName] = $stub;
         }
         $gubbins->setStubs($stubs);
 

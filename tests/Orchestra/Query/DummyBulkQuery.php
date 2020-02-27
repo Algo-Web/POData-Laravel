@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 23/02/20
- * Time: 10:20 PM
+ * Time: 10:20 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Query;
 
 use AlgoWeb\PODataLaravel\Query\LaravelBulkQuery;

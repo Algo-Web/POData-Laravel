@@ -11,7 +11,6 @@ class TestMonomorphicParentOfMorphTarget extends Model
     use MetadataTrait {
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
         // not bury ourselves under a stack overflow and segfault
-        getRelationshipsFromMethods as getRel;
     }
     protected $metaArray;
     protected $connect;
@@ -59,11 +58,6 @@ class TestMonomorphicParentOfMorphTarget extends Model
         return $this->traitmetadata();
     }
 
-    public function getRelationshipsFromMethods($biDir = false)
-    {
-        return $this->getRel($biDir);
-    }
-
     public function morphTargets()
     {
         return $this->hasMany(TestMorphTarget::class, 'child_id');
@@ -74,8 +68,13 @@ class TestMonomorphicParentOfMorphTarget extends Model
         return $this->hasManyThrough(
             TestMonomorphicChildOfMorphTarget::class,
             TestMorphTarget::class,
+            'id',
+            'id',
             'parent_id',
-            'id'
+            'child_id'
         );
+        // localKey  on this                   ->   firstKey on TestMorphTarget
+        // firstKey  on TestMorphTarget        ->   secondLocalKey on TestMorphTarget
+        // secondLocalKey on TestMorphTarget   ->   secondKey on TestMonomorphicParentOfMorphTarget
     }
 }

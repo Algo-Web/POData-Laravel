@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 23/02/20
- * Time: 11:47 PM
+ * Time: 11:47 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Controllers;
 
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraTestModel;
@@ -45,9 +44,9 @@ class OrchestraTestController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param  \Illuminate\Http\Request                                   $request
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @return \Illuminate\Http\Response
      */
     public function storeTestModel(OrchestraTestRequest $request)
     {
@@ -72,9 +71,9 @@ class OrchestraTestController extends Controller
     }
 
     /**
-     * @param TestBulkCreateRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param  TestBulkCreateRequest                                      $request
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @return \Illuminate\Http\JsonResponse
      */
     public function storeBulkTestModel(TestBulkCreateRequest $request)
     {
@@ -126,10 +125,10 @@ class OrchestraTestController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @param  \Illuminate\Http\Request                                   $request
+     * @param  int                                                        $id
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @return \Illuminate\Http\Response
      */
     public function updateTestModel(OrchestraTestRequest $request, $id)
     {
@@ -153,9 +152,9 @@ class OrchestraTestController extends Controller
     }
 
     /**
-     * @param TestBulkUpdateRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param  TestBulkUpdateRequest                                      $request
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @return \Illuminate\Http\JsonResponse
      */
     public function updateBulkTestModel(TestBulkUpdateRequest $request)
     {
@@ -195,9 +194,9 @@ class OrchestraTestController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @param  int                                                        $id
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @return \Illuminate\Http\Response
      */
     public function destroyTestModel($id)
     {

@@ -496,8 +496,6 @@ class IronicSerialiserTest extends SerialiserTestBase
         $model = new TestMorphTarget($meta);
         $model->id = 42;
         $model->name = 'Hammer, M.C.';
-        $this->assertTrue($model->isKnownPolymorphSide());
-        $this->assertTrue($model->isUnknownPolymorphSide());
 
         $payload = new QueryResult();
         $payload->results = $model;
@@ -752,17 +750,17 @@ class IronicSerialiserTest extends SerialiserTestBase
         $ironic->setPropertyExpansion('oneSource', false);
         $ironic->setPropertyExpansion('manyTarget', false);
         $ironic->setPropertyExpansion('oneTarget', false);
-
         $ironicResult = $ironic->writeTopLevelElements($collection);
+
         $this->assertEquals(3, count($ironicResult->entries));
-        $this->assertNull($ironicResult->entries[0]->links[0]->expandedResult);
-        $this->assertNull($ironicResult->entries[1]->links[0]->expandedResult);
-        $this->assertNull($ironicResult->entries[2]->links[0]->expandedResult);
-        $this->assertTrue($ironicResult->entries[0]->links[1]->expandedResult instanceof ODataFeed);
-        $this->assertTrue($ironicResult->entries[0]->links[1]->expandedResult instanceof ODataFeed);
-        $this->assertEquals(1, count($ironicResult->entries[0]->links[1]->expandedResult->entries));
-        $this->assertTrue($ironicResult->entries[2]->links[1]->expandedResult instanceof ODataFeed);
-        $this->assertEquals(1, count($ironicResult->entries[2]->links[1]->expandedResult->entries));
+        $this->assertNull($ironicResult->entries[0]->links[1]->expandedResult);
+        $this->assertNull($ironicResult->entries[1]->links[1]->expandedResult);
+        $this->assertNull($ironicResult->entries[2]->links[1]->expandedResult);
+        $this->assertTrue($ironicResult->entries[0]->links[0]->expandedResult instanceof ODataFeed);
+        $this->assertTrue($ironicResult->entries[0]->links[0]->expandedResult instanceof ODataFeed);
+        $this->assertEquals(1, count($ironicResult->entries[0]->links[0]->expandedResult->entries));
+        $this->assertTrue($ironicResult->entries[2]->links[0]->expandedResult instanceof ODataFeed);
+        $this->assertEquals(1, count($ironicResult->entries[2]->links[0]->expandedResult->entries));
     }
 
     public function testGetConcreteTypeFromAbstractTypeWhereAbstractHasNoDerivedTypes()

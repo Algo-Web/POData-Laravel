@@ -14,17 +14,15 @@ class AssociationStubMonomorphic extends AssociationStubBase
         if (!parent::isCompatible($otherStub)) {
             return false;
         }
-        $isNull = null == $this->getThroughField();
-        $otherNull = null == $otherStub->getThroughField();
 
-        if ($isNull != $otherNull) {
+        if ($this->getThroughFieldChain() !== array_reverse($otherStub->getThroughFieldChain())) {
             return false;
         }
 
         return ($this->getTargType() === $otherStub->getBaseType())
-               && ($this->getBaseType() === $otherStub->getTargType())
-               && ($this->getForeignField() === $otherStub->getKeyField())
-               && ($this->getKeyField() === $otherStub->getForeignField());
+            && ($this->getBaseType() === $otherStub->getTargType())
+            && ($this->getForeignField() === $otherStub->getKeyField())
+            && ($this->getKeyField() === $otherStub->getForeignField());
     }
 
     /**

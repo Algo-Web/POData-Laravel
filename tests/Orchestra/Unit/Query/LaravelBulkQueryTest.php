@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 23/02/20
- * Time: 10:30 PM
+ * Time: 10:30 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Query;
 
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Controllers\OrchestraTestController;
@@ -205,7 +204,7 @@ class LaravelBulkQueryTest extends TestCase
     /**
      * @dataProvider processOutputProvider
      *
-     * @param array $data
+     * @param  array          $data
      * @throws ODataException
      */
     public function testProcessOutputBadResponse($data)

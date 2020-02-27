@@ -35,7 +35,7 @@
             "AlgoWeb\\PODataLaravel\\Orchestra\\Tests\\": "tests/Orchestra/",
             "Tests\\Legacy\\AlgoWeb\\PODataLaravel\\": "tests/Legacy/",
             "Tests\\Regression\\AlgoWeb\\PODataLaravel\\": "tests/Regression/",
-            "Tests\\System\\AlgoWeb\\PODataLaravel\\": "tests/System/"
+            "Tests\\Northwind\\AlgoWeb\\PODataLaravel\\": "tests/Northwind/"
 
         }
     },

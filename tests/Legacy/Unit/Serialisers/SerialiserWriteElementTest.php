@@ -3,6 +3,7 @@
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\ModelReflectionHelper;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
@@ -893,7 +894,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $source = new TestMonomorphicParentOfMorphTarget($metadata);
         $target = new TestMorphTarget($metadata);
 
-        $relMethods = $source->getRelationshipsFromMethods();
+        $relMethods = ModelReflectionHelper::getRelationshipsFromMethods($source);
 
         App::instance(TestMonomorphicParentOfMorphTarget::class, $source);
         App::instance(TestMorphTarget::class, $target);

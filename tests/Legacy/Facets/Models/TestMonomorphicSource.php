@@ -12,7 +12,6 @@ class TestMonomorphicSource extends Model
     use MetadataTrait {
         metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
         // not bury ourselves under a stack overflow and segfault
-        getRelationshipsFromMethods as getRel;
     }
     protected $metaArray;
     protected $connect;

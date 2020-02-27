@@ -17,11 +17,11 @@ abstract class AssociationStubBase
     protected $keyField;
 
     /**
-     * Foreign key field of imtermate relation.
+     * A list of fields to Traverse between Keyfield and foreignField.
      *
-     * @var string|null
+     * @var string[]
      */
-    protected $throughField;
+    protected $throughFieldChain;
 
     /**
      * Foreign key field of other end of relation.
@@ -197,21 +197,20 @@ abstract class AssociationStubBase
     }
 
     /**
-     * @return string
+     * @return string[]|null
      */
-    public function getThroughField()
+    public function getThroughFieldChain(): array
     {
-        return $this->throughField;
+        return $this->throughFieldChain;
     }
 
     /**
-     * @param string $foreignField
+     * @param string[]|null $keyChain
      */
-    public function setThroughField($foreignField)
+    public function setThroughFieldChain(?array $keyChain)
     {
-        $this->throughField = $foreignField;
+        $this->throughFieldChain = $keyChain;
     }
-
     /**
      * Supply a canonical sort ordering to determine order in associations.
      *

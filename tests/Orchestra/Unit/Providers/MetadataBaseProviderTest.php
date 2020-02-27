@@ -3,9 +3,8 @@
  * Created by PhpStorm.
  * User: alex
  * Date: 22/02/20
- * Time: 4:23 AM
+ * Time: 4:23 AM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Providers;
 
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Providers\DummyMetadataBaseProvider;

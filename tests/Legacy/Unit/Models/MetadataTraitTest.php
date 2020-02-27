@@ -2,6 +2,7 @@
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Models;
 
+use AlgoWeb\PODataLaravel\Models\ModelReflectionHelper;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
@@ -300,85 +301,31 @@ class MetadataTraitTest extends TestCase
         $this->assertEquals(0, count($expResDiff) + count($resExpDiff)); // if all keys are common, arrays are equal
     }
 
-
-
     /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
+     * @dataProvider getRelationshipsFromMethodsProvider
+     * @param $model
+     * @param $relation
+     * @throws \ReflectionException
      */
-    public function testGetRelationshipsForMorphTarget()
+    public function testGetRelationshipsFromMethods($model, $relation)
     {
-        $foo = new TestMorphTarget();
-
-        $result = $foo->getRelationshipsFromMethods();
-        $this->assertEquals(2, count($result['HasOne']));
-        $this->assertEquals(1, count($result['HasMany']));
-        $this->assertEquals(1, count($result['KnownPolyMorphSide']));
-        $this->assertEquals(1, count($result['UnknownPolyMorphSide']));
-        $this->assertTrue(array_key_exists('morph', $result['UnknownPolyMorphSide']));
+        $foo = new $model();
+        $result = ModelReflectionHelper::getRelationshipsFromMethods($foo);
+        $message = sprintf('%s relation not found on %s', $relation, $model);
+        $this->assertTrue(in_array($relation, $result), $message);
     }
 
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
-     */
-    public function testGetRelationshipsForMorphManySource()
+    public function getRelationshipsFromMethodsProvider()
     {
-        $foo = new TestMorphManySource();
+        return [
+            [TestMorphManyToManyTarget::class, 'manyTarget'],
+            [TestMorphManyToManySource::class, 'manySource'],
+            [TestMorphOneSource::class, 'morphTarget'],
+            [TestMorphManySource::class, 'morphTarget'],
+            [TestMorphTarget::class, 'morph'],
 
-        $result = $foo->getRelationshipsFromMethods();
-        $this->assertEquals(0, count($result['HasOne']));
-        $this->assertEquals(1, count($result['HasMany']));
-        $this->assertEquals(1, count($result['KnownPolyMorphSide']));
-        $this->assertEquals(0, count($result['UnknownPolyMorphSide']));
-        $this->assertTrue(array_key_exists('morphTarget', $result['KnownPolyMorphSide']));
-        $this->assertTrue(array_key_exists('morphTarget', $result['HasMany']));
+        ];
     }
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
-     */
-    public function testGetRelationshipsForMorphOneSource()
-    {
-        $foo = new TestMorphOneSource();
-
-        $result = $foo->getRelationshipsFromMethods();
-        $this->assertEquals(1, count($result['HasOne']));
-        $this->assertEquals(0, count($result['HasMany']));
-        $this->assertEquals(1, count($result['KnownPolyMorphSide']));
-        $this->assertEquals(0, count($result['UnknownPolyMorphSide']));
-        $this->assertTrue(array_key_exists('morphTarget', $result['KnownPolyMorphSide']));
-        $this->assertTrue(array_key_exists('morphTarget', $result['HasOne']));
-    }
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
-     */
-    public function testGetRelationshipsForMorphManyToManySource()
-    {
-        $foo = new TestMorphManyToManySource();
-        $result = $foo->getRelationshipsFromMethods();
-        $this->assertEquals(0, count($result['HasOne']));
-        $this->assertEquals(1, count($result['HasMany']));
-        $this->assertEquals(1, count($result['KnownPolyMorphSide']));
-        $this->assertEquals(0, count($result['UnknownPolyMorphSide']));
-        $this->assertTrue(array_key_exists('manySource', $result['KnownPolyMorphSide']));
-        $this->assertTrue(array_key_exists('manySource', $result['HasMany']));
-    }
-
-    /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::getRelationshipsFromMethods
-     */
-    public function testGetRelationshipsForMorphManyToManyTarget()
-    {
-        $foo = new TestMorphManyToManyTarget();
-        $result = $foo->getRelationshipsFromMethods();
-        $this->assertEquals(0, count($result['HasOne']));
-        $this->assertEquals(1, count($result['HasMany']));
-        $this->assertEquals(0, count($result['KnownPolyMorphSide']));
-        $this->assertEquals(1, count($result['UnknownPolyMorphSide']));
-        $this->assertTrue(array_key_exists('manyTarget', $result['UnknownPolyMorphSide']));
-        $this->assertTrue(array_key_exists('manyTarget', $result['HasMany']));
-    }
-
     public function testGetDefaultEndpointName()
     {
         $foo = new TestModel();
@@ -455,80 +402,7 @@ class MetadataTraitTest extends TestCase
         }
         $this->assertEquals($expected, $actual);
     }
-
-    /**
-     * @dataProvider knownSideProvider
-     * @param mixed $modelName
-     * @param mixed $expected
-     */
-    public function testCheckKnownSide($modelName, $expected)
-    {
-        $bitz = explode('\\', $modelName);
-        $foo = new $modelName();
-        $actual = $foo->isKnownPolymorphSide();
-        $this->assertTrue($expected === $actual, $bitz[count($bitz)-1]);
-    }
-
-    public function knownSideProvider()
-    {
-        return [
-            [TestCastModel::class, false],
-            [TestGetterModel::class, false],
-            [TestModel::class, false],
-            [TestMonomorphicManySource::class, false],
-            [TestMonomorphicManyTarget::class, false],
-            [TestMonomorphicOneAndManySource::class, false],
-            [TestMonomorphicOneAndManyTarget::class, false],
-            [TestMonomorphicSource::class, false],
-            [TestMonomorphicTarget::class, false],
-            [TestMorphManySource::class, true],
-            [TestMorphManySourceAlternate::class, true],
-            [TestMorphManyToManySource::class, true],
-            [TestMorphManyToManyTarget::class, false],
-            [TestMorphOneSource::class, true],
-            [TestMorphOneSourceAlternate::class, true],
-            [TestMorphTarget::class, true],
-            [TestMorphTargetChild::class, false],
-            [TestMorphManySourceWithUnexposedTarget::class, false]
-        ];
-    }
-
-    /**
-     * @dataProvider unknownSideProvider
-     * @param mixed $modelName
-     * @param mixed $expected
-     */
-    public function testCheckUnknownSide($modelName, $expected)
-    {
-        $bitz = explode('\\', $modelName);
-        $foo = new $modelName();
-        $actual = $foo->isUnknownPolymorphSide();
-        $this->assertTrue($expected === $actual, $bitz[count($bitz)-1]);
-    }
-
-    public function unknownSideProvider()
-    {
-        return [
-            [TestCastModel::class, false],
-            [TestGetterModel::class, false],
-            [TestModel::class, false],
-            [TestMonomorphicManySource::class, false],
-            [TestMonomorphicManyTarget::class, false],
-            [TestMonomorphicOneAndManySource::class, false],
-            [TestMonomorphicOneAndManyTarget::class, false],
-            [TestMonomorphicSource::class, false],
-            [TestMonomorphicTarget::class, false],
-            [TestMorphManySource::class, false],
-            [TestMorphManySourceAlternate::class, false],
-            [TestMorphManyToManySource::class, false],
-            [TestMorphManyToManyTarget::class, true],
-            [TestMorphOneSource::class, false],
-            [TestMorphOneSourceAlternate::class, false],
-            [TestMorphTarget::class, true],
-            [TestMorphTargetChild::class, true],
-            [TestMorphManySourceWithUnexposedTarget::class, false]
-        ];
-    }
+    
 
     public function testSetEagerLoadMalformedPayloadObject()
     {
