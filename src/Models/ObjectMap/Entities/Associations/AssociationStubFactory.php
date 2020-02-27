@@ -139,7 +139,7 @@ abstract class AssociationStubFactory
      * @param  string              $cacheKey
      * @return AssociationStubPolymorphic
      */
-    protected static function handleMorphToMany(string $name, Relation $relation, $cacheKey = 'MorphToMany'): AssociationStubBase
+    protected static function handleMorphToMany(string $name, Relation $relation, $cacheKey = 'MorphToMany'): AssociationStubPolymorphic
     {
         //return self::handleBelongsToMany($name,$relation);
         //TODO: investigate if this could be treated as a BelongsToMany Or more importantly a Monomorphic as we know both sides
