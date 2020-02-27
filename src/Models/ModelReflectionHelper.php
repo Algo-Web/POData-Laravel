@@ -44,7 +44,7 @@ abstract class ModelReflectionHelper
 
         $code  = trim(preg_replace('/\s\s+/', '', $code));
         $begin = strpos($code, 'function(');
-        $code  = substr($code, $begin, strrpos($code, '}') - $begin + 1);
+        $code  = substr($code, (int)$begin, strrpos($code, '}') - $begin + 1);
         return $code;
     }
 
