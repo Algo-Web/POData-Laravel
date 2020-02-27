@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Models;
 
@@ -12,7 +12,7 @@ class EntityFieldTest extends TestCase
 {
     public function testGettersSetters()
     {
-        $foo = new EntityField();
+        $foo          = new EntityField();
         $expectedName = 'name';
         $foo->setName($expectedName);
         $actualName = $foo->getName();
@@ -48,7 +48,7 @@ class EntityFieldTest extends TestCase
     public function testSetKnownPrimitiveType()
     {
         $type = EntityFieldPrimitiveType::INTEGER();
-        $foo = new EntityField();
+        $foo  = new EntityField();
         $foo->setPrimitiveType($type);
         $result = $foo->getEdmFieldType();
         $this->assertEquals(EdmPrimitiveType::INT32(), $result);
@@ -57,7 +57,7 @@ class EntityFieldTest extends TestCase
     public function testSetDatePrimitiveType()
     {
         $type = EntityFieldPrimitiveType::DATE();
-        $foo = new EntityField();
+        $foo  = new EntityField();
         $foo->setPrimitiveType($type);
         $result = $foo->getEdmFieldType();
         $this->assertEquals(EdmPrimitiveType::DATETIME(), $result);
@@ -66,7 +66,7 @@ class EntityFieldTest extends TestCase
     public function testSetDateTimeTzPrimitiveType()
     {
         $type = EntityFieldPrimitiveType::DATETIMETZ();
-        $foo = new EntityField();
+        $foo  = new EntityField();
         $foo->setPrimitiveType($type);
         $result = $foo->getEdmFieldType();
         $this->assertEquals(EdmPrimitiveType::DATETIME(), $result);
@@ -75,7 +75,7 @@ class EntityFieldTest extends TestCase
     public function testSetBigIntPrimitiveType()
     {
         $type = EntityFieldPrimitiveType::BIGINT();
-        $foo = new EntityField();
+        $foo  = new EntityField();
         $foo->setPrimitiveType($type);
         $result = $foo->getEdmFieldType();
         $this->assertEquals(EdmPrimitiveType::INT64(), $result);
@@ -84,7 +84,7 @@ class EntityFieldTest extends TestCase
     public function testSetBinaryPrimitiveType()
     {
         $type = EntityFieldPrimitiveType::BINARY();
-        $foo = new EntityField();
+        $foo  = new EntityField();
         $foo->setPrimitiveType($type);
         $result = $foo->getEdmFieldType();
         $this->assertEquals(EdmPrimitiveType::BINARY(), $result);
@@ -93,7 +93,7 @@ class EntityFieldTest extends TestCase
     public function testSetTextPrimitiveType()
     {
         $type = EntityFieldPrimitiveType::TEXT();
-        $foo = new EntityField();
+        $foo  = new EntityField();
         $foo->setPrimitiveType($type);
         $result = $foo->getEdmFieldType();
         $this->assertEquals(EdmPrimitiveType::STRING(), $result);

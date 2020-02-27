@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
@@ -220,21 +220,21 @@ abstract class AssociationStubBase
      */
     public function compare(AssociationStubBase $other)
     {
-        $thisClass = get_class($this);
+        $thisClass  = get_class($this);
         $otherClass = get_class($other);
-        $classComp = strcmp($thisClass, $otherClass);
+        $classComp  = strcmp($thisClass, $otherClass);
         if (0 !== $classComp) {
             return $classComp / abs($classComp);
         }
-        $thisBase = $this->getBaseType();
-        $otherBase = $other->getBaseType();
-        $baseComp = strcmp($thisBase, $otherBase);
+        $thisBase  = $this->getBaseType() ?? '';
+        $otherBase = $other->getBaseType() ?? '';
+        $baseComp  = strcmp($thisBase, $otherBase);
         if (0 !== $baseComp) {
             return $baseComp / abs($baseComp);
         }
-        $thisMethod = $this->getRelationName();
-        $otherMethod = $other->getRelationName();
-        $methodComp = strcmp($thisMethod, $otherMethod);
+        $thisMethod  = $this->getRelationName() ?? '';
+        $otherMethod = $other->getRelationName() ?? '';
+        $methodComp  = strcmp($thisMethod, $otherMethod);
         return 0 === $methodComp ? 0 : $methodComp / abs($methodComp);
     }
 

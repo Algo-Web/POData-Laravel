@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -28,23 +28,23 @@ class IronicSerialiserTest extends TestCase
     public function setUp() : void
     {
         parent::setUp();
-        $baz = new City();
-        $baz->cityId = 'baz';
-        $baz->name = 'baz';
+        $baz           = new City();
+        $baz->cityId   = 'baz';
+        $baz->name     = 'baz';
         $baz->postcode = 'WTF 0MG';
-        $baz->country = 'The Old Dart';
+        $baz->country  = 'The Old Dart';
         $this->assertTrue($baz->save());
 
-        $foo = new Address();
+        $foo            = new Address();
         $foo->addressId = 'foo';
-        $foo->cityid = 'baz';
-        $foo->street = 'street';
+        $foo->cityid    = 'baz';
+        $foo->street    = 'street';
         $this->assertTrue($foo->save());
 
-        $bar = new Person();
-        $bar->personId = 'bar';
+        $bar            = new Person();
+        $bar->personId  = 'bar';
         $bar->addressid = 'foo';
-        $bar->name = 'Zoidberg';
+        $bar->name      = 'Zoidberg';
         $bar->givenname = 'John';
         $this->assertTrue($bar->save());
     }
@@ -70,26 +70,26 @@ class IronicSerialiserTest extends TestCase
         $request->shouldReceive('header')->withArgs(['ACCEPT'])->andReturn($accept);
 
         $context = new IlluminateOperationContext($request);
-        $host = new ServiceHost($context, $request);
+        $host    = new ServiceHost($context, $request);
         $host->setServiceUri('/odata.svc/');
 
         $query = App::make('odataquery');
-        $meta = App::make('metadata');
+        $meta  = App::make('metadata');
 
         $service = new SimpleDataService($query, $meta, $host);
-        $cereal = new IronicSerialiser($service);
+        $cereal  = new IronicSerialiser($service);
         $service = new SimpleDataService($query, $meta, $host, $cereal);
 
         $service->handleRequest();
 
-        $obj = new QueryResult();
+        $obj          = new QueryResult();
         $obj->results = $foo;
 
         $result = $cereal->writeTopLevelElement($obj);
         $this->assertEquals(1, count($result->links));
         $link = $result->links[0]->expandedResult;
         $this->assertEquals(2, count($link->links));
-        $links = $link->links;
+        $links    = $link->links;
         $targLink = null;
         foreach ($links as $link) {
             if ($link->title !== 'City') {

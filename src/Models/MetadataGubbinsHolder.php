@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Models;
 
@@ -13,7 +13,7 @@ use POData\Common\InvalidOperationException;
 
 class MetadataGubbinsHolder
 {
-    protected $relations = [];
+    protected $relations  = [];
     protected $knownSides = [];
 
     /**
@@ -29,7 +29,7 @@ class MetadataGubbinsHolder
             $msg = $className . ' already added';
             throw new \InvalidArgumentException($msg);
         }
-        $this->relations[$className] = $entity;
+        $this->relations[$className]  = $entity;
         $this->knownSides[$className] = [];
         foreach ($entity->getStubs() as $relName => $stub) {
             if ($stub instanceof AssociationStubPolymorphic && $stub->isKnownSide()) {
@@ -49,7 +49,7 @@ class MetadataGubbinsHolder
             throw new \InvalidArgumentException($msg);
         }
         /** @var AssociationStubBase $stub */
-        $stub = $rels->getStubs()[$relName];
+        $stub     = $rels->getStubs()[$relName];
         $targType = $stub->getTargType();
         if (!array_key_exists($targType, $this->relations)) {
             return [];
@@ -57,7 +57,7 @@ class MetadataGubbinsHolder
         $targRel = $this->relations[$targType];
         // now dig out compatible stubs on target type
         $targStubs = $targRel->getStubs();
-        $relStubs = [];
+        $relStubs  = [];
         foreach ($targStubs as $targStub) {
             if ($stub->isCompatible($targStub)) {
                 $relStubs[] = $targStub;
@@ -75,7 +75,7 @@ class MetadataGubbinsHolder
     {
         $this->checkClassExists($className);
 
-        $rels = $this->relations[$className];
+        $rels  = $this->relations[$className];
         $stubs = $rels->getStubs();
 
         $associations = [];
@@ -90,8 +90,8 @@ class MetadataGubbinsHolder
             }
             if (1 === count($others)) {
                 $others = $others[0];
-                $assoc = new AssociationMonomorphic();
-                $first = -1 === $stub->compare($others);
+                $assoc  = new AssociationMonomorphic();
+                $first  = -1 === $stub->compare($others);
                 $assoc->setFirst($first ? $stub : $others);
                 $assoc->setLast($first ? $others : $stub);
                 if (!$assoc->isOk()) {
@@ -127,9 +127,9 @@ class MetadataGubbinsHolder
             /** @var AssociationStubPolymorphic $known */
             $known = $firstKnown ? $assoc->getFirst() : $assoc->getLast();
             /** @var AssociationStubPolymorphic $unknown */
-            $unknown = $firstKnown ? $assoc->getLast() : $assoc->getFirst();
-            $className = $known->getBaseType();
-            $relName = $known->getRelationName();
+            $unknown                          = $firstKnown ? $assoc->getLast() : $assoc->getFirst();
+            $className                        = $known->getBaseType();
+            $relName                          = $known->getRelationName();
             $unknowns[$className][$relName][] = $unknown;
         }
 
@@ -142,8 +142,8 @@ class MetadataGubbinsHolder
                 }
                 foreach ($lastCandidates as $lc) {
                     /** @var AssociationStubPolymorphic $stub */
-                    $stub = clone $this->knownSides[$knownType][$key];
-                    $isMulti = ($stub->getMultiplicity() == AssociationStubRelationType::MANY());
+                    $stub            = clone $this->knownSides[$knownType][$key];
+                    $isMulti         = ($stub->getMultiplicity() == AssociationStubRelationType::MANY());
                     $relPolyTypeName = substr($lc->getBaseType(), strrpos($lc->getBaseType(), '\\')+1);
                     $relPolyTypeName = Str::plural($relPolyTypeName, $isMulti ? 2 : 1);
                     $stub->setRelationName($stub->getRelationName() . '_' . $relPolyTypeName);

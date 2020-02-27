@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities;
 
@@ -73,8 +73,8 @@ class EntityField
     public function setPrimitiveType(EntityFieldPrimitiveType $primitiveType)
     {
         $this->primitiveType = $primitiveType;
-        $rawType = $this->primitiveTypeToEdmType($primitiveType);
-        $this->edmFieldType = 'stream' === $rawType ? $rawType : new EdmPrimitiveType($rawType);
+        $rawType             = $this->primitiveTypeToEdmType($primitiveType);
+        $this->edmFieldType  = 'stream' === $rawType ? $rawType : new EdmPrimitiveType($rawType);
     }
 
     /**

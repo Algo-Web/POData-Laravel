@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Providers;
 
@@ -60,7 +60,7 @@ class MetadataProviderTest extends TestCase
         parent::setUp();
         $map = new Map();
         App::instance('objectmap', $map);
-        $holder = new MetadataGubbinsHolder();
+        $holder       = new MetadataGubbinsHolder();
         $this->object = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $this->object->shouldReceive('getRelationHolder')->andReturn($holder);
         self::resetMetadataProvider($this->object);
@@ -134,11 +134,11 @@ class MetadataProviderTest extends TestCase
      */
     public function testBootHasMigrationsShouldBeCached()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw                 = [];
+        $metaRaw['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $this->setUpSchemaFacade();
 
         $meta = new SimpleMetadataProvider('Data', 'Data');
@@ -175,9 +175,9 @@ class MetadataProviderTest extends TestCase
 
     public function testBootHasMigrationsSingleModel()
     {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta          = [];
+        $meta['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $testModel = new TestModel($meta, null);
@@ -208,9 +208,9 @@ class MetadataProviderTest extends TestCase
 
     public function testBootHasMigrationsSingleModelWithoutSchema()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $testModel = new TestModel($metaRaw);
@@ -239,9 +239,9 @@ class MetadataProviderTest extends TestCase
 
     public function testBootHasMigrationsThreeDifferentRelationTypes()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $this->setUpSchemaFacade();
 
@@ -287,9 +287,9 @@ class MetadataProviderTest extends TestCase
 
     public function testOneToManyRelationConsistentBothWays()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $this->setUpSchemaFacade();
 
@@ -303,7 +303,7 @@ class MetadataProviderTest extends TestCase
         $classen = [TestMorphManySource::class, TestMorphTarget::class];
 
         $types = [];
-        $i = 0;
+        $i     = 0;
         foreach ($classen as $className) {
             $testModel = new $className($metaRaw);
             App::instance($className, $testModel);
@@ -315,7 +315,7 @@ class MetadataProviderTest extends TestCase
             $types[$className] = $type;
         }
 
-        $abstract = $this->createAbstractMockType();
+        $abstract    = $this->createAbstractMockType();
         $placeholder = $abstract->getCustomState();
 
         $foo = $this->object;
@@ -333,9 +333,9 @@ class MetadataProviderTest extends TestCase
     {
         $functionName = [get_class($this), 'getterSingleton'];
 
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $testModel = new TestModel($metaRaw, null);
@@ -358,11 +358,11 @@ class MetadataProviderTest extends TestCase
             TestMonomorphicParentOfMorphTarget::class];
 
         $types = [];
-        $i = 0;
+        $i     = 0;
         foreach ($classen as $className) {
             $testModel = new $className($metaRaw);
             App::instance($className, $testModel);
-            $type = m::mock(ResourceType::class);
+            $type              = m::mock(ResourceType::class);
             $types[$className] = $type;
         }
         $classen[] = TestModel::class;
@@ -372,9 +372,9 @@ class MetadataProviderTest extends TestCase
         $foo->shouldReceive('getCandidateModels')->andReturn($classen);
         $foo->boot();
 
-        $meta = App::make('metadata');
+        $meta  = App::make('metadata');
         $types = $meta->getTypes();
-        $type = $types[0];
+        $type  = $types[0];
 
         $meta->createSingleton('single', $type, $functionName);
         $result = $meta->callSingleton('single');
@@ -387,12 +387,12 @@ class MetadataProviderTest extends TestCase
         // a dummied-out call to Auth::user() that returns the TestModel set up below
         $functionName = [Auth::class, 'user'];
 
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta          = [];
+        $meta['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
-        $testModel = new TestModel($meta, null);
+        $testModel       = new TestModel($meta, null);
         $testModel->name = 'Commence Primary Ignition';
 
         App::instance(TestModel::class, $testModel);
@@ -416,9 +416,9 @@ class MetadataProviderTest extends TestCase
         $foo->shouldReceive('getCandidateModels')->andReturn($classen);
         $foo->boot();
 
-        $meta = App::make('metadata');
+        $meta  = App::make('metadata');
         $types = $meta->getTypes();
-        $type = $types[0];
+        $type  = $types[0];
 
         $meta->createSingleton('single', $type, $functionName);
         $result = $meta->callSingleton('single');
@@ -432,7 +432,7 @@ class MetadataProviderTest extends TestCase
         $foo = m::mock(MetadataProviderDummy::class)->makePartial();
 
         $expected = 'App';
-        $actual = $foo->getAppNamespace();
+        $actual   = $foo->getAppNamespace();
         $this->assertEquals($expected, $actual);
     }
 
@@ -443,13 +443,13 @@ class MetadataProviderTest extends TestCase
         $foo = m::mock(MetadataProviderDummy::class)->makePartial();
 
         $expected = 'hammertime';
-        $actual = $foo->getAppNamespace();
+        $actual   = $foo->getAppNamespace();
         $this->assertEquals($expected, $actual);
     }
 
     public static function getterSingleton()
     {
-        $model = new TestModel();
+        $model       = new TestModel();
         $model->name = 'VNV Nation';
         return $model;
     }
@@ -474,9 +474,9 @@ class MetadataProviderTest extends TestCase
 
     public function testPostBootHandlingRoundTrip()
     {
-        $foo = new TestProvider($this->app);
+        $foo  = new TestProvider($this->app);
         $meta = 'meta';
-        $key = 'secret';
+        $key  = 'secret';
 
         $foo->handlePostBoot(true, false, $key, $meta);
         $this->assertEquals($meta, Cache::get($key));
@@ -487,9 +487,9 @@ class MetadataProviderTest extends TestCase
 
     public function testPostBootHandlingHasCacheIsCaching()
     {
-        $foo = new TestProvider($this->app);
+        $foo  = new TestProvider($this->app);
         $meta = 'meta';
-        $key = 'secret';
+        $key  = 'secret';
 
         $foo->handlePostBoot(true, true, $key, $meta);
         $this->assertEquals(null, Cache::get($key));

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Regression\AlgoWeb\PODataLaravel;
 
@@ -14,7 +14,7 @@ class TestCase extends BaseTestCase
             \AlgoWeb\PODataLaravel\Providers\MetadataRouteProvider::class,
             \AlgoWeb\PODataLaravel\Providers\QueryProvider::class,
             \AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider::class,
-            /*\Orchestra\Database\ConsoleServiceProvider::class,*/];
+        /*\Orchestra\Database\ConsoleServiceProvider::class,*/];
     }
 
 
@@ -29,7 +29,7 @@ class TestCase extends BaseTestCase
     {
         // Brute-force set app namespace
         $reflec = new \ReflectionClass($app);
-        $prop = $reflec->getProperty('namespace');
+        $prop   = $reflec->getProperty('namespace');
         $prop->setAccessible(true);
         $regressionName = explode('\\', get_class($this))[4];
         $prop->setValue($app, __NAMESPACE__ . '\\' . $regressionName);

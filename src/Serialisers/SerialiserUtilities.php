@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -77,20 +77,20 @@ abstract class SerialiserUtilities
      */
     public static function getEntryInstanceKey($entityInstance, ResourceType $resourceType, $containerName)
     {
-        $typeName = $resourceType->getName();
+        $typeName      = $resourceType->getName();
         $keyProperties = $resourceType->getKeyProperties();
         if (0 == count($keyProperties)) {
             throw new InvalidOperationException('count($keyProperties) == 0');
         }
         $keyString = $containerName . '(';
-        $comma = null;
+        $comma     = null;
         foreach ($keyProperties as $keyName => $resourceProperty) {
             $keyType = $resourceProperty->getInstanceType();
             if (!$keyType instanceof IType) {
                 throw new InvalidOperationException('$keyType not instanceof IType');
             }
-            $keyName = $resourceProperty->getName();
-            $keyValue = $entityInstance->$keyName;
+            $keyName  = $resourceProperty->getName();
+            $keyValue = $entityInstance->{$keyName};
             if (!isset($keyValue)) {
                 throw ODataException::createInternalServerError(
                     Messages::badQueryNullKeysAreNotSupported($typeName, $keyName)

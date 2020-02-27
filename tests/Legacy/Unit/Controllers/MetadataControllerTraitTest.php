@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Controllers;
 
@@ -11,7 +11,7 @@ class MetadataControllerTraitTest extends TestCase
 {
     public function testGetMappings()
     {
-        $foo = new TestController();
+        $foo    = new TestController();
         $result = $foo->getMappings();
 
         $this->assertTrue(array_key_exists(TestModel::class, $result));
@@ -44,7 +44,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo->setMapping([]);
 
         $expected = 'Mapping array must not be empty';
-        $actual = null;
+        $actual   = null;
         try {
             $foo->getMappings();
         } catch (\Exception $e) {
@@ -58,7 +58,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo = new TestModel();
 
         $expected = TestModel::class;
-        $actual = null;
+        $actual   = null;
         try {
             $foo->getMappings();
         } catch (\Exception $e) {
@@ -72,7 +72,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo = new TestModel();
 
         $expected = TestModel::class;
-        $actual = null;
+        $actual   = null;
         try {
             $foo->getMethodName('', '');
         } catch (\Exception $e) {
@@ -87,7 +87,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo->setMapping([]);
 
         $expected = 'Mapping array must not be empty';
-        $actual = null;
+        $actual   = null;
         try {
             $foo->getMethodName('', '');
         } catch (\Exception $e) {
@@ -101,7 +101,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo = new TestController();
 
         $expected = 'Metadata mapping for model  not defined';
-        $actual = null;
+        $actual   = null;
         try {
             $foo->getMethodName('', '');
         } catch (\Exception $e) {
@@ -115,7 +115,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo = new TestController();
 
         $expected = 'CRUD verb remix not defined';
-        $actual = null;
+        $actual   = null;
         try {
             $foo->getMethodName(TestModel::class, 'remix');
         } catch (\Exception $e) {
@@ -177,7 +177,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo->setMapping([TestModel::class => '']);
 
         $expected = 'Metadata mapping for model ' . \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel::class . ' not an array';
-        $actual = null;
+        $actual   = null;
         try {
             $foo->getMethodName(TestModel::class, 'delete');
         } catch (\Exception $e) {
@@ -192,7 +192,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo->setMapping([TestModel::class => []]);
 
         $expected = 'Metadata mapping for CRUD verb delete on model ' . \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel::class . ' not defined';
-        $actual = null;
+        $actual   = null;
         try {
             $foo->getMethodName(TestModel::class, 'delete');
         } catch (\Exception $e) {
@@ -207,7 +207,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo->setMapping([TestModel::class => ['delete' => null]]);
 
         $expected = 'Metadata mapping for CRUD verb delete on model ' . \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel::class . ' null';
-        $actual = null;
+        $actual   = null;
         try {
             $foo->getMethodName(TestModel::class, 'delete');
         } catch (\Exception $e) {
@@ -268,7 +268,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo->setMapping([TestModel::class => '']);
 
         $expected = 'Metadata mapping for model ' . \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel::class . ' not an array';
-        $actual = null;
+        $actual   = null;
         try {
             $foo->getMappings();
         } catch (\Exception $e) {
@@ -283,7 +283,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo->setMapping([TestModel::class => ['flatten' => 'toTheSoundOfTheDrums']]);
 
         $expected = 'CRUD verb flatten not defined';
-        $actual = null;
+        $actual   = null;
         try {
             $foo->getMappings();
         } catch (\Exception $e) {
@@ -298,7 +298,7 @@ class MetadataControllerTraitTest extends TestCase
         $foo->setMapping([TestModel::class => ['delete' => null]]);
 
         $expected = 'Metadata mapping for CRUD verb delete on model ' . \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel::class . ' null';
-        $actual = null;
+        $actual   = null;
         try {
             $foo->getMappings();
         } catch (\Exception $e) {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
@@ -26,11 +26,11 @@ class MetadataProvider extends MetadataBaseProvider
 {
     use MetadataProviderStepTrait;
 
-    protected $multConstraints = ['0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
+    protected $multConstraints      = ['0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
     protected static $metaNAMESPACE = 'Data';
-    protected static $isBooted = false;
-    const POLYMORPHIC = 'polyMorphicPlaceholder';
-    const POLYMORPHIC_PLURAL = 'polyMorphicPlaceholders';
+    protected static $isBooted      = false;
+    const POLYMORPHIC               = 'polyMorphicPlaceholder';
+    const POLYMORPHIC_PLURAL        = 'polyMorphicPlaceholders';
 
     /**
      * @var Map The completed object map set at post Implement;
@@ -72,8 +72,8 @@ class MetadataProvider extends MetadataBaseProvider
                 // if we can't instantiate modelName for whatever reason, move on
                 continue;
             }
-            $gubbins = $modelInstance->extractGubbins();
-            $isEmpty = 0 === count($gubbins->getFields());
+            $gubbins   = $modelInstance->extractGubbins();
+            $isEmpty   = 0 === count($gubbins->getFields());
             $inArtisan = $this->isRunningInArtisan();
             if (!($isEmpty && $inArtisan)) {
                 $objectMap->addEntity($gubbins);
@@ -115,13 +115,13 @@ class MetadataProvider extends MetadataBaseProvider
     private function implement(Map $objectModel)
     {
         /** @var SimpleMetadataProvider $meta */
-        $meta = App::make('metadata');
+        $meta      = App::make('metadata');
         $namespace = $meta->getContainerNamespace().'.';
 
         $entities = $objectModel->getEntities();
         foreach ($entities as $entity) {
-            $baseType = null;
-            $className = $entity->getClassName();
+            $baseType   = null;
+            $className  = $entity->getClassName();
             $entityName = $entity->getName();
             $pluralName = Str::plural($entityName);
             $entityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, null, false, $baseType);
@@ -133,9 +133,9 @@ class MetadataProvider extends MetadataBaseProvider
             $meta->addResourceSet($pluralName, $entityType);
             $meta->oDataEntityMap[$className] = $meta->oDataEntityMap[$namespace.$entityName];
         }
-        $metaCount = count($meta->oDataEntityMap);
+        $metaCount   = count($meta->oDataEntityMap);
         $entityCount = count($entities);
-        $expected = 2 * $entityCount;
+        $expected    = 2 * $entityCount;
         if ($metaCount != $expected) {
             $msg = 'Expected ' . $expected . ' items, actually got '.$metaCount;
             throw new InvalidOperationException($msg);
@@ -163,9 +163,9 @@ class MetadataProvider extends MetadataBaseProvider
     private function implementAssociationsMonomorphic(Map $objectModel, AssociationMonomorphic $associationUnderHammer)
     {
         /** @var SimpleMetadataProvider $meta */
-        $meta = App::make('metadata');
+        $meta  = App::make('metadata');
         $first = $associationUnderHammer->getFirst();
-        $last = $associationUnderHammer->getLast();
+        $last  = $associationUnderHammer->getLast();
         switch ($associationUnderHammer->getAssociationType()) {
             case AssociationType::NULL_ONE_TO_NULL_ONE():
             case AssociationType::NULL_ONE_TO_ONE():
@@ -180,10 +180,10 @@ class MetadataProvider extends MetadataBaseProvider
             case AssociationType::NULL_ONE_TO_MANY():
             case AssociationType::ONE_TO_MANY():
                 if ($first->getMultiplicity() == AssociationStubRelationType::MANY()) {
-                    $oneSide = $last;
+                    $oneSide  = $last;
                     $manySide = $first;
                 } else {
-                    $oneSide = $first;
+                    $oneSide  = $first;
                     $manySide = $last;
                 }
                 $meta->addResourceReferencePropertyBidirectional(
@@ -211,9 +211,9 @@ class MetadataProvider extends MetadataBaseProvider
     private function implementProperties(EntityGubbins $unifiedEntity)
     {
         /** @var SimpleMetadataProvider $meta */
-        $meta = App::make('metadata');
+        $meta        = App::make('metadata');
         $odataEntity = $unifiedEntity->getOdataResourceType();
-        $keyFields = $unifiedEntity->getKeyFields();
+        $keyFields   = $unifiedEntity->getKeyFields();
         /** @var EntityField[] $fields */
         $fields = array_diff_key($unifiedEntity->getFields(), $keyFields);
         foreach ($keyFields as $keyField) {
@@ -228,9 +228,9 @@ class MetadataProvider extends MetadataBaseProvider
                 continue;
             }
 
-            $default = $field->getDefaultValue();
+            $default     = $field->getDefaultValue();
             $isFieldBool = TypeCode::BOOLEAN() == $field->getEdmFieldType();
-            $default = $isFieldBool ? ($default ? 'true' : 'false') : strval($default);
+            $default     = $isFieldBool ? ($default ? 'true' : 'false') : strval($default);
 
             $meta->addPrimitiveProperty(
                 $odataEntity,
@@ -268,9 +268,9 @@ class MetadataProvider extends MetadataBaseProvider
         }
 
         $isCaching = true === $this->getIsCaching();
-        $meta = Cache::get('metadata');
+        $meta      = Cache::get('metadata');
         $objectMap = Cache::get('objectmap');
-        $hasCache = null != $meta && null != $objectMap;
+        $hasCache  = null != $meta && null != $objectMap;
 
         if ($isCaching && $hasCache) {
             App::instance('metadata', $meta);
@@ -280,14 +280,14 @@ class MetadataProvider extends MetadataBaseProvider
         }
         $meta = App::make('metadata');
 
-        $modelNames = $this->getCandidateModels();
+        $modelNames  = $this->getCandidateModels();
         $objectModel = $this->extract($modelNames);
         $objectModel = $this->unify($objectModel);
         $this->verify($objectModel);
         $this->implement($objectModel);
         $this->completedObjectMap = $objectModel;
-        $key = 'metadata';
-        $objKey = 'objectmap';
+        $key                      = 'metadata';
+        $objKey                   = 'objectmap';
         $this->handlePostBoot($isCaching, $hasCache, $key, $meta);
         $this->handlePostBoot($isCaching, $hasCache, $objKey, $objectModel);
         self::$isBooted = true;
@@ -313,8 +313,8 @@ class MetadataProvider extends MetadataBaseProvider
      */
     protected function getCandidateModels()
     {
-        $classes = $this->getClassMap();
-        $ends = [];
+        $classes   = $this->getClassMap();
+        $ends      = [];
         $startName = $this->getAppNamespace();
         foreach ($classes as $name) {
             if (Str::startsWith($name, $startName)) {

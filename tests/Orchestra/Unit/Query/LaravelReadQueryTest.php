@@ -1,11 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
  * Date: 26/02/20
- * Time: 1:42 AM
+ * Time: 1:42 AM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Query;
 
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
@@ -87,7 +86,7 @@ class LaravelReadQueryTest extends TestCase
         $meta = App::make('metadata');
         /** @var ResourceSet $parentSource */
         $parentSource = $meta->resolveResourceSet('OrchestraPolymorphToManySourceModels');
-        $parentType = $parentSource->getResourceType();
+        $parentType   = $parentSource->getResourceType();
         /** @var ResourceSet $targSource */
         $targSource = $meta->resolveResourceSet('OrchestraPolymorphToManyTestModels');
 
@@ -120,7 +119,7 @@ class LaravelReadQueryTest extends TestCase
         $meta = App::make('metadata');
         /** @var ResourceSet $parentSource */
         $parentSource = $meta->resolveResourceSet('OrchestraPolymorphToManyTestModels');
-        $parentType = $parentSource->getResourceType();
+        $parentType   = $parentSource->getResourceType();
 
         /** @var ResourceSet $targSource */
         $targSource = $meta->resolveResourceSet('OrchestraPolymorphToManySourceModels');
@@ -154,9 +153,9 @@ class LaravelReadQueryTest extends TestCase
             ->withArgs($input)
             ->andReturn(false)->once();
 
-        $type = QueryType::ENTITIES();
-        $rSet = m::mock(ResourceSet::class);
-        $tSet = m::mock(ResourceSet::class);
+        $type     = QueryType::ENTITIES();
+        $rSet     = m::mock(ResourceSet::class);
+        $tSet     = m::mock(ResourceSet::class);
         $targProp = m::mock(ResourceProperty::class);
 
         $this->expectException(ODataException::class);
@@ -199,12 +198,12 @@ class LaravelReadQueryTest extends TestCase
 
     public function testPackageResultsFlagHasMore()
     {
-        $qType = QueryType::COUNT();
+        $qType       = QueryType::COUNT();
         $resultCount = 1;
-        $resultSet = ['a'];
-        $skip = 0;
-        $bulkCount = 11;
-        $result = new QueryResult();
+        $resultSet   = ['a'];
+        $skip        = 0;
+        $bulkCount   = 11;
+        $result      = new QueryResult();
         $this->assertNull($result->hasMore);
 
         $foo = new DummyReadQuery();
@@ -217,12 +216,12 @@ class LaravelReadQueryTest extends TestCase
 
     public function testPackageResultsFlagHasNoMore()
     {
-        $qType = QueryType::COUNT();
+        $qType       = QueryType::COUNT();
         $resultCount = 1;
-        $resultSet = ['a'];
-        $skip = 0;
-        $bulkCount = 1;
-        $result = new QueryResult();
+        $resultSet   = ['a'];
+        $skip        = 0;
+        $bulkCount   = 1;
+        $result      = new QueryResult();
         $this->assertNull($result->hasMore);
 
         $foo = new DummyReadQuery();

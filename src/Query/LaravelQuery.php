@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Query;
 
@@ -39,15 +39,15 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     {
         parent::__construct($auth);
         /* MySQLExpressionProvider();*/
-        $this->expression = new LaravelExpressionProvider(); //PHPExpressionProvider('expression');
+        $this->expression             = new LaravelExpressionProvider(); //PHPExpressionProvider('expression');
         $this->queryProviderClassName = get_class($this);
-        $this->reader = new LaravelReadQuery($this->getAuth());
-        $this->modelHook = new LaravelHookQuery($this->getAuth());
-        $this->bulk = new LaravelBulkQuery($this, $this->getAuth());
-        $this->writer = new LaravelWriteQuery($this->getAuth());
+        $this->reader                 = new LaravelReadQuery($this->getAuth());
+        $this->modelHook              = new LaravelHookQuery($this->getAuth());
+        $this->bulk                   = new LaravelBulkQuery($this, $this->getAuth());
+        $this->writer                 = new LaravelWriteQuery($this->getAuth());
 
         self::$touchList = [];
-        self::$inBatch = false;
+        self::$inBatch   = false;
     }
 
     /**
@@ -468,7 +468,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     public function startTransaction($isBulk = false)
     {
         self::$touchList = [];
-        self::$inBatch = true === $isBulk;
+        self::$inBatch   = true === $isBulk;
         DB::beginTransaction();
     }
 
@@ -485,7 +485,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
 
         DB::commit();
         self::$touchList = [];
-        self::$inBatch = false;
+        self::$inBatch   = false;
     }
 
     /**
@@ -495,7 +495,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     {
         DB::rollBack();
         self::$touchList = [];
-        self::$inBatch = false;
+        self::$inBatch   = false;
     }
 
     public static function queueModel(Model &$model)

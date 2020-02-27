@@ -1,5 +1,6 @@
 Unreleased
 ----------
+   * All classes now use strict_types
    * Minimum PHP version is now 7.1
    * Minimum Laravel version is now 5.5
    * Laundry list of obsolete deps cleaned up

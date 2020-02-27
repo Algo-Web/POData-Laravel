@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models;
 
@@ -40,8 +40,8 @@ class TestMorphManySourceWithUnexposedTarget extends Model
             $this->connect = $connect;
         } else {
             $this->processor = \Mockery::mock(\Illuminate\Database\Query\Processors\Processor::class)->makePartial();
-            $this->grammar = \Mockery::mock(\Illuminate\Database\Query\Grammars\Grammar::class)->makePartial();
-            $connect = \Mockery::mock(Connection::class)->makePartial();
+            $this->grammar   = \Mockery::mock(\Illuminate\Database\Query\Grammars\Grammar::class)->makePartial();
+            $connect         = \Mockery::mock(Connection::class)->makePartial();
             $connect->shouldReceive('getQueryGrammar')->andReturn($this->grammar);
             $connect->shouldReceive('getPostProcessor')->andReturn($this->processor);
             $this->connect = $connect;
@@ -50,7 +50,7 @@ class TestMorphManySourceWithUnexposedTarget extends Model
             assert(null !== $this->connect->getPostProcessor());
         }
         parent::__construct();
-        $morph = m::mock(MorphMany::class)->makePartial();
+        $morph   = m::mock(MorphMany::class)->makePartial();
         $related = m::mock(TestMorphUnexposedTarget::class)->makePartial();
         $morph->shouldReceive('getRelated')->andReturn($related);
         $this->morphRelation = $morph;

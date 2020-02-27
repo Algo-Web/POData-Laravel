@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Query;
 
@@ -64,10 +64,10 @@ class LaravelReadQuery extends LaravelBaseQuery
         $sourceEntityInstance = $this->checkSourceInstance($sourceEntityInstance, $resourceSet);
 
         /** @var MetadataTrait $model */
-        $model = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : $sourceEntityInstance->getRelated();
+        $model     = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : $sourceEntityInstance->getRelated();
         $modelLoad = $model->getEagerLoad();
         $tableName = $model->getTable();
-        $rawLoad = array_unique(array_merge($rawLoad, $modelLoad));
+        $rawLoad   = array_unique(array_merge($rawLoad, $modelLoad));
 
         $checkInstance = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : null;
         $this->checkAuth($sourceEntityInstance, $checkInstance);
@@ -91,12 +91,12 @@ class LaravelReadQuery extends LaravelBaseQuery
         }
 
         $nullFilter = !isset($filterInfo);
-        $isvalid = null;
+        $isvalid    = null;
         if (isset($filterInfo)) {
-            $method = 'return ' . $filterInfo->getExpressionAsString() . ';';
-            $clln = $resourceSet->getResourceType()->getName();
+            $method  = 'return ' . $filterInfo->getExpressionAsString() . ';';
+            $clln    = $resourceSet->getResourceType()->getName();
             $isvalid = function ($inputD) use ($clln, $method) {
-                $$clln = $inputD;
+                ${$clln} = $inputD;
                 return eval($method);
             };
         }
@@ -156,7 +156,7 @@ class LaravelReadQuery extends LaravelBaseQuery
 
         $propertyName = $targetProperty->getName();
         /** @var Relation $results */
-        $results = $sourceEntityInstance->$propertyName();
+        $results = $sourceEntityInstance->{$propertyName}();
 
         return $this->getResourceSet(
             $queryType,
@@ -224,7 +224,7 @@ class LaravelReadQuery extends LaravelBaseQuery
             $modelLoad = $sourceEntityInstance->getEagerLoad();
         } elseif ($sourceEntityInstance instanceof Relation) {
             /** @var MetadataTrait $model */
-            $model = $sourceEntityInstance->getRelated();
+            $model     = $sourceEntityInstance->getRelated();
             $modelLoad = $model->getEagerLoad();
         }
         if (!(isset($modelLoad))) {
@@ -267,7 +267,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         $propertyName = $targetProperty->getName();
         $propertyName = $this->getLaravelRelationName($propertyName);
         /** @var Model|null $result */
-        $result = $sourceEntityInstance->$propertyName()->first();
+        $result = $sourceEntityInstance->{$propertyName}()->first();
         if (null === $result) {
             return null;
         }
@@ -306,7 +306,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         }
         // take key descriptor and turn it into where clause here, rather than in getResource call
         /** @var Relation $sourceEntityInstance */
-        $sourceEntityInstance = $sourceEntityInstance->$propertyName();
+        $sourceEntityInstance = $sourceEntityInstance->{$propertyName}();
         $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
         $result = $this->getResource(null, null, [], [], $sourceEntityInstance);
         if (!(null == $result || $result instanceof Model)) {
@@ -354,7 +354,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         callable $isvalid = null
     ) {
         $bulkSetCount = $sourceEntityInstance->count();
-        $bigSet = 20000 < $bulkSetCount;
+        $bigSet       = 20000 < $bulkSetCount;
 
         if ($nullFilter) {
             // default no-filter case, palm processing off to database engine - is a lot faster
@@ -369,8 +369,8 @@ class LaravelReadQuery extends LaravelBaseQuery
                 throw new InvalidOperationException($msg);
             }
             $resultSet = new Collection([]);
-            $rawCount = 0;
-            $rawTop = min($top, $bulkSetCount);
+            $rawCount  = 0;
+            $rawTop    = min($top, $bulkSetCount);
 
             // loop thru, chunk by chunk, to reduce chances of exhausting memory
             $sourceEntityInstance->chunk(
@@ -392,12 +392,12 @@ class LaravelReadQuery extends LaravelBaseQuery
             );
 
             // clean up residual to-be-skipped records
-            $resultSet = $resultSet->slice($skip);
+            $resultSet   = $resultSet->slice($skip);
             $resultCount = $rawCount;
         } else {
             /** @var Collection $resultSet */
-            $resultSet = $sourceEntityInstance->with($rawLoad)->get();
-            $resultSet = $resultSet->filter($isvalid);
+            $resultSet   = $sourceEntityInstance->with($rawLoad)->get();
+            $resultSet   = $resultSet->filter($isvalid);
             $resultCount = $resultSet->count();
 
             $resultSet = $resultSet->slice($skip);
@@ -416,8 +416,8 @@ class LaravelReadQuery extends LaravelBaseQuery
         if (null != $orderBy) {
             foreach ($orderBy->getOrderByInfo()->getOrderByPathSegments() as $order) {
                 foreach ($order->getSubPathSegments() as $subOrder) {
-                    $subName = $subOrder->getName();
-                    $subName = $tableName . '.' . $subName;
+                    $subName              = $subOrder->getName();
+                    $subName              = $tableName . '.' . $subName;
                     $sourceEntityInstance = $sourceEntityInstance->orderBy(
                         $subName,
                         $order->isAscending() ? 'asc' : 'desc'
@@ -454,7 +454,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         if (QueryType::COUNT() == $qVal || QueryType::ENTITIES_WITH_COUNT() == $qVal) {
             $result->count = $resultCount;
         }
-        $hazMore = $bulkSetCount > $skip + count($resultSet);
+        $hazMore         = $bulkSetCount > $skip + count($resultSet);
         $result->hasMore = $hazMore;
     }
 }

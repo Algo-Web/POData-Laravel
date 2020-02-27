@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Query;
 
@@ -11,26 +11,26 @@ use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\PropertyAcce
 
 class LaravelExpressionProvider implements IExpressionProvider
 {
-    const ADD = '+';
-    const CLOSE_BRACKET = ')';
-    const COMMA = ',';
-    const DIVIDE = '/';
-    const SUBTRACT = '-';
-    const EQUAL = '==';
-    const GREATER_THAN = '>';
+    const ADD                   = '+';
+    const CLOSE_BRACKET         = ')';
+    const COMMA                 = ',';
+    const DIVIDE                = '/';
+    const SUBTRACT              = '-';
+    const EQUAL                 = '==';
+    const GREATER_THAN          = '>';
     const GREATER_THAN_OR_EQUAL = '>=';
-    const LESS_THAN = '<';
-    const LESS_THAN_OR_EQUAL = '<=';
-    const LOGICAL_AND = '&&';
-    const LOGICAL_NOT = '!';
-    const LOGICAL_OR = '||';
-    const MEMBER_ACCESS = '->';
-    const MODULO = '%';
-    const MULTIPLY = '*';
-    const NEGATE = '-';
-    const NOT_EQUAL = '!=';
-    const OPEN_BRACKET = '(';
-    const TYPE_NAMESPACE = 'POData\\Providers\\Metadata\\Type\\';
+    const LESS_THAN             = '<';
+    const LESS_THAN_OR_EQUAL    = '<=';
+    const LOGICAL_AND           = '&&';
+    const LOGICAL_NOT           = '!';
+    const LOGICAL_OR            = '||';
+    const MEMBER_ACCESS         = '->';
+    const MODULO                = '%';
+    const MULTIPLY              = '*';
+    const NEGATE                = '-';
+    const NOT_EQUAL             = '!=';
+    const OPEN_BRACKET          = '(';
+    const TYPE_NAMESPACE        = 'POData\\Providers\\Metadata\\Type\\';
 
     private $functionDescriptionParsers;
 
@@ -170,7 +170,9 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onLogicalExpression(ExpressionType $expressionType, $left, $right)
     {
-        $type = $this->unpackExpressionType($expressionType);
+        $left  = strval($left);
+        $right = strval($right);
+        $type  = $this->unpackExpressionType($expressionType);
         switch ($type) {
             case ExpressionType::AND_LOGICAL:
                 return $this->prepareBinaryExpression(self::LOGICAL_AND, $left, $right);
@@ -191,7 +193,9 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onArithmeticExpression(ExpressionType $expressionType, $left, $right)
     {
-        $type = $this->unpackExpressionType($expressionType);
+        $left  = strval($left);
+        $right = strval($right);
+        $type  = $this->unpackExpressionType($expressionType);
         switch ($type) {
             case ExpressionType::MULTIPLY:
                 return $this->prepareBinaryExpression(self::MULTIPLY, $left, $right);
@@ -221,17 +225,17 @@ class LaravelExpressionProvider implements IExpressionProvider
         $type = $this->unpackExpressionType($expressionType);
         switch ($type) {
             case ExpressionType::GREATERTHAN:
-                return $this->prepareBinaryExpression(self::GREATER_THAN, $left, $right);
+                return $this->prepareBinaryExpression(self::GREATER_THAN, strval($left), strval($right));
             case ExpressionType::GREATERTHAN_OR_EQUAL:
-                return $this->prepareBinaryExpression(self::GREATER_THAN_OR_EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::GREATER_THAN_OR_EQUAL, strval($left), strval($right));
             case ExpressionType::LESSTHAN:
-                return $this->prepareBinaryExpression(self::LESS_THAN, $left, $right);
+                return $this->prepareBinaryExpression(self::LESS_THAN, strval($left), strval($right));
             case ExpressionType::LESSTHAN_OR_EQUAL:
-                return $this->prepareBinaryExpression(self::LESS_THAN_OR_EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::LESS_THAN_OR_EQUAL, strval($left), strval($right));
             case ExpressionType::EQUAL:
-                return $this->prepareBinaryExpression(self::EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::EQUAL, strval($left), strval($right));
             case ExpressionType::NOTEQUAL:
-                return $this->prepareBinaryExpression(self::NOT_EQUAL, $left, $right);
+                return $this->prepareBinaryExpression(self::NOT_EQUAL, strval($left), strval($right));
             default:
                 throw new \InvalidArgumentException('onRelationalExpression');
         }
@@ -249,9 +253,9 @@ class LaravelExpressionProvider implements IExpressionProvider
         $type = $this->unpackExpressionType($expressionType);
         switch ($type) {
             case ExpressionType::NEGATE:
-                return $this->prepareUnaryExpression(self::NEGATE, $child);
+                return $this->prepareUnaryExpression(self::NEGATE, strval($child));
             case ExpressionType::NOT_LOGICAL:
-                return $this->prepareUnaryExpression(self::LOGICAL_NOT, $child);
+                return $this->prepareUnaryExpression(self::LOGICAL_NOT, strval($child));
             default:
                 throw new \InvalidArgumentException('onUnaryExpression');
         }
@@ -282,11 +286,11 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onPropertyAccessExpression(PropertyAccessExpression $expression)
     {
-        $parent = $expression;
+        $parent   = $expression;
         $variable = null;
         do {
             $variable = $parent->getResourceProperty()->getName() . self::MEMBER_ACCESS . $variable;
-            $parent = $parent->getParent();
+            $parent   = $parent->getParent();
         } while ($parent != null);
         $variable = rtrim($variable, self::MEMBER_ACCESS);
         $variable = $this->getIteratorName() . self::MEMBER_ACCESS . $variable;

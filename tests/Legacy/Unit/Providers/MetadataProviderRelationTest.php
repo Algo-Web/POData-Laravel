@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Providers;
 
@@ -42,11 +42,11 @@ class MetadataProviderRelationTest extends TestCase
 
     public function testBootFromTwoArmedPolymorphicRelationBothOneToMany()
     {
-        $meta = [];
+        $meta                 = [];
         $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
 
@@ -91,9 +91,9 @@ class MetadataProviderRelationTest extends TestCase
 
     public function testMonomorphicManyToManyRelation()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -123,7 +123,7 @@ class MetadataProviderRelationTest extends TestCase
         $abstract->shouldReceive('getCustomState')->andReturn($abstractSet);
 
         $holder = new MetadataGubbinsHolder();
-        $foo = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo    = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen);
         $foo->shouldReceive('addResourceSet')->withAnyArgs()->passthru();
@@ -138,9 +138,9 @@ class MetadataProviderRelationTest extends TestCase
 
     public function testMorphOneToMorphTargetConcreteTypes()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -165,9 +165,9 @@ class MetadataProviderRelationTest extends TestCase
         $foo->setCandidateModels($classen);
         $foo->boot();
 
-        $metadata = App::make('metadata');
+        $metadata  = App::make('metadata');
         $targAssoc = 'TestMorphOneSource_morphTarget_TestMorphTarget';
-        $set = $metadata->resolveAssociationSet($targAssoc);
+        $set       = $metadata->resolveAssociationSet($targAssoc);
         $this->assertTrue(isset($set));
         $this->assertTrue($set instanceof ResourceAssociationSet, get_class($set));
         $end1Concrete = $set->getEnd1()->getConcreteType();
@@ -184,9 +184,9 @@ class MetadataProviderRelationTest extends TestCase
 
     public function testMorphManyToMorphTargetConcreteTypes()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -211,9 +211,9 @@ class MetadataProviderRelationTest extends TestCase
         $foo->setCandidateModels($classen);
         $foo->boot();
 
-        $metadata = App::make('metadata');
+        $metadata  = App::make('metadata');
         $targAssoc = 'TestMorphManySource_morphTarget_TestMorphTarget';
-        $set = $metadata->resolveAssociationSet($targAssoc);
+        $set       = $metadata->resolveAssociationSet($targAssoc);
         $this->assertTrue(isset($set));
         $this->assertTrue($set instanceof ResourceAssociationSet, get_class($set));
         $end1Concrete = $set->getEnd1()->getConcreteType();
@@ -231,9 +231,9 @@ class MetadataProviderRelationTest extends TestCase
     public function testMorphManyToManyConcreteTypes()
     {
         $this->markTestSkipped('Skipped until figure out/remedy root cause in POData');
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -258,9 +258,9 @@ class MetadataProviderRelationTest extends TestCase
         $foo->setCandidateModels($classen);
         $foo->boot();
 
-        $metadata = App::make('metadata');
+        $metadata  = App::make('metadata');
         $targAssoc = 'TestMorphManyToManyTarget_manyTarget_polyMorphicPlaceholder';
-        $set = $metadata->resolveAssociationSet($targAssoc);
+        $set       = $metadata->resolveAssociationSet($targAssoc);
         $this->assertTrue(isset($set));
         $this->assertTrue($set instanceof ResourceAssociationSet, get_class($set));
         $end1Concrete = $set->getEnd1()->getConcreteType();
@@ -278,9 +278,9 @@ class MetadataProviderRelationTest extends TestCase
     public function testKnownOnBothEndsConcreteTypes()
     {
         $this->markTestSkipped('Skipped until figure out/remedy root cause in POData');
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -301,9 +301,9 @@ class MetadataProviderRelationTest extends TestCase
         $foo->setCandidateModels($classen);
         $foo->boot();
 
-        $metadata = App::make('metadata');
+        $metadata  = App::make('metadata');
         $targAssoc = 'TestMorphTargetChild_morph_polyMorphicPlaceholder';
-        $set = $metadata->resolveAssociationSet($targAssoc);
+        $set       = $metadata->resolveAssociationSet($targAssoc);
         $this->assertTrue(isset($set), 'Association set not retrieved');
         $this->assertTrue($set instanceof ResourceAssociationSet, get_class($set));
         $end1Concrete = $set->getEnd1()->getConcreteType();
@@ -318,7 +318,7 @@ class MetadataProviderRelationTest extends TestCase
         $this->assertEquals(TestMorphTarget::class, $name2);
 
         $revAssoc = 'TestMorphTarget_childMorph_TestMorphTargetChild';
-        $set = $metadata->resolveAssociationSet($revAssoc);
+        $set      = $metadata->resolveAssociationSet($revAssoc);
         $this->assertTrue(isset($set), 'Association set not retrieved');
         $this->assertTrue($set instanceof ResourceAssociationSet, get_class($set));
         $end1Concrete = $set->getEnd1()->getConcreteType();
@@ -335,7 +335,7 @@ class MetadataProviderRelationTest extends TestCase
         // now verify xml output to reduce chances of tripping ourselves up in future
         // model on known-side of relation - TestMorphTargetChild - must have its relation glommed onto placeholder
         // model on unknown-side - TestMorphTarget - must have its relation glommed onto child model
-        $xml = $metadata->getXML();
+        $xml     = $metadata->getXML();
         $accTail = 'cg:GetterAccess="Public" cg:SetterAccess="Public"/>';
 
         $rel1 = '<NavigationProperty Name="morph" Relationship="Data.TestMorphTargetChild_morph_polyMorphicPlaceholder"'
@@ -355,9 +355,9 @@ class MetadataProviderRelationTest extends TestCase
 
     public function testExposeHasManyThroughRelation()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -383,8 +383,8 @@ class MetadataProviderRelationTest extends TestCase
         $foo->setCandidateModels($classen);
         $foo->boot();
 
-        $metadata = App::make('metadata');
-        $xml = $metadata->getXML();
+        $metadata  = App::make('metadata');
+        $xml       = $metadata->getXML();
         $relString = 'TestMonomorphicParentOfMorphTargets_monomorphicChildren';
         $this->assertTrue(false !== strpos($xml, $relString));
     }

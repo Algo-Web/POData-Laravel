@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -22,8 +22,8 @@ trait SerialisePropertyCacheTrait
     protected function checkRelationPropertiesCached(string $targClass, ResourceEntityType $resourceType)
     {
         if (!array_key_exists($targClass, $this->propertiesCache)) {
-            $rawProp = $resourceType->getAllProperties();
-            $relProp = [];
+            $rawProp    = $resourceType->getAllProperties();
+            $relProp    = [];
             $nonRelProp = [];
             foreach ($rawProp as $prop) {
                 $propType = $prop->getResourceType();

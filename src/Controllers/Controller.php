@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 // Lifted straight from Laravel ~5.1.44 to give a base to work from
 namespace AlgoWeb\PODataLaravel\Controllers;
 

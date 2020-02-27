@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -34,12 +34,12 @@ trait SerialiseNextPageLinksTrait
     {
         $stackSegment = $this->getRequest()->getTargetResourceSetWrapper()->getName();
         /** @var array $res */
-        $res = $entryObjects->results;
-        $lastObject = end($res);
-        $segment = $this->getNextLinkUri($lastObject);
-        $nextLink = new ODataLink();
-        $nextLink->name = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
-        $nextLink->url = rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment;
+        $res                 = $entryObjects->results;
+        $lastObject          = end($res);
+        $segment             = $this->getNextLinkUri($lastObject);
+        $nextLink            = new ODataLink();
+        $nextLink->name      = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
+        $nextLink->url       = rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment;
         $odata->nextPageLink = $nextLink;
     }
 
@@ -56,8 +56,8 @@ trait SerialiseNextPageLinksTrait
     protected function needNextPageLink(int $resultSetCount)
     {
         $currentResourceSet = $this->getCurrentResourceSetWrapper();
-        $recursionLevel = count($this->getStack()->getSegmentNames());
-        $pageSize = $currentResourceSet->getResourceSetPageSize();
+        $recursionLevel     = count($this->getStack()->getSegmentNames());
+        $pageSize           = $currentResourceSet->getResourceSetPageSize();
 
         if (1 == $recursionLevel) {
             //presence of $top option affect next link for root container
@@ -83,21 +83,21 @@ trait SerialiseNextPageLinksTrait
     protected function getNextLinkUri(&$lastObject)
     {
         $currentExpandedProjectionNode = $this->getCurrentExpandedProjectionNode();
-        $internalOrderByInfo = $currentExpandedProjectionNode->getInternalOrderByInfo();
+        $internalOrderByInfo           = $currentExpandedProjectionNode->getInternalOrderByInfo();
         if (null === $internalOrderByInfo) {
             throw new InvalidOperationException('Null');
         }
         if (!$internalOrderByInfo instanceof InternalOrderByInfo) {
             throw new InvalidOperationException(get_class($internalOrderByInfo));
         }
-        $numSegments = count($internalOrderByInfo->getOrderByPathSegments());
+        $numSegments          = count($internalOrderByInfo->getOrderByPathSegments());
         $queryParameterString = $this->getNextPageLinkQueryParametersForRootResourceSet();
 
         $skipToken = $internalOrderByInfo->buildSkipTokenValue($lastObject);
         if (empty($skipToken)) {
             throw new InvalidOperationException('!is_null($skipToken)');
         }
-        $token = (1 < $numSegments) ? '$skiptoken=' : '$skip=';
+        $token     = (1 < $numSegments) ? '$skiptoken=' : '$skip=';
         $skipToken = (1 < $numSegments) ? $skipToken : intval(trim($skipToken, '\''));
         $skipToken = '?' . $queryParameterString . $token . $skipToken;
 
@@ -119,10 +119,10 @@ trait SerialiseNextPageLinksTrait
         /** @var string|null $queryParameterString */
         $queryParameterString = null;
         foreach ([ODataConstants::HTTPQUERY_STRING_FILTER,
-                     ODataConstants::HTTPQUERY_STRING_EXPAND,
-                     ODataConstants::HTTPQUERY_STRING_ORDERBY,
-                     ODataConstants::HTTPQUERY_STRING_INLINECOUNT,
-                     ODataConstants::HTTPQUERY_STRING_SELECT, ] as $queryOption) {
+            ODataConstants::HTTPQUERY_STRING_EXPAND,
+            ODataConstants::HTTPQUERY_STRING_ORDERBY,
+            ODataConstants::HTTPQUERY_STRING_INLINECOUNT,
+            ODataConstants::HTTPQUERY_STRING_SELECT, ] as $queryOption) {
             /** @var string|null $value */
             $value = $this->getService()->getHost()->getQueryStringItem($queryOption);
             if (null !== $value) {

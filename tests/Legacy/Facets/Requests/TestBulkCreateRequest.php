@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Requests;
 
@@ -29,12 +29,12 @@ class TestBulkCreateRequest extends Request
 
         if (isset($data)) {
             foreach ($data as $key => $val) {
-                $rules['data.' . $key] = 'required|array';
-                $rules['data.' . $key . '.name'] = 'required|string';
+                $rules['data.' . $key]               = 'required|array';
+                $rules['data.' . $key . '.name']     = 'required|string';
                 $rules['data.' . $key . '.added_at'] = 'required|date';
-                $rules['data.' . $key . '.weight'] = 'required|numeric';
-                $rules['data.' . $key . '.code'] = 'required|string';
-                $rules['data.' . $key . '.success'] = 'required|boolean';
+                $rules['data.' . $key . '.weight']   = 'required|numeric';
+                $rules['data.' . $key . '.code']     = 'required|string';
+                $rules['data.' . $key . '.success']  = 'required|boolean';
             }
         }
 

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities;
 
@@ -12,6 +12,6 @@ use MyCLabs\Enum\Enum;
  */
 class EntityFieldType extends Enum
 {
-    const PRIMITIVE = 1;
+    const PRIMITIVE     = 1;
     const PRIMITIVE_BAG = 2;
 }

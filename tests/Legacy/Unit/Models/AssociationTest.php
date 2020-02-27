@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Models;
 
@@ -102,10 +102,10 @@ class AssociationTest extends TestCase
      */
     public function testGetAssociationTwoRelsOnSameModelPair()
     {
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
-        $model = new TestMonomorphicSource($metaRaw);
+        $model   = new TestMonomorphicSource($metaRaw);
         $nuModel = new TestMonomorphicTarget($metaRaw);
 
         $foo = new MetadataGubbinsHolder();
@@ -141,7 +141,7 @@ class AssociationTest extends TestCase
      */
     public function testGetAssociationsWithOnlyOneModelHookedUp()
     {
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model = new TestMonomorphicSource($metaRaw);
@@ -160,10 +160,10 @@ class AssociationTest extends TestCase
      */
     public function testGetAssociationsWithTwoRelatedModels()
     {
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
-        $model = new TestMonomorphicSource($metaRaw);
+        $model   = new TestMonomorphicSource($metaRaw);
         $nuModel = new TestMonomorphicTarget($metaRaw);
 
         $foo = new MetadataGubbinsHolder();

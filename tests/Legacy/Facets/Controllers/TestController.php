@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Controllers;
 
@@ -43,9 +43,9 @@ class TestController extends \Illuminate\Routing\Controller
      */
     public function storeTestModel(TestRequest $request)
     {
-        $data = $request->all();
+        $data  = $request->all();
         $rules = $request->rules();
-        $msg = null;
+        $msg   = null;
 
         // Validate the inputs
         $validator = Validator::make($data, $rules);
@@ -56,7 +56,7 @@ class TestController extends \Illuminate\Routing\Controller
             if ($isSuccess) {
                 return response()->json(['status' => 'success', 'id' => 1, 'errors' => null]);
             }
-            $error = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] 0';
+            $error  = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] 0';
             $errors = new \Illuminate\Support\MessageBag([$error]);
             return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
         }
@@ -65,17 +65,17 @@ class TestController extends \Illuminate\Routing\Controller
 
     public function storeBulkTestModel(TestBulkCreateRequest $request)
     {
-        $data = $request->all();
+        $data  = $request->all();
         $rules = $request->rules();
-        $msg = null;
+        $msg   = null;
 
         // Validate the inputs
         $validator = Validator::make($data, $rules);
 
         if ($validator->passes()) {
-            $bulkData = $data['data'];
+            $bulkData  = $data['data'];
             $isSuccess = true;
-            $idList = [];
+            $idList    = [];
             foreach ($bulkData as $row) {
                 $isSuccess &= isset($row['success']) && true == $row['success'];
                 $idList[] = count($idList) + 1;
@@ -84,7 +84,7 @@ class TestController extends \Illuminate\Routing\Controller
                 return response()->json(['status' => 'success', 'id' => $idList, 'errors' => null]);
             }
 
-            $error = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] 0';
+            $error  = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] 0';
             $errors = new \Illuminate\Support\MessageBag([$error]);
             return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
         }
@@ -105,7 +105,7 @@ class TestController extends \Illuminate\Routing\Controller
         if ($isSuccess) {
             return response()->json(['status' => 'success', 'id' => $id, 'errors' => null]);
         }
-        $error = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
+        $error  = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
         $errors = new \Illuminate\Support\MessageBag([$error]);
         return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
     }
@@ -119,9 +119,9 @@ class TestController extends \Illuminate\Routing\Controller
      */
     public function updateTestModel(TestRequest $request, $id)
     {
-        $data = $request->all();
+        $data  = $request->all();
         $rules = $request->rules();
-        $msg = null;
+        $msg   = null;
 
         // Validate the inputs
         $validator = Validator::make($data, $rules);
@@ -131,7 +131,7 @@ class TestController extends \Illuminate\Routing\Controller
             if ($isSuccess) {
                 return response()->json(['status' => 'success', 'id' => $id, 'errors' => null]);
             }
-            $err = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
+            $err    = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
             $errors = new \Illuminate\Support\MessageBag([$err]);
             return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
         }
@@ -140,22 +140,22 @@ class TestController extends \Illuminate\Routing\Controller
 
     public function updateBulkTestModel(TestBulkUpdateRequest $request)
     {
-        $data = $request->all();
+        $data  = $request->all();
         $rules = $request->rules();
-        $msg = null;
+        $msg   = null;
 
         // Validate the inputs
         $validator = Validator::make($data, $rules);
 
         if ($validator->passes()) {
-            $bulkData = $data['data'];
-            $bulkKeys = $data['keys'];
-            $numKeys = count($bulkKeys);
+            $bulkData  = $data['data'];
+            $bulkKeys  = $data['keys'];
+            $numKeys   = count($bulkKeys);
             $isSuccess = true;
-            $idList = [];
+            $idList    = [];
 
             for ($i = 0; $i < $numKeys; $i ++) {
-                $row = $bulkData[$i];
+                $row    = $bulkData[$i];
                 $rawKey = $bulkKeys[$i];
 
                 $isSuccess &= isset($row['success']) && true == $row['success'];
@@ -165,7 +165,7 @@ class TestController extends \Illuminate\Routing\Controller
                 return response()->json(['status' => 'success', 'id' => $idList, 'errors' => null]);
             }
 
-            $error = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] 0';
+            $error  = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] 0';
             $errors = new \Illuminate\Support\MessageBag([$error]);
             return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
         }
@@ -186,7 +186,7 @@ class TestController extends \Illuminate\Routing\Controller
         if ($isSuccess) {
             return response()->json(['status' => 'success', 'id' => $id, 'errors' => null]);
         }
-        $error = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
+        $error  = 'No query results for model [\Tests\AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
         $errors = new \Illuminate\Support\MessageBag([$error]);
         return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
     }

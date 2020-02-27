@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -35,18 +35,18 @@ abstract class SerialiserLowLevelWriters
     public static function writePrimitiveProperties(Model $entryObject, ModelSerialiser $modelSerialiser, $nonRelProp)
     {
         $propertyContent = new ODataPropertyContent();
-        $cereal = $modelSerialiser->bulkSerialise($entryObject);
-        $cereal = array_intersect_key($cereal, $nonRelProp);
+        $cereal          = $modelSerialiser->bulkSerialise($entryObject);
+        $cereal          = array_intersect_key($cereal, $nonRelProp);
 
         foreach ($cereal as $corn => $flake) {
-            $corn = strval($corn);
+            $corn  = strval($corn);
             $rType = $nonRelProp[$corn]['type'];
             /** @var ResourceProperty $nrp */
-            $nrp = $nonRelProp[$corn]['prop'];
-            $subProp = new ODataProperty();
-            $subProp->name = $corn;
-            $subProp->value = isset($flake) ? SerialiserLowLevelWriters::primitiveToString($rType, $flake) : null;
-            $subProp->typeName = $nrp->getResourceType()->getFullName();
+            $nrp                                = $nonRelProp[$corn]['prop'];
+            $subProp                            = new ODataProperty();
+            $subProp->name                      = $corn;
+            $subProp->value                     = isset($flake) ? SerialiserLowLevelWriters::primitiveToString($rType, $flake) : null;
+            $subProp->typeName                  = $nrp->getResourceType()->getFullName();
             $propertyContent->properties[$corn] = $subProp;
         }
         return $propertyContent;
@@ -65,7 +65,7 @@ abstract class SerialiserLowLevelWriters
             throw new InvalidOperationException('Bag parameter must be null or array');
         }
         $typeKind = $resourceType->getResourceTypeKind();
-        $kVal = $typeKind;
+        $kVal     = $typeKind;
         if (!(ResourceTypeKind::PRIMITIVE() == $kVal || ResourceTypeKind::COMPLEX() == $kVal)) {
             $msg = '$bagItemResourceTypeKind != ResourceTypeKind::PRIMITIVE'
                    .' && $bagItemResourceTypeKind != ResourceTypeKind::COMPLEX';
@@ -74,7 +74,7 @@ abstract class SerialiserLowLevelWriters
         if (null == $result) {
             return null;
         }
-        $bag = new ODataBagContent();
+        $bag    = new ODataBagContent();
         $result = array_filter($result);
         foreach ($result as $value) {
             if (ResourceTypeKind::PRIMITIVE() == $kVal) {
@@ -120,13 +120,13 @@ abstract class SerialiserLowLevelWriters
 
         $instanceCollection[$count] = &$result;
 
-        $internalContent = new ODataPropertyContent();
+        $internalContent    = new ODataPropertyContent();
         $resourceProperties = $resourceType->getAllProperties();
         // first up, handle primitive properties
         foreach ($resourceProperties as $prop) {
-            $resourceKind = $prop->getKind();
-            $propName = $prop->getName();
-            $internalProperty = new ODataProperty();
+            $resourceKind           = $prop->getKind();
+            $propName               = $prop->getName();
+            $internalProperty       = new ODataProperty();
             $internalProperty->name = $propName;
             if (SerialiserUtilities::isMatchPrimitive($resourceKind)) {
                 $iType = $prop->getInstanceType();
@@ -140,15 +140,15 @@ abstract class SerialiserLowLevelWriters
                     throw new InvalidOperationException(get_class($rType));
                 }
 
-                $internalProperty->value = SerialiserLowLevelWriters::primitiveToString($rType, $result->$propName);
+                $internalProperty->value = SerialiserLowLevelWriters::primitiveToString($rType, $result->{$propName});
 
                 $internalContent->properties[$propName] = $internalProperty;
             } elseif (ResourcePropertyKind::COMPLEX_TYPE == $resourceKind) {
-                $rType = $prop->getResourceType();
+                $rType                      = $prop->getResourceType();
                 $internalProperty->typeName = $rType->getFullName();
-                $internalProperty->value = SerialiserLowLevelWriters::writeComplexValue(
+                $internalProperty->value    = SerialiserLowLevelWriters::writeComplexValue(
                     $rType,
-                    $result->$propName,
+                    $result->{$propName},
                     $propName,
                     $instanceCollection
                 );
@@ -177,8 +177,9 @@ abstract class SerialiserLowLevelWriters
         // switch (true) means we unconditionally enter, and then lean on case statements to match given block
         switch (true) {
             case $type instanceof StringType:
-                $isUTF8 = 'UTF-8' === mb_detect_encoding($primitiveValue);
-                $stringValue = $isUTF8 ? $primitiveValue : utf8_encode($primitiveValue);
+                $primitiveValue = strval($primitiveValue);
+                $isUTF8         = 'UTF-8' === mb_detect_encoding($primitiveValue);
+                $stringValue    = $isUTF8 ? $primitiveValue : utf8_encode($primitiveValue);
                 break;
             case $type instanceof Boolean:
                 $stringValue = (true === $primitiveValue) ? 'true' : 'false';

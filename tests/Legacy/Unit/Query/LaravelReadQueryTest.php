@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Query;
 
@@ -27,8 +27,8 @@ class LaravelReadQueryTest extends TestCase
 {
     public function testBadSkipToken()
     {
-        $query = m::mock(QueryType::class);
-        $resource = m::mock(ResourceSet::class);
+        $query     = m::mock(QueryType::class);
+        $resource  = m::mock(ResourceSet::class);
         $skipToken = new \DateTime();
 
         $foo = new LaravelReadQuery();
@@ -45,10 +45,10 @@ class LaravelReadQueryTest extends TestCase
     public function testBadEagerLoad()
     {
         $expected = 'Eager-load elements must be non-empty strings';
-        $actual = null;
+        $actual   = null;
 
-        $query = m::mock(QueryType::class);
-        $resource = m::mock(ResourceSet::class);
+        $query     = m::mock(QueryType::class);
+        $resource  = m::mock(ResourceSet::class);
         $skipToken = null;
         $eagerLoad = ['start/the/dance', new \DateTime()];
 
@@ -65,11 +65,11 @@ class LaravelReadQueryTest extends TestCase
     public function testSkipTokenWithSegmentValueCountMismatch()
     {
         $expected = 'Expected 1, got 0';
-        $actual = null;
+        $actual   = null;
 
         $source = m::mock(TestModel::class)->makePartial();
 
-        $query = m::mock(QueryType::class);
+        $query    = m::mock(QueryType::class);
         $resource = m::mock(ResourceSet::class);
 
         $skipToken = m::mock(SkipTokenInfo::class)->makePartial();
@@ -97,7 +97,7 @@ class LaravelReadQueryTest extends TestCase
         $source->shouldReceive('get')->andReturn(collect([]));
         $source->shouldReceive('count')->andReturn(0)->once();
 
-        $query = QueryType::ENTITIES_WITH_COUNT();
+        $query    = QueryType::ENTITIES_WITH_COUNT();
         $resource = m::mock(ResourceSet::class);
 
         $subSegment = m::mock(OrderBySubPathSegment::class);
@@ -127,7 +127,7 @@ class LaravelReadQueryTest extends TestCase
         $source = $this->generateTestModelWithMetadata();
         $source->getConnection()->shouldReceive('select')->andReturn([]);
 
-        $query = QueryType::ENTITIES_WITH_COUNT();
+        $query    = QueryType::ENTITIES_WITH_COUNT();
         $resource = m::mock(ResourceSet::class);
 
         $subSegment = m::mock(OrderBySubPathSegment::class);
@@ -162,7 +162,7 @@ class LaravelReadQueryTest extends TestCase
 
     public function testGetNullResource()
     {
-        $rSet = m::mock(ResourceSet::class);
+        $rSet   = m::mock(ResourceSet::class);
         $source = m::mock(TestModel::class)->makePartial();
         $source->shouldReceive('get')->andReturn(collect([]));
 
@@ -170,13 +170,13 @@ class LaravelReadQueryTest extends TestCase
         $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
 
         $expected = null;
-        $actual = $foo->getResource($rSet, null, [], null, $source);
+        $actual   = $foo->getResource($rSet, null, [], null, $source);
         $this->assertEquals($expected, $actual);
     }
 
     public function testGetResourceWithBadEagerLoad()
     {
-        $rSet = m::mock(ResourceSet::class);
+        $rSet   = m::mock(ResourceSet::class);
         $source = m::mock(TestModel::class)->makePartial();
         $source->shouldReceive('get')->andReturn(collect([]));
         $source->shouldReceive('getEagerLoad')->andReturn(null)->once();
@@ -185,7 +185,7 @@ class LaravelReadQueryTest extends TestCase
         $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
 
         $expected = '';
-        $actual = null;
+        $actual   = null;
 
         try {
             $actual = $foo->getResource($rSet, null, [], null, $source);
@@ -212,13 +212,13 @@ class LaravelReadQueryTest extends TestCase
         $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
 
         $expected = null;
-        $actual = $foo->getResource($rSet, null, [], null, $rel);
+        $actual   = $foo->getResource($rSet, null, [], null, $rel);
         $this->assertEquals($expected, $actual);
     }
 
     public function testGetRelatedResourceReferenceWhenItIsntThere()
     {
-        $rSet = m::mock(ResourceSet::class);
+        $rSet     = m::mock(ResourceSet::class);
         $targProp = m::mock(ResourceProperty::class);
         $targProp->shouldReceive('getName')->andReturn('oneSource')->once();
 
@@ -237,7 +237,7 @@ class LaravelReadQueryTest extends TestCase
 
     public function testGetResourceFromRelatedResourceSetBadResult()
     {
-        $rSet = m::mock(ResourceSet::class);
+        $rSet     = m::mock(ResourceSet::class);
         $targProp = m::mock(ResourceProperty::class);
         $targProp->shouldReceive('getName')->andReturn('oneSource')->once();
 
@@ -254,7 +254,7 @@ class LaravelReadQueryTest extends TestCase
         $key->shouldReceive('getValidatedNamedValues')->andReturn([]);
 
         $expected = 'GetResourceFromRelatedResourceSet must return an entity or null';
-        $actual = null;
+        $actual   = null;
 
         try {
             $foo->getResourceFromRelatedResourceSet($rSet, $entity, $rSet, $targProp, $key);
@@ -267,7 +267,7 @@ class LaravelReadQueryTest extends TestCase
     public function testNonTrivialOrderByOnModel()
     {
         $rawModel = $this->generateTestModelWithMetadata();
-        $rawMeta = $rawModel->metadata();
+        $rawMeta  = $rawModel->metadata();
 
         $rSet = m::mock(ResourceSet::class);
 
@@ -301,8 +301,8 @@ class LaravelReadQueryTest extends TestCase
         $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
 
         $expected = null;
-        $type = QueryType::ENTITIES_WITH_COUNT();
-        $actual = $foo->getResourceSet($type, $rSet, null, $orderBy, null, null, null, null, $model);
+        $type     = QueryType::ENTITIES_WITH_COUNT();
+        $actual   = $foo->getResourceSet($type, $rSet, null, $orderBy, null, null, null, null, $model);
         $this->assertFalse($actual->hasMore);
         $this->assertEquals(0, $actual->count);
         $this->assertEquals(0, count($actual->results));
@@ -310,18 +310,18 @@ class LaravelReadQueryTest extends TestCase
 
     public function testApplyFilteringWithNullClosureOnBigSet()
     {
-        $top = 0;
-        $skip = 0;
+        $top                  = 0;
+        $skip                 = 0;
         $sourceEntityInstance = m::mock(TestModel::class)->makePartial();
         $sourceEntityInstance->shouldReceive('count')->andReturn(25000)->once();
         $nullFilter = false;
-        $rawLoad = [];
-        $isValid = null;
+        $rawLoad    = [];
+        $isValid    = null;
 
         $foo = m::mock(LaravelReadQueryDummy::class)->makePartial();
 
         $expected = 'Filter closure not set';
-        $actual = null;
+        $actual   = null;
 
         try {
             $foo->applyFiltering($sourceEntityInstance, $nullFilter, $rawLoad, $top, $skip, $isValid);
@@ -336,12 +336,12 @@ class LaravelReadQueryTest extends TestCase
      */
     private function generateTestModelWithMetadata()
     {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta             = [];
+        $meta['id']       = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name']     = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['weight']   = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code']     = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $instance = new TestModel($meta, null);
         return $instance;

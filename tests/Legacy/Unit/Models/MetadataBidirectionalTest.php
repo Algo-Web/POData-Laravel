@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Models;
 
@@ -64,7 +64,7 @@ class MetadataBidirectionalTest extends TestCase
         $bar = new TestMonomorphicManyTarget();
 
         $expectedFoo = [
-            "manySource",
+            'manySource',
         ];
 
         $expectedBar = ['manyTarget'];
@@ -93,10 +93,10 @@ class MetadataBidirectionalTest extends TestCase
         $foo = new TestMorphTarget();
 
         $expected =  [
-            "morph",
-            "childMorph",
-            "monomorphicChildren",
-            "monomorphicParent",
+            'morph',
+            'childMorph',
+            'monomorphicChildren',
+            'monomorphicParent',
         ];
 
         $actual = $foo->getRelationships();
@@ -107,7 +107,7 @@ class MetadataBidirectionalTest extends TestCase
 
     public function testPolymorphicKnownManySide()
     {
-        $foo = new TestMorphManySource();
+        $foo  = new TestMorphManySource();
         $targ = TestMorphTarget::class;
 
         $expected = [
@@ -146,7 +146,7 @@ class MetadataBidirectionalTest extends TestCase
 
     public function testPolymorphicManyToManyUnknownSide()
     {
-        $foo = new TestMorphManyToManySource();
+        $foo  = new TestMorphManyToManySource();
         $targ = TestMorphManyToManyTarget::class;
 
         $expected = ['manySource'];
@@ -163,7 +163,7 @@ class MetadataBidirectionalTest extends TestCase
 
     public function testPolymorphicManyToManyKnownSide()
     {
-        $foo = new TestMorphManyToManyTarget();
+        $foo  = new TestMorphManyToManyTarget();
         $targ = TestMorphManyToManySource::class;
 
         $expected = ['manyTarget'];
@@ -197,8 +197,8 @@ class MetadataBidirectionalTest extends TestCase
 
     public function testMonomorphicRelationsKeyedOnSameFieldFromChild()
     {
-        $foo = new TestMonomorphicOneAndManyTarget();
-        $targ = new TestMonomorphicOneAndManySource();
+        $foo      = new TestMonomorphicOneAndManyTarget();
+        $targ     = new TestMonomorphicOneAndManySource();
         $targName = get_class($targ);
 
         $expected = ['oneSource','twoSource','manySource'];

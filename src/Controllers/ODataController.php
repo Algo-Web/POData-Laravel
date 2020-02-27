@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Controllers;
 
@@ -23,21 +23,21 @@ class ODataController extends BaseController
      */
     public function index(Request $request)
     {
-        $dryRun = $this->isDryRun();
+        $dryRun     = $this->isDryRun();
         $commitCall = $dryRun ? 'rollBack' : 'commit';
 
         try {
             DB::beginTransaction();
             $context = new OperationContextAdapter($request);
-            $host = new ServiceHost($context, $request);
+            $host    = new ServiceHost($context, $request);
             $host->setServiceUri('/odata.svc/');
 
             $query = App::make('odataquery');
-            $meta = App::make('metadata');
+            $meta  = App::make('metadata');
 
-            $service = new DataService($query, $meta, $host);
-            $cereal = new IronicSerialiser($service, null);
-            $service = new DataService($query, $meta, $host, $cereal);
+            $service  = new DataService($query, $meta, $host);
+            $cereal   = new IronicSerialiser($service, null);
+            $service  = new DataService($query, $meta, $host, $cereal);
             $pageSize = $this->getAppPageSize();
             if (null !== $pageSize) {
                 $service->maxPageSize = intval($pageSize);
@@ -48,9 +48,9 @@ class ODataController extends BaseController
 
             $content = $odataResponse->getStream();
 
-            $headers = $odataResponse->getHeaders();
+            $headers      = $odataResponse->getHeaders();
             $responseCode = $headers[\POData\Common\ODataConstants::HTTPRESPONSE_HEADER_STATUS_CODE];
-            $response = new Response($content, intval($responseCode));
+            $response     = new Response($content, intval($responseCode));
 
             foreach ($headers as $headerName => $headerValue) {
                 if (null !== $headerValue) {

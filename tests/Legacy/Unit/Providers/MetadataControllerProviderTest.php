@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Providers;
 
@@ -36,8 +36,8 @@ class MetadataControllerProviderTest extends TestCase
         $container = m::mock(MetadataControllerContainer::class)->makePartial();
         App::instance('metadataControllers', $container);
 
-        $expectedMap = ['create' => [ 'method' => 'storeTestModel', 'controller' => get_class($controller1)]];
-        $expectedMap['read'] = [ 'method' => 'showTestModel', 'controller' => get_class($controller1)];
+        $expectedMap           = ['create' => [ 'method' => 'storeTestModel', 'controller' => get_class($controller1)]];
+        $expectedMap['read']   = [ 'method' => 'showTestModel', 'controller' => get_class($controller1)];
         $expectedMap['update'] = [ 'method' => 'updateTestModel', 'controller' => get_class($controller2)];
         $expectedMap['delete'] = [ 'method' => 'destroyTestModel', 'controller' => get_class($controller2)];
 
@@ -79,8 +79,8 @@ class MetadataControllerProviderTest extends TestCase
         $container = m::mock(MetadataControllerContainer::class)->makePartial();
         App::instance('metadataControllers', $container);
 
-        $expectedMap = ['create' => [ 'method' => 'storeTestModel', 'controller' => get_class($controller1)]];
-        $expectedMap['read'] = [ 'method' => 'showTestModel', 'controller' => get_class($controller2)];
+        $expectedMap           = ['create' => [ 'method' => 'storeTestModel', 'controller' => get_class($controller1)]];
+        $expectedMap['read']   = [ 'method' => 'showTestModel', 'controller' => get_class($controller2)];
         $expectedMap['update'] = [ 'method' => 'updateTestModel', 'controller' => get_class($controller2)];
         $expectedMap['delete'] = [ 'method' => 'destroyTestModel', 'controller' => get_class($controller2)];
 
@@ -111,8 +111,8 @@ class MetadataControllerProviderTest extends TestCase
         $container = m::mock(MetadataControllerContainer::class)->makePartial();
         App::instance('metadataControllers', $container);
 
-        $expectedMap = ['create' => [ 'method' => 'storeTestModel', 'controller' => TestController::class]];
-        $expectedMap['read'] = [ 'method' => 'showTestModel', 'controller' => TestController::class];
+        $expectedMap           = ['create' => [ 'method' => 'storeTestModel', 'controller' => TestController::class]];
+        $expectedMap['read']   = [ 'method' => 'showTestModel', 'controller' => TestController::class];
         $expectedMap['update'] = [ 'method' => 'updateTestModel', 'controller' => ElectricBoogalooController::class];
         $expectedMap['delete'] = [ 'method' => 'destroyTestModel', 'controller' => ElectricBoogalooController::class];
 
@@ -133,9 +133,9 @@ class MetadataControllerProviderTest extends TestCase
 
     public function testMapAssemblyWithSoftCollisionOnOptionalVerb()
     {
-        $controller1 = new TestController();
-        $controller2 = new ElectricBoogalooController();
-        $mapping = $controller2->getMapping();
+        $controller1                             = new TestController();
+        $controller2                             = new ElectricBoogalooController();
+        $mapping                                 = $controller2->getMapping();
         $mapping[TestModel::class]['bulkCreate'] = 'storeTestModel';
         $controller2->setMapping($mapping);
 
@@ -154,13 +154,13 @@ class MetadataControllerProviderTest extends TestCase
 
     public function testMapAssemblyWithHardCollisionOnOptionalVerb()
     {
-        $controller1 = new TestController();
-        $mapping = $controller1->getMapping();
+        $controller1                             = new TestController();
+        $mapping                                 = $controller1->getMapping();
         $mapping[TestModel::class]['bulkCreate'] = 'storeTestModel';
         $controller1->setMapping($mapping);
         unset($mapping);
-        $controller2 = new ElectricBoogalooController();
-        $mapping = $controller2->getMapping();
+        $controller2                             = new ElectricBoogalooController();
+        $mapping                                 = $controller2->getMapping();
         $mapping[TestModel::class]['bulkCreate'] = 'storeTestModel';
         $controller2->setMapping($mapping);
 
@@ -187,8 +187,8 @@ class MetadataControllerProviderTest extends TestCase
         $container = m::mock(MetadataControllerContainer::class)->makePartial();
         App::instance('metadataControllers', $container);
 
-        $expectedMap = ['create' => [ 'method' => 'storeTestModel', 'controller' => TestController::class]];
-        $expectedMap['read'] = [ 'method' => 'showTestModel', 'controller' => TestController::class];
+        $expectedMap           = ['create' => [ 'method' => 'storeTestModel', 'controller' => TestController::class]];
+        $expectedMap['read']   = [ 'method' => 'showTestModel', 'controller' => TestController::class];
         $expectedMap['update'] = [ 'method' => 'updateTestModel', 'controller' => ElectricBoogalooController::class];
         $expectedMap['delete'] = [ 'method' => 'destroyTestModel', 'controller' => ElectricBoogalooController::class];
 
@@ -266,7 +266,7 @@ class MetadataControllerProviderTest extends TestCase
         $foo->shouldReceive('getIsCaching')->andReturn(false)->once();
 
         $foo->boot();
-        $result = App::make('metadataControllers');
+        $result   = App::make('metadataControllers');
         $metadata = $result->getMetadata();
         $this->assertTrue(is_array($metadata));
         $this->assertEquals(0, count($metadata));
@@ -310,7 +310,7 @@ class MetadataControllerProviderTest extends TestCase
         $this->markTestSkipped('for reasons not clear, the mock to getAppNamespace is not being respected');
 
         $expected = 'Resolved result not a controller';
-        $actual = null;
+        $actual   = null;
 
         try {
             $foo->boot();

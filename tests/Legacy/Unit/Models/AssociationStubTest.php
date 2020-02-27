@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Models;
 
@@ -242,10 +242,10 @@ class AssociationStubTest extends TestCase
 
     public function testStringFieldsRoundTrip()
     {
-        $expectedKey = 'key';
-        $expectedRel = 'rel';
+        $expectedKey   = 'key';
+        $expectedRel   = 'rel';
         $expectedMorph = 'morph';
-        $foo = new AssociationStubPolymorphic();
+        $foo           = new AssociationStubPolymorphic();
         $foo->setKeyField($expectedKey);
         $actualKey = $foo->getKeyField();
         $this->assertEquals($expectedKey, $actualKey);
@@ -317,7 +317,7 @@ class AssociationStubTest extends TestCase
         $foo = new AssociationStubPolymorphic();
 
         $expected = 'Polymorphic stub not OK so known-side determination is meaningless';
-        $actual = null;
+        $actual   = null;
 
         try {
             $foo->isKnownSide();
