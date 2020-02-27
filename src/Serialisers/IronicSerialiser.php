@@ -150,7 +150,7 @@ class IronicSerialiser implements IObjectSerialiser
             $resourceType,
             $resourceSet->getName()
         );
-        $absoluteUri = rtrim($this->absoluteServiceUri, '/') . '/' . $relativeUri;
+        $absoluteUri = rtrim($this->absoluteServiceUri ?? '', '/') . '/' . $relativeUri;
 
         /** var $mediaLink ODataMediaLink|null */
         $mediaLink = null;
