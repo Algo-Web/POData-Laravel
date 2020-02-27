@@ -546,7 +546,7 @@ class IronicSerialiser implements IObjectSerialiser
             $nuLink->expandedResult->selfLink->title = $propName;
             $nuLink->expandedResult->selfLink->url   = $nuLink->url;
             $nuLink->expandedResult->title           = new ODataTitle($propName);
-            $nuLink->expandedResult->id              = rtrim($this->absoluteServiceUri, '/') . '/' . $nuLink->url;
+            $nuLink->expandedResult->id              = rtrim($this->absoluteServiceUri ?? '', '/') . '/' . $nuLink->url;
         }
         if (!isset($nuLink->expandedResult)) {
             throw new InvalidOperationException('');
