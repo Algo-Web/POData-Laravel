@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -24,7 +24,7 @@ class MetadataControllerProviderTest extends TestCase
 {
     public function testDontFilterActiveControllers()
     {
-        $names = [OrchestraBallastController::class, OrchestraTestController::class];
+        $names    = [OrchestraBallastController::class, OrchestraTestController::class];
         $expected = [new OrchestraBallastController(), new OrchestraTestController()];
 
         $app = m::mock(Application::class);
@@ -42,7 +42,7 @@ class MetadataControllerProviderTest extends TestCase
 
     public function testFilterControllerWithoutTrait()
     {
-        $names = [OrchestraNonTraitController::class, OrchestraTestController::class];
+        $names    = [OrchestraNonTraitController::class, OrchestraTestController::class];
         $expected = [new OrchestraTestController()];
 
         $app = m::mock(Application::class);
@@ -57,7 +57,7 @@ class MetadataControllerProviderTest extends TestCase
 
     public function testFilterFromOutsideNamespace()
     {
-        $names = [Role::class, OrchestraTestController::class];
+        $names    = [Role::class, OrchestraTestController::class];
         $expected = [new OrchestraTestController()];
 
         $app = m::mock(Application::class);

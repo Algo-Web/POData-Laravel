@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Controllers;
 
@@ -85,7 +85,7 @@ trait MetadataControllerTrait
             throw new \Exception($msg);
         }
 
-        $class = get_class($this);
+        $class     = get_class($this);
         $parmArray = $this->getParameterNames($result);
 
         return ['method' => $result, 'controller' => $class, 'parameters' => $parmArray];
@@ -133,7 +133,7 @@ trait MetadataControllerTrait
                     $allMappings[$key] = [];
                 }
 
-                $class = get_class($this);
+                $class                    = get_class($this);
                 $allMappings[$key][$verb] = ['method' => $method, 'controller' => $class, 'parameters' => $parmArray];
             }
         }
@@ -158,22 +158,22 @@ trait MetadataControllerTrait
     protected function getParameterNames(string $result)
     {
         $parmArray = [];
-        $reflec = new \ReflectionMethod($this, $result);
-        $params = $reflec->getParameters();
+        $reflec    = new \ReflectionMethod($this, $result);
+        $params    = $reflec->getParameters();
         foreach ($params as $parm) {
-            $detail = [];
+            $detail         = [];
             $detail['name'] = $parm->name;
-            $classHint = $parm->getClass();
-            $isRequest = false;
+            $classHint      = $parm->getClass();
+            $isRequest      = false;
             if (null != $classHint) {
                 // check to see if this is a request
-                $className = $classHint->name;
-                $class = new $className();
-                $isRequest = $class instanceof \Illuminate\Http\Request;
+                $className      = $classHint->name;
+                $class          = new $className();
+                $isRequest      = $class instanceof \Illuminate\Http\Request;
                 $detail['type'] = $className;
             }
 
-            $detail['isRequest'] = $isRequest;
+            $detail['isRequest']    = $isRequest;
             $parmArray[$parm->name] = $detail;
         }
         return $parmArray;

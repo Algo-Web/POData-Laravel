@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Models;
 
@@ -14,7 +14,7 @@ class EntityGubbinsTest extends TestCase
 {
     public function testSimpleGettersAndSetters()
     {
-        $foo = new EntityGubbins();
+        $foo          = new EntityGubbins();
         $expectedName = 'name';
         $foo->setName($expectedName);
         $actualName = $foo->getName();
@@ -27,9 +27,9 @@ class EntityGubbinsTest extends TestCase
 
     public function testSetEmptyFieldsArray()
     {
-        $foo = new EntityGubbins();
+        $foo      = new EntityGubbins();
         $expected = 'Fields array must not be empty for ';
-        $actual = null;
+        $actual   = null;
 
         try {
             $foo->setFields([]);
@@ -44,7 +44,7 @@ class EntityGubbinsTest extends TestCase
         $foo = new EntityGubbins();
         $foo->setClassName('className');
         $expected = 'Fields array must only have EntityField objects for className';
-        $actual = null;
+        $actual   = null;
 
         try {
             $foo->setFields([new \DateTime()]);
@@ -59,7 +59,7 @@ class EntityGubbinsTest extends TestCase
         $foo = new EntityGubbins();
         $foo->setClassName('className');
         $expected = 'No key field supplied in fields array for className';
-        $actual = null;
+        $actual   = null;
 
         $field = new EntityField();
         $this->assertTrue(!$field->getIsKeyField());
@@ -74,7 +74,7 @@ class EntityGubbinsTest extends TestCase
 
     public function testSetOneKeyFieldArray()
     {
-        $foo = new EntityGubbins();
+        $foo   = new EntityGubbins();
         $field = new EntityField();
         $field->setIsKeyField(true);
         $bar = new EntityField();
@@ -93,9 +93,9 @@ class EntityGubbinsTest extends TestCase
 
     public function testSetBadStubsArray()
     {
-        $foo = new EntityGubbins();
+        $foo      = new EntityGubbins();
         $expected = 'Stubs array must only have AssociationStubBase objects';
-        $actual = null;
+        $actual   = null;
 
         try {
             $foo->setStubs([new \DateTime()]);
@@ -107,12 +107,12 @@ class EntityGubbinsTest extends TestCase
 
     public function testSetAbstractODataType()
     {
-        $foo = new EntityGubbins();
+        $foo   = new EntityGubbins();
         $rType = m::mock(ResourceEntityType::class);
         $rType->shouldReceive('isAbstract')->andReturn(true)->once();
 
         $expected = 'OData resource entity type must be concrete';
-        $actual = null;
+        $actual   = null;
 
         try {
             $foo->setOdataResourceType($rType);
@@ -132,11 +132,11 @@ class EntityGubbinsTest extends TestCase
 
     public function testAddDisconnectedEmptyMonomorphicAssociation()
     {
-        $foo = new EntityGubbins();
+        $foo   = new EntityGubbins();
         $assoc = new AssociationMonomorphic();
 
         $expected = 'Association cannot be connected to this entity';
-        $actual = null;
+        $actual   = null;
 
         try {
             $foo->addAssociation($assoc);
@@ -151,11 +151,11 @@ class EntityGubbinsTest extends TestCase
         $foo = new EntityGubbins();
         $foo->setStubs([]);
         $assoc = m::mock(AssociationMonomorphic::class);
-        $stub = m::mock(AssociationStubBase::class);
+        $stub  = m::mock(AssociationStubBase::class);
         $assoc->shouldReceive('getFirst')->andReturn($stub)->once();
 
         $expected = 'Association cannot be connected to this entity';
-        $actual = null;
+        $actual   = null;
 
         try {
             $foo->addAssociation($assoc);
@@ -167,7 +167,7 @@ class EntityGubbinsTest extends TestCase
 
     public function testEmptyAssociationSet()
     {
-        $foo = new EntityGubbins();
+        $foo    = new EntityGubbins();
         $result = $foo->getAssociations();
         $this->assertTrue(is_array($result));
         $this->assertEquals(0, count($result));
@@ -175,7 +175,7 @@ class EntityGubbinsTest extends TestCase
 
     public function testEmptyStubSet()
     {
-        $foo = new EntityGubbins();
+        $foo    = new EntityGubbins();
         $result = $foo->getStubs();
         $this->assertTrue(is_array($result));
         $this->assertEquals(0, count($result));
@@ -183,7 +183,7 @@ class EntityGubbinsTest extends TestCase
 
     public function testEmptyKeyFieldsSet()
     {
-        $foo = new EntityGubbins();
+        $foo    = new EntityGubbins();
         $result = $foo->getKeyFields();
         $this->assertTrue(is_array($result));
         $this->assertEquals(0, count($result));

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Query;
 
@@ -92,7 +92,7 @@ class LaravelHookQuery extends LaravelBaseQuery
                 ->resolveReverseProperty($sourceEntityInstance, $navPropName);
             if (null === $otherPropName) {
                 $srcClass = get_class($sourceEntityInstance);
-                $msg = 'Bad navigation property, ' . $navPropName . ', on source model ' . $srcClass;
+                $msg      = 'Bad navigation property, ' . $navPropName . ', on source model ' . $srcClass;
                 throw new \InvalidArgumentException($msg);
             }
             $this->unhookSingleModel(
@@ -123,7 +123,7 @@ class LaravelHookQuery extends LaravelBaseQuery
         Model $targetEntityInstance,
         string $navPropName
     ) {
-        $relation = $sourceEntityInstance->$navPropName();
+        $relation = $sourceEntityInstance->{$navPropName}();
         if (!$relation instanceof Relation) {
             $msg = 'Navigation property must be an Eloquent relation';
             throw new \InvalidArgumentException($msg);

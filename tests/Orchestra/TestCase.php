@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -19,7 +19,7 @@ class TestCase extends BaseTestCase
             \AlgoWeb\PODataLaravel\Providers\MetadataRouteProvider::class,
             \AlgoWeb\PODataLaravel\Providers\QueryProvider::class,
             \AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider::class,
-            /*\Orchestra\Database\ConsoleServiceProvider::class,*/];
+        /*\Orchestra\Database\ConsoleServiceProvider::class,*/];
     }
 
     /**
@@ -33,7 +33,7 @@ class TestCase extends BaseTestCase
     {
         // Brute-force set app namespace
         $reflec = new \ReflectionClass($app);
-        $prop = $reflec->getProperty('namespace');
+        $prop   = $reflec->getProperty('namespace');
         $prop->setAccessible(true);
         $prop->setValue($app, 'AlgoWeb\\PODataLaravel\\Orchestra\\');
 
@@ -65,10 +65,10 @@ class TestCase extends BaseTestCase
     protected static function resetMetadataProvider($provider)
     {
         $reset = function () {
-            self::$isBooted = false;
-            self::$afterExtract = null;
-            self::$afterUnify = null;
-            self::$afterVerify = null;
+            self::$isBooted       = false;
+            self::$afterExtract   = null;
+            self::$afterUnify     = null;
+            self::$afterVerify    = null;
             self::$afterImplement = null;
         };
         return call_user_func($reset->bindTo($provider, get_class($provider)));

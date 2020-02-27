@@ -1,11 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
  * Date: 26/02/20
- * Time: 12:27 PM
+ * Time: 12:27 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Query;
 
 use AlgoWeb\PODataLaravel\Query\LaravelReadQuery;

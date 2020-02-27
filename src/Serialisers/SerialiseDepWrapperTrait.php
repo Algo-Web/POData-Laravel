@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -88,8 +88,8 @@ trait SerialiseDepWrapperTrait
      */
     public function setService(IService $service)
     {
-        $this->service = $service;
-        $this->absoluteServiceUri = $service->getHost()->getAbsoluteServiceUri()->getUrlAsString();
+        $this->service                     = $service;
+        $this->absoluteServiceUri          = $service->getHost()->getAbsoluteServiceUri()->getUrlAsString();
         $this->absoluteServiceUriWithSlash = rtrim($this->absoluteServiceUri, '/') . '/';
     }
 
@@ -176,7 +176,7 @@ trait SerialiseDepWrapperTrait
     protected function getCurrentResourceSetWrapper()
     {
         $segmentWrappers = $this->getStack()->getSegmentWrappers();
-        $count = count($segmentWrappers);
+        $count           = count($segmentWrappers);
 
         return 0 == $count ? $this->getRequest()->getTargetResourceSetWrapper() : $segmentWrappers[$count-1];
     }

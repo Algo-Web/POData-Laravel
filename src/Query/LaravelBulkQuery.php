@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Query;
 
@@ -30,9 +30,9 @@ class LaravelBulkQuery
 
     public function __construct(LaravelQuery &$query, AuthInterface $auth = null)
     {
-        $this->auth = isset($auth) ? $auth : new NullAuthProvider();
-        $this->metadataProvider = new MetadataProvider(App::make('app'));
-        $this->query = $query;
+        $this->auth                = isset($auth) ? $auth : new NullAuthProvider();
+        $this->metadataProvider    = new MetadataProvider(App::make('app'));
+        $this->query               = $query;
         $this->controllerContainer = App::make('metadataControllers');
     }
 
@@ -53,7 +53,7 @@ class LaravelBulkQuery
         array $data
     ) {
         $verbName = 'bulkCreate';
-        $mapping = $this->getOptionalVerbMapping($sourceResourceSet, $verbName);
+        $mapping  = $this->getOptionalVerbMapping($sourceResourceSet, $verbName);
 
         $result = [];
         try {
@@ -68,8 +68,8 @@ class LaravelBulkQuery
                 }
             } else {
                 $keyDescriptor = null;
-                $pastVerb = 'created';
-                $result = $this->processBulkCustom($sourceResourceSet, $data, $mapping, $pastVerb, $keyDescriptor);
+                $pastVerb      = 'created';
+                $result        = $this->processBulkCustom($sourceResourceSet, $data, $mapping, $pastVerb, $keyDescriptor);
             }
             DB::commit();
         } catch (\Exception $e) {
@@ -107,15 +107,15 @@ class LaravelBulkQuery
         $result = [];
 
         $verbName = 'bulkUpdate';
-        $mapping = $this->getOptionalVerbMapping($sourceResourceSet, $verbName);
+        $mapping  = $this->getOptionalVerbMapping($sourceResourceSet, $verbName);
 
         try {
             DB::beginTransaction();
             if (null === $mapping) {
                 for ($i = 0; $i < $numKeys; $i++) {
                     $newItem = $data[$i];
-                    $newKey = $keyDescriptor[$i];
-                    $raw = $this->getQuery()->
+                    $newKey  = $keyDescriptor[$i];
+                    $raw     = $this->getQuery()->
                         updateResource($sourceResourceSet, $sourceEntityInstance, $newKey, $newItem);
                     if (null === $raw) {
                         throw new \Exception('Bulk model update failed');
@@ -124,7 +124,7 @@ class LaravelBulkQuery
                 }
             } else {
                 $pastVerb = 'updated';
-                $result = $this->processBulkCustom($sourceResourceSet, $data, $mapping, $pastVerb, $keyDescriptor);
+                $result   = $this->processBulkCustom($sourceResourceSet, $data, $mapping, $pastVerb, $keyDescriptor);
             }
             DB::commit();
         } catch (\Exception $e) {
@@ -146,7 +146,7 @@ class LaravelBulkQuery
      */
     protected function prepareBulkRequestInput(array $paramList, array $data, array $keyDescriptors = null)
     {
-        $parms = [];
+        $parms    = [];
         $isCreate = null === $keyDescriptors;
 
         // for moment, we're only processing parameters of type Request
@@ -200,23 +200,23 @@ class LaravelBulkQuery
         string $pastVerb,
         array $keyDescriptor = null
     ) {
-        $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
+        $class        = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
         $controlClass = $mapping['controller'];
-        $method = $mapping['method'];
-        $paramList = $mapping['parameters'];
-        $controller = App::make($controlClass);
-        $parms = $this->prepareBulkRequestInput($paramList, $data, $keyDescriptor);
+        $method       = $mapping['method'];
+        $paramList    = $mapping['parameters'];
+        $controller   = App::make($controlClass);
+        $parms        = $this->prepareBulkRequestInput($paramList, $data, $keyDescriptor);
 
         $callResult = call_user_func_array(array($controller, $method), $parms);
-        $payload = $this->createUpdateDeleteProcessOutput($callResult);
-        $success = isset($payload['id']) && is_array($payload['id']);
+        $payload    = $this->createUpdateDeleteProcessOutput($callResult);
+        $success    = isset($payload['id']) && is_array($payload['id']);
 
         if ($success) {
             try {
                 // return array of Model objects underlying collection returned by findMany
                 /** @var Model $actClass */
                 $actClass = App::make($class);
-                $result = $actClass->findMany($payload['id'])->flatten()->all();
+                $result   = $actClass->findMany($payload['id'])->flatten()->all();
                 foreach ($result as $model) {
                     LaravelQuery::queueModel($model);
                 }

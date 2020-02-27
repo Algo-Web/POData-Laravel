@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities;
 
@@ -137,7 +137,7 @@ class EntityGubbins
             $msg = 'No key field supplied in fields array for '.$this->getClassName();
             throw new \Exception($msg);
         }
-        $this->fields = $fields;
+        $this->fields    = $fields;
         $this->keyFields = $keys;
     }
 
@@ -233,9 +233,9 @@ class EntityGubbins
      */
     public function isOK()
     {
-        $fieldNames = $this->getFieldNames();
+        $fieldNames       = $this->getFieldNames();
         $associationNames = $this->getAssociationNames();
-        $intersection = array_intersect($fieldNames, $associationNames);
+        $intersection     = array_intersect($fieldNames, $associationNames);
         return 0 === count($intersection);
     }
 }

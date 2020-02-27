@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -34,14 +34,14 @@ class RelationTestDummyModel extends Model
 
     public function bigReset()
     {
-        self::$tableData = [];
+        self::$tableData            = [];
         self::$tableColumnsDoctrine = [];
-        self::$tableColumns = [];
+        self::$tableColumns         = [];
     }
 
 
     /**
-     * @param Relation $rel
+     * @param  Relation $rel
      * @return array
      */
     protected function relateMethods(Relation $rel)

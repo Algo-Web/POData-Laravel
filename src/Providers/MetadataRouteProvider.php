@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
@@ -20,7 +20,7 @@ class MetadataRouteProvider extends ServiceProvider
 
     private function setupRoute()
     {
-        $authMiddleware = $this->getAuthMiddleware();
+        $authMiddleware   = $this->getAuthMiddleware();
         $controllerMethod = 'AlgoWeb\PODataLaravel\Controllers\ODataController@index';
 
         Route::get('odata.svc/$metadata', ['uses' => $controllerMethod, 'middleware' => null]);
@@ -50,7 +50,7 @@ class MetadataRouteProvider extends ServiceProvider
 
         if (interface_exists(\Illuminate\Contracts\Auth\Factory::class)) {
             /** @var \Illuminate\Contracts\Auth\Factory $manager */
-            $manager = App::make(\Illuminate\Contracts\Auth\Factory::class);
+            $manager        = App::make(\Illuminate\Contracts\Auth\Factory::class);
             $authMiddleware = $manager->guard('api') ? 'auth:api' : $authMiddleware;
         }
 

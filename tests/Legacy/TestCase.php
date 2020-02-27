@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel;
 
@@ -78,7 +78,7 @@ class TestCase extends BaseTestCase
     {
         if (null === $conn) {
             $schema = \Mockery::mock(\Illuminate\Database\Schema\Builder::class);
-            $conn = \Mockery::mock('Illuminate\Database\ConnectionInterface')->makePartial();
+            $conn   = \Mockery::mock('Illuminate\Database\ConnectionInterface')->makePartial();
             $conn->shouldReceive('getSchemaBuilder')->andReturn($schema);
         }
         if (null === $builder) {
@@ -97,8 +97,8 @@ class TestCase extends BaseTestCase
         parent::setUp();
         date_default_timezone_set('UTC');
         $this->origFacade['schema'] = Schema::getFacadeRoot();
-        $builder = $this->getBuilder();
-        $database = $this->getDatabase($builder);
+        $builder                    = $this->getBuilder();
+        $database                   = $this->getDatabase($builder);
         App::instance('db', $database);
         // Clear any residual metadata bitz from previous runs
         $foo = new TestModel();
@@ -114,10 +114,10 @@ class TestCase extends BaseTestCase
     protected static function resetMetadataProvider($provider)
     {
         $reset = function () {
-            self::$isBooted = false;
-            self::$afterExtract = null;
-            self::$afterUnify = null;
-            self::$afterVerify = null;
+            self::$isBooted       = false;
+            self::$afterExtract   = null;
+            self::$afterUnify     = null;
+            self::$afterVerify    = null;
             self::$afterImplement = null;
         };
         return call_user_func($reset->bindTo($provider, get_class($provider)));
@@ -126,7 +126,7 @@ class TestCase extends BaseTestCase
     protected static function resetModelSerialiser($serialiser)
     {
         $reset = function () {
-            self::$mutatorCache = [];
+            self::$mutatorCache  = [];
             self::$metadataCache = [];
         };
         return call_user_func($reset->bindTo($serialiser, get_class($serialiser)));
@@ -135,9 +135,9 @@ class TestCase extends BaseTestCase
     protected static function resetModel($model)
     {
         $reset = function () {
-            self::$tableData = [];
+            self::$tableData            = [];
             self::$tableColumnsDoctrine = [];
-            self::$tableColumns = [];
+            self::$tableColumns         = [];
         };
         return call_user_func($reset->bindTo($model, get_class($model)));
     }

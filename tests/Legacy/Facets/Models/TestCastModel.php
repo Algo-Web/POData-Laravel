@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models;
 
@@ -19,7 +19,7 @@ class TestCastModel extends Model
     protected $grammar;
     protected $processor;
 
-    protected $casts = ['is_bool' => 'boolean'];
+    protected $casts     = ['is_bool' => 'boolean'];
     protected $isArtisan = null;
 
     public function __construct(array $meta = null, $endpoint = null)
@@ -31,8 +31,8 @@ class TestCastModel extends Model
             $this->endpoint = $endpoint;
         }
         $this->processor = \Mockery::mock(\Illuminate\Database\Query\Processors\Processor::class)->makePartial();
-        $this->grammar = \Mockery::mock(\Illuminate\Database\Query\Grammars\Grammar::class)->makePartial();
-        $connect = \Mockery::mock(Connection::class)->makePartial();
+        $this->grammar   = \Mockery::mock(\Illuminate\Database\Query\Grammars\Grammar::class)->makePartial();
+        $connect         = \Mockery::mock(Connection::class)->makePartial();
         $connect->shouldReceive('getQueryGrammar')->andReturn($this->grammar);
         $connect->shouldReceive('getPostProcessor')->andReturn($this->processor);
         $this->connect = $connect;

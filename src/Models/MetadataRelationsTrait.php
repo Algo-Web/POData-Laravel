@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -35,6 +35,6 @@ trait MetadataRelationsTrait
     public function getRelationships()
     {
         return self::$relationNames = self::$relationNames ??
-                                      ModelReflectionHelper::getRelationshipsFromMethods(/** @scrutinizer ignore-type */$this);
+                                      ModelReflectionHelper::getRelationshipsFromMethods(/* @scrutinizer ignore-type */$this);
     }
 }

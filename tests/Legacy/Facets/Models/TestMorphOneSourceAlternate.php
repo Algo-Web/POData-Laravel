@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models;
 
@@ -32,7 +32,7 @@ class TestMorphOneSourceAlternate extends Model
         if (isset($connect)) {
             $this->connect = $connect;
         } else {
-            $connect = \Mockery::mock(Connection::class)->makePartial();
+            $connect       = \Mockery::mock(Connection::class)->makePartial();
             $this->connect = $connect;
         }
         parent::__construct();

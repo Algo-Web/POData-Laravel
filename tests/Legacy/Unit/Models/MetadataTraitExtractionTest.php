@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Models;
 
@@ -31,15 +31,15 @@ class MetadataTraitExtractionTest extends TestCase
 
     public function testExtractGubbinsMonomorphicSource()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
-        $rawKeys = array_keys($metaRaw);
+        $rawKeys   = array_keys($metaRaw);
         $relations = ['oneSource', 'manySource'];
-        $relKeys = ['one_id', 'many_id'];
-        $relMults = [RelType::NULL_ONE(), RelType::MANY()];
+        $relKeys   = ['one_id', 'many_id'];
+        $relMults  = [RelType::NULL_ONE(), RelType::MANY()];
 
         $foo = new TestMonomorphicSource($metaRaw);
 
@@ -63,15 +63,15 @@ class MetadataTraitExtractionTest extends TestCase
 
     public function testExtractGubbinsTestMorphTargetChild()
     {
-        $metaRaw = [];
-        $metaRaw['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw          = [];
+        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
-        $rawKeys = array_keys($metaRaw);
+        $rawKeys   = array_keys($metaRaw);
         $relations = ['morph'];
-        $relKeys = ['id'];
-        $relMults = [RelType::ONE()];
+        $relKeys   = ['id'];
+        $relMults  = [RelType::ONE()];
 
         $foo = new TestMorphTargetChild($metaRaw);
 
@@ -96,17 +96,17 @@ class MetadataTraitExtractionTest extends TestCase
 
     public function testCollidingPrimitivePropertyNames()
     {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['Name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta          = [];
+        $meta['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['Name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
-        $foo = new TestModel($meta, null);
+        $foo       = new TestModel($meta, null);
         $foo->name = 'Commence Primary Ignition';
 
         $expected = 'Property names must be unique, without regard to case';
-        $actual = null;
+        $actual   = null;
 
         try {
             $result = $foo->extractGubbins();
@@ -118,17 +118,17 @@ class MetadataTraitExtractionTest extends TestCase
 
     public function testPropertyAndRelationNameCollision()
     {
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta                = [];
+        $meta['id']          = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name']        = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['MORPHTARGET'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['photo']       = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
-        $foo = new TestMorphOneSource($meta, null);
+        $foo       = new TestMorphOneSource($meta, null);
         $foo->name = 'Commence Primary Ignition';
 
         $expected = 'Property names must be unique, without regard to case';
-        $actual = null;
+        $actual   = null;
 
         try {
             $result = $foo->extractGubbins();
@@ -143,12 +143,12 @@ class MetadataTraitExtractionTest extends TestCase
      */
     public function testExcludedGetterIsActuallyExcluded()
     {
-        $expected = [];
-        $expected['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => 'name'];
+        $expected             = [];
+        $expected['name']     = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => 'name'];
         $expected['added_at'] =
             ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => '2017-10-11T00:00:00'];
         $expected['weight'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => '100'];
-        $expected['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => 'code'];
+        $expected['code']   = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => 'code'];
 
         $type = m::mock(StringType::class)->makePartial();
 
@@ -181,10 +181,10 @@ class MetadataTraitExtractionTest extends TestCase
         $foo->shouldReceive('getConnection')->andReturn($connect);
         // exclude the WeightCode getter from results
         $foo->shouldReceive('getHidden')->andReturn(['WeightCode', 'weightCode']);
-        $foo->weight = 10;
-        $foo->name = 'name';
+        $foo->weight   = 10;
+        $foo->name     = 'name';
         $foo->added_at = '2017-10-11T00:00:00';
-        $foo->code = 'code';
+        $foo->code     = 'code';
 
         $actual = $foo->metadata();
         $this->assertEquals($expected, $actual);
@@ -224,10 +224,10 @@ class MetadataTraitExtractionTest extends TestCase
         $foo->shouldReceive('getConnection')->andReturn($connect);
         self::resetModel($foo);
         $foo->setCasts(['weight' => 'float']);
-        $foo->weight = 10;
-        $foo->name = 'name';
+        $foo->weight   = 10;
+        $foo->name     = 'name';
         $foo->added_at = '2017-10-11T00:00:00';
-        $foo->code = 'code';
+        $foo->code     = 'code';
 
         $result = $foo->metadata();
         $this->assertEquals('float', $result['weight']['type']);
@@ -241,12 +241,12 @@ class MetadataTraitExtractionTest extends TestCase
 
     public function testGettersDontChangeMetadataFillableNullable()
     {
-        $expected = [];
-        $expected['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => 'name'];
+        $expected             = [];
+        $expected['name']     = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => 'name'];
         $expected['added_at'] =
             ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => '2017-10-11T00:00:00'];
-        $expected['weight'] = ['type' => 'float', 'nullable' => false, 'fillable' => true, 'default' => '100'];
-        $expected['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => 'code'];
+        $expected['weight']     = ['type' => 'float', 'nullable' => false, 'fillable' => true, 'default' => '100'];
+        $expected['code']       = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => 'code'];
         $expected['WeightCode'] = ['type' => 'text', 'nullable' => true, 'fillable' => false, 'default' => '100code'];
 
         $type = m::mock(StringType::class)->makePartial();
@@ -279,10 +279,10 @@ class MetadataTraitExtractionTest extends TestCase
         $foo->shouldReceive('getConnection')->andReturn($connect);
         self::resetModel($foo);
         $foo->setCasts(['weight' => 'float']);
-        $foo->weight = 10;
-        $foo->name = 'name';
+        $foo->weight   = 10;
+        $foo->name     = 'name';
         $foo->added_at = '2017-10-11T00:00:00';
-        $foo->code = 'code';
+        $foo->code     = 'code';
 
         $actual = $foo->metadata();
         $this->assertEquals($expected, $actual);

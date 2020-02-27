@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Requests;
 
@@ -24,23 +24,23 @@ class TestBulkUpdateRequest extends Request
     public function rules()
     {
         $rules = ['data' => 'required|array', 'keys' => 'required|array'];
-        $data = $this->request->get('data');
-        $keys = $this->request->get('keys');
+        $data  = $this->request->get('data');
+        $keys  = $this->request->get('keys');
 
         if (isset($data)) {
             foreach ($data as $key => $val) {
-                $rules['data.' . $key] = 'required|array';
-                $rules['data.' . $key . '.name'] = 'required|string';
+                $rules['data.' . $key]               = 'required|array';
+                $rules['data.' . $key . '.name']     = 'required|string';
                 $rules['data.' . $key . '.added_at'] = 'required|date';
-                $rules['data.' . $key . '.weight'] = 'required|numeric';
-                $rules['data.' . $key . '.code'] = 'required|string';
-                $rules['data.' . $key . '.success'] = 'required|boolean';
+                $rules['data.' . $key . '.weight']   = 'required|numeric';
+                $rules['data.' . $key . '.code']     = 'required|string';
+                $rules['data.' . $key . '.success']  = 'required|boolean';
             }
         }
 
         if (isset($keys)) {
             foreach ($keys as $key => $val) {
-                $rules['keys.' .$key] = 'required|array';
+                $rules['keys.' .$key]       = 'required|array';
                 $rules['keys.' .$key.'.id'] = 'required|integer|min:0';
             }
         }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -27,7 +27,7 @@ class MetadataKeyMethodNamesTraitTest extends TestCase
         $this->markTestSkipped('Sandi can you explain why this test does what it does? ');
         $bar = new Address();
 
-        $rel = $bar->Person();
+        $rel   = $bar->Person();
         $class = get_class($rel);
 
         $foo = new RelationTestDummyModel();
@@ -47,7 +47,7 @@ class MetadataKeyMethodNamesTraitTest extends TestCase
 
         $bar = new Address();
 
-        $rel = $bar->Person();
+        $rel   = $bar->Person();
         $class = get_class($rel);
 
         $foo = new RelationTestDummyModel();

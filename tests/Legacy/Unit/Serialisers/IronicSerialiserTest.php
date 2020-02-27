@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Serialisers;
 
@@ -110,13 +110,13 @@ class IronicSerialiserTest extends SerialiserTestBase
         $mockService->shouldReceive('getHost->getAbsoluteServiceUri->getUrlAsString')
             ->andReturn('http://localhost/odata.svc/Models');
         $kidNode = m::mock(ExpandedProjectionNode::class);
-        $node = m::mock(RootProjectionNode::class);
+        $node    = m::mock(RootProjectionNode::class);
         $node->shouldReceive('canSelectAllProperties')->withAnyArgs()->andReturn(false)->once();
         $node->shouldReceive('getChildNodes')->andReturn([$kidNode])->once();
         $request = m::mock(RequestDescription::class)->makePartial();
         $request->shouldReceive('getRootProjectionNode')->andReturn($node)->once();
 
-        $foo = new IronicSerialiserDummy($mockService, $request);
+        $foo    = new IronicSerialiserDummy($mockService, $request);
         $result = $foo->getProjectionNodes();
         $this->assertTrue(is_array($result));
         $this->assertEquals(1, count($result));
@@ -141,13 +141,13 @@ class IronicSerialiserTest extends SerialiserTestBase
         $mockService->shouldReceive('getHost->getAbsoluteServiceUri->getUrlAsString')
             ->andReturn('http://localhost/odata.svc/Models');
         $kidNode = m::mock(ExpandedProjectionNode::class);
-        $node = m::mock(RootProjectionNode::class);
+        $node    = m::mock(RootProjectionNode::class);
         $node->shouldReceive('findNode')->withArgs(['Models'])->andReturn($kidNode)->never();
         $node->shouldReceive('isExpansionSpecified')->andReturn(true)->once();
         $request = m::mock(RequestDescription::class)->makePartial();
         $request->shouldReceive('getRootProjectionNode')->andReturn($node)->times(2);
 
-        $segName = 'Models';
+        $segName    = 'Models';
         $segWrapper = m::mock(ResourceSetWrapper::class);
 
         $foo = new IronicSerialiserDummy($mockService, $request);
@@ -163,7 +163,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $mockService->shouldReceive('getHost->getAbsoluteServiceUri->getUrlAsString')
             ->andReturn('http://localhost/odata.svc/Models');
         $kidNode = m::mock(ExpandedProjectionNode::class);
-        $node = m::mock(RootProjectionNode::class);
+        $node    = m::mock(RootProjectionNode::class);
         $node->shouldReceive('isExpansionSpecified')->andReturn(true);
         $node->shouldReceive('getPropertyName')->andReturn('Scatman John');
         $request = m::mock(RequestDescription::class)->makePartial();
@@ -195,7 +195,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $foo->setLightStack($stack);
 
         $expected = 'is_null($expandedProjectionNode)';
-        $actual = null;
+        $actual   = null;
 
         try {
             $result = $foo->getCurrentExpandedProjectionNode();
@@ -224,7 +224,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $foo->setLightStack($stack);
 
         $expected = '$expandedProjectionNode not instanceof ExpandedProjectionNode';
-        $actual = null;
+        $actual   = null;
 
         try {
             $result = $foo->getCurrentExpandedProjectionNode();
@@ -256,7 +256,7 @@ class IronicSerialiserTest extends SerialiserTestBase
 
     public function testNeedNextPageLineOnRootHasTopCount()
     {
-        $segName = 'Models';
+        $segName    = 'Models';
         $segWrapper = m::mock(ResourceSetWrapper::class);
         $segWrapper->shouldReceive('getResourceSetPageSize')->andReturn(10);
         $node = m::mock(RootProjectionNode::class);
@@ -280,7 +280,7 @@ class IronicSerialiserTest extends SerialiserTestBase
 
     public function testNeedNextPageLineOnRootHasNullTopCount()
     {
-        $segName = 'Models';
+        $segName    = 'Models';
         $segWrapper = m::mock(ResourceSetWrapper::class);
         $segWrapper->shouldReceive('getResourceSetPageSize')->andReturn(10);
         $node = m::mock(RootProjectionNode::class);
@@ -357,7 +357,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $foo->shouldReceive('getRequest')->andReturn($request);
 
         $expected = '?$orderby=CustomerTitle&$inlinecount=all&$top=200&$skip=200';
-        $actual = $foo->getNextLinkUri($object, ' ');
+        $actual   = $foo->getNextLinkUri($object, ' ');
         $this->assertEquals($expected, $actual);
     }
 
@@ -396,7 +396,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $foo->shouldReceive('getRequest')->andReturn($request);
 
         $expected = '?$orderby=CustomerTitle&$inlinecount=all&$skiptoken=\'University+of+Loamshire\'';
-        $actual = $foo->getNextLinkUri($object, ' ');
+        $actual   = $foo->getNextLinkUri($object, ' ');
         $this->assertEquals($expected, $actual);
     }
 
@@ -405,11 +405,11 @@ class IronicSerialiserTest extends SerialiserTestBase
         $known = Carbon::create(2017, 1, 1, 0, 0, 0, 'UTC');
         Carbon::setTestNow($known);
 
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta                 = [];
+        $meta['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
 
@@ -426,38 +426,38 @@ class IronicSerialiserTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder = new MetadataGubbinsHolder();
+        $holder   = new MetadataGubbinsHolder();
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->boot();
 
-        $propContent = new ODataPropertyContent();
+        $propContent             = new ODataPropertyContent();
         $propContent->properties = [
             'name' => new ODataProperty(),
             'alternate_id' => new ODataProperty(),
             'id' => new ODataProperty()
         ];
-        $propContent->properties['name']->name = 'name';
-        $propContent->properties['alternate_id']->name = 'alternate_id';
-        $propContent->properties['id']->name = 'id';
-        $propContent->properties['name']->typeName = 'Edm.String';
+        $propContent->properties['name']->name             = 'name';
+        $propContent->properties['alternate_id']->name     = 'alternate_id';
+        $propContent->properties['id']->name               = 'id';
+        $propContent->properties['name']->typeName         = 'Edm.String';
         $propContent->properties['alternate_id']->typeName = 'Edm.Int32';
-        $propContent->properties['id']->typeName = 'Edm.Int32';
-        $propContent->properties['name']->value = 'Hammer, M.C.';
-        $propContent->properties['id']->value = '42';
+        $propContent->properties['id']->typeName           = 'Edm.Int32';
+        $propContent->properties['name']->value            = 'Hammer, M.C.';
+        $propContent->properties['id']->value              = '42';
 
-        $odataLink = new ODataLink();
-        $odataLink->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph_TestMorphOneSource';
+        $odataLink        = new ODataLink();
+        $odataLink->name  = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph_TestMorphOneSource';
         $odataLink->title = 'morph_TestMorphOneSource';
-        $odataLink->type = 'application/atom+xml;type=entry';
-        $odataLink->url = 'TestMorphTargets(id=42)/morph_TestMorphOneSource';
+        $odataLink->type  = 'application/atom+xml;type=entry';
+        $odataLink->url   = 'TestMorphTargets(id=42)/morph_TestMorphOneSource';
 
-        $odataLink1 = new ODataLink();
-        $odataLink1->name = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph_TestMorphOneSourceAlternate';
+        $odataLink1        = new ODataLink();
+        $odataLink1->name  = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph_TestMorphOneSourceAlternate';
         $odataLink1->title = 'morph_TestMorphOneSourceAlternate';
-        $odataLink1->type = 'application/atom+xml;type=entry';
-        $odataLink1->url = 'TestMorphTargets(id=42)/morph_TestMorphOneSourceAlternate';
+        $odataLink1->type  = 'application/atom+xml;type=entry';
+        $odataLink1->url   = 'TestMorphTargets(id=42)/morph_TestMorphOneSourceAlternate';
 
         $mediaLink1 = new ODataMediaLink(
             'photo',
@@ -475,29 +475,29 @@ class IronicSerialiserTest extends SerialiserTestBase
             'edit-media'
         );
 
-        $expected = new ODataEntry();
-        $expected->id = 'http://localhost/odata.svc/TestMorphTargets(id=42)';
-        $expected->title = new ODataTitle('TestMorphTarget');
-        $expected->editLink = new ODataLink();
-        $expected->editLink->url = 'TestMorphTargets(id=42)';
-        $expected->editLink->name = 'edit';
-        $expected->editLink->title = 'TestMorphTarget';
-        $expected->type = new ODataCategory('Data.TestMorphTarget');
-        $expected->propertyContent = $propContent;
-        $expected->links[] = $odataLink;
-        $expected->links[] = $odataLink1;
-        $expected->mediaLink = $mediaLink;
-        $expected->mediaLinks[] = $mediaLink1;
+        $expected                   = new ODataEntry();
+        $expected->id               = 'http://localhost/odata.svc/TestMorphTargets(id=42)';
+        $expected->title            = new ODataTitle('TestMorphTarget');
+        $expected->editLink         = new ODataLink();
+        $expected->editLink->url    = 'TestMorphTargets(id=42)';
+        $expected->editLink->name   = 'edit';
+        $expected->editLink->title  = 'TestMorphTarget';
+        $expected->type             = new ODataCategory('Data.TestMorphTarget');
+        $expected->propertyContent  = $propContent;
+        $expected->links[]          = $odataLink;
+        $expected->links[]          = $odataLink1;
+        $expected->mediaLink        = $mediaLink;
+        $expected->mediaLinks[]     = $mediaLink1;
         $expected->isMediaLinkEntry = true;
-        $expected->resourceSetName = 'TestMorphTargets';
-        $expected->updated = '2017-01-01T00:00:00+00:00';
-        $expected->baseURI = 'http://localhost/odata.svc/';
+        $expected->resourceSetName  = 'TestMorphTargets';
+        $expected->updated          = '2017-01-01T00:00:00+00:00';
+        $expected->baseURI          = 'http://localhost/odata.svc/';
 
-        $model = new TestMorphTarget($meta);
-        $model->id = 42;
+        $model       = new TestMorphTarget($meta);
+        $model->id   = 42;
         $model->name = 'Hammer, M.C.';
 
-        $payload = new QueryResult();
+        $payload          = new QueryResult();
         $payload->results = $model;
 
         $simple = App::make('metadata');
@@ -545,11 +545,11 @@ class IronicSerialiserTest extends SerialiserTestBase
         $known = Carbon::create(2017, 1, 1, 0, 0, 0, 'UTC');
         Carbon::setTestNow($known);
 
-        $meta = [];
-        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta                 = [];
+        $meta['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $model = new TestMorphTarget($meta);
 
@@ -561,7 +561,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $simple->shouldReceive('getDerivedTypes')->andReturn([$concType]);
         App::instance('metadata', $simple);
 
-        $payload = new QueryResult();
+        $payload          = new QueryResult();
         $payload->results = $model;
 
         $targType = m::mock(ResourceEntityType::class)->makePartial();
@@ -607,8 +607,8 @@ class IronicSerialiserTest extends SerialiserTestBase
         $request->shouldReceive('fullUrl')
             ->andReturn('http://localhost/odata.svc/TestMonomorphicManySources(1)?$expand=manySource');
 
-        $metadata = [];
-        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata         = [];
+        $metadata['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $source = new TestMonomorphicManySource($metadata);
@@ -617,7 +617,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         App::instance(TestMonomorphicManySource::class, $source);
         App::instance(TestMonomorphicManyTarget::class, $target);
 
-        $op = new IlluminateOperationContext($request);
+        $op   = new IlluminateOperationContext($request);
         $host = new ServiceHost($op, $request);
         $host->setServiceUri('/odata.svc/');
 
@@ -627,8 +627,8 @@ class IronicSerialiserTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder = new MetadataGubbinsHolder();
-        $classen = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
+        $holder   = new MetadataGubbinsHolder();
+        $classen  = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
@@ -641,15 +641,15 @@ class IronicSerialiserTest extends SerialiserTestBase
 
         $model = m::mock(TestMonomorphicManySource::class)->makePartial();
         $model->shouldReceive('metadata')->andReturn($metadata);
-        $model->id = 1;
+        $model->id   = 1;
         $model->name = 'Name';
         $model->shouldReceive('getAttribute')->withArgs(['manySource'])->andReturn(collect([]));
 
-        $result = new QueryResult();
+        $result          = new QueryResult();
         $result->results = $model;
 
         // default data service
-        $service = new TestDataService($query, $meta, $host);
+        $service   = new TestDataService($query, $meta, $host);
         $processor = $service->handleRequest();
 
         $ironic = m::mock(IronicSerialiser::class)->makePartial()->shouldAllowMockingProtectedMethods();
@@ -677,8 +677,8 @@ class IronicSerialiserTest extends SerialiserTestBase
         $request->shouldReceive('fullUrl')
             ->andReturn('http://localhost/odata.svc/TestMonomorphicSources(1)?$expand=manySource');
 
-        $metadata = [];
-        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata         = [];
+        $metadata['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $source = new TestMonomorphicSource($metadata);
@@ -687,7 +687,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         App::instance(TestMonomorphicSource::class, $source);
         App::instance(TestMonomorphicTarget::class, $target);
 
-        $op = new IlluminateOperationContext($request);
+        $op   = new IlluminateOperationContext($request);
         $host = new ServiceHost($op, $request);
         $host->setServiceUri('/odata.svc/');
 
@@ -697,16 +697,16 @@ class IronicSerialiserTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder = new MetadataGubbinsHolder();
-        $classen = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
+        $holder   = new MetadataGubbinsHolder();
+        $classen  = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         self::resetMetadataProvider($metaProv);
         $metaProv->boot();
 
-        $targ = new TestMonomorphicTarget($metadata);
-        $targ->id = 1;
+        $targ       = new TestMonomorphicTarget($metadata);
+        $targ->id   = 1;
         $targ->name = 'Name';
 
         $hasMany = m::mock(HasMany::class)->makePartial();
@@ -730,19 +730,19 @@ class IronicSerialiserTest extends SerialiserTestBase
         $src3->shouldReceive('manySource')->andReturn($hasMany);
         $src3->id = 3;
 
-        $results = [new QueryResult(), new QueryResult(), new QueryResult()];
+        $results             = [new QueryResult(), new QueryResult(), new QueryResult()];
         $results[0]->results = $src1;
         $results[1]->results = $src2;
         $results[2]->results = $src3;
 
-        $collection = new QueryResult();
+        $collection          = new QueryResult();
         $collection->results = $results;
 
         $meta = App::make('metadata');
 
         $query = m::mock(LaravelQuery::class);
 
-        $service = new TestDataService($query, $meta, $host);
+        $service   = new TestDataService($query, $meta, $host);
         $processor = $service->handleRequest();
 
         $ironic = new IronicSerialiserDummy($service, $processor->getRequest());
@@ -777,7 +777,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
 
         $expected = 'Supplied abstract type must have at least one derived type';
-        $actual = null;
+        $actual   = null;
 
         try {
             $ironic->getConcreteTypeFromAbstractType($abstractType, $metadata, $payloadClass);
@@ -801,7 +801,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
 
         $expected = 'Concrete resource type not selected for payload payloadClass';
-        $actual = null;
+        $actual   = null;
 
         try {
             $ironic->getConcreteTypeFromAbstractType($abstractType, $metadata, $payloadClass);
@@ -829,7 +829,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
 
         $expected = 'Concrete resource type not selected for payload payloadClass';
-        $actual = null;
+        $actual   = null;
 
         try {
             $ironic->getConcreteTypeFromAbstractType($abstractType, $metadata, $payloadClass);
@@ -865,7 +865,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $ironic = m::mock(IronicSerialiser::class)->makePartial();
 
         $expected = 'Request not yet set';
-        $actual = null;
+        $actual   = null;
 
         try {
             $ironic->getRequest();
@@ -878,14 +878,14 @@ class IronicSerialiserTest extends SerialiserTestBase
     public function testGetNextLinkUriWithBadOrderByInfo()
     {
         $lastObject = new \stdClass();
-        $node = m::mock(ExpandedProjectionNode::class)->makePartial();
+        $node       = m::mock(ExpandedProjectionNode::class)->makePartial();
         $node->shouldReceive('getInternalOrderByInfo')->andReturn(null);
 
         $ironic = m::mock(IronicSerialiserDummy::class)->makePartial();
         $ironic->shouldReceive('getCurrentExpandedProjectionNode')->andReturn($node)->once();
 
         $expected = 'Null';
-        $actual = null;
+        $actual   = null;
 
         try {
             $ironic->getNextLinkUri($lastObject);

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Query;
 
@@ -68,9 +68,9 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnLogicalExpressionNullArguments()
     {
-        $foo = new LaravelExpressionProvider();
+        $foo      = new LaravelExpressionProvider();
         $expected = 'onLogicalExpression';
-        $actual = null;
+        $actual   = null;
 
         try {
             $result = $foo->onLogicalExpression(ExpressionType::NOT_LOGICAL(), null, null);
@@ -82,10 +82,10 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnLogicalExpressionLogicalAnd()
     {
-        $foo = new LaravelExpressionProvider();
-        $left = 'x < 4';
-        $right = 'y > 2';
-        $type = ExpressionType::AND_LOGICAL();
+        $foo      = new LaravelExpressionProvider();
+        $left     = 'x < 4';
+        $right    = 'y > 2';
+        $type     = ExpressionType::AND_LOGICAL();
         $expected = '(x < 4 && y > 2)';
 
         $result = $foo->onLogicalExpression($type, $left, $right);
@@ -94,10 +94,10 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnLogicalExpressionLogicalOr()
     {
-        $foo = new LaravelExpressionProvider();
-        $left = 'x < 4';
-        $right = 'y > 2';
-        $type = ExpressionType::OR_LOGICAL();
+        $foo      = new LaravelExpressionProvider();
+        $left     = 'x < 4';
+        $right    = 'y > 2';
+        $type     = ExpressionType::OR_LOGICAL();
         $expected = '(x < 4 || y > 2)';
 
         $result = $foo->onLogicalExpression($type, $left, $right);
@@ -106,10 +106,10 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnLogicalExpressionLogicalOrPacked()
     {
-        $foo = new LaravelExpressionProvider();
-        $left = 'x < 4';
-        $right = 'y > 2';
-        $type = ExpressionType::OR_LOGICAL();
+        $foo      = new LaravelExpressionProvider();
+        $left     = 'x < 4';
+        $right    = 'y > 2';
+        $type     = ExpressionType::OR_LOGICAL();
         $expected = '(x < 4 || y > 2)';
 
         $result = $foo->onLogicalExpression($type, $left, $right);
@@ -118,9 +118,9 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnArithmeticExpressionNullArguments()
     {
-        $foo = new LaravelExpressionProvider();
+        $foo      = new LaravelExpressionProvider();
         $expected = 'onArithmeticExpression';
-        $actual = null;
+        $actual   = null;
 
         try {
             $result = $foo->onArithmeticExpression(ExpressionType::NOT_LOGICAL(), null, null);
@@ -132,10 +132,10 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnArithmeticExpressionMultiply()
     {
-        $foo = new LaravelExpressionProvider();
-        $left = '4';
-        $right = 2;
-        $type = ExpressionType::MULTIPLY();
+        $foo      = new LaravelExpressionProvider();
+        $left     = '4';
+        $right    = 2;
+        $type     = ExpressionType::MULTIPLY();
         $expected = '(4 * 2)';
 
         $result = $foo->onArithmeticExpression($type, $left, $right);
@@ -144,10 +144,10 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnArithmeticExpressionDivide()
     {
-        $foo = new LaravelExpressionProvider();
-        $left = '4';
-        $right = 2;
-        $type = ExpressionType::DIVIDE();
+        $foo      = new LaravelExpressionProvider();
+        $left     = '4';
+        $right    = 2;
+        $type     = ExpressionType::DIVIDE();
         $expected = '(4 / 2)';
 
         $result = $foo->onArithmeticExpression($type, $left, $right);
@@ -156,10 +156,10 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnArithmeticExpressionAdd()
     {
-        $foo = new LaravelExpressionProvider();
-        $left = '4';
-        $right = 2;
-        $type = ExpressionType::ADD();
+        $foo      = new LaravelExpressionProvider();
+        $left     = '4';
+        $right    = 2;
+        $type     = ExpressionType::ADD();
         $expected = '(4 + 2)';
 
         $result = $foo->onArithmeticExpression($type, $left, $right);
@@ -168,10 +168,10 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnArithmeticExpressionSubtract()
     {
-        $foo = new LaravelExpressionProvider();
-        $left = '4';
-        $right = 2;
-        $type = ExpressionType::SUBTRACT();
+        $foo      = new LaravelExpressionProvider();
+        $left     = '4';
+        $right    = 2;
+        $type     = ExpressionType::SUBTRACT();
         $expected = '(4 - 2)';
 
         $result = $foo->onArithmeticExpression($type, $left, $right);
@@ -180,10 +180,10 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnArithmeticExpressionModulus()
     {
-        $foo = new LaravelExpressionProvider();
-        $left = '4';
-        $right = 2;
-        $type = ExpressionType::MODULO();
+        $foo      = new LaravelExpressionProvider();
+        $left     = '4';
+        $right    = 2;
+        $type     = ExpressionType::MODULO();
         $expected = '(4 % 2)';
 
         $result = $foo->onArithmeticExpression($type, $left, $right);
@@ -192,9 +192,9 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnRelationalExpressionNullArguments()
     {
-        $foo = new LaravelExpressionProvider();
+        $foo      = new LaravelExpressionProvider();
         $expected = 'onRelationalExpression';
-        $actual = null;
+        $actual   = null;
 
         try {
             $result = $foo->onRelationalExpression(ExpressionType::NOT_LOGICAL(), null, null);
@@ -206,10 +206,10 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnRelationalExpressionGreaterThan()
     {
-        $foo = new LaravelExpressionProvider();
-        $left = '4';
-        $right = 2;
-        $type = ExpressionType::GREATERTHAN();
+        $foo      = new LaravelExpressionProvider();
+        $left     = '4';
+        $right    = 2;
+        $type     = ExpressionType::GREATERTHAN();
         $expected = '(4 > 2)';
 
         $result = $foo->onRelationalExpression($type, $left, $right);
@@ -218,10 +218,10 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnRelationalExpressionGreaterThanOrEqual()
     {
-        $foo = new LaravelExpressionProvider();
-        $left = '4';
-        $right = 2;
-        $type = ExpressionType::GREATERTHAN_OR_EQUAL();
+        $foo      = new LaravelExpressionProvider();
+        $left     = '4';
+        $right    = 2;
+        $type     = ExpressionType::GREATERTHAN_OR_EQUAL();
         $expected = '(4 >= 2)';
 
         $result = $foo->onRelationalExpression($type, $left, $right);
@@ -230,10 +230,10 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnRelationalExpressionLesserThan()
     {
-        $foo = new LaravelExpressionProvider();
-        $left = '4';
-        $right = 2;
-        $type = ExpressionType::LESSTHAN();
+        $foo      = new LaravelExpressionProvider();
+        $left     = '4';
+        $right    = 2;
+        $type     = ExpressionType::LESSTHAN();
         $expected = '(4 < 2)';
 
         $result = $foo->onRelationalExpression($type, $left, $right);
@@ -242,10 +242,10 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnRelationalExpressionLesserThanOrEqual()
     {
-        $foo = new LaravelExpressionProvider();
-        $left = '4';
-        $right = 2;
-        $type = ExpressionType::LESSTHAN_OR_EQUAL();
+        $foo      = new LaravelExpressionProvider();
+        $left     = '4';
+        $right    = 2;
+        $type     = ExpressionType::LESSTHAN_OR_EQUAL();
         $expected = '(4 <= 2)';
 
         $result = $foo->onRelationalExpression($type, $left, $right);
@@ -254,10 +254,10 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnRelationalExpressionEquals()
     {
-        $foo = new LaravelExpressionProvider();
-        $left = '4';
-        $right = 2;
-        $type = ExpressionType::EQUAL();
+        $foo      = new LaravelExpressionProvider();
+        $left     = '4';
+        $right    = 2;
+        $type     = ExpressionType::EQUAL();
         $expected = '(4 == 2)';
 
         $result = $foo->onRelationalExpression($type, $left, $right);
@@ -266,10 +266,10 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnRelationalExpressionNotEquals()
     {
-        $foo = new LaravelExpressionProvider();
-        $left = '4';
-        $right = 2;
-        $type = ExpressionType::NOTEQUAL();
+        $foo      = new LaravelExpressionProvider();
+        $left     = '4';
+        $right    = 2;
+        $type     = ExpressionType::NOTEQUAL();
         $expected = '(4 != 2)';
 
         $result = $foo->onRelationalExpression($type, $left, $right);
@@ -278,9 +278,9 @@ class LaravelExpressionProviderTest extends TestCase
 
     public function testOnUnaryExpressionNullArguments()
     {
-        $foo = new LaravelExpressionProvider();
+        $foo      = new LaravelExpressionProvider();
         $expected = 'onUnaryExpression';
-        $actual = null;
+        $actual   = null;
 
         try {
             $result = $foo->onUnaryExpression(ExpressionType::NOTEQUAL(), null);
@@ -294,7 +294,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $type = ExpressionType::NEGATE();
+        $type  = ExpressionType::NEGATE();
         $child = 'hammertime';
 
         $expected = '-(hammertime)';
@@ -307,7 +307,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $type = ExpressionType::NOT_LOGICAL();
+        $type  = ExpressionType::NOT_LOGICAL();
         $child = 'hammertime';
 
         $expected = '!(hammertime)';
@@ -358,7 +358,7 @@ class LaravelExpressionProviderTest extends TestCase
         $SecondLevelPropertyAccess = \Mockery::mock(
             'POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\PropertyAccessExpression'
         )->makePartial();
-        $topLevelResourceProperty = \Mockery::mock('POData\Providers\Metadata\ResourceProperty')->makePartial();
+        $topLevelResourceProperty    = \Mockery::mock('POData\Providers\Metadata\ResourceProperty')->makePartial();
         $secondLevelResourceProperty = \Mockery::mock('POData\Providers\Metadata\ResourceProperty')->makePartial();
 
 
@@ -369,21 +369,21 @@ class LaravelExpressionProviderTest extends TestCase
         $secondLevelResourceProperty->shouldReceive('getName')->andReturn('SecondPropertyAccessor');
 
 
-        $foo = new LaravelExpressionProvider();
-        $fooRef= new \ReflectionObject($foo);
+        $foo         = new LaravelExpressionProvider();
+        $fooRef      = new \ReflectionObject($foo);
         $refProperty = $fooRef->getProperty('iteratorName');
         $refProperty->setAccessible(true);
         $refProperty->setValue($foo, 'testIterator');
         $expected = 'testIterator->SecondPropertyAccessor->TopPropertyAccessor';
-        $result = $foo->onPropertyAccessExpression($topLevelPropertyAccess);
+        $result   = $foo->onPropertyAccessExpression($topLevelPropertyAccess);
         $this->assertEquals($expected, $result);
     }
 
     public function testOnFunctionCallExpressionNullArguments()
     {
-        $foo = new LaravelExpressionProvider();
+        $foo      = new LaravelExpressionProvider();
         $expected = 'onFunctionCallExpression';
-        $actual = null;
+        $actual   = null;
 
         try {
             $result = $foo->onFunctionCallExpression(null, null);
@@ -400,7 +400,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription('ka-fricking-boom', null, null);
 
         $expected = 'onFunctionCallExpression';
-        $actual = null;
+        $actual   = null;
 
         try {
             $result = $foo->onFunctionCallExpression($func, null);
@@ -417,7 +417,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::STRFUN_COMPARE, null, null);
 
         $expected = 'strcmp(foo, bar)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
         $this->assertEquals($expected, $result);
     }
 
@@ -428,7 +428,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::STRFUN_ENDSWITH, null, null);
 
         $expected = '(strcmp(substr(foo, strlen(foo) - strlen(bar)), bar) === 0)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
         $this->assertEquals($expected, $result);
     }
 
@@ -439,7 +439,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::STRFUN_INDEXOF, null, null);
 
         $expected = 'strpos(foo, bar)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
         $this->assertEquals($expected, $result);
     }
 
@@ -450,7 +450,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::STRFUN_REPLACE, null, null);
 
         $expected = 'str_replace(bar, city, foo)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo', 'bar', 'city']);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar', 'city']);
         $this->assertEquals($expected, $result);
     }
 
@@ -461,7 +461,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::STRFUN_STARTSWITH, null, null);
 
         $expected = '(strpos(foo, bar) === 0)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
         $this->assertEquals($expected, $result);
     }
 
@@ -472,7 +472,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::STRFUN_TOLOWER, null, null);
 
         $expected = 'strtolower(FoO)';
-        $result = $foo->onFunctionCallExpression($func, [ 'FoO']);
+        $result   = $foo->onFunctionCallExpression($func, [ 'FoO']);
         $this->assertEquals($expected, $result);
     }
 
@@ -483,7 +483,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::STRFUN_TOUPPER, null, null);
 
         $expected = 'strtoupper(FoO)';
-        $result = $foo->onFunctionCallExpression($func, [ 'FoO']);
+        $result   = $foo->onFunctionCallExpression($func, [ 'FoO']);
         $this->assertEquals($expected, $result);
     }
 
@@ -494,7 +494,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::STRFUN_TRIM, null, null);
 
         $expected = 'trim(FoO)';
-        $result = $foo->onFunctionCallExpression($func, [ 'FoO']);
+        $result   = $foo->onFunctionCallExpression($func, [ 'FoO']);
         $this->assertEquals($expected, $result);
     }
     public function testOnFunctionCallExpressionStrSubstring()
@@ -504,7 +504,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::STRFUN_SUBSTRING, null, null);
 
         $expected = 'substr(foo, 2)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo', 2]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo', 2]);
         $this->assertEquals($expected, $result);
     }
     
@@ -515,7 +515,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::STRFUN_SUBSTRING, null, null);
 
         $expected = 'substr(foo, 2, 3)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo', 2, 3]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo', 2, 3]);
         $this->assertEquals($expected, $result);
     }
 
@@ -526,7 +526,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::STRFUN_SUBSTRINGOF, null, null);
 
         $expected = '(strpos(bar, foo) !== false)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
         $this->assertEquals($expected, $result);
     }
 
@@ -537,7 +537,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::STRFUN_CONCAT, null, null);
 
         $expected = 'foo . bar';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
         $this->assertEquals($expected, $result);
     }
 
@@ -548,7 +548,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::STRFUN_LENGTH, null, null);
 
         $expected = 'strlen(foo)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo' ]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
         $this->assertEquals($expected, $result);
     }
 
@@ -559,7 +559,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::GUIDFUN_EQUAL, null, null);
 
         $expected = 'POData\Providers\Metadata\Type\Guid::guidEqual(foo, bar)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo', 'bar' ]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar' ]);
         $this->assertEquals($expected, $result);
     }
 
@@ -570,7 +570,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::DATETIME_COMPARE, null, null);
 
         $expected = 'POData\Providers\Metadata\Type\DateTime::dateTimeCmp(foo, bar)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo', 'bar' ]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar' ]);
         $this->assertEquals($expected, $result);
     }
 
@@ -581,7 +581,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::DATETIME_YEAR, null, null);
 
         $expected = 'POData\Providers\Metadata\Type\DateTime::year(foo)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo' ]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
         $this->assertEquals($expected, $result);
     }
 
@@ -592,7 +592,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::DATETIME_MONTH, null, null);
 
         $expected = 'POData\Providers\Metadata\Type\DateTime::month(foo)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo' ]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
         $this->assertEquals($expected, $result);
     }
 
@@ -603,7 +603,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::DATETIME_DAY, null, null);
 
         $expected = 'POData\Providers\Metadata\Type\DateTime::day(foo)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo' ]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
         $this->assertEquals($expected, $result);
     }
 
@@ -614,7 +614,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::DATETIME_HOUR, null, null);
 
         $expected = 'POData\Providers\Metadata\Type\DateTime::hour(foo)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo' ]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
         $this->assertEquals($expected, $result);
     }
 
@@ -625,7 +625,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::DATETIME_MINUTE, null, null);
 
         $expected = 'POData\Providers\Metadata\Type\DateTime::minute(foo)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo' ]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
         $this->assertEquals($expected, $result);
     }
 
@@ -636,7 +636,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::DATETIME_SECOND, null, null);
 
         $expected = 'POData\Providers\Metadata\Type\DateTime::second(foo)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo' ]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
         $this->assertEquals($expected, $result);
     }
 
@@ -647,7 +647,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::MATHFUN_ROUND, null, null);
 
         $expected = 'round(foo)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo' ]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
         $this->assertEquals($expected, $result);
     }
 
@@ -658,7 +658,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::MATHFUN_FLOOR, null, null);
 
         $expected = 'floor(foo)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo' ]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
         $this->assertEquals($expected, $result);
     }
 
@@ -669,7 +669,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::MATHFUN_CEILING, null, null);
 
         $expected = 'ceil(foo)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo' ]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
         $this->assertEquals($expected, $result);
     }
 
@@ -680,7 +680,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription(ODataConstants::BINFUL_EQUAL, null, null);
 
         $expected = 'POData\Providers\Metadata\Type\Binary::binaryEqual(foo, bar)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo', 'bar' ]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar' ]);
         $this->assertEquals($expected, $result);
     }
 
@@ -691,7 +691,7 @@ class LaravelExpressionProviderTest extends TestCase
         $func = new FunctionDescription('is_null', null, null);
 
         $expected = 'is_null(foo)';
-        $result = $foo->onFunctionCallExpression($func, [ 'foo' ]);
+        $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
         $this->assertEquals($expected, $result);
     }
 }

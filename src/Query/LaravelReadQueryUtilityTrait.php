@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -32,23 +32,23 @@ trait LaravelReadQueryUtilityTrait
     protected function processSkipToken(SkipTokenInfo $skipToken, $sourceEntityInstance)
     {
         $parameters = [];
-        $processed = [];
-        $segments = $skipToken->getOrderByInfo()->getOrderByPathSegments();
-        $values = $skipToken->getOrderByKeysInToken();
-        $numValues = count($values);
+        $processed  = [];
+        $segments   = $skipToken->getOrderByInfo()->getOrderByPathSegments();
+        $values     = $skipToken->getOrderByKeysInToken();
+        $numValues  = count($values);
         if ($numValues != count($segments)) {
             $msg = 'Expected '.count($segments).', got '.$numValues;
             throw new InvalidOperationException($msg);
         }
 
         for ($i = 0; $i < $numValues; $i++) {
-            $relation = $segments[$i]->isAscending() ? '>' : '<';
-            $name = $segments[$i]->getSubPathSegments()[0]->getName();
+            $relation          = $segments[$i]->isAscending() ? '>' : '<';
+            $name              = $segments[$i]->getSubPathSegments()[0]->getName();
             $parameters[$name] = ['direction' => $relation, 'value' => trim($values[$i][0], '\'')];
         }
 
         foreach ($parameters as $name => $line) {
-            $processed[$name] = ['direction' => $line['direction'], 'value' => $line['value']];
+            $processed[$name]     = ['direction' => $line['direction'], 'value' => $line['value']];
             $sourceEntityInstance = $sourceEntityInstance
                 ->orWhere(
                     function (Builder $query) use ($processed) {
@@ -105,7 +105,7 @@ trait LaravelReadQueryUtilityTrait
         if ($keyDescriptor) {
             $table = ($sourceEntityInstance instanceof Model) ? $sourceEntityInstance->getTable() . '.' : '';
             foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
-                $trimValue = trim($value[0], '\'');
+                $trimValue            = trim($value[0], '\'');
                 $sourceEntityInstance = $sourceEntityInstance->where($table . $key, $trimValue);
             }
         }
@@ -118,13 +118,13 @@ trait LaravelReadQueryUtilityTrait
      */
     protected function processEagerLoadList(array $eagerLoad = null)
     {
-        $load = (null === $eagerLoad) ? [] : $eagerLoad;
+        $load    = (null === $eagerLoad) ? [] : $eagerLoad;
         $rawLoad = [];
         foreach ($load as $line) {
             if (!is_string($line)) {
                 throw new InvalidOperationException('Eager-load elements must be non-empty strings');
             }
-            $lineParts = explode('/', $line);
+            $lineParts     = explode('/', $line);
             $numberOfParts = count($lineParts);
             for ($i = 0; $i < $numberOfParts; $i++) {
                 $lineParts[$i] = $this->getLaravelRelationName($lineParts[$i]);
@@ -142,7 +142,7 @@ trait LaravelReadQueryUtilityTrait
     protected function getLaravelRelationName(string $odataProperty)
     {
         $laravelProperty = $odataProperty;
-        $pos = strrpos($laravelProperty, '_');
+        $pos             = strrpos($laravelProperty, '_');
         if ($pos !== false) {
             $laravelProperty = substr($laravelProperty, 0, $pos);
         }

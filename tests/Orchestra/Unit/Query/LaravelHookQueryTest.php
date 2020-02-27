@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -28,7 +28,7 @@ class LaravelHookQueryTest extends TestCase
 
         $sourceInstance = new OrchestraHasManyTestModel();
         $targetInstance = new OrchestraBelongsToTestModel();
-        $propName = 'children';
+        $propName       = 'children';
 
         $foo = new LaravelHookQuery();
 
@@ -46,7 +46,7 @@ class LaravelHookQueryTest extends TestCase
 
         $sourceInstance = new OrchestraBelongsToTestModel();
         $targetInstance = new OrchestraHasManyTestModel();
-        $propName = 'parent';
+        $propName       = 'parent';
 
         $foo = new LaravelHookQuery();
 
@@ -64,7 +64,7 @@ class LaravelHookQueryTest extends TestCase
 
         $sourceInstance = new OrchestraBelongsToTestModel();
         $targetInstance = new OrchestraHasManyTestModel();
-        $propName = 'parent';
+        $propName       = 'parent';
 
         $foo = new LaravelHookQuery();
 
@@ -82,7 +82,7 @@ class LaravelHookQueryTest extends TestCase
 
         $sourceInstance = new OrchestraHasManyThroughTestModel();
         $targetInstance = new OrchestraBelongsToTestModel();
-        $propName = 'grandchildren';
+        $propName       = 'grandchildren';
 
         $foo = new LaravelHookQuery();
 
@@ -100,7 +100,7 @@ class LaravelHookQueryTest extends TestCase
 
         $sourceInstance = new OrchestraBelongsToManyTestModel();
         $targetInstance = new OrchestraBelongsToManyTestModel();
-        $propName = 'children';
+        $propName       = 'children';
 
         $foo = new LaravelHookQuery();
 

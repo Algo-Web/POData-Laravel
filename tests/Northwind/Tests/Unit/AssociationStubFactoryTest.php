@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Northwind\AlgoWeb\PODataLaravel\Tests\Unit;
 
@@ -37,7 +37,7 @@ class AssociationStubFactoryTest extends TestCase
         $this->assertTrue(class_exists($from), '$from parameter must be a class');
         $this->assertTrue(class_exists($from), '$to parameter must be a class');
         $this->assertInstanceOf(Model::class, new $from(), sprintf('$from should Be instance of %s', Model::class));
-        (is_null($to)) ?: $this->assertInstanceOf(Model::class, new $to(), sprintf('$to should Be instance of %s', Model::class));
+        (null === $to) ?: $this->assertInstanceOf(Model::class, new $to(), sprintf('$to should Be instance of %s', Model::class));
         $this->assertTrue(
             method_exists($from, $relationName),
             sprintf('%s is not a method on %s', $relationName, $from)
@@ -56,10 +56,10 @@ class AssociationStubFactoryTest extends TestCase
         $this->assertEquals(
             $from,
             $stub->getBaseType(),
-            "the base type of a relationship should be the model on which the relation lives"
+            'the base type of a relationship should be the model on which the relation lives'
         );
         $this->assertEquals($to, $stub->getTargType(), sprintf($relationXonY . ' have a Target Type of %s', $to));
-        $this->assertEquals($relationName, $stub->getRelationName(), sprintf($relationXonY . " be named %s", $relationName));
+        $this->assertEquals($relationName, $stub->getRelationName(), sprintf($relationXonY . ' be named %s', $relationName));
         $this->assertEquals($thisField, $stub->getKeyField(), sprintf($relationXonY . ' have a key field on %s side of the relation', $from));
         $this->assertEquals($thatField, $stub->getForeignField(), sprintf($relationXonY . ' have a foreign field on %s side of the relation', $to));
         $this->assertEquals($throughChain, $stub->getThroughFieldChain(), sprintf($relationXonY . 'should have through chain[' . implode(', ', $throughChain) . ']'));
@@ -98,14 +98,14 @@ class AssociationStubFactoryTest extends TestCase
     {
         $oneRelType = get_class((new $oneModel())->{$oneRel}());
         $twoRelType = get_class((new $twoModel())->{$twoRel}());
-        $message = 'Relation: %s  ' . "\r\n" .
+        $message    = 'Relation: %s  ' . "\r\n" .
             'On: %s ' . "\r\n" .
             'of Type: %s' . "\r\n";
         $oneMessage = sprintf($message, $oneRel, $oneModel, $oneRelType);
         $twoMessage = sprintf($message, $twoRel, $twoModel, $twoRelType);
-        $message = sprintf($oneMessage . '%s' . "\r\n" . $twoMessage, $compatible ? 'SHOULD' : 'SHOULD NOT');
-        $oneStub = AssociationStubFactory::associationStubFromRelation(new $oneModel(), $oneRel);
-        $twoStub = AssociationStubFactory::associationStubFromRelation(new $twoModel(), $twoRel);
+        $message    = sprintf($oneMessage . '%s' . "\r\n" . $twoMessage, $compatible ? 'SHOULD' : 'SHOULD NOT');
+        $oneStub    = AssociationStubFactory::associationStubFromRelation(new $oneModel(), $oneRel);
+        $twoStub    = AssociationStubFactory::associationStubFromRelation(new $twoModel(), $twoRel);
         $this->assertEquals($compatible, $oneStub->isCompatible($twoStub), $message);
         $this->assertEquals(
             $compatible,

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Serialisers;
 
@@ -37,19 +37,19 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
 
         // default data service
-        $service = new TestDataService($query, $meta, $host);
-        $processor = $service->handleRequest();
+        $service                            = new TestDataService($query, $meta, $host);
+        $processor                          = $service->handleRequest();
         $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
         $processor->getRequest()->setCountValue(1);
         $object = new ObjectModelSerializer($service, $processor->getRequest());
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
         $propName = 'makeItPhunkee';
-        $rType = m::mock(ResourceType::class);
+        $rType    = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
 
-        $collection = new QueryResult();
+        $collection          = new QueryResult();
         $collection->results = null;
 
         $objectResult = $object->writeTopLevelComplexObject($collection, $propName, $rType);
@@ -68,38 +68,38 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
 
         // default data service
-        $service = new TestDataService($query, $meta, $host);
-        $processor = $service->handleRequest();
+        $service                            = new TestDataService($query, $meta, $host);
+        $processor                          = $service->handleRequest();
         $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
         $processor->getRequest()->setCountValue(1);
         $object = new ObjectModelSerializer($service, $processor->getRequest());
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
         $propName = 'makeItPhunkee';
-        $rType = m::mock(ResourceType::class);
+        $rType    = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
         $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
 
-        $collection = new QueryResult();
+        $collection          = new QueryResult();
         $collection->results = [ 'foo' ];
 
-        $expected = null;
+        $expected               = null;
         $expectedExceptionClass = null;
-        $actual = null;
-        $actualExceptionClass = null;
+        $actual                 = null;
+        $actualExceptionClass   = null;
 
         try {
             $object->writeTopLevelComplexObject($collection, $propName, $rType);
         } catch (\Exception $e) {
             $expectedExceptionClass = get_class($e);
-            $expected = $e->getMessage();
+            $expected               = $e->getMessage();
         }
         try {
             $ironic->writeTopLevelComplexObject($collection, $propName, $rType);
         } catch (\Exception $e) {
             $actualExceptionClass = get_class($e);
-            $actual = $e->getMessage();
+            $actual               = $e->getMessage();
         }
 
         $this->assertEquals($expectedExceptionClass, $actualExceptionClass);
@@ -115,8 +115,8 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
 
         // default data service
-        $service = new TestDataService($query, $meta, $host);
-        $processor = $service->handleRequest();
+        $service                            = new TestDataService($query, $meta, $host);
+        $processor                          = $service->handleRequest();
         $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
         $processor->getRequest()->setCountValue(1);
         $object = new ObjectModelSerializer($service, $processor->getRequest());
@@ -139,17 +139,17 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         $rProp2->shouldReceive('getResourceType')->andReturn($subType2);
 
         $propName = 'makeItPhunkee';
-        $rType = m::mock(ResourceType::class);
+        $rType    = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
         $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
         $rType->shouldReceive('getAllProperties')->andReturn([$rProp1, $rProp2]);
 
-        $model = new TestMonomorphicTarget();
-        $model->id = 11;
+        $model      = new TestMonomorphicTarget();
+        $model->id  = 11;
         $model->foo = 'bar';
 
-        $collection = new QueryResult();
+        $collection          = new QueryResult();
         $collection->results = $model;
 
         $objectResult = $object->writeTopLevelComplexObject($collection, $propName, $rType);
@@ -168,8 +168,8 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
 
         // default data service
-        $service = new TestDataService($query, $meta, $host);
-        $processor = $service->handleRequest();
+        $service                            = new TestDataService($query, $meta, $host);
+        $processor                          = $service->handleRequest();
         $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
         $processor->getRequest()->setCountValue(1);
         $object = new ObjectModelSerializer($service, $processor->getRequest());
@@ -192,17 +192,17 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         $rProp2->shouldReceive('getResourceType')->andReturn($subType2);
 
         $propName = 'makeItPhunkee';
-        $rType = m::mock(ResourceType::class);
+        $rType    = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
         $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
         $rType->shouldReceive('getAllProperties')->andReturn([$rProp1, $rProp2]);
 
-        $model = new reusableEntityClass1();
+        $model       = new reusableEntityClass1();
         $model->name = 'name';
         $model->type = 'type';
 
-        $collection = new QueryResult();
+        $collection          = new QueryResult();
         $collection->results = $model;
 
         $objectResult = $object->writeTopLevelComplexObject($collection, $propName, $rType);
@@ -221,8 +221,8 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
 
         // default data service
-        $service = new TestDataService($query, $meta, $host);
-        $processor = $service->handleRequest();
+        $service                            = new TestDataService($query, $meta, $host);
+        $processor                          = $service->handleRequest();
         $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
         $processor->getRequest()->setCountValue(1);
         $object = new ObjectModelSerializer($service, $processor->getRequest());
@@ -265,21 +265,21 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         $rProp2->shouldReceive('getResourceType')->andReturn($subType2);
 
         $propName = 'makeItPhunkee';
-        $rType = m::mock(ResourceType::class);
+        $rType    = m::mock(ResourceType::class);
         $rType->shouldReceive('getFullName')->andReturn('stopHammerTime');
         $rType->shouldReceive('getName')->andReturn('tooLegitToQuit');
         $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::COMPLEX());
         $rType->shouldReceive('getAllProperties')->andReturn([$rProp1, $rProp2]);
 
-        $zoidberg = new reusableEntityClass1();
+        $zoidberg       = new reusableEntityClass1();
         $zoidberg->name = 'name';
         $zoidberg->type = 'type';
 
-        $model = new TestMonomorphicTarget();
-        $model->id = 11;
+        $model      = new TestMonomorphicTarget();
+        $model->id  = 11;
         $model->foo = $zoidberg;
 
-        $collection = new QueryResult();
+        $collection          = new QueryResult();
         $collection->results = $model;
 
         $objectResult = $object->writeTopLevelComplexObject($collection, $propName, $rType);
@@ -298,8 +298,8 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         list($host, $meta, $query) = $this->setUpDataServiceDeps($request);
 
         // default data service
-        $service = new TestDataService($query, $meta, $host);
-        $processor = $service->handleRequest();
+        $service                            = new TestDataService($query, $meta, $host);
+        $processor                          = $service->handleRequest();
         $processor->getRequest()->queryType = QueryType::ENTITIES_WITH_COUNT();
         $processor->getRequest()->setCountValue(1);
         $object = new ObjectModelSerializer($service, $processor->getRequest());
@@ -329,41 +329,41 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         $rType->shouldReceive('getAllProperties')->andReturn([$rProp1, $rProp2]);
         $rProp2->shouldReceive('getResourceType')->andReturn($rType);
 
-        $zoidberg = new TestMonomorphicTarget();
-        $zoidberg->id = 11;
+        $zoidberg      = new TestMonomorphicTarget();
+        $zoidberg->id  = 11;
         $zoidberg->foo = null;
 
-        $subModel = new TestMonomorphicTarget();
-        $subModel->id = 11;
+        $subModel      = new TestMonomorphicTarget();
+        $subModel->id  = 11;
         $subModel->foo = $zoidberg;
 
-        $model = new TestMonomorphicTarget();
-        $model->id = 11;
+        $model      = new TestMonomorphicTarget();
+        $model->id  = 11;
         $model->foo = $subModel;
 
         $zoidberg->foo = $model;
 
-        $collection = new QueryResult();
+        $collection          = new QueryResult();
         $collection->results = $model;
 
         $propName = 'makeItPhunkee';
 
-        $expected = null;
+        $expected               = null;
         $expectedExceptionClass = null;
-        $actual = null;
-        $actualExceptionClass = null;
+        $actual                 = null;
+        $actualExceptionClass   = null;
 
         try {
             $object->writeTopLevelComplexObject($collection, $propName, $rType);
         } catch (\Exception $e) {
             $expectedExceptionClass = get_class($e);
-            $expected = $e->getMessage();
+            $expected               = $e->getMessage();
         }
         try {
             $ironic->writeTopLevelComplexObject($collection, $propName, $rType);
         } catch (\Exception $e) {
             $actualExceptionClass = get_class($e);
-            $actual = $e->getMessage();
+            $actual               = $e->getMessage();
         }
 
         $this->assertEquals($expectedExceptionClass, $actualExceptionClass);
@@ -382,16 +382,16 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
      */
     private function setUpDataServiceDeps($request)
     {
-        $holder = new MetadataGubbinsHolder();
-        $metadata = [];
-        $metadata['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $holder            = new MetadataGubbinsHolder();
+        $metadata          = [];
+        $metadata['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $testModel = new TestModel($metadata, null);
         App::instance(TestModel::class, $testModel);
 
-        $op = new OperationContextAdapter($request);
+        $op   = new OperationContextAdapter($request);
         $host = new ServiceHost($op, $request);
 
         Cache::shouldReceive('get')->withArgs(['metadata'])->andReturn(null);
@@ -400,7 +400,7 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $classen = [TestModel::class];
+        $classen  = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);

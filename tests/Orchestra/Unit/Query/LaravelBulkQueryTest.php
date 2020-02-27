@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -29,28 +29,28 @@ class LaravelBulkQueryTest extends TestCase
     public function testInputPrepEmptyInput()
     {
         $paramList = [];
-        $data = [];
-        $keyDesc = null;
+        $data      = [];
+        $keyDesc   = null;
 
         $query = m::mock(LaravelQuery::class)->makePartial();
-        $foo = new DummyBulkQuery($query);
+        $foo   = new DummyBulkQuery($query);
 
         $expected = [];
-        $actual = $foo->prepareBulkRequestInput($paramList, $data, $keyDesc);
+        $actual   = $foo->prepareBulkRequestInput($paramList, $data, $keyDesc);
         $this->assertEquals($expected, $actual);
     }
 
     public function testOnlyNonRequestInputIsCreate()
     {
         $paramList = ['foo'];
-        $data = [11];
-        $keyDesc = null;
+        $data      = [11];
+        $keyDesc   = null;
 
         $query = m::mock(LaravelQuery::class)->makePartial();
-        $foo = new DummyBulkQuery($query);
+        $foo   = new DummyBulkQuery($query);
 
         $expected = [];
-        $actual = $foo->prepareBulkRequestInput($paramList, $data, $keyDesc);
+        $actual   = $foo->prepareBulkRequestInput($paramList, $data, $keyDesc);
         $this->assertEquals($expected, $actual);
     }
 
@@ -68,11 +68,11 @@ class LaravelBulkQueryTest extends TestCase
         $spec = ['type' => TestRequest::class, 'isRequest' => true];
 
         $paramList = [$spec];
-        $data = [11];
-        $keyDesc = [$rawDesc];
+        $data      = [11];
+        $keyDesc   = [$rawDesc];
 
         $query = m::mock(LaravelQuery::class)->makePartial();
-        $foo = new DummyBulkQuery($query);
+        $foo   = new DummyBulkQuery($query);
 
         $bulkData = ['data' => [11], 'keys' => [['name' => 'name', 'added_at' => '2012-11-10', 'weight' => 11,
             'code' => 'up to 11', 'success' => true]]];
@@ -81,7 +81,7 @@ class LaravelBulkQueryTest extends TestCase
         $exp->request = new \Symfony\Component\HttpFoundation\ParameterBag($bulkData);
 
         $expected = [$exp];
-        $actual = $foo->prepareBulkRequestInput($paramList, $data, $keyDesc);
+        $actual   = $foo->prepareBulkRequestInput($paramList, $data, $keyDesc);
         $this->assertEquals($expected, $actual);
     }
 
@@ -90,11 +90,11 @@ class LaravelBulkQueryTest extends TestCase
         $spec = ['type' => TestRequest::class, 'isRequest' => true];
 
         $paramList = [$spec];
-        $data = [11];
-        $keyDesc = [new \stdClass];
+        $data      = [11];
+        $keyDesc   = [new \stdClass];
 
         $query = m::mock(LaravelQuery::class)->makePartial();
-        $foo = new DummyBulkQuery($query);
+        $foo   = new DummyBulkQuery($query);
 
         $this->expectException(InvalidOperationException::class);
 
@@ -112,12 +112,12 @@ class LaravelBulkQueryTest extends TestCase
 
         $date = new \DateTime('2017-01-01');
 
-        $rawData = [];
+        $rawData   = [];
         $rawData[] = ['name' => 'name', 'added_at' => $date, 'weight' => 0, 'code' => '42', 'success' => true];
         $rawData[] = ['name' => 'name', 'added_at' => $date, 'weight' => 0, 'code' => '42', 'success' => true];
 
         $query = m::mock(LaravelQuery::class)->makePartial();
-        $foo = new DummyBulkQuery($query);
+        $foo   = new DummyBulkQuery($query);
 
         $rSet = m::mock(ResourceSet::class);
         $rSet->shouldReceive('getResourceType->getInstanceType->getName')->andReturn(OrchestraTestModel::class);
@@ -153,12 +153,12 @@ class LaravelBulkQueryTest extends TestCase
 
         $date = new \DateTime('2017-01-01');
 
-        $rawData = [];
+        $rawData   = [];
         $rawData[] = ['name' => 'name', 'added_at' => $date, 'weight' => 0, 'code' => '42', 'success' => true];
         $rawData[] = ['name' => 'name', 'added_at' => $date, 'weight' => 0, 'code' => '42', 'success' => true];
 
         $query = m::mock(LaravelQuery::class)->makePartial();
-        $foo = new DummyBulkQuery($query);
+        $foo   = new DummyBulkQuery($query);
 
         $rSet = m::mock(ResourceSet::class);
         $rSet->shouldReceive('getResourceType->getInstanceType->getName')->andReturn(OrchestraTestModel::class);
@@ -179,7 +179,7 @@ class LaravelBulkQueryTest extends TestCase
         $response = new JsonResponse();
 
         $query = m::mock(LaravelQuery::class)->makePartial();
-        $foo = new DummyBulkQuery($query);
+        $foo   = new DummyBulkQuery($query);
 
         $this->expectException(ODataException::class);
         $this->expectExceptionMessage('at least one of id, status and/or errors fields.');
@@ -190,7 +190,7 @@ class LaravelBulkQueryTest extends TestCase
 
     public function processOutputProvider() : array
     {
-        $result = [];
+        $result   = [];
         $result[] = [['id' => 1]];
         $result[] = [['status' => 'OK']];
         $result[] = [['errors' => null]];
@@ -213,7 +213,7 @@ class LaravelBulkQueryTest extends TestCase
         $response->setData($data);
 
         $query = m::mock(LaravelQuery::class)->makePartial();
-        $foo = new DummyBulkQuery($query);
+        $foo   = new DummyBulkQuery($query);
 
         $this->expectException(ODataException::class);
         $this->expectExceptionMessage('at least one of id, status and/or errors fields.');

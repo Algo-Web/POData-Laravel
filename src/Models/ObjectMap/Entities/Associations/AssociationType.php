@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: Barnso
@@ -22,9 +22,9 @@ use MyCLabs\Enum\Enum;
 class AssociationType extends Enum
 {
     const NULL_ONE_TO_NULL_ONE = 1;
-    const ONE_TO_ONE = 2;
-    const NULL_ONE_TO_ONE = 3;
-    const MANY_TO_MANY = 4;
-    const NULL_ONE_TO_MANY = 5;
-    const ONE_TO_MANY = 6;
+    const ONE_TO_ONE           = 2;
+    const NULL_ONE_TO_ONE      = 3;
+    const MANY_TO_MANY         = 4;
+    const NULL_ONE_TO_MANY     = 5;
+    const ONE_TO_MANY          = 6;
 }

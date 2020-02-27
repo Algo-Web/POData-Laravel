@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Models;
 
@@ -46,8 +46,8 @@ class MetadataTraitTest extends TestCase
     {
         parent::setUp();
         $this->object = $this->getMockForTrait('\AlgoWeb\PODataLaravel\Models\MetadataTrait');
-        $msg = 'Simple metadata provider cannot be called from metadata trait';
-        $meta = m::mock(SimpleMetadataProvider::class);
+        $msg          = 'Simple metadata provider cannot be called from metadata trait';
+        $meta         = m::mock(SimpleMetadataProvider::class);
         $meta->shouldReceive('resolveResourceProperty')->andThrow(new \Exception($msg))->never();
         $meta->shouldReceive('addEntityType')->andThrow(new \Exception($msg))->never();
         $meta->shouldReceive('addKeyProperty')->andThrow(new \Exception($msg))->never();
@@ -74,10 +74,10 @@ class MetadataTraitTest extends TestCase
      */
     public function testMetadataNotAnEloquentModel()
     {
-        $class = get_class($this->object);
-        $blewUp = false;
+        $class    = get_class($this->object);
+        $blewUp   = false;
         $expected = $class;
-        $actual = null;
+        $actual   = null;
 
         try {
             $result = $this->object->metadata();
@@ -136,8 +136,8 @@ class MetadataTraitTest extends TestCase
         $foo->shouldReceive('getConnection')->andReturn($connect);
         $foo->shouldReceive('metadataMask')->andReturn(['id', 'name']);
 
-        $expected = [];
-        $expected['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $expected         = [];
+        $expected['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $expected['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $result = $foo->metadata();
@@ -146,12 +146,12 @@ class MetadataTraitTest extends TestCase
 
     public function testMetadataGenerationWithGetter()
     {
-        $expected = [];
-        $expected['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $expected['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $expected['added_at'] = ['type' => 'integer', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $expected['weight'] = ['type' => 'integer', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $expected['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $expected               = [];
+        $expected['id']         = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $expected['name']       = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $expected['added_at']   = ['type' => 'integer', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $expected['weight']     = ['type' => 'integer', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $expected['code']       = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $expected['WeightCode'] = ['type' => 'text', 'nullable' => true, 'fillable' => false, 'default' => ''];
 
         $intType = \Mockery::mock(\Doctrine\DBAL\Types\IntegerType::class);
@@ -191,11 +191,11 @@ class MetadataTraitTest extends TestCase
 
     public function testMetadataGenerationFromExplicitModel()
     {
-        $expected = [];
-        $expected['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $expected         = [];
+        $expected['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $expected['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
-        $foo = new TestExplicitModel();
+        $foo    = new TestExplicitModel();
         $result = $foo->metadata();
         $this->assertEquals(count($expected), count($result));
         foreach ($expected as $key => $val) {
@@ -209,11 +209,11 @@ class MetadataTraitTest extends TestCase
     public function testMetadataMaskNothingHiddenNothingVisible()
     {
         $expected = ['id', 'name', 'added_at', 'weight', 'code'];
-        $foo = \Mockery::mock(TestModel::class)->makePartial();
+        $foo      = \Mockery::mock(TestModel::class)->makePartial();
         $foo->shouldReceive('getHidden')->andReturn([]);
         $foo->shouldReceive('getVisible')->andReturn([]);
 
-        $result = $foo->metadataMask();
+        $result     = $foo->metadataMask();
         $expResDiff = array_diff($expected, $result); // values in expected that are not in result, ignoring order
         $resExpDiff = array_diff($result, $expected); // values in result that are not in expected, ignoring order
         $this->assertEquals(0, count($expResDiff) + count($resExpDiff)); // if all keys are common, arrays are equal
@@ -225,11 +225,11 @@ class MetadataTraitTest extends TestCase
     public function testMetadataMaskNothingHiddenOverlappingVisible()
     {
         $expected = ['name'];
-        $foo = \Mockery::mock(TestModel::class)->makePartial();
+        $foo      = \Mockery::mock(TestModel::class)->makePartial();
         $foo->shouldReceive('getHidden')->andReturn([]);
         $foo->shouldReceive('getVisible')->andReturn(['name', 'height']);
 
-        $result = $foo->metadataMask();
+        $result     = $foo->metadataMask();
         $expResDiff = array_diff($expected, $result); // values in expected that are not in result, ignoring order
         $resExpDiff = array_diff($result, $expected); // values in result that are not in expected, ignoring order
         $this->assertEquals(0, count($expResDiff) + count($resExpDiff)); // if all keys are common, arrays are equal
@@ -241,11 +241,11 @@ class MetadataTraitTest extends TestCase
     public function testMetadataMaskNothingHiddenOverlappingSingleVisible()
     {
         $expected = ['name'];
-        $foo = \Mockery::mock(TestModel::class)->makePartial();
+        $foo      = \Mockery::mock(TestModel::class)->makePartial();
         $foo->shouldReceive('getHidden')->andReturn([]);
         $foo->shouldReceive('getVisible')->andReturn(['name']);
 
-        $result = $foo->metadataMask();
+        $result     = $foo->metadataMask();
         $expResDiff = array_diff($expected, $result); // values in expected that are not in result, ignoring order
         $resExpDiff = array_diff($result, $expected); // values in result that are not in expected, ignoring order
         $this->assertEquals(0, count($expResDiff) + count($resExpDiff)); // if all keys are common, arrays are equal
@@ -257,11 +257,11 @@ class MetadataTraitTest extends TestCase
     public function testMetadataMaskNothingVisibleOverlappingSingleHidden()
     {
         $expected = ['id', 'added_at', 'weight', 'code'];
-        $foo = \Mockery::mock(TestModel::class)->makePartial();
+        $foo      = \Mockery::mock(TestModel::class)->makePartial();
         $foo->shouldReceive('getHidden')->andReturn(['name']);
         $foo->shouldReceive('getVisible')->andReturn([]);
 
-        $result = $foo->metadataMask();
+        $result     = $foo->metadataMask();
         $expResDiff = array_diff($expected, $result); // values in expected that are not in result, ignoring order
         $resExpDiff = array_diff($result, $expected); // values in result that are not in expected, ignoring order
         $this->assertEquals(0, count($expResDiff) + count($resExpDiff)); // if all keys are common, arrays are equal
@@ -273,7 +273,7 @@ class MetadataTraitTest extends TestCase
     public function testMetadataMaskOverlappingHiddenNothingVisible()
     {
         $expected = ['id', 'added_at', 'weight', 'code'];
-        $foo = \Mockery::mock(TestModel::class)->makePartial();
+        $foo      = \Mockery::mock(TestModel::class)->makePartial();
         $foo->shouldReceive('getHidden')->andReturn(['name', 'height']);
         $foo->shouldReceive('getVisible')->andReturn([]);
 
@@ -290,7 +290,7 @@ class MetadataTraitTest extends TestCase
     public function testMetadataMaskVisibleTakesPrecedenceOverHidden()
     {
         $expected = ['id', 'name'];
-        $foo = \Mockery::mock(TestModel::class)->makePartial();
+        $foo      = \Mockery::mock(TestModel::class)->makePartial();
         $foo->shouldReceive('getHidden')->andReturn(['name', 'id']);
         $foo->shouldReceive('getVisible')->andReturn(['name', 'id']);
 
@@ -309,8 +309,8 @@ class MetadataTraitTest extends TestCase
      */
     public function testGetRelationshipsFromMethods($model, $relation)
     {
-        $foo = new $model();
-        $result = ModelReflectionHelper::getRelationshipsFromMethods($foo);
+        $foo     = new $model();
+        $result  = ModelReflectionHelper::getRelationshipsFromMethods($foo);
         $message = sprintf('%s relation not found on %s', $relation, $model);
         $this->assertTrue(in_array($relation, $result), $message);
     }
@@ -331,21 +331,21 @@ class MetadataTraitTest extends TestCase
         $foo = new TestModel();
 
         $expected = 'TestModel';
-        $actual = $foo->getEndpointName();
+        $actual   = $foo->getEndpointName();
         $this->assertEquals($expected, $actual);
     }
 
     public function testGetEndpointSpecifiedName()
     {
-        $foo = new TestModel(null, 'EndPoint');
+        $foo      = new TestModel(null, 'EndPoint');
         $expected = 'EndPoint';
-        $actual = $foo->getEndpointName();
+        $actual   = $foo->getEndpointName();
         $this->assertEquals($expected, $actual);
     }
 
     public function testGetMetadataMaskWithGetterSet()
     {
-        $columns = ['name', 'added_at', 'weight', 'code'];
+        $columns  = ['name', 'added_at', 'weight', 'code'];
         $expected = ['name', 'added_at', 'weight', 'code', 'WeightCode'];
 
         $mockBuilder = \Mockery::mock(\Illuminate\Database\Schema\MySqlBuilder::class)->makePartial();
@@ -364,7 +364,7 @@ class MetadataTraitTest extends TestCase
 
     public function testGetSetEagerLoadGoodData()
     {
-        $foo = new TestMonomorphicSource();
+        $foo       = new TestMonomorphicSource();
         $relations = ['manySource', 'oneSource'];
         $foo->setEagerLoad($relations);
         $result = $foo->getEagerLoad();
@@ -373,11 +373,11 @@ class MetadataTraitTest extends TestCase
 
     public function testSetEagerLoadBadDataIsObject()
     {
-        $foo = new TestMonomorphicSource();
+        $foo       = new TestMonomorphicSource();
         $relations = [new \DateTime()];
 
         $expected = 'Object of class DateTime could not be converted to string';
-        $actual = null;
+        $actual   = null;
 
         try {
             $foo->setEagerLoad($relations);
@@ -389,11 +389,11 @@ class MetadataTraitTest extends TestCase
 
     public function testSetEagerLoadBadDataIsArray()
     {
-        $foo = new TestMonomorphicSource();
+        $foo       = new TestMonomorphicSource();
         $relations = [[]];
 
         $expected = 'Array to string conversion';
-        $actual = null;
+        $actual   = null;
 
         try {
             $foo->setEagerLoad($relations);
@@ -409,7 +409,7 @@ class MetadataTraitTest extends TestCase
         $foo = new TestMonomorphicSource();
 
         $expected = 'Object of class stdClass could not be converted to string';
-        $actual = null;
+        $actual   = null;
 
         try {
             $foo->setEagerLoad(['foobar', new \stdClass()]);

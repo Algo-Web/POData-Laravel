@@ -1,11 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
  * Date: 27/02/20
- * Time: 11:38 AM
+ * Time: 11:38 AM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;

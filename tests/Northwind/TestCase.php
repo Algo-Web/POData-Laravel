@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 
 namespace Tests\Northwind\AlgoWeb\PODataLaravel;
@@ -25,7 +25,7 @@ class TestCase extends BaseTestCase
             \AlgoWeb\PODataLaravel\Providers\MetadataRouteProvider::class,
             \AlgoWeb\PODataLaravel\Providers\QueryProvider::class,
             \AlgoWeb\PODataLaravel\Providers\MetadataControllerProvider::class,
-            /*\Orchestra\Database\ConsoleServiceProvider::class,*/];
+        /*\Orchestra\Database\ConsoleServiceProvider::class,*/];
     }
 
 
@@ -40,7 +40,7 @@ class TestCase extends BaseTestCase
     {
         // Brute-force set app namespace
         $reflec = new \ReflectionClass($app);
-        $prop = $reflec->getProperty('namespace');
+        $prop   = $reflec->getProperty('namespace');
         $prop->setAccessible(true);
         $prop->setValue($app, 'Tests\\System\\AlgoWeb\\PODataLaravel');
         // Setup default database to use sqlite :memory:

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
@@ -106,7 +106,7 @@ class Map
      */
     private function addAssociationMonomorphic(AssociationMonomorphic $association)
     {
-        $firstClass = $this->entities[$association->getFirst()->getBaseType()];
+        $firstClass  = $this->entities[$association->getFirst()->getBaseType()];
         $secondClass = $this->entities[$association->getLast()->getBaseType()];
         $firstClass->addAssociation($association);
         $secondClass->addAssociation($association, false);

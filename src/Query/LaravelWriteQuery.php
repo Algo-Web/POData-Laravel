@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -33,7 +33,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
             $varType = isset($spec['type']) ? $spec['type'] : null;
             $varName = $spec['name'];
             if (null == $varType) {
-                $parms[] = ('id' == $varName) ? $sourceEntityInstance->getKey() : $sourceEntityInstance->$varName;
+                $parms[] = ('id' == $varName) ? $sourceEntityInstance->getKey() : $sourceEntityInstance->{$varName};
                 continue;
             }
             // TODO: Give this smarts and actively pick up instantiation details
@@ -92,7 +92,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
         Model $source = null
     ) {
         $lastWord = 'update' == $verb ? 'updated' : 'created';
-        $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
+        $class    = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
         if (!$this->getAuth()->canAuth($this->getVerbMap()[$verb], $class, $source)) {
             throw new ODataException('Access denied', 403);
         }
@@ -138,10 +138,10 @@ class LaravelWriteQuery extends LaravelBaseQuery
         }
 
         $controlClass = $goal['controller'];
-        $method = $goal['method'];
-        $paramList = $goal['parameters'];
-        $controller = App::make($controlClass);
-        $parms = $this->createUpdateDeleteProcessInput($data, $paramList, $sourceEntityInstance);
+        $method       = $goal['method'];
+        $paramList    = $goal['parameters'];
+        $controller   = App::make($controlClass);
+        $parms        = $this->createUpdateDeleteProcessInput($data, $paramList, $sourceEntityInstance);
         unset($data);
 
         $result = call_user_func_array(array($controller, $method), $parms);
@@ -170,9 +170,9 @@ class LaravelWriteQuery extends LaravelBaseQuery
         }
 
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
-        $id = $source->getKey();
-        $name = $source->getKeyName();
-        $data = [$name => $id];
+        $id    = $source->getKey();
+        $name  = $source->getKeyName();
+        $data  = [$name => $id];
 
         $data = $this->createUpdateDeleteCore($source, $data, $class, $verb);
 

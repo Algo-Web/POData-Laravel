@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Query;
 
@@ -67,7 +67,7 @@ class LaravelQueryBatchProcessingTest extends TestCase
         $model = m::mock(Model::class);
         $model->shouldReceive('save')->andReturn(true)->once();
 
-        $rSet = m::mock(ResourceSet::class);
+        $rSet    = m::mock(ResourceSet::class);
         $keyDesc = m::mock(KeyDescriptor::class);
 
         $writer = m::mock(LaravelWriteQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
