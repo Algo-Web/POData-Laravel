@@ -140,7 +140,6 @@ abstract class AssociationStubFactory
     {
         //return self::handleBelongsToMany($name,$relation);
         //TODO: investigate if this could be treated as a BelongsToMany Or more importantly a Monomorphic as we know both sides
-        $inverse  = self::getKeyChain($relation, 'inverse')[0];
         $stub     = new AssociationStubPolymorphic();
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub->setRelationName($name);
@@ -264,6 +263,5 @@ abstract class AssociationStubFactory
         'MorphToMany' => ['parentKey','foreignPivotKey','morphType', 'relatedPivotKey','relatedKey'],
         'MorphTo' => ['foreignKey', 'morphType', 'ownerKey'],
         'MorphOneOrMany' => ['localKey', 'morphType', 'foreignKey'],
-        'inverse' => ['inverse'], // TODO: currently used to get inverse, should be removed when morphtomany is fixed
     ];
 }

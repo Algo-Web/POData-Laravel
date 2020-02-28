@@ -369,7 +369,7 @@ class MetadataProviderUriTest extends TestCase
             $morphTarget = $entities[\Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestMorphTarget::class];
             $MorphManySourceAlternate = $entities[\Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestMorphManySourceAlternate::class];
             $morphTargetStubs = $morphTarget->getStubs();
-            $this->assertEquals(4, count($morphTargetStubs));
+            $this->assertEquals(5, count($morphTargetStubs));
             $MorphManySourceAlternateStubs = $MorphManySourceAlternate->getStubs();
             $this->assertEquals(1, count($MorphManySourceAlternateStubs));
             $morphTargetAssoc = $morphTarget->getAssociations();

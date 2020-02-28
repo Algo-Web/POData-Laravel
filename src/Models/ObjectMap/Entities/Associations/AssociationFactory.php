@@ -43,8 +43,8 @@ abstract class AssociationFactory
         if ($stubOne->getTargType() == null && self::$marshalPolymorphics) {
             $stubOne = self::marshalPolyToMono($stubOne, $stubTwo);
         }
-        $input[intval(!$first)] = $stubOne;
-        $input[intval($first)] = $stubTwo;
+
+        $input = [intval(!$first) => $stubOne, intval($first) => $stubTwo];
         $association->setFirst($input[0]);
         $association->setLast($input[1]);
         return $association;

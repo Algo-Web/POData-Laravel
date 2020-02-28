@@ -70,7 +70,7 @@ class MetadataTraitExtractionTest extends TestCase
 
         $rawKeys   = array_keys($metaRaw);
         $relations = ['morph'];
-        $relKeys   = ['id'];
+        $relKeys   = ['id', 'morph_id'];
         $relMults  = [RelType::ONE()];
 
         $foo = new TestMorphTargetChild($metaRaw);

@@ -411,7 +411,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $meta['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['morph_id']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['morph_id']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
 
@@ -438,7 +438,8 @@ class IronicSerialiserTest extends SerialiserTestBase
         $propContent->properties = [
             'name' => new ODataProperty(),
             'alternate_id' => new ODataProperty(),
-            'id' => new ODataProperty()
+            'id' => new ODataProperty(),
+            'morph_id' => new ODataProperty()
         ];
         $propContent->properties['name']->name             = 'name';
         $propContent->properties['alternate_id']->name     = 'alternate_id';
