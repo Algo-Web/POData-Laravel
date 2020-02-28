@@ -3,6 +3,7 @@
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubPolymorphic;
@@ -36,7 +37,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $model   = new TestMonomorphicSource($metaRaw);
         $gubbins = $model->extractGubbins();
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $foo->addEntity($gubbins);
 
         $expected = \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestMonomorphicSource::class .' already added';
@@ -52,7 +53,7 @@ class MetadataGubbinsHolderTest extends TestCase
 
     public function testGetRelationsOnNonExistentClass()
     {
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
 
         $expected = \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestMonomorphicSource::class . ' does not exist in holder';
         $actual   = null;
@@ -78,7 +79,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $model   = new TestMonomorphicSource($metaRaw);
         $gubbins = $model->extractGubbins();
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $foo->addEntity($gubbins);
 
         $expected = 'Relation foo not registered on '. \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestMonomorphicSource::class;
@@ -101,11 +102,15 @@ class MetadataGubbinsHolderTest extends TestCase
     {
         $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model   = new TestMonomorphicSource($metaRaw);
         $nuModel = new TestMonomorphicTarget($metaRaw);
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $modelEntity = $model->extractGubbins();
         $foo->addEntity($modelEntity);
         $nuEntity = $nuModel->extractGubbins();
@@ -123,6 +128,7 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicSource::class, 'oneSource');
         $this->assertEquals(1, count($result));
+        $expected->addAssociation($result[0]->getAssocations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -135,11 +141,15 @@ class MetadataGubbinsHolderTest extends TestCase
     {
         $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model   = new TestMonomorphicSource($metaRaw);
         $nuModel = new TestMonomorphicTarget($metaRaw);
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $modelEntity = $model->extractGubbins();
         $foo->addEntity($modelEntity);
         $nuEntity = $nuModel->extractGubbins();
@@ -156,6 +166,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $expected->setEntity($modelEntity);
         $result = $foo->getRelationsByRelationName(TestMonomorphicTarget::class, 'oneTarget');
         $this->assertEquals(1, count($result));
+        $expected->addAssociation($result[0]->getAssocations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -168,11 +179,15 @@ class MetadataGubbinsHolderTest extends TestCase
     {
         $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model   = new TestMonomorphicSource($metaRaw);
         $nuModel = new TestMonomorphicTarget($metaRaw);
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $modelEntity = $model->extractGubbins();
         $foo->addEntity($modelEntity);
         $nuEntity = $nuModel->extractGubbins();
@@ -190,6 +205,7 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicSource::class, 'manySource');
         $this->assertEquals(1, count($result));
+        $expected->addAssociation($result[0]->getAssocations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -202,11 +218,15 @@ class MetadataGubbinsHolderTest extends TestCase
     {
         $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model   = new TestMonomorphicSource($metaRaw);
         $nuModel = new TestMonomorphicTarget($metaRaw);
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $modelEntity = $model->extractGubbins();
         $foo->addEntity($modelEntity);
         $nuEntity = $nuModel->extractGubbins();
@@ -224,6 +244,7 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicTarget::class, 'manyTarget');
         $this->assertEquals(1, count($result));
+        $expected->addAssociation($result[0]->getAssocations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -240,7 +261,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $model   = new TestMonomorphicManySource($metaRaw);
         $nuModel = new TestMonomorphicManyTarget($metaRaw);
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $modelEntity = $model->extractGubbins();
         $foo->addEntity($modelEntity);
         $nuEntity = $nuModel->extractGubbins();
@@ -258,6 +279,7 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicManySource::class, 'manySource');
         $this->assertEquals(1, count($result));
+        $expected->addAssociation($result[0]->getAssocations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -274,7 +296,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $model   = new TestMonomorphicManySource($metaRaw);
         $nuModel = new TestMonomorphicManyTarget($metaRaw);
 
-        $foo = new MetadataGubbinsHolder();
+            $foo = new MetadataRelationshipContainer();
         $modelEntity = $model->extractGubbins();
         $foo->addEntity($modelEntity);
         $nuEntity = $nuModel->extractGubbins();
@@ -292,6 +314,7 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicManyTarget::class, 'manyTarget');
         $this->assertEquals(1, count($result));
+        $expected->addAssociation($result[0]->getAssocations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -304,18 +327,19 @@ class MetadataGubbinsHolderTest extends TestCase
     {
         $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['morph_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model   = new TestMorphTarget($metaRaw);
         $nuModel = new TestMorphOneSource($metaRaw);
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $modelEntity = $model->extractGubbins();
         $foo->addEntity($modelEntity);
         $nuEntity = $nuModel->extractGubbins();
         $foo->addEntity($nuEntity);
 
         $result = $foo->getRelationsByRelationName(TestMorphTarget::class, 'morph');
-        $this->assertEquals(0, count($result));
+        $this->assertEquals(1, count($result));
     }
 
     /**
@@ -327,11 +351,12 @@ class MetadataGubbinsHolderTest extends TestCase
     {
         $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['morph_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model   = new TestMorphTarget($metaRaw);
         $nuModel = new TestMorphOneSource($metaRaw);
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $modelEntity = $model->extractGubbins();
         $foo->addEntity($modelEntity);
         $nuEntity = $nuModel->extractGubbins();
@@ -340,7 +365,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $expected = new AssociationStubPolymorphic();
         $expected->setRelationName('morph');
         $expected->setForeignFieldName(null);
-        $expected->setKeyFieldName('id');
+        $expected->setKeyFieldName('morph_id');
         $expected->setBaseType(TestMorphTarget::class);
         $expected->setTargType(null);
         $expected->setMultiplicity(AssociationStubRelationType::ONE());
@@ -350,6 +375,7 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $result = $foo->getRelationsByRelationName(TestMorphOneSource::class, 'morphTarget');
         $this->assertEquals(1, count($result));
+        $expected->addAssociation($result[0]->getAssocations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -362,11 +388,12 @@ class MetadataGubbinsHolderTest extends TestCase
     {
         $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['morph_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model   = new TestMorphTarget($metaRaw);
         $nuModel = new TestMorphManySource($metaRaw);
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $modelEntity = $model->extractGubbins();
         $foo->addEntity($modelEntity);
         $nuEntity = $nuModel->extractGubbins();
@@ -375,7 +402,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $expected = new AssociationStubPolymorphic();
         $expected->setRelationName('morph');
         $expected->setForeignFieldName(null);
-        $expected->setKeyFieldName('id');
+        $expected->setKeyFieldName('morph_id');
         $expected->setBaseType(TestMorphTarget::class);
         $expected->setTargType(null);
         $expected->setMultiplicity(AssociationStubRelationType::ONE());
@@ -384,6 +411,7 @@ class MetadataGubbinsHolderTest extends TestCase
 $expected->setEntity($modelEntity);
         $result = $foo->getRelationsByRelationName(TestMorphManySource::class, 'morphTarget');
         $this->assertEquals(1, count($result));
+        $expected->addAssociation($result[0]->getAssocations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -396,11 +424,13 @@ $expected->setEntity($modelEntity);
     {
         $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['source_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['target_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model   = new TestMorphManyToManySource($metaRaw);
         $nuModel = new TestMorphManyToManyTarget($metaRaw);
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $modelEntity = $model->extractGubbins();
         $foo->addEntity($modelEntity);
         $nuEntity = $nuModel->extractGubbins();
@@ -408,10 +438,10 @@ $expected->setEntity($modelEntity);
 
         $expected = new AssociationStubPolymorphic();
         $expected->setRelationName('manyTarget');
-        $expected->setForeignFieldName(null);
-        $expected->setKeyFieldName('source_id');
+        $expected->setForeignFieldName('id');
+        $expected->setKeyFieldName('id');
         $expected->setBaseType(TestMorphManyToManyTarget::class);
-        $expected->setTargType(null);
+        $expected->setTargType(TestMorphManyToManySource::class);
         $expected->setMultiplicity(AssociationStubRelationType::MANY());
         $expected->setThroughFieldChain(['id', 'target_id', 'manyable_type', 'source_id', 'id']);
         $expected->setMorphType('manyable_type');
@@ -419,6 +449,7 @@ $expected->setEntity($modelEntity);
 
         $result = $foo->getRelationsByRelationName(TestMorphManyToManySource::class, 'manySource');
         $this->assertEquals(1, count($result));
+        $expected->addAssociation($result[0]->getAssocations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -431,18 +462,20 @@ $expected->setEntity($modelEntity);
     {
         $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['source_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['target_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model   = new TestMorphManyToManySource($metaRaw);
         $nuModel = new TestMorphManyToManyTarget($metaRaw);
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $modelEntity = $model->extractGubbins();
         $foo->addEntity($modelEntity);
         $nuEntity = $nuModel->extractGubbins();
         $foo->addEntity($nuEntity);
-
         $result = $foo->getRelationsByRelationName(TestMorphManyToManyTarget::class, 'manyTarget');
-        $this->assertEquals(0, count($result));
+
+        $this->assertEquals(1, count($result));
     }
 
     /**
@@ -455,12 +488,13 @@ $expected->setEntity($modelEntity);
         $metaRaw['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['morph_id']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model    = new TestMorphTarget($metaRaw);
         $nuModel  = new TestMorphManySource($metaRaw);
         $altModel = new TestMorphManySourceAlternate($metaRaw);
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $foo->addEntity($model->extractGubbins());
         $foo->addEntity($nuModel->extractGubbins());
         $foo->addEntity($altModel->extractGubbins());
@@ -499,6 +533,7 @@ $expected->setEntity($modelEntity);
         $metaRaw['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['parent_id']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model   = new TestMonomorphicParentOfMorphTarget($metaRaw);
         $nuModel = new TestMonomorphicChildOfMorphTarget($metaRaw);
@@ -510,7 +545,7 @@ $expected->setEntity($modelEntity);
         $right = $nuModelGubbins->getStubs()['monomorphicParent'];
         $this->assertTrue($left->isCompatible($right));
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $foo->addEntity($model->extractGubbins());
         $foo->addEntity($nuModel->extractGubbins());
 

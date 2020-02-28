@@ -53,7 +53,7 @@ class AssociationStubFactoryTest extends TestCase
         $fieldChain = ['id', 'manyable_id', 'manyable_type', 'many_id', 'id'];
 
         $this->assertEquals(OrchestraPolymorphToManySourceModel::class, $result->getBaseType());
-        $this->assertEquals('manyable_id', $result->getForeignFieldName());
+        $this->assertEquals('id', $result->getForeignFieldName());
         $this->assertEquals(OrchestraPolymorphToManyTestModel::class, $result->getTargType());
         $this->assertEquals('sourceChildren', $result->getRelationName());
         $this->assertEquals($fieldChain, $result->getThroughFieldChain());
@@ -72,10 +72,10 @@ class AssociationStubFactoryTest extends TestCase
 
         $result = AssociationStubFactory::associationStubFromRelation($model, 'child');
 
-        $fieldChain = ['morph_id', 'morph_type', 'id'];
+        $fieldChain = ['id', 'morph_type', 'morph_id'];
 
         $this->assertEquals(OrchestraMorphOneTestModel::class, $result->getBaseType());
-        $this->assertEquals('id', $result->getForeignFieldName());
+        $this->assertEquals('morph_id', $result->getForeignFieldName());
         $this->assertEquals(OrchestraMorphToTestModel::class, $result->getTargType());
         $this->assertEquals('child', $result->getRelationName());
         $this->assertEquals($fieldChain, $result->getThroughFieldChain());
@@ -94,10 +94,10 @@ class AssociationStubFactoryTest extends TestCase
 
         $result = AssociationStubFactory::associationStubFromRelation($model, 'child');
 
-        $fieldChain = ['morph_id', 'morph_type', 'id'];
+        $fieldChain = ['id', 'morph_type', 'morph_id'];
 
         $this->assertEquals(OrchestraMorphManyTestModel::class, $result->getBaseType());
-        $this->assertEquals('id', $result->getForeignFieldName());
+        $this->assertEquals('morph_id', $result->getForeignFieldName());
         $this->assertEquals(OrchestraMorphToTestModel::class, $result->getTargType());
         $this->assertEquals('child', $result->getRelationName());
         $this->assertEquals($fieldChain, $result->getThroughFieldChain());
