@@ -31,7 +31,6 @@ interface IMetadataRelationshipContainer
      *
      * @param string $className
      * @return Association[]
-     * @throws InvalidOperationException
      */
     public function getRelationsByClass(string $className): array;
 
@@ -39,7 +38,6 @@ interface IMetadataRelationshipContainer
      * Gets all defined Associations
      *
      * @return Association[]
-     * @throws InvalidOperationException
      */
     public function getRelations(): array;
 
