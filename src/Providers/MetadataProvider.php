@@ -3,7 +3,6 @@
 namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\IMetadataRelationshipContainer;
-use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\MetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
@@ -312,6 +311,7 @@ class MetadataProvider extends MetadataBaseProvider
 
     /**
      * @return array
+     * @throws \Exception
      */
     protected function getCandidateModels()
     {
