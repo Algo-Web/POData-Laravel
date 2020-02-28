@@ -84,7 +84,7 @@ abstract class AssociationStubFactory
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
-        $stub->setKeyFieldName($keyChain[2] ?: $relation->getRelated()->getKeyName());
+        $stub->setKeyFieldName($keyChain[0]);
         $stub->setForeignFieldName($keyChain[2]);
         $stub->setMultiplicity(AssociationStubRelationType::ONE());
         $stub->setTargType(null);
@@ -145,11 +145,11 @@ abstract class AssociationStubFactory
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
-        $stub->setKeyFieldName($keyChain[3]);
-        $stub->setForeignFieldName($inverse ? null : $keyChain[1]);
+        $stub->setKeyFieldName($keyChain[0]);
+        $stub->setForeignFieldName( $keyChain[4]);
         $stub->setMultiplicity(AssociationStubRelationType::MANY());
         $stub->setMorphType($keyChain[2]);
-        $stub->setTargType($inverse ? null : get_class($relation->getRelated()));
+        $stub->setTargType( get_class($relation->getRelated()));
         return $stub;
     }
 
@@ -263,7 +263,7 @@ abstract class AssociationStubFactory
         'HasManyThrough' => ['localKey', 'firstKey', 'secondLocalKey', 'secondKey'],
         'MorphToMany' => ['parentKey','foreignPivotKey','morphType', 'relatedPivotKey','relatedKey'],
         'MorphTo' => ['foreignKey', 'morphType', 'ownerKey'],
-        'MorphOneOrMany' => ['foreignKey', 'morphType', 'localKey'],
+        'MorphOneOrMany' => ['localKey', 'morphType', 'foreignKey'],
         'inverse' => ['inverse'], // TODO: currently used to get inverse, should be removed when morphtomany is fixed
     ];
 }

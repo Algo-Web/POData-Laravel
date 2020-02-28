@@ -23,8 +23,8 @@ class AssociationMonomorphic extends Association
      */
     public function setLast(AssociationStubBase $last)
     {
-        $last->addAssociation($this);
         $this->last = $last;
+        $last->addAssociation($this);
     }
 
     /**
@@ -43,7 +43,7 @@ class AssociationMonomorphic extends Association
         if (!$first->isCompatible($last)) {
             return false;
         }
-        return -1 === $first->compare($last);
+        return true;
     }
 
     /**

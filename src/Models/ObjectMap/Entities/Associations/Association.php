@@ -28,8 +28,8 @@ abstract class Association
      */
     public function setFirst(AssociationStubBase $first)
     {
-        $first->addAssociation($this);
         $this->first = $first;
+        $first->addAssociation($this);
     }
 
     /**
