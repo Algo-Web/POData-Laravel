@@ -43,7 +43,7 @@ class AssociationMonomorphic extends Association
         if (!$first->isCompatible($last)) {
             return false;
         }
-        return true;
+        return -1 === $first->compare($last);
     }
 
     /**

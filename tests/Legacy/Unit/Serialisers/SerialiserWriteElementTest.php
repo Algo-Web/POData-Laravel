@@ -692,7 +692,14 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $result->results = $model;
 
         $propContent                               = new ODataPropertyContent();
-        $propContent->properties                   = ['id' => new ODataProperty(), 'name' => new ODataProperty()];
+        $propContent->properties                   = [
+            'id' => new ODataProperty(),
+            'name' => new ODataProperty(),
+            'many_id' => new ODataProperty(),
+            'one_id' => new ODataProperty(),
+            'one_source' => new ODataProperty(),
+            'many_source' => new ODataProperty(),
+        ];
         $propContent->properties['id']->name       = 'id';
         $propContent->properties['name']->name     = 'name';
         $propContent->properties['id']->typeName   = 'Edm.Int32';
@@ -700,8 +707,25 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $propContent->properties['id']->value      = '1';
         $propContent->properties['name']->value    = 'Name';
 
+        $propContent->properties['many_id']->name     = 'many_id';
+        $propContent->properties['many_id']->typeName = 'Edm.String';
+        $propContent->properties['one_id']->name     = 'one_id';
+        $propContent->properties['one_id']->typeName = 'Edm.String';
+        $propContent->properties['one_source']->name     = 'one_source';
+        $propContent->properties['one_source']->typeName = 'Edm.String';
+        $propContent->properties['many_source']->name     = 'many_source';
+        $propContent->properties['many_source']->typeName = 'Edm.String';
+
+
         $feed1Content                               = new ODataPropertyContent();
-        $feed1Content->properties                   = ['id' => new ODataProperty(), 'name' => new ODataProperty()];
+        $feed1Content->properties                   = [
+            'id' => new ODataProperty(),
+            'name' => new ODataProperty(),
+            'many_id' => new ODataProperty(),
+            'one_id' => new ODataProperty(),
+            'one_source' => new ODataProperty(),
+            'many_source' => new ODataProperty(),
+        ];
         $feed1Content->properties['id']->name       = 'id';
         $feed1Content->properties['name']->name     = 'name';
         $feed1Content->properties['id']->typeName   = 'Edm.Int32';
@@ -709,14 +733,40 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $feed1Content->properties['id']->value      = '1';
         $feed1Content->properties['name']->value    = 'Inspector';
 
+        $feed1Content->properties['many_id']->name     = 'many_id';
+        $feed1Content->properties['many_id']->typeName = 'Edm.String';
+        $feed1Content->properties['one_id']->name     = 'one_id';
+        $feed1Content->properties['one_id']->typeName = 'Edm.String';
+        $feed1Content->properties['one_source']->name     = 'one_source';
+        $feed1Content->properties['one_source']->typeName = 'Edm.String';
+        $feed1Content->properties['many_source']->name     = 'many_source';
+        $feed1Content->properties['many_source']->typeName = 'Edm.String';
+
         $feed2Content                               = new ODataPropertyContent();
-        $feed2Content->properties                   = ['id' => new ODataProperty(), 'name' => new ODataProperty()];
+        $feed2Content->properties                   = [
+            'id' => new ODataProperty(),
+            'name' => new ODataProperty(),
+            'many_id' => new ODataProperty(),
+            'one_id' => new ODataProperty(),
+            'one_source' => new ODataProperty(),
+            'many_source' => new ODataProperty(),
+        ];
+
         $feed2Content->properties['id']->name       = 'id';
         $feed2Content->properties['name']->name     = 'name';
         $feed2Content->properties['id']->typeName   = 'Edm.Int32';
         $feed2Content->properties['name']->typeName = 'Edm.String';
         $feed2Content->properties['id']->value      = '2';
         $feed2Content->properties['name']->value    = 'Gadget';
+
+        $feed2Content->properties['many_id']->name     = 'many_id';
+        $feed2Content->properties['many_id']->typeName = 'Edm.String';
+        $feed2Content->properties['one_id']->name     = 'one_id';
+        $feed2Content->properties['one_id']->typeName = 'Edm.String';
+        $feed2Content->properties['one_source']->name     = 'one_source';
+        $feed2Content->properties['one_source']->typeName = 'Edm.String';
+        $feed2Content->properties['many_source']->name     = 'many_source';
+        $feed2Content->properties['many_source']->typeName = 'Edm.String';
 
         $feed1                   = new ODataEntry();
         $feed1->id               = 'http://localhost/odata.svc/TestMonomorphicTargets(id=1)';

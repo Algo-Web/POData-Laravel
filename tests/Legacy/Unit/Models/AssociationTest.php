@@ -141,16 +141,18 @@ class AssociationTest extends TestCase
         ];
 
         $assoc1 = new AssociationMonomorphic();
-        $assoc1->setLast($srcStubs[0][0]);
-        $assoc1->setFirst($dstStubs[0][0]);
+        $assoc1->setLast(clone $srcStubs[0][0]);
+        $assoc1->setFirst(clone $dstStubs[0][0]);
         $assoc2 = new AssociationMonomorphic();
-        $assoc2->setLast($srcStubs[1][0]);
-        $assoc2->setFirst($dstStubs[1][0]);
+        $assoc2->setLast(clone $srcStubs[1][0]);
+        $assoc2->setFirst(clone $dstStubs[1][0]);
 
         $result = $foo->getRelationsByClass(TestMonomorphicSource::class);
         $this->assertEquals(2, count($result));
-        $this->assertTrue(in_array($assoc1, $result));
-        $this->assertTrue(in_array($assoc2, $result));
+        $this->assertEquals($srcStubs[1][0], $result[0]->getLast());
+        $this->assertEquals($dstStubs[1][0], $result[0]->getFirst());
+        $this->assertEquals($srcStubs[0][0], $result[1]->getLast());
+        $this->assertEquals($dstStubs[0][0], $result[1]->getFirst());
     }
 
     /**

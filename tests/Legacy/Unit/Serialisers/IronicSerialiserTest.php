@@ -449,6 +449,8 @@ class IronicSerialiserTest extends SerialiserTestBase
         $propContent->properties['id']->typeName           = 'Edm.Int32';
         $propContent->properties['name']->value            = 'Hammer, M.C.';
         $propContent->properties['id']->value              = '42';
+        $propContent->properties['morph_id']->name               = 'morph_id';
+        $propContent->properties['morph_id']->typeName         = 'Edm.String';
 
         $odataLink        = new ODataLink();
         $odataLink->name  = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph_TestMorphOneSource';

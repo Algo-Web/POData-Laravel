@@ -19,7 +19,8 @@ abstract class AssociationFactory
         AssociationStubBase $stubOne,
         AssociationStubBase $stubTwo
     ): Association {
-        return self::checkAssociations($stubOne, $stubTwo) ?? self::buildAssociationFromStubs($stubOne, $stubTwo);
+        $checkAssociation = self::checkAssociations($stubOne, $stubTwo);
+        return null === $checkAssociation ? self::buildAssociationFromStubs($stubOne, $stubTwo) : $checkAssociation;
     }
 
     /**
@@ -32,15 +33,11 @@ abstract class AssociationFactory
         AssociationStubBase $stubOne,
         AssociationStubBase $stubTwo
     ): Association {
-        $oneFirst = $stubOne->getKeyField()->getIsKeyField();
-        $twoFirst = $stubTwo->getKeyField()->getIsKeyField();
-        $first = $oneFirst === $twoFirst ? -1 === $stubOne->compare($stubTwo) : $oneFirst;
+        $first = -1 === $stubOne->compare($stubTwo);
 
         $association = new AssociationMonomorphic();
-        if (null === $stubTwo->getTargType()) {
-            dd($stubTwo);
-        }
         if ($stubOne->getTargType() == null && self::$marshalPolymorphics) {
+            $stubOne->addAssociation($association);
             $stubOne = self::marshalPolyToMono($stubOne, $stubTwo);
         }
 
@@ -54,8 +51,6 @@ abstract class AssociationFactory
         AssociationStubBase $stub,
         AssociationStubBase $stubTwo
     ): AssociationStubBase {
-        $oldName = $stub->getRelationName();
-        //$stubOne->addAssociation($association);
         $stubNew = clone $stub;
         $relPolyTypeName = substr($stubTwo->getBaseType(), strrpos($stubTwo->getBaseType(), '\\')+1);
         $relPolyTypeName = Str::plural($relPolyTypeName, 1);
@@ -64,9 +59,6 @@ abstract class AssociationFactory
         $stubNew->setForeignFieldName($stubTwo->getKeyFieldName());
         $entity = $stub->getEntity();
         $stubs = $entity->getStubs();
-        if (array_key_exists($oldName, $stubs)) {
-               //unset($stubs[$oldName]);
-        }
         $stubs[$stubNew->getRelationName()] = $stubNew;
         $entity->setStubs($stubs);
         return $stubNew;

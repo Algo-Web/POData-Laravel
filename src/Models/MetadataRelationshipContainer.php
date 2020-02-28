@@ -74,17 +74,16 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
             count($item->getThroughFieldChain()) == 3) ? null : $item->getBaseType();
 
         $otherCandidates = array_filter($this->getStubs($item->getTargType(), $baseTypeCheck), [$item, 'isCompatible']);
-
-        $assocations = array_reduce(
+        $associations = array_reduce(
             $otherCandidates,
             function ($carry, $candidate) use ($item) {
-                $newAssocation = AssociationFactory::getAssocationFromStubs($candidate, $item);
-                $carry[spl_object_hash($newAssocation)] = $newAssocation;
+                $newAssociation = AssociationFactory::getAssocationFromStubs($candidate, $item);
+                $carry[spl_object_hash($newAssociation)] = $newAssociation;
                 return $carry;
             },
             []
         );
-        $this->addAssociations($assocations);
+        $this->addAssociations($associations);
     }
 
     private function addAssociations(array $additionals)
@@ -111,8 +110,8 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
         if (empty($this->associations)) {
             $this->buildAssociations();
         }
-        $entites = $this->entities[$className];
-        $relation = $entites->getStubs()[$relName];
+        $entities = $this->entities[$className];
+        $relation = $entities->getStubs()[$relName];
         return array_reduce($relation->getAssocations(), function ($carry, Association $item) use ($relation) {
             $carry[] = ($item->getFirst() === $relation) ? $item->getLast() : $item->getFirst();
             return $carry;
@@ -130,6 +129,7 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
         if (empty($this->associations)) {
             $this->buildAssociations();
         }
+
         $this->checkClassExists($className);
         return array_reduce($this->entities[$className]->getStubs(), function ($carry, AssociationStubBase $item) {
             return array_merge($carry, $item->getAssocations());

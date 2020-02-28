@@ -140,7 +140,7 @@ abstract class AssociationStubBase
      */
     public function getKeyFieldName(): string
     {
-        return $this->keyFieldName;
+        return $this->keyFieldName ?? '';
     }
 
     public function getKeyField() : ?EntityField
@@ -281,6 +281,14 @@ abstract class AssociationStubBase
      */
     public function compare(AssociationStubBase $other)
     {
+        $thisFirst = $this->getKeyFieldName() === '' ? false : $this->getKeyField()->getIsKeyField();
+        $otherFirst = $other->getKeyFieldName() === '' ? false : $other->getKeyField()->getIsKeyField();
+        if(
+            ($thisFirst || $otherFirst) &&
+            !($thisFirst && $otherFirst)
+            ){
+            return $thisFirst ? -1 : 1;
+        }
         $thisClass  = get_class($this);
         $otherClass = get_class($other);
         $classComp  = strcmp($thisClass, $otherClass);
