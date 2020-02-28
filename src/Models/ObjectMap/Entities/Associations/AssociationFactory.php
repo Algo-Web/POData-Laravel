@@ -3,6 +3,8 @@
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
+use Illuminate\Support\Str;
+
 abstract class AssociationFactory
 {
     public static function getAssocationFromStubs(
@@ -16,6 +18,12 @@ abstract class AssociationFactory
         AssociationStubBase $stubOne,
         AssociationStubBase $stubTwo
     ): Association {
+        if ($stubOne->getTargType() == null) {
+            $stubOne = clone $stubOne;
+            $relPolyTypeName = substr($stubTwo->getBaseType(), strrpos($stubTwo->getBaseType(), '\\')+1);
+            $relPolyTypeName = Str::plural($relPolyTypeName, 1);
+            $stubOne->setRelationName($stubOne->getRelationName() . '_' . $relPolyTypeName);
+        }
         $oneFirst = $stubOne->getKeyField()->getIsKeyField();
         $twoFirst = $stubTwo->getKeyField()->getIsKeyField();
         $first = $oneFirst === $twoFirst ? -1 === $stubOne->compare($stubTwo) : $oneFirst;
