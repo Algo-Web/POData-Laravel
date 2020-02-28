@@ -21,17 +21,13 @@ class ModelSerialiser
     /**
      * Serialise needed bits of supplied model, taking fast path where possible.
      *
-     * @param Model|mixed $model
+     * @param Model $model
      *
-     * @throws InvalidOperationException
      * @return mixed
      */
-    public function bulkSerialise($model)
+    public function bulkSerialise(Model $model)
     {
         $class = get_class($model);
-        if (!$model instanceof Model) {
-            throw new InvalidOperationException($class);
-        }
         // dig up metadata
         if (!isset(self::$metadataCache[$class])) {
             self::$metadataCache[$class] = $model->metadata();
