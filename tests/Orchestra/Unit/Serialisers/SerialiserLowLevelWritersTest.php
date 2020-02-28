@@ -9,6 +9,7 @@ namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Serialisers;
 
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use AlgoWeb\PODataLaravel\Serialisers\SerialiserLowLevelWriters;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use POData\Providers\Metadata\Type\StringType;
 
@@ -20,6 +21,18 @@ class SerialiserLowLevelWritersTest extends TestCase
         $type     = new StringType();
 
         $actual = SerialiserLowLevelWriters::primitiveToString($type, $expected);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDateWithNonDateIType()
+    {
+        $date = Carbon::create(2019, 1, 1, 0, 0, 0);
+        $type = new StringType();
+
+        $expected = '2019-01-01 00:00:00';
+
+        $actual = SerialiserLowLevelWriters::primitiveToString($type, $date);
 
         $this->assertEquals($expected, $actual);
     }
