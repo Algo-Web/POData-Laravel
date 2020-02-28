@@ -11,7 +11,7 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 use Illuminate\Support\Str;
 use POData\Common\InvalidOperationException;
 
-class MetadataGubbinsHolder
+class MetadataGubbinsHolder implements IMetadataRelationshipContainer
 {
     protected $relations  = [];
     protected $knownSides = [];
@@ -22,7 +22,7 @@ class MetadataGubbinsHolder
      * @param  EntityGubbins             $entity
      * @throws InvalidOperationException
      */
-    public function addEntity(EntityGubbins $entity)
+    public function addEntity(EntityGubbins $entity): void
     {
         $className = $entity->getClassName();
         if (array_key_exists($className, $this->relations)) {
@@ -38,7 +38,14 @@ class MetadataGubbinsHolder
         }
     }
 
-    public function getRelationsByRelationName($className, $relName)
+    /**
+     * returns all Relation Stubs that are permitted at the other end
+     *
+     * @param string $className
+     * @param string $relName
+     * @return array|AssociationStubBase[]
+     */
+    public function getRelationsByRelationName(string $className, string $relName): array
     {
         $this->checkClassExists($className);
 
@@ -67,11 +74,13 @@ class MetadataGubbinsHolder
     }
 
     /**
+     * Gets all associations On a given class.
+     *
      * @param  string                    $className
-     * @throws InvalidOperationException
+     * @return Association[]
      * @return array
      */
-    public function getRelationsByClass($className)
+    public function getRelationsByClass(string $className): array
     {
         $this->checkClassExists($className);
 
@@ -104,10 +113,12 @@ class MetadataGubbinsHolder
     }
 
     /**
+     * Gets all defined Associations
+     *
+     * @return Association[]
      * @throws InvalidOperationException
-     * @return array
      */
-    public function getRelations()
+    public function getRelations(): array
     {
         $classNames = array_keys($this->relations);
 
@@ -162,7 +173,13 @@ class MetadataGubbinsHolder
         return $result;
     }
 
-    public function hasClass($className)
+    /**
+     * Checks if a class is loaded into the relation container
+     *
+     * @param string $className
+     * @return bool
+     */
+    public function hasClass(string $className): bool
     {
         return array_key_exists($className, $this->relations);
     }

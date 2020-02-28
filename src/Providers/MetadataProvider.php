@@ -2,6 +2,7 @@
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use AlgoWeb\PODataLaravel\Models\IMetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
@@ -90,7 +91,7 @@ class MetadataProvider extends MetadataBaseProvider
      */
     private function unify(Map $objectMap)
     {
-        /** @var MetadataGubbinsHolder $mgh */
+        /** @var IMetadataRelationshipContainer $mgh */
         $mgh = $this->getRelationHolder();
         foreach ($objectMap->getEntities() as $entity) {
             $mgh->addEntity($entity);
@@ -329,9 +330,9 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * @return MetadataGubbinsHolder
+     * @return IMetadataRelationshipContainer|null
      */
-    public function getRelationHolder()
+    public function getRelationHolder() : ?IMetadataRelationshipContainer
     {
         return $this->relationHolder;
     }
