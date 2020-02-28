@@ -35,13 +35,13 @@ class AssociationStubTest extends TestCase
     public function testMonomorphicAssociationIsOkBadForeignField()
     {
         $foo = new AssociationStubMonomorphic();
-        $foo->setKeyField('key');
+        $foo->setKeyFieldName('key');
         $foo->setRelationName('rel');
         $foo->setMultiplicity(AssociationStubRelationType::NULL_ONE());
         $foo->setBaseType(TestMorphTarget::class);
         $foo->setTargType(TestMorphTargetChild::class);
         $this->assertFalse($foo->isOk());
-        $foo->setForeignField(123);
+        $foo->setForeignFieldName(123);
         $this->assertFalse($foo->isOk());
     }
 
@@ -74,12 +74,12 @@ class AssociationStubTest extends TestCase
     public function testPolymorphicAssociationIsOkBadForeignField()
     {
         $foo = new AssociationStubPolymorphic();
-        $foo->setKeyField('key');
+        $foo->setKeyFieldName('key');
         $foo->setRelationName('rel');
         $foo->setMultiplicity(AssociationStubRelationType::NULL_ONE());
         $foo->setBaseType(TestMorphTarget::class);
         $foo->setTargType(null);
-        $foo->setForeignField(123);
+        $foo->setForeignFieldName(123);
         $this->assertFalse($foo->isOk());
     }
 
@@ -87,8 +87,8 @@ class AssociationStubTest extends TestCase
     {
         $foo = new AssociationStubPolymorphic();
         $bar = new AssociationStubPolymorphic();
-        $foo->setKeyField('key');
-        $bar->setKeyField('key');
+        $foo->setKeyFieldName('key');
+        $bar->setKeyFieldName('key');
         $foo->setRelationName('rel');
         $bar->setRelationName('rel');
         $foo->setMultiplicity(AssociationStubRelationType::NULL_ONE());
@@ -96,8 +96,8 @@ class AssociationStubTest extends TestCase
         $foo->setBaseType(TestMorphTarget::class);
         $foo->setTargType(TestMorphTargetChild::class);
         $bar->setBaseType(TestMorphTargetChild::class);
-        $foo->setForeignField('foreign');
-        $bar->setForeignField(null);
+        $foo->setForeignFieldName('foreign');
+        $bar->setForeignFieldName(null);
         $this->assertTrue($foo->isOk());
         $this->assertTrue($bar->isOk());
 
@@ -109,8 +109,8 @@ class AssociationStubTest extends TestCase
     {
         $foo = new AssociationStubPolymorphic();
         $bar = new AssociationStubPolymorphic();
-        $foo->setKeyField('key');
-        $bar->setKeyField('key');
+        $foo->setKeyFieldName('key');
+        $bar->setKeyFieldName('key');
         $foo->setRelationName('rel');
         $bar->setRelationName('rel');
         $foo->setBaseType(TestMorphManyToManySource::class);
@@ -118,8 +118,8 @@ class AssociationStubTest extends TestCase
         $bar->setBaseType(TestMorphManyToManyTarget::class);
         $foo->setMultiplicity(AssociationStubRelationType::MANY());
         $bar->setMultiplicity(AssociationStubRelationType::MANY());
-        $foo->setForeignField('foreign');
-        $bar->setForeignField(null);
+        $foo->setForeignFieldName('foreign');
+        $bar->setForeignFieldName(null);
         $this->assertTrue($foo->isOk());
         $this->assertTrue($bar->isOk());
 
@@ -133,8 +133,8 @@ class AssociationStubTest extends TestCase
     {
         $foo = new AssociationStubPolymorphic();
         $bar = new AssociationStubPolymorphic();
-        $foo->setKeyField('key');
-        $bar->setKeyField('key');
+        $foo->setKeyFieldName('key');
+        $bar->setKeyFieldName('key');
         $foo->setRelationName('rel');
         $bar->setRelationName('rel');
         $foo->setMultiplicity(AssociationStubRelationType::ONE());
@@ -142,8 +142,8 @@ class AssociationStubTest extends TestCase
         $foo->setBaseType(TestMorphTarget::class);
         $foo->setTargType(TestMorphTargetChild::class);
         $bar->setBaseType(TestMorphTargetChild::class);
-        $foo->setForeignField('foreign');
-        $bar->setForeignField(null);
+        $foo->setForeignFieldName('foreign');
+        $bar->setForeignFieldName(null);
         $this->assertTrue($foo->isOk());
         $this->assertTrue($bar->isOk());
 
@@ -157,8 +157,8 @@ class AssociationStubTest extends TestCase
     {
         $foo = new AssociationStubPolymorphic();
         $bar = new AssociationStubPolymorphic();
-        $foo->setKeyField('key');
-        $bar->setKeyField('key');
+        $foo->setKeyFieldName('key');
+        $bar->setKeyFieldName('key');
         $foo->setRelationName('rel');
         $bar->setRelationName('rel');
         $foo->setMultiplicity(AssociationStubRelationType::ONE());
@@ -178,8 +178,8 @@ class AssociationStubTest extends TestCase
     {
         $foo = new AssociationStubPolymorphic();
         $bar = new AssociationStubPolymorphic();
-        $foo->setKeyField('key');
-        $bar->setKeyField('key');
+        $foo->setKeyFieldName('key');
+        $bar->setKeyFieldName('key');
         $foo->setRelationName('rel');
         $bar->setRelationName('rel');
         $foo->setMultiplicity(AssociationStubRelationType::ONE());
@@ -187,8 +187,8 @@ class AssociationStubTest extends TestCase
         $foo->setBaseType(TestMorphTarget::class);
         $foo->setTargType(TestMonomorphicSource::class);
         $bar->setBaseType(TestMorphTarget::class);
-        $foo->setForeignField('foreign');
-        $bar->setForeignField(null);
+        $foo->setForeignFieldName('foreign');
+        $bar->setForeignFieldName(null);
         $this->assertTrue($foo->isOk());
         $this->assertTrue($bar->isOk());
 
@@ -199,7 +199,7 @@ class AssociationStubTest extends TestCase
     public function testAssociationMonomorphicNotOk()
     {
         $foo = new AssociationStubMonomorphic();
-        $foo->setKeyField('key');
+        $foo->setKeyFieldName('key');
         $foo->setRelationName('rel');
         $foo->setMultiplicity(AssociationStubRelationType::ONE());
         $foo->setBaseType(TestMonomorphicSource::class);
@@ -212,8 +212,8 @@ class AssociationStubTest extends TestCase
     {
         $foo = new AssociationStubPolymorphic();
         $bar = new AssociationStubPolymorphic();
-        $foo->setKeyField('key');
-        $bar->setKeyField('');
+        $foo->setKeyFieldName('key');
+        $bar->setKeyFieldName('');
         $foo->setRelationName('rel');
         $bar->setRelationName('rel');
         $foo->setMultiplicity(AssociationStubRelationType::ONE());
@@ -232,7 +232,7 @@ class AssociationStubTest extends TestCase
         $this->assertFalse($foo->isOk());
         $foo->setMultiplicity(AssociationStubRelationType::ONE());
         $this->assertFalse($foo->isOk());
-        $foo->setKeyField('key');
+        $foo->setKeyFieldName('key');
         $this->assertFalse($foo->isOk());
         $foo->setRelationName('rel');
         $this->assertFalse($foo->isOk());
@@ -246,8 +246,8 @@ class AssociationStubTest extends TestCase
         $expectedRel   = 'rel';
         $expectedMorph = 'morph';
         $foo           = new AssociationStubPolymorphic();
-        $foo->setKeyField($expectedKey);
-        $actualKey = $foo->getKeyField();
+        $foo->setKeyFieldName($expectedKey);
+        $actualKey = $foo->getKeyFieldName();
         $this->assertEquals($expectedKey, $actualKey);
         $foo->setRelationName($expectedRel);
         $actualRel = $foo->getRelationName();
@@ -263,7 +263,7 @@ class AssociationStubTest extends TestCase
         $expectedRel = 'rel';
 
         $foo = new AssociationStubMonomorphic();
-        $foo->setKeyField($expectedKey);
+        $foo->setKeyFieldName($expectedKey);
         $foo->setRelationName($expectedRel);
         $foo->setMultiplicity(AssociationStubRelationType::NULL_ONE());
         $this->assertFalse($foo->isOk());

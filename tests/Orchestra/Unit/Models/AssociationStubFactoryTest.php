@@ -32,7 +32,7 @@ class AssociationStubFactoryTest extends TestCase
         $fieldChain = ['morph_id', 'morph_type', null];
 
         $this->assertEquals(OrchestraMorphToTestModel::class, $result->getBaseType());
-        $this->assertEquals(null, $result->getForeignField());
+        $this->assertEquals(null, $result->getForeignFieldName());
         $this->assertEquals(null, $result->getTargType());
         $this->assertEquals('parent', $result->getRelationName());
         $this->assertEquals($fieldChain, $result->getThroughFieldChain());
@@ -53,7 +53,7 @@ class AssociationStubFactoryTest extends TestCase
         $fieldChain = ['id', 'manyable_id', 'manyable_type', 'many_id', 'id'];
 
         $this->assertEquals(OrchestraPolymorphToManySourceModel::class, $result->getBaseType());
-        $this->assertEquals('manyable_id', $result->getForeignField());
+        $this->assertEquals('manyable_id', $result->getForeignFieldName());
         $this->assertEquals(OrchestraPolymorphToManyTestModel::class, $result->getTargType());
         $this->assertEquals('sourceChildren', $result->getRelationName());
         $this->assertEquals($fieldChain, $result->getThroughFieldChain());
@@ -75,7 +75,7 @@ class AssociationStubFactoryTest extends TestCase
         $fieldChain = ['morph_id', 'morph_type', 'id'];
 
         $this->assertEquals(OrchestraMorphOneTestModel::class, $result->getBaseType());
-        $this->assertEquals('id', $result->getForeignField());
+        $this->assertEquals('id', $result->getForeignFieldName());
         $this->assertEquals(OrchestraMorphToTestModel::class, $result->getTargType());
         $this->assertEquals('child', $result->getRelationName());
         $this->assertEquals($fieldChain, $result->getThroughFieldChain());
@@ -97,7 +97,7 @@ class AssociationStubFactoryTest extends TestCase
         $fieldChain = ['morph_id', 'morph_type', 'id'];
 
         $this->assertEquals(OrchestraMorphManyTestModel::class, $result->getBaseType());
-        $this->assertEquals('id', $result->getForeignField());
+        $this->assertEquals('id', $result->getForeignFieldName());
         $this->assertEquals(OrchestraMorphToTestModel::class, $result->getTargType());
         $this->assertEquals('child', $result->getRelationName());
         $this->assertEquals($fieldChain, $result->getThroughFieldChain());

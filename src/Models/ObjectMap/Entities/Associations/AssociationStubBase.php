@@ -14,7 +14,7 @@ abstract class AssociationStubBase
      *
      * @var string|null
      */
-    protected $keyField;
+    protected $keyFieldName;
 
     /**
      * A list of fields to Traverse between Keyfield and foreignField.
@@ -28,7 +28,7 @@ abstract class AssociationStubBase
      *
      * @var string|null
      */
-    protected $foreignField;
+    protected $foreignFieldName;
 
     /**
      * @var string|null
@@ -72,7 +72,7 @@ abstract class AssociationStubBase
      */
     public function getAssocations(): array
     {
-
+       return $this->associations;
     }
 
     /**
@@ -110,17 +110,17 @@ abstract class AssociationStubBase
     /**
      * @return string
      */
-    public function getKeyField()
+    public function getKeyFieldName()
     {
-        return $this->keyField;
+        return $this->keyFieldName;
     }
 
     /**
-     * @param string $keyField
+     * @param string $keyFieldName
      */
-    public function setKeyField($keyField)
+    public function setKeyFieldName($keyFieldName)
     {
-        $this->keyField = $this->checkStringInput($keyField) ? $keyField : $this->keyField;
+        $this->keyFieldName = $this->checkStringInput($keyFieldName) ? $keyFieldName : $this->keyFieldName;
     }
 
     public function isCompatible(AssociationStubBase $otherStub)
@@ -152,7 +152,7 @@ abstract class AssociationStubBase
         if (null === $this->relationName) {
             return false;
         }
-        if (null === $this->keyField) {
+        if (null === $this->keyFieldName) {
             return false;
         }
         if (null === $this->baseType) {
@@ -162,7 +162,7 @@ abstract class AssociationStubBase
         if ($this instanceof AssociationStubMonomorphic && null === $targType) {
             return false;
         }
-        $foreignField = $this->foreignField;
+        $foreignField = $this->foreignFieldName;
         if (null !== $targType) {
             if (!$this->checkStringInput($targType)) {
                 return false;
@@ -209,17 +209,17 @@ abstract class AssociationStubBase
     /**
      * @return string
      */
-    public function getForeignField()
+    public function getForeignFieldName()
     {
-        return $this->foreignField;
+        return $this->foreignFieldName;
     }
 
     /**
-     * @param string $foreignField
+     * @param string $foreignFieldName
      */
-    public function setForeignField($foreignField)
+    public function setForeignFieldName($foreignFieldName)
     {
-        $this->foreignField = $foreignField;
+        $this->foreignFieldName = $foreignFieldName;
     }
 
     /**

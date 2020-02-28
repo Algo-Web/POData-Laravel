@@ -21,8 +21,8 @@ class AssociationStubMonomorphic extends AssociationStubBase
 
         return ($this->getTargType() === $otherStub->getBaseType())
             && ($this->getBaseType() === $otherStub->getTargType())
-            && ($this->getForeignField() === $otherStub->getKeyField())
-            && ($this->getKeyField() === $otherStub->getForeignField());
+            && ($this->getForeignFieldName() === $otherStub->getKeyFieldName())
+            && ($this->getKeyFieldName() === $otherStub->getForeignFieldName());
     }
 
     /**

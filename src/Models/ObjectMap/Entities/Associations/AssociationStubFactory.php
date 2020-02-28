@@ -65,8 +65,8 @@ abstract class AssociationStubFactory
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
-        $stub->setKeyField($keyChain[0]);
-        $stub->setForeignField($keyChain[1]);
+        $stub->setKeyFieldName($keyChain[0]);
+        $stub->setForeignFieldName($keyChain[1]);
         $stub->setTargType(get_class($relation->getRelated()));
         $stub->setMultiplicity(AssociationStubRelationType::ONE());
         return $stub;
@@ -84,8 +84,8 @@ abstract class AssociationStubFactory
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
-        $stub->setKeyField($keyChain[2] ?: $relation->getRelated()->getKeyName());
-        $stub->setForeignField($keyChain[2]);
+        $stub->setKeyFieldName($keyChain[2] ?: $relation->getRelated()->getKeyName());
+        $stub->setForeignFieldName($keyChain[2]);
         $stub->setMultiplicity(AssociationStubRelationType::ONE());
         $stub->setTargType(null);
         $stub->setMorphType($keyChain[1]);
@@ -107,8 +107,8 @@ abstract class AssociationStubFactory
         $stub->setThroughFieldChain($keyChain);
         $stub->setMultiplicity(AssociationStubRelationType::MANY());
         $stub->setTargType(get_class($relation->getRelated()));
-        $stub->setKeyField($keyChain[0]);
-        $stub->setForeignField($keyChain[3]);
+        $stub->setKeyFieldName($keyChain[0]);
+        $stub->setForeignFieldName($keyChain[3]);
         return $stub;
     }
     /**
@@ -125,8 +125,8 @@ abstract class AssociationStubFactory
         $stub->setThroughFieldChain($keyChain);
         $stub->setMultiplicity(AssociationStubRelationType::MANY());
         $stub->setTargType(get_class($relation->getRelated()));
-        $stub->setKeyField($keyChain[0]);
-        $stub->setForeignField($keyChain[3]);
+        $stub->setKeyFieldName($keyChain[0]);
+        $stub->setForeignFieldName($keyChain[3]);
         return $stub;
     }
 
@@ -145,8 +145,8 @@ abstract class AssociationStubFactory
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
-        $stub->setKeyField($keyChain[3]);
-        $stub->setForeignField($inverse ? null : $keyChain[1]);
+        $stub->setKeyFieldName($keyChain[3]);
+        $stub->setForeignFieldName($inverse ? null : $keyChain[1]);
         $stub->setMultiplicity(AssociationStubRelationType::MANY());
         $stub->setMorphType($keyChain[2]);
         $stub->setTargType($inverse ? null : get_class($relation->getRelated()));
@@ -165,8 +165,8 @@ abstract class AssociationStubFactory
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
-        $stub->setKeyField($keyChain[0]);
-        $stub->setForeignField($keyChain[1]);
+        $stub->setKeyFieldName($keyChain[0]);
+        $stub->setForeignFieldName($keyChain[1]);
         $stub->setTargType(get_class($relation->getRelated()));
         $stub->setMultiplicity(AssociationStubRelationType::NULL_ONE());
         return $stub;
@@ -184,8 +184,8 @@ abstract class AssociationStubFactory
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
-        $stub->setKeyField($keyChain[0]);
-        $stub->setForeignField($keyChain[1]);
+        $stub->setKeyFieldName($keyChain[0]);
+        $stub->setForeignFieldName($keyChain[1]);
         $stub->setTargType(get_class($relation->getRelated()));
         $stub->setMultiplicity(AssociationStubRelationType::MANY());
         return $stub;
@@ -203,8 +203,8 @@ abstract class AssociationStubFactory
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
-        $stub->setKeyField($keyChain[0]);
-        $stub->setForeignField($keyChain[2]);
+        $stub->setKeyFieldName($keyChain[0]);
+        $stub->setForeignFieldName($keyChain[2]);
         $stub->setTargType(get_class($relation->getRelated()));
         $stub->setMorphType($keyChain[1]);
         $stub->setMultiplicity(AssociationStubRelationType::NULL_ONE());
@@ -223,9 +223,9 @@ abstract class AssociationStubFactory
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub->setRelationName($name);
         $stub->setThroughFieldChain($keyChain);
-        $stub->setKeyField($keyChain[0]);
+        $stub->setKeyFieldName($keyChain[0]);
         $stub->setMorphType($keyChain[1]);
-        $stub->setForeignField($keyChain[2]);
+        $stub->setForeignFieldName($keyChain[2]);
         $stub->setMultiplicity(AssociationStubRelationType::MANY());
         $stub->setTargType(get_class($relation->getRelated()));
         return $stub;

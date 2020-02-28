@@ -111,8 +111,8 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $expected = new AssociationStubMonomorphic();
         $expected->setRelationName('oneTarget');
-        $expected->setForeignField('one_id');
-        $expected->setKeyField('one_source');
+        $expected->setForeignFieldName('one_id');
+        $expected->setKeyFieldName('one_source');
         $expected->setBaseType(TestMonomorphicTarget::class);
         $expected->setTargType(TestMonomorphicSource::class);
         $expected->setMultiplicity(AssociationStubRelationType::ONE());
@@ -142,8 +142,8 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $expected = new AssociationStubMonomorphic();
         $expected->setRelationName('oneSource');
-        $expected->setForeignField('one_source');
-        $expected->setKeyField('one_id');
+        $expected->setForeignFieldName('one_source');
+        $expected->setKeyFieldName('one_id');
         $expected->setBaseType(TestMonomorphicSource::class);
         $expected->setTargType(TestMonomorphicTarget::class);
         $expected->setMultiplicity(AssociationStubRelationType::NULL_ONE());
@@ -172,8 +172,8 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $expected = new AssociationStubMonomorphic();
         $expected->setRelationName('manyTarget');
-        $expected->setForeignField('many_id');
-        $expected->setKeyField('many_source');
+        $expected->setForeignFieldName('many_id');
+        $expected->setKeyFieldName('many_source');
         $expected->setBaseType(TestMonomorphicTarget::class);
         $expected->setTargType(TestMonomorphicSource::class);
         $expected->setMultiplicity(AssociationStubRelationType::ONE());
@@ -203,8 +203,8 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $expected = new AssociationStubMonomorphic();
         $expected->setRelationName('manySource');
-        $expected->setForeignField('many_source');
-        $expected->setKeyField('many_id');
+        $expected->setForeignFieldName('many_source');
+        $expected->setKeyFieldName('many_id');
         $expected->setBaseType(TestMonomorphicSource::class);
         $expected->setTargType(TestMonomorphicTarget::class);
         $expected->setMultiplicity(AssociationStubRelationType::MANY());
@@ -234,8 +234,8 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $expected = new AssociationStubMonomorphic();
         $expected->setRelationName('manyTarget');
-        $expected->setForeignField('id');
-        $expected->setKeyField('id');
+        $expected->setForeignFieldName('id');
+        $expected->setKeyFieldName('id');
         $expected->setThroughFieldChain([ 'id', 'many_id', 'many_source', 'id']);
         $expected->setBaseType(TestMonomorphicManyTarget::class);
         $expected->setTargType(TestMonomorphicManySource::class);
@@ -265,8 +265,8 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $expected = new AssociationStubMonomorphic();
         $expected->setRelationName('manySource');
-        $expected->setForeignField('id');
-        $expected->setKeyField('id');
+        $expected->setForeignFieldName('id');
+        $expected->setKeyFieldName('id');
         $expected->setBaseType(TestMonomorphicManySource::class);
         $expected->setTargType(TestMonomorphicManyTarget::class);
         $expected->setMultiplicity(AssociationStubRelationType::MANY());
@@ -317,8 +317,8 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $expected = new AssociationStubPolymorphic();
         $expected->setRelationName('morph');
-        $expected->setForeignField(null);
-        $expected->setKeyField('id');
+        $expected->setForeignFieldName(null);
+        $expected->setKeyFieldName('id');
         $expected->setBaseType(TestMorphTarget::class);
         $expected->setTargType(null);
         $expected->setMultiplicity(AssociationStubRelationType::ONE());
@@ -349,8 +349,8 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $expected = new AssociationStubPolymorphic();
         $expected->setRelationName('morph');
-        $expected->setForeignField(null);
-        $expected->setKeyField('id');
+        $expected->setForeignFieldName(null);
+        $expected->setKeyFieldName('id');
         $expected->setBaseType(TestMorphTarget::class);
         $expected->setTargType(null);
         $expected->setMultiplicity(AssociationStubRelationType::ONE());
@@ -381,8 +381,8 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $expected = new AssociationStubPolymorphic();
         $expected->setRelationName('manyTarget');
-        $expected->setForeignField(null);
-        $expected->setKeyField('source_id');
+        $expected->setForeignFieldName(null);
+        $expected->setKeyFieldName('source_id');
         $expected->setBaseType(TestMorphManyToManyTarget::class);
         $expected->setTargType(null);
         $expected->setMultiplicity(AssociationStubRelationType::MANY());

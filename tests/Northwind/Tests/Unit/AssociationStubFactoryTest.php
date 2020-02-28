@@ -60,8 +60,8 @@ class AssociationStubFactoryTest extends TestCase
         );
         $this->assertEquals($to, $stub->getTargType(), sprintf($relationXonY . ' have a Target Type of %s', $to));
         $this->assertEquals($relationName, $stub->getRelationName(), sprintf($relationXonY . ' be named %s', $relationName));
-        $this->assertEquals($thisField, $stub->getKeyField(), sprintf($relationXonY . ' have a key field on %s side of the relation', $from));
-        $this->assertEquals($thatField, $stub->getForeignField(), sprintf($relationXonY . ' have a foreign field on %s side of the relation', $to));
+        $this->assertEquals($thisField, $stub->getKeyFieldName(), sprintf($relationXonY . ' have a key field on %s side of the relation', $from));
+        $this->assertEquals($thatField, $stub->getForeignFieldName(), sprintf($relationXonY . ' have a foreign field on %s side of the relation', $to));
         $this->assertEquals($throughChain, $stub->getThroughFieldChain(), sprintf($relationXonY . 'should have through chain[' . implode(', ', $throughChain) . ']'));
     }
 
