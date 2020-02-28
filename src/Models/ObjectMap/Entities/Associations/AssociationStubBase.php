@@ -50,6 +50,32 @@ abstract class AssociationStubBase
     protected $baseType;
 
     /**
+     * Any assocations this stub is a member of.
+     *
+     * @var Association[]
+     */
+    protected $associations = [];
+
+    /**
+     * Adds this stub as a member of an assocation
+     *
+     * @param Association $newAssocation the new assocation to be a member of
+     */
+    public function addAssociation(Association $newAssocation): void {
+        $this->associations[] = $newAssocation;
+    }
+
+    /**
+     * Gets all assocations assigned to this stub.
+     *
+     * @return Association[] All assocations this stub is a member of
+     */
+    public function getAssocations(): array
+    {
+
+    }
+
+    /**
      * @return string
      */
     public function getRelationName()

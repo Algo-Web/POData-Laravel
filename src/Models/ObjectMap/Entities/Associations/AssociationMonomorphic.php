@@ -23,6 +23,7 @@ class AssociationMonomorphic extends Association
      */
     public function setLast(AssociationStubBase $last)
     {
+        $last->addAssociation($this);
         $this->last = $last;
     }
 

@@ -22,6 +22,7 @@ class AssociationTest extends TestCase
     {
         $one = m::mock(AssociationStubBase::class);
         $one->shouldReceive('isOk')->andReturn(false);
+        $one->shouldReceive('addAssociation');
 
         $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
@@ -32,6 +33,7 @@ class AssociationTest extends TestCase
     {
         $one = m::mock(AssociationStubBase::class);
         $one->shouldReceive('isOk')->andReturn(true);
+        $one->shouldReceive('addAssociation');
 
         $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
@@ -42,8 +44,11 @@ class AssociationTest extends TestCase
     {
         $one = m::mock(AssociationStubBase::class);
         $one->shouldReceive('isOk')->andReturn(true);
+        $one->shouldReceive('addAssociation');
+
         $two = m::mock(AssociationStubBase::class);
         $two->shouldReceive('isOk')->andReturn(false);
+        $two->shouldReceive('addAssociation');
 
         $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
@@ -56,8 +61,11 @@ class AssociationTest extends TestCase
         $one = m::mock(AssociationStubBase::class);
         $one->shouldReceive('isOk')->andReturn(true);
         $one->shouldReceive('isCompatible')->andReturn(false);
+        $one->shouldReceive('addAssociation');
+
         $two = m::mock(AssociationStubBase::class);
         $two->shouldReceive('isOk')->andReturn(true);
+        $two->shouldReceive('addAssociation');
 
         $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
@@ -71,8 +79,11 @@ class AssociationTest extends TestCase
         $one->shouldReceive('isOk')->andReturn(true);
         $one->shouldReceive('isCompatible')->andReturn(true);
         $one->shouldReceive('compare')->andReturn(42);
+        $one->shouldReceive('addAssociation');
+
         $two = m::mock(AssociationStubBase::class);
         $two->shouldReceive('isOk')->andReturn(true);
+        $two->shouldReceive('addAssociation');
 
         $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
@@ -86,8 +97,11 @@ class AssociationTest extends TestCase
         $one->shouldReceive('isOk')->andReturn(true);
         $one->shouldReceive('isCompatible')->andReturn(true);
         $one->shouldReceive('compare')->andReturn(-1);
+        $one->shouldReceive('addAssociation');
+
         $two = m::mock(AssociationStubBase::class);
         $two->shouldReceive('isOk')->andReturn(true);
+        $two->shouldReceive('addAssociation');
 
         $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
