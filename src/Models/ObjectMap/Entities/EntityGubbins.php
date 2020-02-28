@@ -160,6 +160,7 @@ class EntityGubbins
                 $msg = 'Stubs array must only have AssociationStubBase objects';
                 throw new \Exception($msg);
             }
+            $field->setEntity($this);
         }
         $this->stubs = $stubs;
     }

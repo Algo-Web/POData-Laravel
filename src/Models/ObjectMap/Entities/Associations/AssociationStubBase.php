@@ -2,6 +2,9 @@
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
+
 abstract class AssociationStubBase
 {
     /**
@@ -56,6 +59,30 @@ abstract class AssociationStubBase
      */
     protected $associations = [];
 
+    /**
+     * @var EntityGubbins the entity this stub lives on.
+     */
+    protected $entity;
+
+    /**
+     * Sets the entity owning this AssocationStub
+     *
+     * @param EntityGubbins $entity
+     */
+    public function setEntity(EntityGubbins $entity): void
+    {
+        $this->entity = $entity;
+    }
+
+    /**
+     * Gets the entity owning this AssocationStub
+     *
+     * @return EntityGubbins
+     */
+    public function getEntity(): EntityGubbins
+    {
+        return $this->entity;
+    }
     /**
      * Adds this stub as a member of an assocation
      *
