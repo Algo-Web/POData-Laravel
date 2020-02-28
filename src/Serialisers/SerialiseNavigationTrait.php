@@ -44,7 +44,7 @@ trait SerialiseNavigationTrait
         //we will directly return the root node,
         //which is 'ExpandedProjectionNode'
         // for resource identified by resource path.
-        if (0 != $depth) {
+        if (!empty($segmentNames)) {
             for ($i = 1; $i < $depth; ++$i) {
                 $segName                = $segmentNames[$i]['prop'];
                 $expandedProjectionNode = $expandedProjectionNode->findNode($segName);
