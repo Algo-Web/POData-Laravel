@@ -76,12 +76,12 @@ class AssociationStubFactoryTest extends TestCase
             ['invoice', Order::class, Invoice::class, 'id', 'order_id',['id', 'order_id']], // Has one
             ['invoices', Customer::class, Invoice::class, 'id', 'order_id', ['id','customer_id','id','order_id']],
             ['customer', Invoice::class, Customer::class, 'order_id', 'id', ['order_id','id','customer_id','id']],
-            //TODO: the morphOneHandler Should do this... but doesnt ['photos', Customer::class, Photo::class, 'id', 'rel_id', ['id', 'rel_type','rel_id']], // Morph One
-            //TODO: the morphManyHandler should do this... but doesnt ['photos', Employee::class, Photo::class, 'id', 'rel_id', ['id', 'rel_type','rel_id']], // Morph Many
-            //TODO: the morphToHandler should do this... but doesnt ['photoOf', Photo::class,null, 'rel_id', null, ['rel_id', 'rel_type', null]]
-            //TODO: the morphToManyHandler should do this... but doesnt ['tags', Customer::class, Tag::class, 'id', 'id', ['id','taggable_id','taggable_type','tag_id', 'id']],
-            //TODO: the morphedByManyHandler should do this... but doesnt['taggedCustomer', Tag::class, Customer::class, 'id', 'id', ['id','tag_id','taggable_type','taggable_id', 'id']],
-            //TODO: the morphedByManyHandler should do this... but doesnt['taggedEmployees', Tag::class, Employee::class, 'id', 'id', ['id','tag_id','taggable_type','taggable_id', 'id']],
+            ['photos', Customer::class, Photo::class, 'id', 'rel_id', ['id', 'rel_type','rel_id']], // Morph One
+            ['photos', Employee::class, Photo::class, 'id', 'rel_id', ['id', 'rel_type','rel_id']], // Morph Many
+            ['photoOf', Photo::class,null, 'rel_id', null, ['rel_id', 'rel_type', null]],
+            ['tags', Customer::class, Tag::class, 'id', 'id', ['id','taggable_id','taggable_type','tag_id', 'id']],
+            ['taggedCustomer', Tag::class, Customer::class, 'id', 'id', ['id','tag_id','taggable_type','taggable_id', 'id']],
+            ['taggedEmployees', Tag::class, Employee::class, 'id', 'id', ['id','tag_id','taggable_type','taggable_id', 'id']],
         ];
     }
 
@@ -103,7 +103,7 @@ class AssociationStubFactoryTest extends TestCase
             'of Type: %s' . "\r\n";
         $oneMessage = sprintf($message, $oneRel, $oneModel, $oneRelType);
         $twoMessage = sprintf($message, $twoRel, $twoModel, $twoRelType);
-        $message    = sprintf($oneMessage . '%s' . "\r\n" . $twoMessage, $compatible ? 'SHOULD' : 'SHOULD NOT');
+        $message    = sprintf($oneMessage . '%s' . "\r\n" . $twoMessage, ($compatible ? 'SHOULD' : 'SHOULD NOT') . ' BE COMPATABLE WITH ');
         $oneStub    = AssociationStubFactory::associationStubFromRelation(new $oneModel(), $oneRel);
         $twoStub    = AssociationStubFactory::associationStubFromRelation(new $twoModel(), $twoRel);
         $this->assertEquals($compatible, $oneStub->isCompatible($twoStub), $message);
@@ -117,17 +117,17 @@ class AssociationStubFactoryTest extends TestCase
     public function associationStubCompatibleProvider()
     {
         return [
-            [Customer::class, 'orders', Order::class, 'customer',true], //  HasMany -> BelongsTo
+            [Customer::class, 'orders', Order::class, 'customer',true],//  HasMany -> BelongsTo
             [Customer::class, 'photos', Photo::class, 'photoOf',true], // MorphOne -> MorphTo
             [Employee::class, 'photos', Photo::class, 'photoOf',true], // MorphMany -> MorphTo
             [Employee::class, 'tags', Tag::class, 'taggedEmployees',true], // MorphToMany -> MorphedByMany
             [Customer::class, 'tags', Tag::class, 'taggedCustomer',true], // MorphToMany -> MorphedByMany
-            [Order::class, 'invoice', Invoice::class, 'order',true], // HasOne -> BelongsTo
+             [Order::class, 'invoice', Invoice::class, 'order',true], // HasOne -> BelongsTo
             [Customer::class, 'invoices', Invoice::class, 'customer',true], // HasManyThrough -> HasManyThrough
             [Customer::class, 'orders', Employee::class, 'privileges',false],
             [Customer::class, 'photos', Order::class, 'customer',false],
-            // TODO: this tests should pass, but current stub factoy is broke see: testAssociationStubFactory [Employee::class, 'tags', Tag::class, 'taggedCustomer',false],
-            // TODO: this tests should pass, but current stub factoy is broke see: testAssociationStubFactory[Customer::class, 'tags', Tag::class, 'taggedEmployees',false],
+            [Employee::class, 'tags', Tag::class, 'taggedCustomer',false],
+            [Customer::class, 'tags', Tag::class, 'taggedEmployees',false], //
         ];
     }
 }
