@@ -408,7 +408,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $expected->setMultiplicity(AssociationStubRelationType::ONE());
         $expected->setThroughFieldChain(['morph_id', 'morph_type', null]);
         $expected->setMorphType('morph_type');
-$expected->setEntity($modelEntity);
+        $expected->setEntity($modelEntity);
         $result = $foo->getRelationsByRelationName(TestMorphManySource::class, 'morphTarget');
         $this->assertEquals(1, count($result));
         $expected->addAssociation($result[0]->getAssocations()[0]);

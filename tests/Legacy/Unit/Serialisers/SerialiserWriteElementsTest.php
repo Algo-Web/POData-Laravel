@@ -3,6 +3,7 @@
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
 use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
@@ -48,7 +49,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -110,7 +111,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -158,6 +159,10 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $metadata['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metadata['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['many_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['many_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['one_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['one_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $source            = new TestMonomorphicSource($metadata, null);
         $target            = new TestMonomorphicTarget($metadata, null);
 
@@ -174,7 +179,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -226,6 +231,10 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $metadata['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metadata['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['many_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['many_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['one_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['one_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $source            = new TestMonomorphicSource($metadata, null);
         $target            = new TestMonomorphicTarget($metadata, null);
 
@@ -242,7 +251,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -319,7 +328,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -387,7 +396,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -440,7 +449,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);

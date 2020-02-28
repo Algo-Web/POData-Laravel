@@ -4,6 +4,7 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Models\IMetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubRelationType;
@@ -256,7 +257,7 @@ class MetadataProvider extends MetadataBaseProvider
     {
         App::forgetInstance('metadata');
         App::forgetInstance('objectmap');
-        $this->relationHolder = new MetadataGubbinsHolder();
+        $this->relationHolder = new MetadataRelationshipContainer();
 
         self::$metaNAMESPACE = env('ODataMetaNamespace', 'Data');
         // If we aren't migrated, there's no DB tables to pull metadata _from_, so bail out early

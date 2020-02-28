@@ -3,6 +3,7 @@
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Support\Facades\App;
@@ -124,7 +125,7 @@ class MetadataProviderRelationTest extends TestCase
         $abstract->shouldReceive('setCustomState')->andReturn(null);
         $abstract->shouldReceive('getCustomState')->andReturn($abstractSet);
 
-        $holder = new MetadataGubbinsHolder();
+        $holder = new MetadataRelationshipContainer();
         $foo    = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getRelationHolder')->andReturn($holder);
         $foo->shouldReceive('getCandidateModels')->andReturn($classen);

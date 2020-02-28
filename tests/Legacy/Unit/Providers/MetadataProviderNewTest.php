@@ -3,6 +3,7 @@
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Support\Facades\App;
@@ -60,7 +61,7 @@ class MetadataProviderNewTest extends TestCase
         $map = new Map();
         App::instance('objectmap', $map);
 //        $this->object = new \AlgoWeb\PODataLaravel\Providers\MetadataProvider();
-        $holder       = new MetadataGubbinsHolder();
+        $holder       = new MetadataRelationshipContainer();
         $this->object = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $this->object->shouldReceive('getRelationHolder')->andReturn($holder);
         self::resetMetadataProvider($this->object);
@@ -137,7 +138,14 @@ class MetadataProviderNewTest extends TestCase
         $metaRaw['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['photo']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['morph_id']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['parent_id']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['child_id']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['many_source']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
         $this->setUpSchemaFacade();
 
         $meta = new SimpleMetadataProvider('Data', 'Data');
@@ -241,6 +249,10 @@ class MetadataProviderNewTest extends TestCase
         $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['many_source'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
@@ -288,6 +300,9 @@ class MetadataProviderNewTest extends TestCase
         $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['morph_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
         $this->setUpSchemaFacade();
 
         $cacheStore = Cache::getFacadeRoot();
@@ -334,6 +349,11 @@ class MetadataProviderNewTest extends TestCase
         $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['many_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['morph_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $testModel = new TestModel($metaRaw, null);
         App::instance(TestModel::class, $testModel);

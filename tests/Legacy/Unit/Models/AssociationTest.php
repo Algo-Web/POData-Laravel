@@ -119,11 +119,15 @@ class AssociationTest extends TestCase
     {
         $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model   = new TestMonomorphicSource($metaRaw);
         $nuModel = new TestMonomorphicTarget($metaRaw);
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $foo->addEntity($model->extractGubbins());
         $foo->addEntity($nuModel->extractGubbins());
 

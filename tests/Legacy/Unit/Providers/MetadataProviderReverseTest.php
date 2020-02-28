@@ -3,6 +3,7 @@
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Providers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
@@ -29,7 +30,7 @@ class MetadataProviderReverseTest extends TestCase
         parent::setUp();
         $map = new Map();
         App::instance('objectmap', $map);
-        $holder                 = new MetadataGubbinsHolder();
+        $holder                 = new MetadataRelationshipContainer();
         $this->metadataProvider = m::mock(MetadataProvider::class)
             ->makePartial()->shouldAllowMockingProtectedMethods();
         $this->metadataProvider->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -42,6 +43,10 @@ class MetadataProviderReverseTest extends TestCase
         $meta['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $meta['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['many_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['many_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['one_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['one_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
 
@@ -90,6 +95,7 @@ class MetadataProviderReverseTest extends TestCase
         $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $meta['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['morph_id']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
 
@@ -179,6 +185,7 @@ class MetadataProviderReverseTest extends TestCase
         $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $meta['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $meta['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['morph_id']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
 
