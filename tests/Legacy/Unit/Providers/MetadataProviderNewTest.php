@@ -134,18 +134,18 @@ class MetadataProviderNewTest extends TestCase
 
     public function testBootHasMigrationsShouldBeCached()
     {
-        $metaRaw                 = [];
-        $metaRaw['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['photo']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['morph_id']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['parent_id']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['child_id']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw                       = [];
+        $metaRaw['id']                 = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['alternate_id']       = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']               = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo']              = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['morph_id']           = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['parent_id']          = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['child_id']           = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
         $metaRaw['many_source']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['many_id']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['one_source']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['one_id']        = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id']            = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source']         = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id']             = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
         $this->setUpSchemaFacade();
 
         $meta = new SimpleMetadataProvider('Data', 'Data');
@@ -245,13 +245,13 @@ class MetadataProviderNewTest extends TestCase
 
     public function testBootHasMigrationsThreeDifferentRelationTypes()
     {
-        $metaRaw          = [];
-        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['one_id'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['one_source'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['many_id'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw                = [];
+        $metaRaw['id']          = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']        = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo']       = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id']      = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source']  = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id']     = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $metaRaw['many_source'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $this->setUpSchemaFacade();
 
@@ -296,11 +296,11 @@ class MetadataProviderNewTest extends TestCase
 
     public function testOneToManyRelationConsistentBothWays()
     {
-        $metaRaw          = [];
-        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['one_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw              = [];
+        $metaRaw['id']        = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']      = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo']     = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id']    = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['morph_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -345,15 +345,15 @@ class MetadataProviderNewTest extends TestCase
     {
         $functionName = [get_class($this), 'getterSingleton'];
 
-        $metaRaw          = [];
-        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw                 = [];
+        $metaRaw['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $metaRaw['many_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['many_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['one_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['one_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['morph_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id']      = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id']       = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source']   = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['morph_id']     = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $testModel = new TestModel($metaRaw, null);
         App::instance(TestModel::class, $testModel);

@@ -39,14 +39,14 @@ class MetadataProviderReverseTest extends TestCase
 
     public function testReverseAcrossSingleRelation()
     {
-        $meta          = [];
-        $meta['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta                 = [];
+        $meta['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $meta['many_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['many_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['one_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['one_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['many_id']      = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['one_source']   = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['one_id']       = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
 
@@ -90,11 +90,11 @@ class MetadataProviderReverseTest extends TestCase
 
     public function testReverseAcrossTwoArmedPolymorphicRelation()
     {
-        $meta                 = [];
-        $meta['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta                     = [];
+        $meta['id']               = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['alternate_id']     = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name']             = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo']            = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $meta['morph_id']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -180,11 +180,11 @@ class MetadataProviderReverseTest extends TestCase
 
     public function testReverseAcrossMissingProperty()
     {
-        $meta                 = [];
-        $meta['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta                     = [];
+        $meta['id']               = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['alternate_id']     = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name']             = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['photo']            = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $meta['morph_id']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();

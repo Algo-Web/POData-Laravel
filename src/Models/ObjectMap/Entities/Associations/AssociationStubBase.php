@@ -60,12 +60,12 @@ abstract class AssociationStubBase
     protected $associations = [];
 
     /**
-     * @var EntityGubbins the entity this stub lives on.
+     * @var EntityGubbins the entity this stub lives on
      */
     protected $entity;
 
     /**
-     * Sets the entity owning this AssocationStub
+     * Sets the entity owning this AssocationStub.
      *
      * @param EntityGubbins $entity
      */
@@ -75,7 +75,7 @@ abstract class AssociationStubBase
     }
 
     /**
-     * Gets the entity owning this AssocationStub
+     * Gets the entity owning this AssocationStub.
      *
      * @return EntityGubbins
      */
@@ -84,13 +84,13 @@ abstract class AssociationStubBase
         return $this->entity;
     }
     /**
-     * Adds this stub as a member of an association
+     * Adds this stub as a member of an association.
      *
-     * @param Association $newAssocation the new association to be a member of
+     * @param Association $newAssociation the new association to be a member of
      */
-    public function addAssociation(Association $newAssocation): void
+    public function addAssociation(Association $newAssociation): void
     {
-        $this->associations[spl_object_hash($newAssocation)] = $newAssocation;
+        $this->associations[spl_object_hash($newAssociation)] = $newAssociation;
     }
 
     /**
@@ -145,7 +145,6 @@ abstract class AssociationStubBase
 
     public function getKeyField() : ?EntityField
     {
-
         return $this->entity->getFields()[$this->getKeyFieldName()];
     }
 
@@ -281,12 +280,12 @@ abstract class AssociationStubBase
      */
     public function compare(AssociationStubBase $other)
     {
-        $thisFirst = $this->getKeyFieldName() === '' ? false : $this->getKeyField()->getIsKeyField();
+        $thisFirst  = $this->getKeyFieldName() === '' ? false : $this->getKeyField()->getIsKeyField();
         $otherFirst = $other->getKeyFieldName() === '' ? false : $other->getKeyField()->getIsKeyField();
-        if(
+        if (
             ($thisFirst || $otherFirst) &&
             !($thisFirst && $otherFirst)
-            ){
+            ) {
             return $thisFirst ? -1 : 1;
         }
         $thisClass  = get_class($this);

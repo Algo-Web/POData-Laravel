@@ -122,7 +122,7 @@ class AssociationStubFactoryTest extends TestCase
             [Employee::class, 'photos', Photo::class, 'photoOf',true], // MorphMany -> MorphTo
             [Employee::class, 'tags', Tag::class, 'taggedEmployees',true], // MorphToMany -> MorphedByMany
             [Customer::class, 'tags', Tag::class, 'taggedCustomer',true], // MorphToMany -> MorphedByMany
-             [Order::class, 'invoice', Invoice::class, 'order',true], // HasOne -> BelongsTo
+            [Order::class, 'invoice', Invoice::class, 'order',true], // HasOne -> BelongsTo
             [Customer::class, 'invoices', Invoice::class, 'customer',true], // HasManyThrough -> HasManyThrough
             [Customer::class, 'orders', Employee::class, 'privileges',false],
             [Customer::class, 'photos', Order::class, 'customer',false],

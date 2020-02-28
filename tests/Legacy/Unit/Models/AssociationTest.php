@@ -117,12 +117,12 @@ class AssociationTest extends TestCase
      */
     public function testGetAssociationTwoRelsOnSameModelPair()
     {
-        $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['id']          = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']        = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['many_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['one_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['many_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['one_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id']     = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id']      = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model   = new TestMonomorphicSource($metaRaw);
         $nuModel = new TestMonomorphicTarget($metaRaw);
@@ -181,16 +181,16 @@ class AssociationTest extends TestCase
      */
     public function testGetAssociationsWithTwoRelatedModels()
     {
-        $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['id']          = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']        = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
         $metaRaw['many_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['one_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['many_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['one_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id']     = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id']      = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model   = new TestMonomorphicSource($metaRaw);
         $nuModel = new TestMonomorphicTarget($metaRaw);
-        $foo = new MetadataRelationshipContainer();
+        $foo     = new MetadataRelationshipContainer();
         $foo->addEntity($model->extractGubbins());
         $foo->addEntity($nuModel->extractGubbins());
 

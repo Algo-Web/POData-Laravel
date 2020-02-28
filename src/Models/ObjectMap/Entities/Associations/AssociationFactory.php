@@ -59,6 +59,7 @@ abstract class AssociationFactory
         $stubNew->setForeignFieldName($stubTwo->getKeyFieldName());
         $entity = $stub->getEntity();
         $stubs = $entity->getStubs();
+
         $stubs[$stubNew->getRelationName()] = $stubNew;
         $entity->setStubs($stubs);
         return $stubNew;

@@ -57,14 +57,14 @@ class MetadataProviderUriTest extends TestCase
 
     public function testUriOfMonomorphicOneToOneRelation()
     {
-        $metaRaw          = [];
-        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw                = [];
+        $metaRaw['id']          = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']        = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo']       = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $metaRaw['many_source'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['many_id'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['one_source'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['one_id'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id']     = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source']  = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id']      = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
 
@@ -129,14 +129,14 @@ class MetadataProviderUriTest extends TestCase
 
     public function testUriOfMonomorphicOneToManyRelation()
     {
-        $metaRaw          = [];
-        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw                = [];
+        $metaRaw['id']          = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']        = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo']       = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $metaRaw['many_source'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['many_id'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['one_source'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $metaRaw['one_id'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id']     = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source']  = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id']      = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
 
@@ -263,10 +263,10 @@ class MetadataProviderUriTest extends TestCase
 
     public function testUriOfPolymorphicOneToOneRelation()
     {
-        $metaRaw          = [];
-        $metaRaw['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw             = [];
+        $metaRaw['id']       = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']     = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo']    = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $metaRaw['morph_id'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();
@@ -326,11 +326,11 @@ class MetadataProviderUriTest extends TestCase
 
     public function testUriOfPolymorphicOneToManyRelation()
     {
-        $metaRaw                 = [];
-        $metaRaw['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['alternate_id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metaRaw['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metaRaw                    = [];
+        $metaRaw['id']              = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['alternate_id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']            = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['photo']           = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $metaRaw['morph_id']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $this->setUpSchemaFacade();

@@ -155,16 +155,16 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $request->shouldReceive('fullUrl')
             ->andReturn('http://localhost/odata.svc/TestMonomorphicSources(id=1)/manySource');
 
-        $metadata          = [];
-        $metadata['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metadata['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata                 = [];
+        $metadata['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $metadata['many_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metadata['many_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metadata['one_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metadata['one_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $source            = new TestMonomorphicSource($metadata, null);
-        $target            = new TestMonomorphicTarget($metadata, null);
+        $metadata['many_id']      = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['one_source']   = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['one_id']       = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $source                   = new TestMonomorphicSource($metadata, null);
+        $target                   = new TestMonomorphicTarget($metadata, null);
 
         App::instance(TestMonomorphicSource::class, $source);
         App::instance(TestMonomorphicTarget::class, $target);
@@ -227,16 +227,16 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $request->shouldReceive('fullUrl')
             ->andReturn('http://localhost/odata.svc/TestMonomorphicSources?$expand=manySource');
 
-        $metadata          = [];
-        $metadata['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metadata['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata                 = [];
+        $metadata['id']           = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name']         = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo']        = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
         $metadata['many_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metadata['many_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metadata['one_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metadata['one_id']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $source            = new TestMonomorphicSource($metadata, null);
-        $target            = new TestMonomorphicTarget($metadata, null);
+        $metadata['many_id']      = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['one_source']   = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['one_id']       = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $source                   = new TestMonomorphicSource($metadata, null);
+        $target                   = new TestMonomorphicTarget($metadata, null);
 
         App::instance(TestMonomorphicSource::class, $source);
         App::instance(TestMonomorphicTarget::class, $target);

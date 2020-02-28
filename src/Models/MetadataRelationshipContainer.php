@@ -1,8 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 
 namespace AlgoWeb\PODataLaravel\Models;
-
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationFactory;
@@ -24,7 +23,7 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
     private $stubs = [
     ];
     /**
-     * A complete set of associations, keyed by classname
+     * A complete set of associations, keyed by classname.
      *
      * @var Association[]
      */
@@ -37,7 +36,7 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
      */
     public function addEntity(EntityGubbins $entity): void
     {
-        $baseType = $entity->getClassName();
+        $baseType                  = $entity->getClassName();
         $this->entities[$baseType] = $entity;
         if (array_key_exists($baseType, $this->stubs)) {
             throw new \InvalidArgumentException(sprintf('%s already added', $baseType));
@@ -54,8 +53,8 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
     }
 
     /**
-     * @param string $baseType
-     * @param string $targetType
+     * @param  string                $baseType
+     * @param  string                $targetType
      * @return AssociationStubBase[]
      */
     private function getStubs(?string $baseType, ?string $targetType): array
@@ -121,7 +120,7 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
     /**
      * gets All Association On a given class.
      *
-     * @param string $className
+     * @param  string        $className
      * @return Association[]
      */
     public function getRelationsByClass(string $className): array
@@ -147,10 +146,10 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
         }
     }
     /**
-     * gets all defined Association
+     * gets all defined Association.
      *
-     * @return Association[]
      * @throws InvalidOperationException
+     * @return Association[]
      */
     public function getRelations(): array
     {
@@ -161,9 +160,9 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
     }
 
     /**
-     * checks if a class is loaded into the relation container
+     * checks if a class is loaded into the relation container.
      *
-     * @param string $className
+     * @param  string $className
      * @return bool
      */
     public function hasClass(string $className): bool
