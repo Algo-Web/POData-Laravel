@@ -27,7 +27,7 @@ class EntityGubbins
     private $keyFields = [];
 
     /**
-     * @var EntityField[]
+     * @var EntityField[] keyed by name
      */
     private $fields = [];
 
