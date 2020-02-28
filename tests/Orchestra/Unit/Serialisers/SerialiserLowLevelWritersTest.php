@@ -11,7 +11,14 @@ use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use AlgoWeb\PODataLaravel\Serialisers\SerialiserLowLevelWriters;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use POData\Common\InvalidOperationException;
+use POData\Providers\Metadata\ResourceProperty;
+use POData\Providers\Metadata\ResourcePropertyKind;
+use POData\Providers\Metadata\ResourceType;
+use POData\Providers\Metadata\ResourceTypeKind;
 use POData\Providers\Metadata\Type\StringType;
+use POData\Providers\Metadata\Type\DateTime;
+use Mockery as m;
 
 class SerialiserLowLevelWritersTest extends TestCase
 {
@@ -35,5 +42,53 @@ class SerialiserLowLevelWritersTest extends TestCase
         $actual = SerialiserLowLevelWriters::primitiveToString($type, $date);
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testBadDateWithDateType()
+    {
+        $date = 'date!';
+        $type = new DateTime();
+
+        $expected = 'date!';
+
+        $actual = SerialiserLowLevelWriters::primitiveToString($type, $date);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     */
+    public function testWriteBagValueWithBadPrimitiveType()
+    {
+        $rProp = m::mock(ResourceProperty::class);
+        $rProp->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE);
+        $rProp->shouldReceive('getName')->andReturn('property');
+
+        $rType = m::mock(ResourceType::class);
+        $rType->shouldReceive("getAllProperties")->andReturn([$rProp]);
+        $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE());
+        $rType->shouldReceive('getInstanceType')->andReturn(new \stdClass);
+
+        $result = ['foo'];
+
+        $this->expectException(InvalidOperationException::class);
+        $this->expectExceptionMessage('stdClass');
+
+        SerialiserLowLevelWriters::writeBagValue($rType, $result);
+    }
+
+    public function testWriteComplexValueWithObjectCollision()
+    {
+        $rType = m::mock(ResourceType::class);
+
+        $result = new \stdClass();
+        $coll = [$result];
+
+        $this->expectException(InvalidOperationException::class);
+        $this->expectExceptionMessage('circular loop was detected');
+
+        SerialiserLowLevelWriters::writeComplexValue($rType, $result, 'property', $coll);
     }
 }

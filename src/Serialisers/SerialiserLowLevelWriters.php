@@ -32,8 +32,11 @@ abstract class SerialiserLowLevelWriters
      * @throws InvalidOperationException
      * @return ODataPropertyContent
      */
-    public static function writePrimitiveProperties(Model $entryObject, ModelSerialiser $modelSerialiser, $nonRelProp)
-    {
+    public static function writePrimitiveProperties(
+        Model $entryObject,
+        ModelSerialiser $modelSerialiser,
+        $nonRelProp
+    ): ODataPropertyContent {
         $propertyContent = new ODataPropertyContent();
         $cereal          = $modelSerialiser->bulkSerialise($entryObject);
         $cereal          = array_intersect_key($cereal, $nonRelProp);
@@ -59,7 +62,7 @@ abstract class SerialiserLowLevelWriters
      * @throws \ReflectionException
      * @return ODataBagContent|null
      */
-    public static function writeBagValue(ResourceType &$resourceType, $result)
+    public static function writeBagValue(ResourceType &$resourceType, $result) : ?ODataBagContent
     {
         if (!(null == $result || is_array($result))) {
             throw new InvalidOperationException('Bag parameter must be null or array');
@@ -104,7 +107,7 @@ abstract class SerialiserLowLevelWriters
         &$result,
         $propertyName = null,
         array &$instanceCollection = []
-    ) {
+    ): ODataPropertyContent {
         if (!is_object($result)) {
             throw new InvalidOperationException('Supplied $customObject must be an object');
         }
@@ -171,7 +174,7 @@ abstract class SerialiserLowLevelWriters
      *
      * @return string
      */
-    public static function primitiveToString(IType &$type, $primitiveValue)
+    public static function primitiveToString(IType &$type, $primitiveValue): string
     {
         // kludge to enable switching on type of $type without getting tripped up by mocks as we would with get_class
         // switch (true) means we unconditionally enter, and then lean on case statements to match given block
