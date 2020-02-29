@@ -114,7 +114,7 @@ trait SerialiseNextPageLinksTrait
      *                                   is no query parameters
      *                                   required for the next link of top level result set
      */
-    protected function getNextPageLinkQueryParametersForRootResourceSet()
+    protected function getNextPageLinkQueryParametersForRootResourceSet() : ?string
     {
         /** @var string|null $queryParameterString */
         $queryParameterString = null;
@@ -136,7 +136,7 @@ trait SerialiseNextPageLinksTrait
 
         $topCountValue = $this->getRequest()->getTopOptionCount();
         if (null !== $topCountValue) {
-            $remainingCount = $topCountValue-$this->getRequest()->getTopCount();
+            $remainingCount = $topCountValue - $this->getRequest()->getTopCount();
             if (0 < $remainingCount) {
                 if (null !== $queryParameterString) {
                     $queryParameterString .= '&';
