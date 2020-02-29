@@ -21,4 +21,14 @@ class DummyIronicSerialiser extends IronicSerialiser
     {
         parent::loadStackIfEmpty();
     }
+
+    public function getNextLinkUri(&$lastObject)
+    {
+        return parent::getNextLinkUri($lastObject);
+    }
+
+    public function getNextPageLinkQueryParametersForRootResourceSet() : ?string
+    {
+        return parent::getNextPageLinkQueryParametersForRootResourceSet();
+    }
 }
