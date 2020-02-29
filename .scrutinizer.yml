@@ -177,5 +177,5 @@ tools:
   php_changetracking: true
 
 build_failure_conditions:
-  - 'elements.rating(<= F).new.exists'
+  - 'elements.rating(<= D).new.exists'
   - 'issues.severity(>= CRITICAL).new.exists'
