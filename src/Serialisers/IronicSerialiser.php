@@ -500,7 +500,6 @@ class IronicSerialiser implements IObjectSerialiser
         string $propName
     ) {
         $nextName             = $prop->getResourceType()->getName();
-        $nuLink->isExpanded   = true;
         $value                = $entryObject->results->{$propName};
         $isCollection         = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
         $nuLink->isCollection = $isCollection;
@@ -564,6 +563,7 @@ class IronicSerialiser implements IObjectSerialiser
         $links = [];
         foreach ($relProp as $prop) {
             $nuLink   = new ODataLink();
+            /** @var ResourcePropertyKind|int $propKind */
             $propKind = $prop->getKind();
 
             if (!(ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind
@@ -579,7 +579,6 @@ class IronicSerialiser implements IObjectSerialiser
             $nuLink->name         = ODataConstants::ODATA_RELATED_NAMESPACE . $propName;
             $nuLink->url          = $relativeUri . '/' . $propName;
             $nuLink->type         = $propType;
-            $nuLink->isExpanded   = false;
             $nuLink->isCollection = 'feed' === $propTail;
 
             $shouldExpand = $this->shouldExpandSegment($propName);
