@@ -552,14 +552,14 @@ class IronicSerialiser implements IObjectSerialiser
 
     /**
      * @param  QueryResult               $entryObject
-     * @param  array                     $relProp
+     * @param  ResourceProperty[]        $relProp
      * @param  string                    $relativeUri
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \ReflectionException
      * @return array
      */
-    protected function buildLinksFromRels(QueryResult $entryObject, array $relProp, string $relativeUri)
+    protected function buildLinksFromRels(QueryResult $entryObject, array $relProp, string $relativeUri) : array
     {
         $links = [];
         foreach ($relProp as $prop) {

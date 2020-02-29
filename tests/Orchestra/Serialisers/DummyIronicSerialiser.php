@@ -9,6 +9,7 @@
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Serialisers;
 
 use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
+use POData\Providers\Query\QueryResult;
 
 class DummyIronicSerialiser extends IronicSerialiser
 {
@@ -30,5 +31,10 @@ class DummyIronicSerialiser extends IronicSerialiser
     public function getNextPageLinkQueryParametersForRootResourceSet() : ?string
     {
         return parent::getNextPageLinkQueryParametersForRootResourceSet();
+    }
+
+    public function buildLinksFromRels(QueryResult $entryObject, array $relProp, string $relativeUri) : array
+    {
+        return parent::buildLinksFromRels($entryObject, $relProp, $relativeUri);
     }
 }
