@@ -548,9 +548,6 @@ class IronicSerialiser implements IObjectSerialiser
             $nuLink->expandedResult->title           = new ODataTitle($propName);
             $nuLink->expandedResult->id              = rtrim($this->absoluteServiceUri ?? '', '/') . '/' . $nuLink->url;
         }
-        if (!isset($nuLink->expandedResult)) {
-            throw new InvalidOperationException('');
-        }
     }
 
     /**
@@ -592,10 +589,6 @@ class IronicSerialiser implements IObjectSerialiser
                 $this->expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName);
             }
             $nuLink->isExpanded = isset($nuLink->expandedResult);
-            if (null === $nuLink->isCollection) {
-                throw new InvalidOperationException('');
-            }
-
             $links[] = $nuLink;
         }
         return $links;
