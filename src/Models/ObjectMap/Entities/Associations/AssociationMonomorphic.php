@@ -36,10 +36,10 @@ class AssociationMonomorphic extends Association
     {
         $first = $this->getFirst();
         $last  = $this->getLast();
-        if (null === $first || !$first->isOk()) {
+        if (!$first->isOk()) {
             return false;
         }
-        if (null === $last || !$last->isOk()) {
+        if (!$last->isOk()) {
             return false;
         }
         if (!$first->isCompatible($last)) {

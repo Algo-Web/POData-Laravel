@@ -17,7 +17,11 @@ class AssociationTest extends TestCase
 {
     public function testNotOkNewCreation()
     {
+        $stub = m::mock(AssociationStubBase::class)->makePartial();
+        $stub->shouldReceive('isOk')->andReturn(false);
         $foo = new AssociationMonomorphic();
+        $foo->setFirst($stub);
+        $foo->setLast($stub);
         $this->assertFalse($foo->isOk());
     }
 
@@ -27,19 +31,13 @@ class AssociationTest extends TestCase
         $one->shouldReceive('isOk')->andReturn(false);
         $one->shouldReceive('addAssociation');
 
-        $foo = new AssociationMonomorphic();
-        $foo->setFirst($one);
-        $this->assertFalse($foo->isOk());
-    }
-
-    public function testNotOkSecondEmpty()
-    {
-        $one = m::mock(AssociationStubBase::class);
-        $one->shouldReceive('isOk')->andReturn(true);
-        $one->shouldReceive('addAssociation');
+        $two = m::mock(AssociationStubBase::class);
+        $two->shouldReceive('isOk')->andReturn(true);
+        $two->shouldReceive('addAssociation');
 
         $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
+        $foo->setLast($two);
         $this->assertFalse($foo->isOk());
     }
 
