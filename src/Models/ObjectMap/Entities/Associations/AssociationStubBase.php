@@ -199,7 +199,6 @@ abstract class AssociationStubBase
             $this->relationName,
             $this->keyFieldName,
             $this->baseType,
-            $this->throughFieldChain
         ];
         $requireResult = array_filter($required, [$this, 'checkStringInput']);
 
