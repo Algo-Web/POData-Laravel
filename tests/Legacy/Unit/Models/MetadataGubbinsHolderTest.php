@@ -116,14 +116,10 @@ class MetadataGubbinsHolderTest extends TestCase
         $nuEntity = $nuModel->extractGubbins();
         $foo->addEntity($nuEntity);
 
-        $expected = new AssociationStubMonomorphic();
-        $expected->setRelationName('oneTarget');
+        $expected = new AssociationStubMonomorphic('oneTarget', 'one_source', ['one_source', 'one_id'], AssociationStubRelationType::ONE());
         $expected->setForeignFieldName('one_id');
-        $expected->setKeyFieldName('one_source');
         $expected->setBaseType(TestMonomorphicTarget::class);
         $expected->setTargType(TestMonomorphicSource::class);
-        $expected->setMultiplicity(AssociationStubRelationType::ONE());
-        $expected->setThroughFieldChain(['one_source', 'one_id']);
         $expected->setEntity($nuEntity);
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicSource::class, 'oneSource');
@@ -155,14 +151,10 @@ class MetadataGubbinsHolderTest extends TestCase
         $nuEntity = $nuModel->extractGubbins();
         $foo->addEntity($nuEntity);
 
-        $expected = new AssociationStubMonomorphic();
-        $expected->setRelationName('oneSource');
+        $expected = new AssociationStubMonomorphic('oneSource', 'one_id', ['one_id','one_source'], AssociationStubRelationType::NULL_ONE());
         $expected->setForeignFieldName('one_source');
-        $expected->setKeyFieldName('one_id');
         $expected->setBaseType(TestMonomorphicSource::class);
         $expected->setTargType(TestMonomorphicTarget::class);
-        $expected->setMultiplicity(AssociationStubRelationType::NULL_ONE());
-        $expected->setThroughFieldChain(['one_id','one_source']);
         $expected->setEntity($modelEntity);
         $result = $foo->getRelationsByRelationName(TestMonomorphicTarget::class, 'oneTarget');
         $this->assertEquals(1, count($result));
@@ -193,14 +185,10 @@ class MetadataGubbinsHolderTest extends TestCase
         $nuEntity = $nuModel->extractGubbins();
         $foo->addEntity($nuEntity);
 
-        $expected = new AssociationStubMonomorphic();
-        $expected->setRelationName('manyTarget');
+        $expected = new AssociationStubMonomorphic('manyTarget', 'many_source', ['many_source','many_id'], AssociationStubRelationType::ONE());
         $expected->setForeignFieldName('many_id');
-        $expected->setKeyFieldName('many_source');
         $expected->setBaseType(TestMonomorphicTarget::class);
         $expected->setTargType(TestMonomorphicSource::class);
-        $expected->setMultiplicity(AssociationStubRelationType::ONE());
-        $expected->setThroughFieldChain(['many_source','many_id']);
         $expected->setEntity($nuEntity);
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicSource::class, 'manySource');
@@ -232,14 +220,10 @@ class MetadataGubbinsHolderTest extends TestCase
         $nuEntity = $nuModel->extractGubbins();
         $foo->addEntity($nuEntity);
 
-        $expected = new AssociationStubMonomorphic();
-        $expected->setRelationName('manySource');
+        $expected = new AssociationStubMonomorphic('manySource', 'many_id', ['many_id', 'many_source'], AssociationStubRelationType::MANY());
         $expected->setForeignFieldName('many_source');
-        $expected->setKeyFieldName('many_id');
         $expected->setBaseType(TestMonomorphicSource::class);
         $expected->setTargType(TestMonomorphicTarget::class);
-        $expected->setMultiplicity(AssociationStubRelationType::MANY());
-        $expected->setThroughFieldChain(['many_id', 'many_source']);
         $expected->setEntity($modelEntity);
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicTarget::class, 'manyTarget');
@@ -267,14 +251,10 @@ class MetadataGubbinsHolderTest extends TestCase
         $nuEntity = $nuModel->extractGubbins();
         $foo->addEntity($nuEntity);
 
-        $expected = new AssociationStubMonomorphic();
-        $expected->setRelationName('manyTarget');
+        $expected = new AssociationStubMonomorphic('manyTarget', 'id', [ 'id', 'many_id', 'many_source', 'id'], AssociationStubRelationType::MANY());
         $expected->setForeignFieldName('id');
-        $expected->setKeyFieldName('id');
-        $expected->setThroughFieldChain([ 'id', 'many_id', 'many_source', 'id']);
         $expected->setBaseType(TestMonomorphicManyTarget::class);
         $expected->setTargType(TestMonomorphicManySource::class);
-        $expected->setMultiplicity(AssociationStubRelationType::MANY());
         $expected->setEntity($nuEntity);
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicManySource::class, 'manySource');
@@ -302,14 +282,10 @@ class MetadataGubbinsHolderTest extends TestCase
         $nuEntity = $nuModel->extractGubbins();
         $foo->addEntity($nuEntity);
 
-        $expected = new AssociationStubMonomorphic();
-        $expected->setRelationName('manySource');
+        $expected = new AssociationStubMonomorphic('manySource', 'id', ['id', 'many_source', 'many_id', 'id'], AssociationStubRelationType::MANY());
         $expected->setForeignFieldName('id');
-        $expected->setKeyFieldName('id');
         $expected->setBaseType(TestMonomorphicManySource::class);
         $expected->setTargType(TestMonomorphicManyTarget::class);
-        $expected->setMultiplicity(AssociationStubRelationType::MANY());
-        $expected->setThroughFieldChain(['id', 'many_source', 'many_id', 'id']);
         $expected->setEntity($modelEntity);
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicManyTarget::class, 'manyTarget');
@@ -362,14 +338,10 @@ class MetadataGubbinsHolderTest extends TestCase
         $nuEntity = $nuModel->extractGubbins();
         $foo->addEntity($nuEntity);
 
-        $expected = new AssociationStubPolymorphic();
-        $expected->setRelationName('morph_TestMorphOneSource');
+        $expected = new AssociationStubPolymorphic('morph_TestMorphOneSource', 'morph_id', ['morph_id', 'morph_type', null], AssociationStubRelationType::ONE());
         $expected->setForeignFieldName('id');
-        $expected->setKeyFieldName('morph_id');
         $expected->setBaseType(TestMorphTarget::class);
         $expected->setTargType(TestMorphOneSource::class);
-        $expected->setMultiplicity(AssociationStubRelationType::ONE());
-        $expected->setThroughFieldChain(['morph_id', 'morph_type', null]);
         $expected->setMorphType('morph_type');
         $expected->setEntity($modelEntity);
 
@@ -399,14 +371,10 @@ class MetadataGubbinsHolderTest extends TestCase
         $nuEntity = $nuModel->extractGubbins();
         $foo->addEntity($nuEntity);
 
-        $expected = new AssociationStubPolymorphic();
-        $expected->setRelationName('morph_TestMorphManySource');
+        $expected = new AssociationStubPolymorphic('morph_TestMorphManySource', 'morph_id', ['morph_id', 'morph_type', null], AssociationStubRelationType::ONE());
         $expected->setForeignFieldName('id');
-        $expected->setKeyFieldName('morph_id');
         $expected->setBaseType(TestMorphTarget::class);
         $expected->setTargType(TestMorphManySource::class);
-        $expected->setMultiplicity(AssociationStubRelationType::ONE());
-        $expected->setThroughFieldChain(['morph_id', 'morph_type', null]);
         $expected->setMorphType('morph_type');
         $expected->setEntity($modelEntity);
         $result = $foo->getRelationsByRelationName(TestMorphManySource::class, 'morphTarget');
@@ -436,14 +404,10 @@ class MetadataGubbinsHolderTest extends TestCase
         $nuEntity = $nuModel->extractGubbins();
         $foo->addEntity($nuEntity);
 
-        $expected = new AssociationStubPolymorphic();
-        $expected->setRelationName('manyTarget');
+        $expected = new AssociationStubPolymorphic('manyTarget', 'id', ['id', 'target_id', 'manyable_type', 'source_id', 'id'], AssociationStubRelationType::MANY());
         $expected->setForeignFieldName('id');
-        $expected->setKeyFieldName('id');
         $expected->setBaseType(TestMorphManyToManyTarget::class);
         $expected->setTargType(TestMorphManyToManySource::class);
-        $expected->setMultiplicity(AssociationStubRelationType::MANY());
-        $expected->setThroughFieldChain(['id', 'target_id', 'manyable_type', 'source_id', 'id']);
         $expected->setMorphType('manyable_type');
         $expected->setEntity($nuEntity);
 

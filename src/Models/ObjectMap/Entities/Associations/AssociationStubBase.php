@@ -65,6 +65,25 @@ abstract class AssociationStubBase
     protected $entity;
 
     /**
+     * AssociationStubBase constructor.
+     * @param string $relationName
+     * @param string $keyFieldName
+     * @param string[] $throughFieldChain
+     * @param AssociationStubRelationType $multiplicity
+     */
+    public function __construct(
+        string $relationName,
+        string $keyFieldName,
+        array $throughFieldChain,
+        AssociationStubRelationType $multiplicity
+    ) {
+        $this->relationName = $relationName;
+        $this->keyFieldName = $keyFieldName;
+        $this->throughFieldChain = $throughFieldChain;
+        $this->multiplicity = $multiplicity;
+    }
+
+    /**
      * Sets the entity owning this AssocationStub.
      *
      * @param EntityGubbins $entity
@@ -145,7 +164,7 @@ abstract class AssociationStubBase
 
     public function getKeyField() : ?EntityField
     {
-        return $this->entity->getFields()[$this->getKeyFieldName()];
+        return (null === $this->entity) ? null : $this->entity->getFields()[$this->getKeyFieldName()];
     }
 
     /**
@@ -262,8 +281,8 @@ abstract class AssociationStubBase
      */
     public function compare(AssociationStubBase $other)
     {
-        $thisFirst  = $this->getKeyFieldName() === '' ? false : $this->getKeyField()->getIsKeyField();
-        $otherFirst = $other->getKeyFieldName() === '' ? false : $other->getKeyField()->getIsKeyField();
+        $thisFirst  = null === $this->getKeyField() ? false : $this->getKeyField()->getIsKeyField();
+        $otherFirst = null === $other->getKeyField() ? false : $other->getKeyField()->getIsKeyField();
         if (
             ($thisFirst || $otherFirst) &&
             !($thisFirst && $otherFirst)
