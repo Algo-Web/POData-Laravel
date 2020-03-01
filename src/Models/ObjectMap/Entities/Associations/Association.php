@@ -13,14 +13,14 @@ abstract class Association
     ];
 
     /**
-     * @var AssociationStubBase|null
+     * @var AssociationStubBase
      */
     protected $first;
 
     /**
-     * @return AssociationStubBase|null
+     * @return AssociationStubBase
      */
-    public function getFirst(): ?AssociationStubBase
+    public function getFirst(): AssociationStubBase
     {
         return $this->first;
     }

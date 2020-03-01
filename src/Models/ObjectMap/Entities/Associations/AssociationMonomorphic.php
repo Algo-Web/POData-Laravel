@@ -8,14 +8,14 @@ class AssociationMonomorphic extends Association
 {
 
     /**
-     * @var AssociationStubBase|null
+     * @var AssociationStubBase
      */
     protected $last;
 
     /**
-     * @return AssociationStubBase|null
+     * @return AssociationStubBase
      */
-    public function getLast(): ?AssociationStubBase
+    public function getLast(): AssociationStubBase
     {
         return $this->last;
     }
