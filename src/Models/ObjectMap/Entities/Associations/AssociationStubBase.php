@@ -205,6 +205,7 @@ abstract class AssociationStubBase
         $isOk = true;
         $isOk &= $required == $requireResult;
         $isOk &= (null === $this->targType) === (null ===  $this->foreignFieldName);
+        $isOk &= count($this->throughFieldChain) >= 2;
 
         return boolval($isOk);
     }

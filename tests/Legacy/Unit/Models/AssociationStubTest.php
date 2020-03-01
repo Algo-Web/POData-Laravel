@@ -107,8 +107,8 @@ class AssociationStubTest extends TestCase
 
     public function testAssociationIncompatibleBothNotOk()
     {
-        $foo = new AssociationStubPolymorphic('rel', 'key', [], AssociationStubRelationType::ONE());
-        $bar = new AssociationStubPolymorphic('rel', '', [], AssociationStubRelationType::ONE());
+        $foo = new AssociationStubPolymorphic('rel', 'key', [null, 'rel_id', 'rel_type'], AssociationStubRelationType::ONE());
+        $bar = new AssociationStubPolymorphic('rel', '', ['rel_id',"rel_type",null], AssociationStubRelationType::ONE());
         $foo->setBaseType(TestMorphTarget::class);
         $this->assertTrue($foo->isOk());
         $this->assertFalse($bar->isOk());
