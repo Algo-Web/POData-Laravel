@@ -2,7 +2,7 @@
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Serialisers;
 
-use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Models\ModelReflectionHelper;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use AlgoWeb\PODataLaravel\Query\LaravelQuery;
@@ -72,7 +72,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -136,7 +136,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -188,12 +188,16 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicSources');
         $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestMonomorphicSources');
 
-        $metadata          = [];
-        $metadata['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metadata['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $source            = new TestMonomorphicSource($metadata, null);
-        $target            = new TestMonomorphicTarget($metadata, null);
+        $metadata                = [];
+        $metadata['id']          = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name']        = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo']       = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['many_source'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['one_source']  = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['many_id']     = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['one_id']      = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $source                  = new TestMonomorphicSource($metadata, null);
+        $target                  = new TestMonomorphicTarget($metadata, null);
 
         App::instance(TestMonomorphicSource::class, $source);
         App::instance(TestMonomorphicTarget::class, $target);
@@ -208,7 +212,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -253,12 +257,16 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestMonomorphicTargets');
         $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestMonomorphicTargets');
 
-        $metadata          = [];
-        $metadata['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metadata['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $source            = new TestMonomorphicSource($metadata, null);
-        $target            = new TestMonomorphicTarget($metadata, null);
+        $metadata                = [];
+        $metadata['id']          = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name']        = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo']       = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['many_source'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['one_source']  = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['one_id']      = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['many_id']     = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $source                  = new TestMonomorphicSource($metadata, null);
+        $target                  = new TestMonomorphicTarget($metadata, null);
 
         App::instance(TestMonomorphicSource::class, $source);
         App::instance(TestMonomorphicTarget::class, $target);
@@ -273,7 +281,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -342,7 +350,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -454,7 +462,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestModel::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -528,7 +536,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestMonomorphicManySource::class, TestMonomorphicManyTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -606,9 +614,13 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $request->shouldReceive('fullUrl')
             ->andReturn('http://localhost/odata.svc/TestMonomorphicSources(1)?$expand=manySource');
 
-        $metadata         = [];
-        $metadata['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata                = [];
+        $metadata['id']          = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name']        = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['many_source'] = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['one_source']  = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['many_id']     = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['one_id']      = ['type' => 'string', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $source = new TestMonomorphicSource($metadata);
         $target = new TestMonomorphicTarget($metadata);
@@ -626,7 +638,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -680,7 +692,14 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $result->results = $model;
 
         $propContent                               = new ODataPropertyContent();
-        $propContent->properties                   = ['id' => new ODataProperty(), 'name' => new ODataProperty()];
+        $propContent->properties                   = [
+            'id' => new ODataProperty(),
+            'name' => new ODataProperty(),
+            'many_id' => new ODataProperty(),
+            'one_id' => new ODataProperty(),
+            'one_source' => new ODataProperty(),
+            'many_source' => new ODataProperty(),
+        ];
         $propContent->properties['id']->name       = 'id';
         $propContent->properties['name']->name     = 'name';
         $propContent->properties['id']->typeName   = 'Edm.Int32';
@@ -688,8 +707,25 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $propContent->properties['id']->value      = '1';
         $propContent->properties['name']->value    = 'Name';
 
+        $propContent->properties['many_id']->name         = 'many_id';
+        $propContent->properties['many_id']->typeName     = 'Edm.String';
+        $propContent->properties['one_id']->name          = 'one_id';
+        $propContent->properties['one_id']->typeName      = 'Edm.String';
+        $propContent->properties['one_source']->name      = 'one_source';
+        $propContent->properties['one_source']->typeName  = 'Edm.String';
+        $propContent->properties['many_source']->name     = 'many_source';
+        $propContent->properties['many_source']->typeName = 'Edm.String';
+
+
         $feed1Content                               = new ODataPropertyContent();
-        $feed1Content->properties                   = ['id' => new ODataProperty(), 'name' => new ODataProperty()];
+        $feed1Content->properties                   = [
+            'id' => new ODataProperty(),
+            'name' => new ODataProperty(),
+            'many_id' => new ODataProperty(),
+            'one_id' => new ODataProperty(),
+            'one_source' => new ODataProperty(),
+            'many_source' => new ODataProperty(),
+        ];
         $feed1Content->properties['id']->name       = 'id';
         $feed1Content->properties['name']->name     = 'name';
         $feed1Content->properties['id']->typeName   = 'Edm.Int32';
@@ -697,14 +733,40 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $feed1Content->properties['id']->value      = '1';
         $feed1Content->properties['name']->value    = 'Inspector';
 
+        $feed1Content->properties['many_id']->name         = 'many_id';
+        $feed1Content->properties['many_id']->typeName     = 'Edm.String';
+        $feed1Content->properties['one_id']->name          = 'one_id';
+        $feed1Content->properties['one_id']->typeName      = 'Edm.String';
+        $feed1Content->properties['one_source']->name      = 'one_source';
+        $feed1Content->properties['one_source']->typeName  = 'Edm.String';
+        $feed1Content->properties['many_source']->name     = 'many_source';
+        $feed1Content->properties['many_source']->typeName = 'Edm.String';
+
         $feed2Content                               = new ODataPropertyContent();
-        $feed2Content->properties                   = ['id' => new ODataProperty(), 'name' => new ODataProperty()];
+        $feed2Content->properties                   = [
+            'id' => new ODataProperty(),
+            'name' => new ODataProperty(),
+            'many_id' => new ODataProperty(),
+            'one_id' => new ODataProperty(),
+            'one_source' => new ODataProperty(),
+            'many_source' => new ODataProperty(),
+        ];
+
         $feed2Content->properties['id']->name       = 'id';
         $feed2Content->properties['name']->name     = 'name';
         $feed2Content->properties['id']->typeName   = 'Edm.Int32';
         $feed2Content->properties['name']->typeName = 'Edm.String';
         $feed2Content->properties['id']->value      = '2';
         $feed2Content->properties['name']->value    = 'Gadget';
+
+        $feed2Content->properties['many_id']->name         = 'many_id';
+        $feed2Content->properties['many_id']->typeName     = 'Edm.String';
+        $feed2Content->properties['one_id']->name          = 'one_id';
+        $feed2Content->properties['one_id']->typeName      = 'Edm.String';
+        $feed2Content->properties['one_source']->name      = 'one_source';
+        $feed2Content->properties['one_source']->typeName  = 'Edm.String';
+        $feed2Content->properties['many_source']->name     = 'many_source';
+        $feed2Content->properties['many_source']->typeName = 'Edm.String';
 
         $feed1                   = new ODataEntry();
         $feed1->id               = 'http://localhost/odata.svc/TestMonomorphicTargets(id=1)';
@@ -797,9 +859,10 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $request->shouldReceive('fullUrl')
             ->andReturn('http://localhost/odata.svc/TestMorphManySources(1)?$expand=morphTarget');
 
-        $metadata         = [];
-        $metadata['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata             = [];
+        $metadata['id']       = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name']     = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['morph_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $source = new TestMorphManySource($metadata);
         $target = new TestMorphTarget($metadata);
@@ -817,7 +880,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder  = new MetadataGubbinsHolder();
+        $holder  = new MetadataRelationshipContainer();
         $classen = [TestMorphManySource::class, TestMorphTarget::class];
         shuffle($classen);
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
@@ -887,9 +950,10 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $request->shouldReceive('fullUrl')
             ->andReturn('http://localhost/odata.svc/TestMonomorphicParentOfMorphTargets(1)?$expand=morphTargets');
 
-        $metadata         = [];
-        $metadata['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metadata['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata             = [];
+        $metadata['id']       = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name']     = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['child_id'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $source = new TestMonomorphicParentOfMorphTarget($metadata);
         $target = new TestMorphTarget($metadata);
@@ -909,7 +973,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder  = new MetadataGubbinsHolder();
+        $holder  = new MetadataRelationshipContainer();
         $classen = [TestMonomorphicParentOfMorphTarget::class, TestMorphTarget::class];
         shuffle($classen);
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
@@ -980,12 +1044,16 @@ class SerialiserWriteElementTest extends SerialiserTestBase
             ->andReturn('http://localhost/odata.svc/TestMonomorphicSources(id=42)?$expand=oneSource');
         $request->request = new ParameterBag(['$expand' => 'oneSource']);
 
-        $metadata          = [];
-        $metadata['id']    = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metadata['name']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $metadata['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $source            = new TestMonomorphicSource($metadata, null);
-        $target            = new TestMonomorphicTarget($metadata, null);
+        $metadata                = [];
+        $metadata['id']          = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metadata['name']        = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metadata['photo']       = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['many_source'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['many_id']     = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['one_source']  = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $metadata['one_id']      = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $source                  = new TestMonomorphicSource($metadata, null);
+        $target                  = new TestMonomorphicTarget($metadata, null);
 
         App::instance(TestMonomorphicSource::class, $source);
         App::instance(TestMonomorphicTarget::class, $target);
@@ -1000,7 +1068,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);
@@ -1092,7 +1160,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         Cache::shouldReceive('forget')->withArgs(['metadata'])->andReturn(null);
         Cache::shouldReceive('forget')->withArgs(['objectmap'])->andReturn(null);
 
-        $holder   = new MetadataGubbinsHolder();
+        $holder   = new MetadataRelationshipContainer();
         $classen  = [TestMonomorphicSource::class, TestMonomorphicTarget::class];
         $metaProv = m::mock(MetadataProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $metaProv->shouldReceive('getRelationHolder')->andReturn($holder);

@@ -14,7 +14,7 @@ class AssociationStubPolymorphic extends AssociationStubBase
     /**
      * @return string
      */
-    public function getMorphType()
+    public function getMorphType() : ?string
     {
         return $this->morphType;
     }
@@ -22,7 +22,7 @@ class AssociationStubPolymorphic extends AssociationStubBase
     /**
      * @param string $morphType
      */
-    public function setMorphType($morphType)
+    public function setMorphType(string $morphType) : void
     {
         $this->morphType = $morphType;
     }
@@ -32,22 +32,24 @@ class AssociationStubPolymorphic extends AssociationStubBase
      *
      * @return bool
      */
-    public function isCompatible(AssociationStubBase $otherStub)
+    public function isCompatible(AssociationStubBase $otherStub) : bool
     {
         if (!parent::isCompatible($otherStub)) {
             return false;
         }
-        $thisTarg = $this->getTargType();
-        $thatTarg = $otherStub->getTargType();
-        $thisNull = null === $thisTarg;
-        $thatNull = null === $thatTarg;
-        if ($thisNull == $thatNull) {
+
+        if (null === $this->getTargType() && null === $otherStub->getTargType()) {
             return false;
         }
-        if ($thisNull && ($thatTarg != $this->getBaseType())) {
+
+        $thisBase = $this->getBaseType();
+        $thatBase = $otherStub->getBaseType();
+        $thatTarg = $otherStub->getTargType() ?? $thisBase;
+        $thisTarg = $this->getTargType() ?? $thatBase;
+        if ($thatTarg != $thisBase) {
             return false;
         }
-        if ($thatNull && ($thisTarg != $otherStub->getBaseType())) {
+        if ($thisTarg != $thatBase) {
             return false;
         }
 
@@ -55,21 +57,9 @@ class AssociationStubPolymorphic extends AssociationStubBase
     }
 
     /**
-     * @throws InvalidOperationException
-     * @return bool
-     */
-    public function isKnownSide()
-    {
-        if (!($this->isOk())) {
-            throw new InvalidOperationException('Polymorphic stub not OK so known-side determination is meaningless');
-        }
-        return null === $this->targType;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function morphicType()
+    public function morphicType() : string
     {
         return 'polymorphic';
     }

@@ -26,7 +26,7 @@ class EntityGubbinsTest extends TestCase
     public function testAddAssociationWithUnnamedStub()
     {
         $stub = m::mock(AssociationStubMonomorphic::class)->makePartial();
-        $stub->shouldReceive('getRelationName')->andReturnNull()->once();
+        $stub->shouldReceive('getRelationName')->andReturn('')->once();
 
         $assoc = m::mock(AssociationMonomorphic::class)->makePartial();
         $assoc->shouldReceive('getFirst')->andReturn($stub)->once();

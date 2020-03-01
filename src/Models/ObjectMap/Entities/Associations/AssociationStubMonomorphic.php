@@ -9,7 +9,7 @@ class AssociationStubMonomorphic extends AssociationStubBase
      *
      * @return bool
      */
-    public function isCompatible(AssociationStubBase $otherStub)
+    public function isCompatible(AssociationStubBase $otherStub) : bool
     {
         if (!parent::isCompatible($otherStub)) {
             return false;
@@ -21,14 +21,26 @@ class AssociationStubMonomorphic extends AssociationStubBase
 
         return ($this->getTargType() === $otherStub->getBaseType())
             && ($this->getBaseType() === $otherStub->getTargType())
-            && ($this->getForeignField() === $otherStub->getKeyField())
-            && ($this->getKeyField() === $otherStub->getForeignField());
+            && ($this->getForeignFieldName() === $otherStub->getKeyFieldName())
+            && ($this->getKeyFieldName() === $otherStub->getForeignFieldName());
     }
+    /**
+     * Is this AssociationStub sane?
+     */
+    public function isOk(): bool
+    {
 
+        $isOk = parent::isOk();
+        $stringCheck = [$this->targType, $this->foreignFieldName];
+        $checkResult = array_filter($stringCheck, [$this, 'checkStringInput']);
+        $isOk &= $stringCheck == $checkResult;
+
+        return boolval($isOk);
+    }
     /**
      * {@inheritdoc}
      */
-    public function morphicType()
+    public function morphicType() : string
     {
         return 'monomorphic';
     }

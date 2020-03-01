@@ -8,6 +8,7 @@
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 
@@ -15,7 +16,7 @@ class MetadataGubbinsHolderTest extends TestCase
 {
     public function testGetRelationsByClass()
     {
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
 
         $this->expectExceptionMessage('AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraTestModel does not exist in holder');
 

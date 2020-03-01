@@ -27,7 +27,7 @@ class EntityGubbins
     private $keyFields = [];
 
     /**
-     * @var EntityField[]
+     * @var EntityField[] keyed by name
      */
     private $fields = [];
 
@@ -160,6 +160,7 @@ class EntityGubbins
                 $msg = 'Stubs array must only have AssociationStubBase objects';
                 throw new \Exception($msg);
             }
+            $field->setEntity($this);
         }
         $this->stubs = $stubs;
     }
@@ -178,7 +179,7 @@ class EntityGubbins
             }
             $propertyName = $stub->getRelationName();
         }
-        if (!isset($propertyName)) {
+        if (empty($propertyName)) {
             throw new InvalidOperationException('');
         }
         $this->associations[$propertyName] = $association;

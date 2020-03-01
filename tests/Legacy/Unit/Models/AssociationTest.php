@@ -3,6 +3,7 @@
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Models;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
+use AlgoWeb\PODataLaravel\Models\MetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStubBase;
 use Mockery as m;
@@ -22,6 +23,7 @@ class AssociationTest extends TestCase
     {
         $one = m::mock(AssociationStubBase::class);
         $one->shouldReceive('isOk')->andReturn(false);
+        $one->shouldReceive('addAssociation');
 
         $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
@@ -32,6 +34,7 @@ class AssociationTest extends TestCase
     {
         $one = m::mock(AssociationStubBase::class);
         $one->shouldReceive('isOk')->andReturn(true);
+        $one->shouldReceive('addAssociation');
 
         $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
@@ -42,8 +45,11 @@ class AssociationTest extends TestCase
     {
         $one = m::mock(AssociationStubBase::class);
         $one->shouldReceive('isOk')->andReturn(true);
+        $one->shouldReceive('addAssociation');
+
         $two = m::mock(AssociationStubBase::class);
         $two->shouldReceive('isOk')->andReturn(false);
+        $two->shouldReceive('addAssociation');
 
         $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
@@ -56,8 +62,11 @@ class AssociationTest extends TestCase
         $one = m::mock(AssociationStubBase::class);
         $one->shouldReceive('isOk')->andReturn(true);
         $one->shouldReceive('isCompatible')->andReturn(false);
+        $one->shouldReceive('addAssociation');
+
         $two = m::mock(AssociationStubBase::class);
         $two->shouldReceive('isOk')->andReturn(true);
+        $two->shouldReceive('addAssociation');
 
         $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
@@ -71,8 +80,11 @@ class AssociationTest extends TestCase
         $one->shouldReceive('isOk')->andReturn(true);
         $one->shouldReceive('isCompatible')->andReturn(true);
         $one->shouldReceive('compare')->andReturn(42);
+        $one->shouldReceive('addAssociation');
+
         $two = m::mock(AssociationStubBase::class);
         $two->shouldReceive('isOk')->andReturn(true);
+        $two->shouldReceive('addAssociation');
 
         $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
@@ -86,8 +98,11 @@ class AssociationTest extends TestCase
         $one->shouldReceive('isOk')->andReturn(true);
         $one->shouldReceive('isCompatible')->andReturn(true);
         $one->shouldReceive('compare')->andReturn(-1);
+        $one->shouldReceive('addAssociation');
+
         $two = m::mock(AssociationStubBase::class);
         $two->shouldReceive('isOk')->andReturn(true);
+        $two->shouldReceive('addAssociation');
 
         $foo = new AssociationMonomorphic();
         $foo->setFirst($one);
@@ -102,13 +117,17 @@ class AssociationTest extends TestCase
      */
     public function testGetAssociationTwoRelsOnSameModelPair()
     {
-        $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['id']          = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']        = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id']     = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id']      = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model   = new TestMonomorphicSource($metaRaw);
         $nuModel = new TestMonomorphicTarget($metaRaw);
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $foo->addEntity($model->extractGubbins());
         $foo->addEntity($nuModel->extractGubbins());
 
@@ -122,16 +141,18 @@ class AssociationTest extends TestCase
         ];
 
         $assoc1 = new AssociationMonomorphic();
-        $assoc1->setLast($srcStubs[0][0]);
-        $assoc1->setFirst($dstStubs[0][0]);
+        $assoc1->setLast(clone $srcStubs[0][0]);
+        $assoc1->setFirst(clone $dstStubs[0][0]);
         $assoc2 = new AssociationMonomorphic();
-        $assoc2->setLast($srcStubs[1][0]);
-        $assoc2->setFirst($dstStubs[1][0]);
+        $assoc2->setLast(clone $srcStubs[1][0]);
+        $assoc2->setFirst(clone $dstStubs[1][0]);
 
         $result = $foo->getRelationsByClass(TestMonomorphicSource::class);
         $this->assertEquals(2, count($result));
-        $this->assertTrue(in_array($assoc1, $result));
-        $this->assertTrue(in_array($assoc2, $result));
+        $this->assertEquals($srcStubs[1][0], $result[0]->getLast());
+        $this->assertEquals($dstStubs[1][0], $result[0]->getFirst());
+        $this->assertEquals($srcStubs[0][0], $result[1]->getLast());
+        $this->assertEquals($dstStubs[0][0], $result[1]->getFirst());
     }
 
     /**
@@ -146,7 +167,7 @@ class AssociationTest extends TestCase
 
         $model = new TestMonomorphicSource($metaRaw);
 
-        $foo = new MetadataGubbinsHolder();
+        $foo = new MetadataRelationshipContainer();
         $foo->addEntity($model->extractGubbins());
 
         $result = $foo->getRelationsByClass(TestMonomorphicSource::class);
@@ -160,13 +181,16 @@ class AssociationTest extends TestCase
      */
     public function testGetAssociationsWithTwoRelatedModels()
     {
-        $metaRaw['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $metaRaw['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['id']          = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $metaRaw['name']        = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_source'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_source']  = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['many_id']     = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $metaRaw['one_id']      = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $model   = new TestMonomorphicSource($metaRaw);
         $nuModel = new TestMonomorphicTarget($metaRaw);
-
-        $foo = new MetadataGubbinsHolder();
+        $foo     = new MetadataRelationshipContainer();
         $foo->addEntity($model->extractGubbins());
         $foo->addEntity($nuModel->extractGubbins());
 
@@ -185,8 +209,8 @@ class AssociationTest extends TestCase
         $assoc2 = new AssociationMonomorphic();
         $assoc2->setLast($srcStubs[1][0]);
         $assoc2->setFirst($dstStubs[1][0]);
-
         $result = $foo->getRelations();
+
         $this->assertEquals(2, count($result));
         $this->assertTrue(in_array($assoc1, $result));
         $this->assertTrue(in_array($assoc2, $result));

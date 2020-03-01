@@ -2,6 +2,9 @@
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
+
 abstract class AssociationStubBase
 {
     /**
@@ -14,7 +17,7 @@ abstract class AssociationStubBase
      *
      * @var string|null
      */
-    protected $keyField;
+    protected $keyFieldName;
 
     /**
      * A list of fields to Traverse between Keyfield and foreignField.
@@ -28,7 +31,7 @@ abstract class AssociationStubBase
      *
      * @var string|null
      */
-    protected $foreignField;
+    protected $foreignFieldName;
 
     /**
      * @var string|null
@@ -50,9 +53,79 @@ abstract class AssociationStubBase
     protected $baseType;
 
     /**
+     * Any associations this stub is a member of.
+     *
+     * @var Association[]
+     */
+    protected $associations = [];
+
+    /**
+     * @var EntityGubbins the entity this stub lives on
+     */
+    protected $entity;
+
+    /**
+     * AssociationStubBase constructor.
+     * @param string $relationName
+     * @param string $keyFieldName
+     * @param string[] $throughFieldChain
+     * @param AssociationStubRelationType $multiplicity
+     */
+    public function __construct(
+        string $relationName,
+        string $keyFieldName,
+        array $throughFieldChain,
+        AssociationStubRelationType $multiplicity
+    ) {
+        $this->relationName = $relationName;
+        $this->keyFieldName = $keyFieldName;
+        $this->throughFieldChain = $throughFieldChain;
+        $this->multiplicity = $multiplicity;
+    }
+
+    /**
+     * Sets the entity owning this AssocationStub.
+     *
+     * @param EntityGubbins $entity
+     */
+    public function setEntity(EntityGubbins $entity): void
+    {
+        $this->entity = $entity;
+    }
+
+    /**
+     * Gets the entity owning this AssocationStub.
+     *
+     * @return EntityGubbins
+     */
+    public function getEntity(): EntityGubbins
+    {
+        return $this->entity;
+    }
+    /**
+     * Adds this stub as a member of an association.
+     *
+     * @param Association $newAssociation the new association to be a member of
+     */
+    public function addAssociation(Association $newAssociation): void
+    {
+        $this->associations[spl_object_hash($newAssociation)] = $newAssociation;
+    }
+
+    /**
+     * Gets all associations assigned to this stub.
+     *
+     * @return Association[] All associations this stub is a member of
+     */
+    public function getAssociations(): array
+    {
+        return array_values($this->associations);
+    }
+
+    /**
      * @return string
      */
-    public function getRelationName()
+    public function getRelationName() : string
     {
         return $this->relationName;
     }
@@ -60,7 +133,7 @@ abstract class AssociationStubBase
     /**
      * @param string $relationName
      */
-    public function setRelationName($relationName)
+    public function setRelationName(string $relationName) : void
     {
         $this->relationName = $this->checkStringInput($relationName) ? $relationName : $this->relationName;
     }
@@ -68,7 +141,7 @@ abstract class AssociationStubBase
     /**
      * @return AssociationStubRelationType
      */
-    public function getMultiplicity()
+    public function getMultiplicity() : AssociationStubRelationType
     {
         return $this->multiplicity;
     }
@@ -76,7 +149,7 @@ abstract class AssociationStubBase
     /**
      * @param AssociationStubRelationType $multiplicity
      */
-    public function setMultiplicity(AssociationStubRelationType $multiplicity)
+    public function setMultiplicity(AssociationStubRelationType $multiplicity) : void
     {
         $this->multiplicity = $multiplicity;
     }
@@ -84,20 +157,25 @@ abstract class AssociationStubBase
     /**
      * @return string
      */
-    public function getKeyField()
+    public function getKeyFieldName(): string
     {
-        return $this->keyField;
+        return $this->keyFieldName ?? '';
+    }
+
+    public function getKeyField() : ?EntityField
+    {
+        return (null === $this->entity) ? null : $this->entity->getFields()[$this->getKeyFieldName()];
     }
 
     /**
-     * @param string $keyField
+     * @param string $keyFieldName
      */
-    public function setKeyField($keyField)
+    public function setKeyFieldName(string $keyFieldName) : void
     {
-        $this->keyField = $this->checkStringInput($keyField) ? $keyField : $this->keyField;
+        $this->keyFieldName = $this->checkStringInput($keyFieldName) ? $keyFieldName : $this->keyFieldName;
     }
 
-    public function isCompatible(AssociationStubBase $otherStub)
+    public function isCompatible(AssociationStubBase $otherStub) : bool
     {
         if ($this->morphicType() != $otherStub->morphicType()) {
             return false;
@@ -109,65 +187,49 @@ abstract class AssociationStubBase
         if (!$otherStub->isOk()) {
             return false;
         }
-        $thisMult = $this->getMultiplicity();
-        $thatMult = $otherStub->getMultiplicity();
-        return (AssociationStubRelationType::MANY() == $thisMult
-                || $thisMult != $thatMult);
+        return count($this->getThroughFieldChain()) === count($otherStub->getThroughFieldChain());
     }
 
     /**
      * Is this AssociationStub sane?
      */
-    public function isOk()
+    public function isOk(): bool
     {
-        if (null === $this->multiplicity) {
-            return false;
-        }
-        if (null === $this->relationName) {
-            return false;
-        }
-        if (null === $this->keyField) {
-            return false;
-        }
-        if (null === $this->baseType) {
-            return false;
-        }
-        $targType = $this->targType;
-        if ($this instanceof AssociationStubMonomorphic && null === $targType) {
-            return false;
-        }
-        $foreignField = $this->foreignField;
-        if (null !== $targType) {
-            if (!$this->checkStringInput($targType)) {
-                return false;
-            }
-            if (!$this->checkStringInput($foreignField)) {
-                return false;
-            }
-        }
-        return (null === $targType) === (null === $foreignField);
+        $required = [
+            $this->relationName,
+            $this->keyFieldName,
+            $this->baseType,
+        ];
+        $requireResult = array_filter($required, [$this, 'checkStringInput']);
+
+        $isOk = true;
+        $isOk &= $required == $requireResult;
+        $isOk &= (null === $this->targType) === (null ===  $this->foreignFieldName);
+        $isOk &= count($this->throughFieldChain) >= 2;
+
+        return boolval($isOk);
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTargType()
+    public function getTargType() : ?string
     {
         return $this->targType;
     }
 
     /**
-     * @param string $targType
+     * @param string|null $targType
      */
-    public function setTargType($targType)
+    public function setTargType(?string $targType) : void
     {
         $this->targType = $targType;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getBaseType()
+    public function getBaseType() : ?string
     {
         return $this->baseType;
     }
@@ -175,25 +237,25 @@ abstract class AssociationStubBase
     /**
      * @param string $baseType
      */
-    public function setBaseType($baseType)
+    public function setBaseType(string $baseType) : void
     {
         $this->baseType = $this->checkStringInput($baseType) ? $baseType : $this->baseType;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getForeignField()
+    public function getForeignFieldName() : ?string
     {
-        return $this->foreignField;
+        return $this->foreignFieldName;
     }
 
     /**
-     * @param string $foreignField
+     * @param string $foreignFieldName
      */
-    public function setForeignField($foreignField)
+    public function setForeignFieldName($foreignFieldName) : void
     {
-        $this->foreignField = $foreignField;
+        $this->foreignFieldName = $foreignFieldName;
     }
 
     /**
@@ -207,7 +269,7 @@ abstract class AssociationStubBase
     /**
      * @param string[]|null $keyChain
      */
-    public function setThroughFieldChain(?array $keyChain)
+    public function setThroughFieldChain(?array $keyChain) : void
     {
         $this->throughFieldChain = $keyChain;
     }
@@ -218,24 +280,28 @@ abstract class AssociationStubBase
      *
      * @return int
      */
-    public function compare(AssociationStubBase $other)
+    public function compare(AssociationStubBase $other) : int
     {
-        $thisClass  = get_class($this);
-        $otherClass = get_class($other);
-        $classComp  = strcmp($thisClass, $otherClass);
-        if (0 !== $classComp) {
-            return $classComp / abs($classComp);
+        $thisFirst  = null === $this->getKeyField() ? false : $this->getKeyField()->getIsKeyField();
+        $otherFirst = null === $other->getKeyField() ? false : $other->getKeyField()->getIsKeyField();
+        if (
+            ($thisFirst || $otherFirst) &&
+            !($thisFirst && $otherFirst)
+            ) {
+            return $thisFirst ? -1 : 1;
         }
-        $thisBase  = $this->getBaseType() ?? '';
-        $otherBase = $other->getBaseType() ?? '';
-        $baseComp  = strcmp($thisBase, $otherBase);
-        if (0 !== $baseComp) {
-            return $baseComp / abs($baseComp);
+        $cmps = [
+            [get_class($this), get_class($other)],
+            [$this->getBaseType() ?? '', $other->getBaseType() ?? ''],
+            [$this->getRelationName() ?? '', $other->getRelationName() ?? ''],
+        ];
+        foreach ($cmps as $cmpvals) {
+            $cmp = strcmp($cmpvals[0], $cmpvals[1]);
+            if (0 !== $cmp) {
+                return $cmp / abs($cmp);
+            }
         }
-        $thisMethod  = $this->getRelationName() ?? '';
-        $otherMethod = $other->getRelationName() ?? '';
-        $methodComp  = strcmp($thisMethod, $otherMethod);
-        return 0 === $methodComp ? 0 : $methodComp / abs($methodComp);
+        return 0;
     }
 
     /**
@@ -243,13 +309,13 @@ abstract class AssociationStubBase
      *
      * @return string
      */
-    abstract public function morphicType();
+    abstract public function morphicType() : string;
 
     /**
-     * @param $input
+     * @param mixed $input
      * @return bool
      */
-    private function checkStringInput($input)
+    protected function checkStringInput($input) : bool
     {
         if (null === $input || !is_string($input) || empty($input)) {
             return false;

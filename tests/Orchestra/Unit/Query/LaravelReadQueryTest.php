@@ -124,7 +124,7 @@ class LaravelReadQueryTest extends TestCase
         /** @var ResourceSet $targSource */
         $targSource = $meta->resolveResourceSet('OrchestraPolymorphToManySourceModels');
 
-        $property = $parentType->resolveProperty('sourceParents_OrchestraPolymorphToManySourceModels');
+        $property = $parentType->resolveProperty('sourceParents');
 
         /** @var LaravelReadQuery $foo */
         $foo = App::make(LaravelReadQuery::class);

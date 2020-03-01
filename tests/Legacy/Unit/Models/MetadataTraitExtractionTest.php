@@ -56,7 +56,7 @@ class MetadataTraitExtractionTest extends TestCase
         $stubs = $result->getStubs();
         foreach ($stubs as $stub) {
             $this->assertTrue($stub->isOk());
-            $this->assertTrue(in_array($stub->getKeyField(), $relKeys));
+            $this->assertTrue(in_array($stub->getKeyFieldName(), $relKeys));
             $this->assertTrue(in_array($stub->getRelationName(), $relations));
         }
     }
@@ -70,7 +70,7 @@ class MetadataTraitExtractionTest extends TestCase
 
         $rawKeys   = array_keys($metaRaw);
         $relations = ['morph'];
-        $relKeys   = ['id'];
+        $relKeys   = ['id', 'morph_id'];
         $relMults  = [RelType::ONE()];
 
         $foo = new TestMorphTargetChild($metaRaw);
@@ -89,7 +89,7 @@ class MetadataTraitExtractionTest extends TestCase
         $this->assertNull($stubs['morph']->getTargType());
         foreach ($stubs as $stub) {
             $this->assertTrue($stub->isOk());
-            $this->assertTrue(in_array($stub->getKeyField(), $relKeys));
+            $this->assertTrue(in_array($stub->getKeyFieldName(), $relKeys));
             $this->assertTrue(in_array($stub->getRelationName(), $relations));
         }
     }
