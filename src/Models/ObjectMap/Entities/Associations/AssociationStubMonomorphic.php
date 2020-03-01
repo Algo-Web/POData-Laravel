@@ -9,7 +9,7 @@ class AssociationStubMonomorphic extends AssociationStubBase
      *
      * @return bool
      */
-    public function isCompatible(AssociationStubBase $otherStub)
+    public function isCompatible(AssociationStubBase $otherStub) : bool
     {
         if (!parent::isCompatible($otherStub)) {
             return false;
@@ -40,7 +40,7 @@ class AssociationStubMonomorphic extends AssociationStubBase
     /**
      * {@inheritdoc}
      */
-    public function morphicType()
+    public function morphicType() : string
     {
         return 'monomorphic';
     }

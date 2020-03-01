@@ -179,7 +179,7 @@ class EntityGubbins
             }
             $propertyName = $stub->getRelationName();
         }
-        if (!isset($propertyName)) {
+        if (empty($propertyName)) {
             throw new InvalidOperationException('');
         }
         $this->associations[$propertyName] = $association;

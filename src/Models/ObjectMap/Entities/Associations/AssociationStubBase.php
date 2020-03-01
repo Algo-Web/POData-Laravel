@@ -125,7 +125,7 @@ abstract class AssociationStubBase
     /**
      * @return string
      */
-    public function getRelationName()
+    public function getRelationName() : string
     {
         return $this->relationName;
     }
@@ -133,7 +133,7 @@ abstract class AssociationStubBase
     /**
      * @param string $relationName
      */
-    public function setRelationName($relationName)
+    public function setRelationName($relationName) : void
     {
         $this->relationName = $this->checkStringInput($relationName) ? $relationName : $this->relationName;
     }
@@ -141,7 +141,7 @@ abstract class AssociationStubBase
     /**
      * @return AssociationStubRelationType
      */
-    public function getMultiplicity()
+    public function getMultiplicity() : AssociationStubRelationType
     {
         return $this->multiplicity;
     }
@@ -149,7 +149,7 @@ abstract class AssociationStubBase
     /**
      * @param AssociationStubRelationType $multiplicity
      */
-    public function setMultiplicity(AssociationStubRelationType $multiplicity)
+    public function setMultiplicity(AssociationStubRelationType $multiplicity) : void
     {
         $this->multiplicity = $multiplicity;
     }
@@ -170,12 +170,12 @@ abstract class AssociationStubBase
     /**
      * @param string $keyFieldName
      */
-    public function setKeyFieldName($keyFieldName)
+    public function setKeyFieldName($keyFieldName) : void
     {
         $this->keyFieldName = $this->checkStringInput($keyFieldName) ? $keyFieldName : $this->keyFieldName;
     }
 
-    public function isCompatible(AssociationStubBase $otherStub)
+    public function isCompatible(AssociationStubBase $otherStub) : bool
     {
         if ($this->morphicType() != $otherStub->morphicType()) {
             return false;
@@ -212,7 +212,7 @@ abstract class AssociationStubBase
     /**
      * @return string|null
      */
-    public function getTargType()
+    public function getTargType() : ?string
     {
         return $this->targType;
     }
@@ -220,15 +220,15 @@ abstract class AssociationStubBase
     /**
      * @param string $targType
      */
-    public function setTargType($targType)
+    public function setTargType($targType) : void
     {
         $this->targType = $targType;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getBaseType()
+    public function getBaseType() : ?string
     {
         return $this->baseType;
     }
@@ -236,15 +236,15 @@ abstract class AssociationStubBase
     /**
      * @param string $baseType
      */
-    public function setBaseType($baseType)
+    public function setBaseType($baseType) : void
     {
         $this->baseType = $this->checkStringInput($baseType) ? $baseType : $this->baseType;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getForeignFieldName()
+    public function getForeignFieldName() : ?string
     {
         return $this->foreignFieldName;
     }
@@ -252,7 +252,7 @@ abstract class AssociationStubBase
     /**
      * @param string $foreignFieldName
      */
-    public function setForeignFieldName($foreignFieldName)
+    public function setForeignFieldName($foreignFieldName) : void
     {
         $this->foreignFieldName = $foreignFieldName;
     }
@@ -268,7 +268,7 @@ abstract class AssociationStubBase
     /**
      * @param string[]|null $keyChain
      */
-    public function setThroughFieldChain(?array $keyChain)
+    public function setThroughFieldChain(?array $keyChain) : void
     {
         $this->throughFieldChain = $keyChain;
     }
@@ -279,7 +279,7 @@ abstract class AssociationStubBase
      *
      * @return int
      */
-    public function compare(AssociationStubBase $other)
+    public function compare(AssociationStubBase $other) : int
     {
         $thisFirst  = null === $this->getKeyField() ? false : $this->getKeyField()->getIsKeyField();
         $otherFirst = null === $other->getKeyField() ? false : $other->getKeyField()->getIsKeyField();
@@ -308,13 +308,13 @@ abstract class AssociationStubBase
      *
      * @return string
      */
-    abstract public function morphicType();
+    abstract public function morphicType() : string;
 
     /**
      * @param $input
      * @return bool
      */
-    protected function checkStringInput($input)
+    protected function checkStringInput($input) : bool
     {
         if (null === $input || !is_string($input) || empty($input)) {
             return false;
