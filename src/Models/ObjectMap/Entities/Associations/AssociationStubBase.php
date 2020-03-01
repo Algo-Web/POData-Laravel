@@ -196,14 +196,15 @@ abstract class AssociationStubBase
     public function isOk(): bool
     {
         $required = [
-            $this->multiplicity,
             $this->relationName,
             $this->keyFieldName,
             $this->baseType,
             $this->throughFieldChain
         ];
+        $requireResult = array_filter($required, [$this, 'checkStringInput']);
+
         $isOk = true;
-        $isOk &= empty(array_filter($required, 'is_null'));
+        $isOk &= $required == $requireResult;
         $isOk &= (null === $this->targType) === (null ===  $this->foreignFieldName);
 
         return boolval($isOk);
