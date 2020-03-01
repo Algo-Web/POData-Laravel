@@ -37,20 +37,19 @@ class AssociationStubPolymorphic extends AssociationStubBase
         if (!parent::isCompatible($otherStub)) {
             return false;
         }
-        $thisBase = $this->getBaseType();
-        $thatBase = $otherStub->getBaseType();
-        $thisTarg = $this->getTargType();
-        $thatTarg = $otherStub->getTargType();
-        if (null === $thisTarg && null === $thatTarg) {
+
+        if (null === $this->getTargType() && null === $otherStub->getTargType()) {
             return false;
         }
 
-        $thatTarg = $otherStub->getTargType() ?? $this->getBaseType();
-        $thisTarg = $this->getTargType() ?? $otherStub->getBaseType();
-        if (($thatTarg != $thisBase)) {
+        $thisBase = $this->getBaseType();
+        $thatBase = $otherStub->getBaseType();
+        $thatTarg = $otherStub->getTargType() ?? $thisBase;
+        $thisTarg = $this->getTargType() ?? $thatBase;
+        if ($thatTarg != $thisBase) {
             return false;
         }
-        if (($thisTarg != $thatBase)) {
+        if ($thisTarg != $thatBase) {
             return false;
         }
 
