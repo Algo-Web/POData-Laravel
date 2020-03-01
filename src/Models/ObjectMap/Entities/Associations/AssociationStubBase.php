@@ -293,9 +293,9 @@ abstract class AssociationStubBase
             [$this->getBaseType() ?? '', $other->getBaseType() ?? ''],
             [$this->getRelationName() ?? '', $other->getRelationName() ?? ''],
         ];
-        foreach($cmps as $cmpvals){
+        foreach ($cmps as $cmpvals) {
             $cmp = strcmp($cmpvals[0], $cmpvals[1]);
-            if(0 !== $cmp){
+            if (0 !== $cmp) {
                 return $cmp / abs($cmp);
             }
         }
