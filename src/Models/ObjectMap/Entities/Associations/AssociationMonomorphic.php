@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
@@ -13,7 +15,7 @@ class AssociationMonomorphic extends Association
     /**
      * @return AssociationStubBase|null
      */
-    public function getLast() : ?AssociationStubBase
+    public function getLast(): ?AssociationStubBase
     {
         return $this->last;
     }
@@ -21,7 +23,7 @@ class AssociationMonomorphic extends Association
     /**
      * @param AssociationStubBase $last
      */
-    public function setLast(AssociationStubBase $last) : void
+    public function setLast(AssociationStubBase $last): void
     {
         $this->last = $last;
         $last->addAssociation($this);
@@ -30,7 +32,7 @@ class AssociationMonomorphic extends Association
     /**
      * @return bool
      */
-    public function isOk() : bool
+    public function isOk(): bool
     {
         $first = $this->getFirst();
         $last  = $this->getLast();
@@ -49,7 +51,7 @@ class AssociationMonomorphic extends Association
     /**
      * @return \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationType
      */
-    public function getAssociationType() : AssociationType
+    public function getAssociationType(): AssociationType
     {
         return new AssociationType($this->first->getMultiplicity()->getValue()
                                     | $this->last->getMultiplicity()->getValue());

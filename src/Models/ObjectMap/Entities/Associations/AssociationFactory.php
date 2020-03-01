@@ -12,10 +12,10 @@ abstract class AssociationFactory
     public static $marshalPolymorphics = true;
 
     /**
-     * @param AssociationStubBase $stubOne
-     * @param AssociationStubBase $stubTwo
-     * @return Association
+     * @param  AssociationStubBase $stubOne
+     * @param  AssociationStubBase $stubTwo
      * @throws \Exception
+     * @return Association
      */
     public static function getAssocationFromStubs(
         AssociationStubBase $stubOne,
@@ -26,10 +26,10 @@ abstract class AssociationFactory
     }
 
     /**
-     * @param AssociationStubBase $stubOne
-     * @param AssociationStubBase $stubTwo
-     * @return Association
+     * @param  AssociationStubBase $stubOne
+     * @param  AssociationStubBase $stubTwo
      * @throws \Exception
+     * @return Association
      */
     private static function buildAssociationFromStubs(
         AssociationStubBase $stubOne,
@@ -53,14 +53,14 @@ abstract class AssociationFactory
         AssociationStubBase $stub,
         AssociationStubBase $stubTwo
     ): AssociationStubBase {
-        $stubNew = clone $stub;
+        $stubNew         = clone $stub;
         $relPolyTypeName = substr($stubTwo->getBaseType(), strrpos($stubTwo->getBaseType(), '\\')+1);
         $relPolyTypeName = Str::plural($relPolyTypeName, 1);
         $stubNew->setRelationName($stub->getRelationName() . '_' . $relPolyTypeName);
         $stubNew->setTargType($stubTwo->getBaseType());
         $stubNew->setForeignFieldName($stubTwo->getKeyFieldName());
         $entity = $stub->getEntity();
-        $stubs = $entity->getStubs();
+        $stubs  = $entity->getStubs();
 
         $stubs[$stubNew->getRelationName()] = $stubNew;
         $entity->setStubs($stubs);

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Models;
 
@@ -108,7 +110,7 @@ class AssociationStubTest extends TestCase
     public function testAssociationIncompatibleBothNotOk()
     {
         $foo = new AssociationStubPolymorphic('rel', 'key', [null, 'rel_id', 'rel_type'], AssociationStubRelationType::ONE());
-        $bar = new AssociationStubPolymorphic('rel', '', ['rel_id',"rel_type",null], AssociationStubRelationType::ONE());
+        $bar = new AssociationStubPolymorphic('rel', '', ['rel_id','rel_type',null], AssociationStubRelationType::ONE());
         $foo->setBaseType(TestMorphTarget::class);
         $this->assertTrue($foo->isOk());
         $this->assertFalse($bar->isOk());
@@ -137,7 +139,7 @@ class AssociationStubTest extends TestCase
         $expectedRel   = 'rel';
         $expectedMorph = 'morph';
         $foo           = new AssociationStubPolymorphic($expectedRel, $expectedKey, [], AssociationStubRelationType::NULL_ONE());
-        $actualKey = $foo->getKeyFieldName();
+        $actualKey     = $foo->getKeyFieldName();
         $this->assertEquals($expectedKey, $actualKey);
         $actualRel = $foo->getRelationName();
         $this->assertEquals($expectedRel, $actualRel);

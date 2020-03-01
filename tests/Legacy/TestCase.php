@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel;
 
@@ -15,7 +17,7 @@ use Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel;
 class TestCase extends BaseTestCase
 {
     protected $origFacade = [];
-    
+
     protected function getPackageProviders($app)
     {
         return [\AlgoWeb\PODataLaravel\Providers\MetadataProvider::class,
@@ -54,7 +56,7 @@ class TestCase extends BaseTestCase
 
     protected function getBuilder(ConnectionInterface $conn = null, Processor $proc = null)
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\Grammar;
+        $grammar = new \Illuminate\Database\Query\Grammars\Grammar();
         if (null !== $proc) {
             $processor = $proc;
         } else {
@@ -92,7 +94,7 @@ class TestCase extends BaseTestCase
         return $database;
     }
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
         date_default_timezone_set('UTC');
@@ -142,7 +144,7 @@ class TestCase extends BaseTestCase
         return call_user_func($reset->bindTo($model, get_class($model)));
     }
 
-    public function tearDown() : void
+    public function tearDown(): void
     {
         //Schema::swap($this->origFacade['schema']);
         parent::tearDown();

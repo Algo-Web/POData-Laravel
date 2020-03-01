@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Query;
 
@@ -77,7 +79,7 @@ class LaravelQueryBatchProcessingTest extends TestCase
         $foo->shouldReceive('getWriter')->andReturn($writer);
 
         $foo->startTransaction(true);
-        $foo->updateResource($rSet, $model, $keyDesc, new \stdClass);
+        $foo->updateResource($rSet, $model, $keyDesc, new \stdClass());
         $foo->commitTransaction();
     }
 
@@ -99,7 +101,7 @@ class LaravelQueryBatchProcessingTest extends TestCase
         $foo->shouldReceive('getWriter')->andReturn($writer);
 
         $foo->startTransaction(true);
-        $foo->createResourceforResourceSet($rSet, $model, new \stdClass);
+        $foo->createResourceforResourceSet($rSet, $model, new \stdClass());
         $foo->commitTransaction();
     }
 }

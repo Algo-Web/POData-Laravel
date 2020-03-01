@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
@@ -37,7 +38,7 @@ abstract class AssociationStubFactory
         return $stub;
     }
 
-    private static function getHandlerMethod(Relation $relation):string
+    private static function getHandlerMethod(Relation $relation): string
     {
         $methods                                      = [];
         $methods[$relation instanceof BelongsTo]      = 'BelongsTo'; //DONE
@@ -172,7 +173,7 @@ abstract class AssociationStubFactory
      * @param  string                     $cacheKey
      * @return AssociationStubPolymorphic
      */
-    protected static function handleMorphOne(string $name, Relation $relation, $cacheKey = 'MorphOneOrMany'):AssociationStubPolymorphic
+    protected static function handleMorphOne(string $name, Relation $relation, $cacheKey = 'MorphOneOrMany'): AssociationStubPolymorphic
     {
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub     = new AssociationStubPolymorphic($name, $keyChain[0], $keyChain, AssociationStubRelationType::NULL_ONE());
@@ -203,7 +204,7 @@ abstract class AssociationStubFactory
      * @param  string   $cacheKey
      * @return array
      */
-    private static function getKeyChain(Relation $relation, string $cacheKey) : array
+    private static function getKeyChain(Relation $relation, string $cacheKey): array
     {
         $fields = self::$fieldOrderCache[$cacheKey];
         $getter = function () use ($fields) {

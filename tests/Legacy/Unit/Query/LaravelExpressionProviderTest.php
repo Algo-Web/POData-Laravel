@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Query;
 
@@ -23,7 +25,7 @@ class LaravelExpressionProviderTest extends TestCase
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
 //        $this->object = new \AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider();
@@ -33,7 +35,7 @@ class LaravelExpressionProviderTest extends TestCase
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */
-    public function tearDown() : void
+    public function tearDown(): void
     {
         parent::tearDown();
     }
@@ -333,14 +335,14 @@ class LaravelExpressionProviderTest extends TestCase
     public function onConstantExpressionProvider()
     {
         return [
-            [new \POData\Providers\Metadata\Type\Null1, null, 'NULL'],
-            [new \POData\Providers\Metadata\Type\Boolean , true, 'true'],
-            [new \POData\Providers\Metadata\Type\Boolean , false, 'false'],
-            [new \POData\Providers\Metadata\Type\Byte, 254, 254],
-            [new \POData\Providers\Metadata\Type\Int16, 32767, 32767],
-            [new \POData\Providers\Metadata\Type\Int32, 2147483647, 2147483647],
-            [new \POData\Providers\Metadata\Type\Int64, 9223372036854775807, 9223372036854775807],
-            [new \POData\Providers\Metadata\Type\StringType, 'the mighty string', 'the mighty string'],
+            [new \POData\Providers\Metadata\Type\Null1(), null, 'NULL'],
+            [new \POData\Providers\Metadata\Type\Boolean() , true, 'true'],
+            [new \POData\Providers\Metadata\Type\Boolean() , false, 'false'],
+            [new \POData\Providers\Metadata\Type\Byte(), 254, 254],
+            [new \POData\Providers\Metadata\Type\Int16(), 32767, 32767],
+            [new \POData\Providers\Metadata\Type\Int32(), 2147483647, 2147483647],
+            [new \POData\Providers\Metadata\Type\Int64(), 9223372036854775807, 9223372036854775807],
+            [new \POData\Providers\Metadata\Type\StringType(), 'the mighty string', 'the mighty string'],
 
         ];
     }
@@ -507,7 +509,7 @@ class LaravelExpressionProviderTest extends TestCase
         $result   = $foo->onFunctionCallExpression($func, [ 'foo', 2]);
         $this->assertEquals($expected, $result);
     }
-    
+
     public function testOnFunctionCallExpressionStrSubstring2()
     {
         $foo = new LaravelExpressionProvider();
