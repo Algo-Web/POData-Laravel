@@ -42,7 +42,7 @@ abstract class ModelReflectionHelper
             $file->next();
         }
 
-        $code  = trim(preg_replace('/\s\s+/', '', $code));
+        $code  = preg_replace('/\s\s+/', '', $code);
         $begin = strpos($code, 'function(');
         $code  = substr($code, (int)$begin, strrpos($code, '}') - $begin + 1);
         return $code;
@@ -54,13 +54,12 @@ abstract class ModelReflectionHelper
      */
     public static function getModelClassMethods(Model $model): array
     {
-        // TODO: Handle case when Mock::class not present
-        return array_diff(
+        return array_values(array_diff(
             get_class_methods($model),
             get_class_methods(Model::class),
-            get_class_methods(Mock::class),
+            get_class_methods(Mock::class) ?? [],
             get_class_methods(MetadataTrait::class)
-        );
+        ));
     }
 
     /**

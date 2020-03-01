@@ -29,4 +29,11 @@ class ObjectMapTest extends TestCase
 
         $this->assertFalse($foo->isOK());
     }
+
+    public function testNOkWhenNoComponents()
+    {
+        $foo = new Map();
+
+        $this->assertTrue($foo->isOK());
+    }
 }

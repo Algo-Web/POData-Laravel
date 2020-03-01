@@ -48,7 +48,7 @@ class EntityGubbins
     /**
      * @return ResourceEntityType
      */
-    public function getOdataResourceType()
+    public function getOdataResourceType() : ?ResourceEntityType
     {
         return $this->odataResourceType;
     }
@@ -56,7 +56,7 @@ class EntityGubbins
     /**
      * @param ResourceEntityType $odataType
      */
-    public function setOdataResourceType(ResourceEntityType $odataType)
+    public function setOdataResourceType(ResourceEntityType $odataType) : void
     {
         if ($odataType->isAbstract()) {
             $msg = 'OData resource entity type must be concrete';
@@ -68,7 +68,7 @@ class EntityGubbins
     /**
      * @return string
      */
-    public function getName()
+    public function getName() : ?string
     {
         return $this->name;
     }
@@ -76,7 +76,7 @@ class EntityGubbins
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName($name) : void
     {
         $this->name = $name;
     }
@@ -84,7 +84,7 @@ class EntityGubbins
     /**
      * @return string
      */
-    public function getClassName()
+    public function getClassName() : ?string
     {
         return $this->className;
     }
@@ -92,7 +92,7 @@ class EntityGubbins
     /**
      * @param string $className
      */
-    public function setClassName($className)
+    public function setClassName($className) : void
     {
         $this->className = $className;
     }
@@ -100,7 +100,7 @@ class EntityGubbins
     /**
      * @return EntityField[]
      */
-    public function getKeyFields()
+    public function getKeyFields() : array
     {
         return $this->keyFields;
     }
@@ -108,7 +108,7 @@ class EntityGubbins
     /**
      * @return EntityField[]
      */
-    public function getFields()
+    public function getFields() : array
     {
         return $this->fields;
     }
@@ -117,7 +117,7 @@ class EntityGubbins
      * @param  EntityField[] $fields
      * @throws \Exception
      */
-    public function setFields(array $fields)
+    public function setFields(array $fields) : void
     {
         if (0 == count($fields)) {
             $msg = 'Fields array must not be empty for '.$this->getClassName();
@@ -144,7 +144,7 @@ class EntityGubbins
     /**
      * @return AssociationStubBase[]
      */
-    public function getStubs()
+    public function getStubs() : array
     {
         return $this->stubs;
     }
@@ -153,7 +153,7 @@ class EntityGubbins
      * @param  AssociationStubBase[] $stubs
      * @throws \Exception
      */
-    public function setStubs(array $stubs)
+    public function setStubs(array $stubs) : void
     {
         foreach ($stubs as $field) {
             if (!$field instanceof AssociationStubBase) {
@@ -169,7 +169,7 @@ class EntityGubbins
      * @param  bool                      $isFirst
      * @throws InvalidOperationException
      */
-    public function addAssociation(Association $association, $isFirst = true)
+    public function addAssociation(Association $association, $isFirst = true) : void
     {
         if ($association instanceof AssociationMonomorphic) {
             $stub = $isFirst ? $association->getFirst() : $association->getLast();
@@ -187,7 +187,7 @@ class EntityGubbins
     /**
      * @return String[]
      */
-    protected function getFieldNames()
+    protected function getFieldNames() : array
     {
         $fieldNames = [];
         foreach ($this->fields as $field) {
@@ -199,22 +199,19 @@ class EntityGubbins
     /**
      * @return String[]
      */
-    protected function getAssociationNames()
+    protected function getAssociationNames() : array
     {
-        if (empty($this->stubs)) {
-            return [];
-        }
-        $assocationNames = [];
+        $associationNames = [];
         foreach ($this->stubs as $stub) {
-            $assocationNames[] = $stub->getRelationName();
+            $associationNames[] = $stub->getRelationName();
         }
-        return $assocationNames;
+        return $associationNames;
     }
 
     /**
      * @return Associations\Association[]
      */
-    public function getAssociations()
+    public function getAssociations() : array
     {
         return $this->associations;
     }
@@ -223,7 +220,7 @@ class EntityGubbins
      * @param $relName
      * @return Association|null
      */
-    public function resolveAssociation($relName)
+    public function resolveAssociation($relName) : ?Association
     {
         return array_key_exists($relName, $this->associations) ? $this->associations[$relName] : null;
     }
@@ -231,7 +228,7 @@ class EntityGubbins
     /**
      * @return bool
      */
-    public function isOK()
+    public function isOK() : bool
     {
         $fieldNames       = $this->getFieldNames();
         $associationNames = $this->getAssociationNames();

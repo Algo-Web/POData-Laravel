@@ -94,6 +94,15 @@ class CreateTestModelsTable extends Migration
             $table->string('code')->default('');
         });
 
+        Schema::create('test_polymorph_to_many_source_malformed_models', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
+            $table->string('name')->default('');
+            $table->timestamp('added_at')->useCurrent();
+            $table->float('weight')->default(0);
+            $table->string('code')->default('');
+        });
+
         Schema::create('test_morph_to_target_models', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
@@ -101,6 +110,8 @@ class CreateTestModelsTable extends Migration
             $table->timestamp('added_at')->useCurrent();
             $table->float('weight')->default(0);
             $table->string('code')->default('');
+            $table->morphs('morph');
+            $table->morphs('newmorph');
         });
 
         Schema::create('test_morph_one_models', function (Blueprint $table) {
@@ -110,7 +121,6 @@ class CreateTestModelsTable extends Migration
             $table->timestamp('added_at')->useCurrent();
             $table->float('weight')->nullable();
             $table->string('code')->nullable();
-            $table->morphs('morph');
         });
 
         Schema::create('test_morph_many_models', function (Blueprint $table) {
@@ -120,7 +130,6 @@ class CreateTestModelsTable extends Migration
             $table->timestamp('added_at')->useCurrent();
             $table->float('weight')->nullable();
             $table->string('code')->nullable();
-            $table->morphs('morph');
         });
     }
 
