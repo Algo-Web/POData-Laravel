@@ -40,6 +40,7 @@ class AssociationStubPolymorphic extends AssociationStubBase
         $thisTarg = $this->getTargType();
         $thatTarg = $otherStub->getTargType();
         $thisBase = $this->getBaseType();
+        $thatBase = $otherStub->getBaseType();
         $thisNull = null === $thisTarg;
         $thatNull = null === $thatTarg;
         if ($thisNull && $thatNull) {
@@ -48,7 +49,7 @@ class AssociationStubPolymorphic extends AssociationStubBase
         if ((!$thisNull &&
             !$thatNull) &&
             ($thisBase !== $otherStub->getTargType() ||
-            $otherStub->getBaseType() !== $this->getTargType())
+             $thatBase !== $this->getTargType())
         ) {
             return false;
         }
@@ -56,7 +57,7 @@ class AssociationStubPolymorphic extends AssociationStubBase
         if ($thisNull && ($thatTarg != $thisBase)) {
             return false;
         }
-        if ($thatNull && ($thisTarg != $otherStub->getBaseType())) {
+        if ($thatNull && ($thisTarg != $thatBase)) {
             return false;
         }
 
