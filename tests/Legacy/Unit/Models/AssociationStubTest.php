@@ -226,19 +226,4 @@ class AssociationStubTest extends TestCase
         $this->assertEquals(1, $foo->compare($bar));
         $this->assertEquals(-1, $bar->compare($foo));
     }
-
-    public function testIsKnownSideInconsistentState()
-    {
-        $foo = new AssociationStubPolymorphic();
-
-        $expected = 'Polymorphic stub not OK so known-side determination is meaningless';
-        $actual   = null;
-
-        try {
-            $foo->isKnownSide();
-        } catch (InvalidOperationException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
 }

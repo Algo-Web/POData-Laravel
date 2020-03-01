@@ -57,18 +57,6 @@ class AssociationStubPolymorphic extends AssociationStubBase
     }
 
     /**
-     * @throws InvalidOperationException
-     * @return bool
-     */
-    public function isKnownSide()
-    {
-        if (!($this->isOk())) {
-            throw new InvalidOperationException('Polymorphic stub not OK so known-side determination is meaningless');
-        }
-        return null === $this->targType;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function morphicType()
