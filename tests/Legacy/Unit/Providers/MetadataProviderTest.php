@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Providers;
 
@@ -56,7 +58,7 @@ class MetadataProviderTest extends TestCase
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
         $map = new Map();
@@ -74,7 +76,7 @@ class MetadataProviderTest extends TestCase
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */
-    public function tearDown() : void
+    public function tearDown(): void
     {
         parent::tearDown();
     }

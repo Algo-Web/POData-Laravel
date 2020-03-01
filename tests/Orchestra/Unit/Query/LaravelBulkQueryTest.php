@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -91,7 +93,7 @@ class LaravelBulkQueryTest extends TestCase
 
         $paramList = [$spec];
         $data      = [11];
-        $keyDesc   = [new \stdClass];
+        $keyDesc   = [new \stdClass()];
 
         $query = m::mock(LaravelQuery::class)->makePartial();
         $foo   = new DummyBulkQuery($query);
@@ -188,7 +190,7 @@ class LaravelBulkQueryTest extends TestCase
     }
 
 
-    public function processOutputProvider() : array
+    public function processOutputProvider(): array
     {
         $result   = [];
         $result[] = [['id' => 1]];

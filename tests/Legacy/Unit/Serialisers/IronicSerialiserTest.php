@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Serialisers;
 
@@ -544,7 +546,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $this->assertEquals($expected, $actual);
     }
 
-    
+
     public function testSerialiseKnownSideWithNoResourceMatch()
     {
         $known = Carbon::create(2017, 1, 1, 0, 0, 0, 'UTC');

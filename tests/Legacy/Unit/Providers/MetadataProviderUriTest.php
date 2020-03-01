@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Providers;
 
@@ -36,7 +38,7 @@ use Tests\Legacy\AlgoWeb\PODataLaravel\TestCase;
 
 class MetadataProviderUriTest extends TestCase
 {
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
         $map = new Map();
@@ -45,7 +47,7 @@ class MetadataProviderUriTest extends TestCase
         self::resetMetadataProvider($foo);
     }
 
-    public function tearDown() : void
+    public function tearDown(): void
     {
         MetadataProvider::setAfterExtract(null);
         MetadataProvider::setAfterUnify(null);

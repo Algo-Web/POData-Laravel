@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Seeder;
 
@@ -13,7 +15,7 @@ class ProductsTableSeeder extends Seeder
     public function run()
     {
         \DB::table('products')->delete();
-        
+
         \DB::table('products')->insert(
             [
                 0 =>

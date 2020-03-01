@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Providers;
 
@@ -25,7 +27,7 @@ class MetadataProviderReverseTest extends TestCase
 {
     private $metadataProvider;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
         $map = new Map();

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 // Lifted straight from Laravel ~5.1.44 to give a base to work from
 namespace AlgoWeb\PODataLaravel\Controllers;
 
@@ -9,5 +11,7 @@ use Illuminate\Routing\Controller as BaseController;
 
 abstract class Controller extends BaseController
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    use AuthorizesRequests;
+    use DispatchesJobs;
+    use ValidatesRequests;
 }

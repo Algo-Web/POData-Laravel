@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 
 namespace Tests\Northwind\AlgoWeb\PODataLaravel;
@@ -7,12 +9,12 @@ use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
-    public static function setUpBeforeClass() : void
+    public static function setUpBeforeClass(): void
     {
         putenv('APP_DISABLE_AUTH=true');
     }
 
-    public static function tearDownAfterClass() : void
+    public static function tearDownAfterClass(): void
     {
         putenv('APP_DISABLE_AUTH=false');
     }
@@ -52,7 +54,7 @@ class TestCase extends BaseTestCase
         ]);
     }
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
         //$this->loadMigrationsFrom(realpath(__DIR__ . '/database/migrations'));

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
@@ -310,8 +312,8 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * @return array
      * @throws \Exception
+     * @return array
      */
     protected function getCandidateModels()
     {
@@ -333,7 +335,7 @@ class MetadataProvider extends MetadataBaseProvider
     /**
      * @return IMetadataRelationshipContainer|null
      */
-    public function getRelationHolder() : ?IMetadataRelationshipContainer
+    public function getRelationHolder(): ?IMetadataRelationshipContainer
     {
         return $this->relationHolder;
     }

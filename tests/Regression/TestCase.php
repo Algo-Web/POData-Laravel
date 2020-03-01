@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Regression\AlgoWeb\PODataLaravel;
 
@@ -43,7 +45,7 @@ class TestCase extends BaseTestCase
         ]);
     }
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
         //$this->loadMigrationsFrom(realpath(__DIR__ . '/database/migrations'));

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
@@ -558,7 +560,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @throws \ReflectionException
      * @return array
      */
-    protected function buildLinksFromRels(QueryResult $entryObject, array $relProp, string $relativeUri) : array
+    protected function buildLinksFromRels(QueryResult $entryObject, array $relProp, string $relativeUri): array
     {
         $links = [];
         foreach ($relProp as $prop) {
@@ -588,7 +590,7 @@ class IronicSerialiser implements IObjectSerialiser
                 $this->expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName);
             }
             $nuLink->isExpanded = isset($nuLink->expandedResult);
-            $links[] = $nuLink;
+            $links[]            = $nuLink;
         }
         return $links;
     }

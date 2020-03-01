@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Query;
 
@@ -491,7 +493,7 @@ class LaravelQueryBulkTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    
+
     public function testBulkCustomUpdateGoodLookup()
     {
         $callResult = response()->json(['status' => 'success', 'id' => [2, 4, 6], 'errors' => null]);
@@ -610,13 +612,13 @@ class LaravelQueryBulkTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
         $this->origFacade['DB'] = DB::getFacadeRoot();
     }
 
-    public function tearDown() : void
+    public function tearDown(): void
     {
         DB::swap($this->origFacade['DB']);
         parent::tearDown();

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
@@ -66,9 +68,9 @@ abstract class AssociationStubBase
 
     /**
      * AssociationStubBase constructor.
-     * @param string $relationName
-     * @param string $keyFieldName
-     * @param string[] $throughFieldChain
+     * @param string                      $relationName
+     * @param string                      $keyFieldName
+     * @param string[]                    $throughFieldChain
      * @param AssociationStubRelationType $multiplicity
      */
     public function __construct(
@@ -77,10 +79,10 @@ abstract class AssociationStubBase
         array $throughFieldChain,
         AssociationStubRelationType $multiplicity
     ) {
-        $this->relationName = $relationName;
-        $this->keyFieldName = $keyFieldName;
+        $this->relationName      = $relationName;
+        $this->keyFieldName      = $keyFieldName;
         $this->throughFieldChain = $throughFieldChain;
-        $this->multiplicity = $multiplicity;
+        $this->multiplicity      = $multiplicity;
     }
 
     /**
@@ -125,7 +127,7 @@ abstract class AssociationStubBase
     /**
      * @return string
      */
-    public function getRelationName() : string
+    public function getRelationName(): string
     {
         return $this->relationName;
     }
@@ -133,7 +135,7 @@ abstract class AssociationStubBase
     /**
      * @param string $relationName
      */
-    public function setRelationName(string $relationName) : void
+    public function setRelationName(string $relationName): void
     {
         $this->relationName = $this->checkStringInput($relationName) ? $relationName : $this->relationName;
     }
@@ -141,7 +143,7 @@ abstract class AssociationStubBase
     /**
      * @return AssociationStubRelationType
      */
-    public function getMultiplicity() : AssociationStubRelationType
+    public function getMultiplicity(): AssociationStubRelationType
     {
         return $this->multiplicity;
     }
@@ -149,7 +151,7 @@ abstract class AssociationStubBase
     /**
      * @param AssociationStubRelationType $multiplicity
      */
-    public function setMultiplicity(AssociationStubRelationType $multiplicity) : void
+    public function setMultiplicity(AssociationStubRelationType $multiplicity): void
     {
         $this->multiplicity = $multiplicity;
     }
@@ -162,7 +164,7 @@ abstract class AssociationStubBase
         return $this->keyFieldName ?? '';
     }
 
-    public function getKeyField() : ?EntityField
+    public function getKeyField(): ?EntityField
     {
         return (null === $this->entity) ? null : $this->entity->getFields()[$this->getKeyFieldName()];
     }
@@ -170,12 +172,12 @@ abstract class AssociationStubBase
     /**
      * @param string $keyFieldName
      */
-    public function setKeyFieldName(string $keyFieldName) : void
+    public function setKeyFieldName(string $keyFieldName): void
     {
         $this->keyFieldName = $this->checkStringInput($keyFieldName) ? $keyFieldName : $this->keyFieldName;
     }
 
-    public function isCompatible(AssociationStubBase $otherStub) : bool
+    public function isCompatible(AssociationStubBase $otherStub): bool
     {
         if ($this->morphicType() != $otherStub->morphicType()) {
             return false;
@@ -213,7 +215,7 @@ abstract class AssociationStubBase
     /**
      * @return string|null
      */
-    public function getTargType() : ?string
+    public function getTargType(): ?string
     {
         return $this->targType;
     }
@@ -221,7 +223,7 @@ abstract class AssociationStubBase
     /**
      * @param string|null $targType
      */
-    public function setTargType(?string $targType) : void
+    public function setTargType(?string $targType): void
     {
         $this->targType = $targType;
     }
@@ -229,7 +231,7 @@ abstract class AssociationStubBase
     /**
      * @return string|null
      */
-    public function getBaseType() : ?string
+    public function getBaseType(): ?string
     {
         return $this->baseType;
     }
@@ -237,7 +239,7 @@ abstract class AssociationStubBase
     /**
      * @param string $baseType
      */
-    public function setBaseType(string $baseType) : void
+    public function setBaseType(string $baseType): void
     {
         $this->baseType = $this->checkStringInput($baseType) ? $baseType : $this->baseType;
     }
@@ -245,7 +247,7 @@ abstract class AssociationStubBase
     /**
      * @return string|null
      */
-    public function getForeignFieldName() : ?string
+    public function getForeignFieldName(): ?string
     {
         return $this->foreignFieldName;
     }
@@ -253,7 +255,7 @@ abstract class AssociationStubBase
     /**
      * @param string $foreignFieldName
      */
-    public function setForeignFieldName($foreignFieldName) : void
+    public function setForeignFieldName($foreignFieldName): void
     {
         $this->foreignFieldName = $foreignFieldName;
     }
@@ -269,7 +271,7 @@ abstract class AssociationStubBase
     /**
      * @param string[]|null $keyChain
      */
-    public function setThroughFieldChain(?array $keyChain) : void
+    public function setThroughFieldChain(?array $keyChain): void
     {
         $this->throughFieldChain = $keyChain;
     }
@@ -280,7 +282,7 @@ abstract class AssociationStubBase
      *
      * @return int
      */
-    public function compare(AssociationStubBase $other) : int
+    public function compare(AssociationStubBase $other): int
     {
         $thisFirst  = null === $this->getKeyField() ? false : $this->getKeyField()->getIsKeyField();
         $otherFirst = null === $other->getKeyField() ? false : $other->getKeyField()->getIsKeyField();
@@ -309,13 +311,13 @@ abstract class AssociationStubBase
      *
      * @return string
      */
-    abstract public function morphicType() : string;
+    abstract public function morphicType(): string;
 
     /**
-     * @param mixed $input
+     * @param  mixed $input
      * @return bool
      */
-    protected function checkStringInput($input) : bool
+    protected function checkStringInput($input): bool
     {
         if (null === $input || !is_string($input) || empty($input)) {
             return false;

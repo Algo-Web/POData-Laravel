@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -62,7 +64,7 @@ abstract class SerialiserLowLevelWriters
      * @throws \ReflectionException
      * @return ODataBagContent|null
      */
-    public static function writeBagValue(ResourceType &$resourceType, $result) : ?ODataBagContent
+    public static function writeBagValue(ResourceType &$resourceType, $result): ?ODataBagContent
     {
         if (!(null == $result || is_array($result))) {
             throw new InvalidOperationException('Bag parameter must be null or array');

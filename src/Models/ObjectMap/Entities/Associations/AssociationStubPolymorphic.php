@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
@@ -14,7 +16,7 @@ class AssociationStubPolymorphic extends AssociationStubBase
     /**
      * @return string
      */
-    public function getMorphType() : ?string
+    public function getMorphType(): ?string
     {
         return $this->morphType;
     }
@@ -22,7 +24,7 @@ class AssociationStubPolymorphic extends AssociationStubBase
     /**
      * @param string $morphType
      */
-    public function setMorphType(string $morphType) : void
+    public function setMorphType(string $morphType): void
     {
         $this->morphType = $morphType;
     }
@@ -32,7 +34,7 @@ class AssociationStubPolymorphic extends AssociationStubBase
      *
      * @return bool
      */
-    public function isCompatible(AssociationStubBase $otherStub) : bool
+    public function isCompatible(AssociationStubBase $otherStub): bool
     {
         if (!parent::isCompatible($otherStub)) {
             return false;
@@ -59,7 +61,7 @@ class AssociationStubPolymorphic extends AssociationStubBase
     /**
      * {@inheritdoc}
      */
-    public function morphicType() : string
+    public function morphicType(): string
     {
         return 'polymorphic';
     }
