@@ -46,18 +46,11 @@ class AssociationStubPolymorphic extends AssociationStubBase
         if ($thisNull && $thatNull) {
             return false;
         }
-        if ((!$thisNull &&
-            !$thatNull) &&
-            ($thisBase !== $thatTarg ||
-             $thatBase !== $thisTarg)
-        ) {
-            return false;
-        }
 
-        if ($thisNull && ($thatTarg != $thisBase)) {
+        if (!$thatNull && ($thatTarg != $thisBase)) {
             return false;
         }
-        if ($thatNull && ($thisTarg != $thatBase)) {
+        if (!$thisNull && ($thisTarg != $thatBase)) {
             return false;
         }
 
