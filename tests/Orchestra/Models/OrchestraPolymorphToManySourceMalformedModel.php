@@ -13,8 +13,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrchestraPolymorphToManySourceMalformedModel extends Model
 {
-    use MetadataTrait;
-
     protected $table = 'test_polymorph_to_many_source_models';
 
     protected $fillable = [ 'name', 'added_at', 'weight', 'code'];

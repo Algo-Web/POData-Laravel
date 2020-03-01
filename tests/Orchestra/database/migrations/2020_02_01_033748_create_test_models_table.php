@@ -110,6 +110,8 @@ class CreateTestModelsTable extends Migration
             $table->timestamp('added_at')->useCurrent();
             $table->float('weight')->default(0);
             $table->string('code')->default('');
+            $table->morphs('morph');
+            $table->morphs('newmorph');
         });
 
         Schema::create('test_morph_one_models', function (Blueprint $table) {
@@ -119,7 +121,6 @@ class CreateTestModelsTable extends Migration
             $table->timestamp('added_at')->useCurrent();
             $table->float('weight')->nullable();
             $table->string('code')->nullable();
-            $table->morphs('morph');
         });
 
         Schema::create('test_morph_many_models', function (Blueprint $table) {
@@ -129,7 +130,6 @@ class CreateTestModelsTable extends Migration
             $table->timestamp('added_at')->useCurrent();
             $table->float('weight')->nullable();
             $table->string('code')->nullable();
-            $table->morphs('morph');
         });
     }
 
