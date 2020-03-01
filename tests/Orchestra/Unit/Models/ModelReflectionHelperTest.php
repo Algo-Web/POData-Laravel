@@ -9,8 +9,10 @@
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Models;
 
 use AlgoWeb\PODataLaravel\Models\ModelReflectionHelper;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraBelongsToTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraPolymorphToManySourceMalformedModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
+use Mockery as m;
 
 class ModelReflectionHelperTest extends TestCase
 {
@@ -59,6 +61,16 @@ class ModelReflectionHelperTest extends TestCase
         $expected = 'function(){return $this->morphMany(OrchestraMorphToTestModel::class, \'morph\');'.PHP_EOL
                 .'})();}';
         $actual = ModelReflectionHelper::getCodeForMethod($method);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testMockedClassMethods()
+    {
+        $expected = [0 => 'parent'];
+
+        $foo = m::mock(OrchestraBelongsToTestModel::class)->makePartial();
+
+        $actual = ModelReflectionHelper::getModelClassMethods($foo);
         $this->assertEquals($expected, $actual);
     }
 }
