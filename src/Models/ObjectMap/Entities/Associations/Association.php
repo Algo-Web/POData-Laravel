@@ -11,14 +11,14 @@ abstract class Association
     ];
 
     /**
-     * @var AssociationStubBase
+     * @var AssociationStubBase|null
      */
     protected $first;
 
     /**
-     * @return AssociationStubBase
+     * @return AssociationStubBase|null
      */
-    public function getFirst()
+    public function getFirst() : ?AssociationStubBase
     {
         return $this->first;
     }
@@ -26,7 +26,7 @@ abstract class Association
     /**
      * @param AssociationStubBase $first
      */
-    public function setFirst(AssociationStubBase $first)
+    public function setFirst(AssociationStubBase $first) : void
     {
         $this->first = $first;
         $first->addAssociation($this);
@@ -40,7 +40,7 @@ abstract class Association
     /**
      * @return bool
      */
-    abstract public function isOk();
+    abstract public function isOk() : bool;
 
     /**
      * @return AssociationType|AssociationType[]
