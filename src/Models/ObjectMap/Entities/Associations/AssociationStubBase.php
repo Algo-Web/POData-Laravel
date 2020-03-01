@@ -17,12 +17,12 @@ abstract class AssociationStubBase
     /**
      * Foreign key field of this end of relation.
      *
-     * @var string|null
+     * @var string
      */
     protected $keyFieldName;
 
     /**
-     * A list of fields to Traverse between Keyfield and foreignField.
+     * A list of fields to Traverse between keyField and foreignField.
      *
      * @var string[]
      */
@@ -36,7 +36,7 @@ abstract class AssociationStubBase
     protected $foreignFieldName;
 
     /**
-     * @var string|null
+     * @var string
      */
     protected $relationName;
 
@@ -300,7 +300,7 @@ abstract class AssociationStubBase
         foreach ($cmps as $cmpvals) {
             $cmp = strcmp($cmpvals[0], $cmpvals[1]);
             if (0 !== $cmp) {
-                return $cmp / abs($cmp);
+                return $cmp <=> 0;
             }
         }
         return 0;
