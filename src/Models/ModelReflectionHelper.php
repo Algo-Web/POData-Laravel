@@ -54,11 +54,10 @@ abstract class ModelReflectionHelper
      */
     public static function getModelClassMethods(Model $model): array
     {
-        // TODO: Handle case when Mock::class not present
         return array_diff(
             get_class_methods($model),
             get_class_methods(Model::class),
-            get_class_methods(Mock::class),
+            get_class_methods(Mock::class) ?? [],
             get_class_methods(MetadataTrait::class)
         );
     }
