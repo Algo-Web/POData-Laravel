@@ -24,7 +24,19 @@ class AssociationStubMonomorphic extends AssociationStubBase
             && ($this->getForeignFieldName() === $otherStub->getKeyFieldName())
             && ($this->getKeyFieldName() === $otherStub->getForeignFieldName());
     }
+    /**
+     * Is this AssociationStub sane?
+     */
+    public function isOk(): bool
+    {
 
+        $isOk = parent::isOk();
+        $stringCheck = [$this->targType, $this->foreignFieldName];
+        $checkResult = array_filter($stringCheck, [$this, 'checkStringInput']);
+        $isOk &= $stringCheck == $checkResult;
+
+        return boolval($isOk);
+    }
     /**
      * {@inheritdoc}
      */

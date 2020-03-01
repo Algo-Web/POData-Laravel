@@ -174,38 +174,20 @@ abstract class AssociationStubBase
     /**
      * Is this AssociationStub sane?
      */
-    public function isOk()
+    public function isOk(): bool
     {
-        if (null === $this->multiplicity) {
-            return false;
-        }
-        if (null === $this->relationName) {
-            return false;
-        }
-        if (null === $this->keyFieldName) {
-            return false;
-        }
-        if (null === $this->baseType) {
-            return false;
-        }
-        $targType = $this->targType;
-        if ($this instanceof AssociationStubMonomorphic && null === $targType) {
-            return false;
-        }
-        $foreignField = $this->foreignFieldName;
-        if (null !== $targType) {
-            if (!$this->checkStringInput($targType)) {
-                return false;
-            }
-            if (!$this->checkStringInput($foreignField)) {
-                return false;
-            }
-        }
+        $required = [
+            $this->multiplicity,
+            $this->relationName,
+            $this->keyFieldName,
+            $this->baseType,
+            $this->throughFieldChain
+        ];
+        $isOk = true;
+        $isOk &= empty(array_filter($required, 'is_null'));
+        $isOk &= (null === $this->targType) === (null ===  $this->foreignFieldName);
 
-        if (null === $this->throughFieldChain) {
-            return false;
-        }
-        return (null === $targType) === (null === $foreignField);
+        return boolval($isOk);
     }
 
     /**
@@ -313,7 +295,7 @@ abstract class AssociationStubBase
      * @param $input
      * @return bool
      */
-    private function checkStringInput($input)
+    protected function checkStringInput($input)
     {
         if (null === $input || !is_string($input) || empty($input)) {
             return false;
