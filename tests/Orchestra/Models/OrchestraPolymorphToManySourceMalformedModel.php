@@ -22,4 +22,10 @@ class OrchestraPolymorphToManySourceMalformedModel extends Model
     public function sourceChildren() { return $this->morphToMany(OrchestraPolymorphToManyTestModel::class, 'manyable', 'test_manyables', 'manyable_id', 'many_id'); }
     public function child() { return $this->morphMany(OrchestraMorphToTestModel::class, 'morph');
     }
+    public function voodooChild() {
+        return (function(){
+            return $this->morphMany(OrchestraMorphToTestModel::class, 'morph');
+})();
+
+    }
 }

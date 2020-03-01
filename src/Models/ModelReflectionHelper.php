@@ -42,7 +42,7 @@ abstract class ModelReflectionHelper
             $file->next();
         }
 
-        $code  = trim(preg_replace('/\s\s+/', '', $code));
+        $code  = preg_replace('/\s\s+/', '', $code);
         $begin = strpos($code, 'function(');
         $code  = substr($code, (int)$begin, strrpos($code, '}') - $begin + 1);
         return $code;

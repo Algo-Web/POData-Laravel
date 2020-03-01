@@ -45,4 +45,20 @@ class ModelReflectionHelperTest extends TestCase
         $actual = ModelReflectionHelper::getCodeForMethod($method);
         $this->assertEquals($expected, $actual);
     }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testGetCodeForMethodContainingAnonymousFunction()
+    {
+        $foo = new OrchestraPolymorphToManySourceMalformedModel();
+        $reflec = new \ReflectionClass($foo);
+
+        $method = $reflec->getMethod('voodooChild');
+
+        $expected = 'function(){return $this->morphMany(OrchestraMorphToTestModel::class, \'morph\');'.PHP_EOL
+                .'})();}';
+        $actual = ModelReflectionHelper::getCodeForMethod($method);
+        $this->assertEquals($expected, $actual);
+    }
 }
