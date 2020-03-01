@@ -38,7 +38,7 @@ class AssociationStubTest extends TestCase
         $foo->setBaseType(TestMorphTarget::class);
         $foo->setTargType(TestMorphTargetChild::class);
         $this->assertFalse($foo->isOk());
-        $foo->setForeignFieldName(123);
+        $foo->setForeignFieldName('');
         $this->assertFalse($foo->isOk());
     }
 
@@ -101,7 +101,7 @@ class AssociationStubTest extends TestCase
         $foo = new AssociationStubMonomorphic('rel', 'key', [], AssociationStubRelationType::ONE());
         $foo->setBaseType(TestMonomorphicSource::class);
         $this->assertFalse($foo->isOk());
-        $foo->setTargType(123);
+        $foo->setTargType('');
         $this->assertFalse($foo->isOk());
     }
 

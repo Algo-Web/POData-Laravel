@@ -22,7 +22,7 @@ class AssociationStubPolymorphic extends AssociationStubBase
     /**
      * @param string $morphType
      */
-    public function setMorphType($morphType) : void
+    public function setMorphType(string $morphType) : void
     {
         $this->morphType = $morphType;
     }

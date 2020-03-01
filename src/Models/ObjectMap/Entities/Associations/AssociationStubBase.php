@@ -133,7 +133,7 @@ abstract class AssociationStubBase
     /**
      * @param string $relationName
      */
-    public function setRelationName($relationName) : void
+    public function setRelationName(string $relationName) : void
     {
         $this->relationName = $this->checkStringInput($relationName) ? $relationName : $this->relationName;
     }
@@ -170,7 +170,7 @@ abstract class AssociationStubBase
     /**
      * @param string $keyFieldName
      */
-    public function setKeyFieldName($keyFieldName) : void
+    public function setKeyFieldName(string $keyFieldName) : void
     {
         $this->keyFieldName = $this->checkStringInput($keyFieldName) ? $keyFieldName : $this->keyFieldName;
     }
@@ -218,9 +218,9 @@ abstract class AssociationStubBase
     }
 
     /**
-     * @param string $targType
+     * @param string|null $targType
      */
-    public function setTargType($targType) : void
+    public function setTargType(?string $targType) : void
     {
         $this->targType = $targType;
     }
@@ -236,7 +236,7 @@ abstract class AssociationStubBase
     /**
      * @param string $baseType
      */
-    public function setBaseType($baseType) : void
+    public function setBaseType(string $baseType) : void
     {
         $this->baseType = $this->checkStringInput($baseType) ? $baseType : $this->baseType;
     }
@@ -311,7 +311,7 @@ abstract class AssociationStubBase
     abstract public function morphicType() : string;
 
     /**
-     * @param $input
+     * @param mixed $input
      * @return bool
      */
     protected function checkStringInput($input) : bool
