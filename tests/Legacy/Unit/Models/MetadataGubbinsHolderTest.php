@@ -128,7 +128,7 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicSource::class, 'oneSource');
         $this->assertEquals(1, count($result));
-        $expected->addAssociation($result[0]->getAssocations()[0]);
+        $expected->addAssociation($result[0]->getAssociations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -166,7 +166,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $expected->setEntity($modelEntity);
         $result = $foo->getRelationsByRelationName(TestMonomorphicTarget::class, 'oneTarget');
         $this->assertEquals(1, count($result));
-        $expected->addAssociation($result[0]->getAssocations()[0]);
+        $expected->addAssociation($result[0]->getAssociations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -205,7 +205,7 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicSource::class, 'manySource');
         $this->assertEquals(1, count($result));
-        $expected->addAssociation($result[0]->getAssocations()[0]);
+        $expected->addAssociation($result[0]->getAssociations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -244,7 +244,7 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicTarget::class, 'manyTarget');
         $this->assertEquals(1, count($result));
-        $expected->addAssociation($result[0]->getAssocations()[0]);
+        $expected->addAssociation($result[0]->getAssociations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -279,7 +279,7 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicManySource::class, 'manySource');
         $this->assertEquals(1, count($result));
-        $expected->addAssociation($result[0]->getAssocations()[0]);
+        $expected->addAssociation($result[0]->getAssociations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -314,7 +314,7 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $result = $foo->getRelationsByRelationName(TestMonomorphicManyTarget::class, 'manyTarget');
         $this->assertEquals(1, count($result));
-        $expected->addAssociation($result[0]->getAssocations()[0]);
+        $expected->addAssociation($result[0]->getAssociations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -375,7 +375,7 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $result = $foo->getRelationsByRelationName(TestMorphOneSource::class, 'morphTarget');
         $this->assertEquals(1, count($result));
-        $expected->addAssociation($result[0]->getAssocations()[0]);
+        $expected->addAssociation($result[0]->getAssociations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -411,7 +411,7 @@ class MetadataGubbinsHolderTest extends TestCase
         $expected->setEntity($modelEntity);
         $result = $foo->getRelationsByRelationName(TestMorphManySource::class, 'morphTarget');
         $this->assertEquals(1, count($result));
-        $expected->addAssociation($result[0]->getAssocations()[0]);
+        $expected->addAssociation($result[0]->getAssociations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 
@@ -449,7 +449,7 @@ class MetadataGubbinsHolderTest extends TestCase
 
         $result = $foo->getRelationsByRelationName(TestMorphManyToManySource::class, 'manySource');
         $this->assertEquals(1, count($result));
-        $expected->addAssociation($result[0]->getAssocations()[0]);
+        $expected->addAssociation($result[0]->getAssociations()[0]);
         $this->assertEquals($expected, $result[0]);
     }
 

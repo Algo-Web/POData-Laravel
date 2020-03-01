@@ -98,7 +98,7 @@ abstract class AssociationStubBase
      *
      * @return Association[] All associations this stub is a member of
      */
-    public function getAssocations(): array
+    public function getAssociations(): array
     {
         return array_values($this->associations);
     }
@@ -288,22 +288,18 @@ abstract class AssociationStubBase
             ) {
             return $thisFirst ? -1 : 1;
         }
-        $thisClass  = get_class($this);
-        $otherClass = get_class($other);
-        $classComp  = strcmp($thisClass, $otherClass);
-        if (0 !== $classComp) {
-            return $classComp / abs($classComp);
+        $cmps = [
+            [get_class($this), get_class($other)],
+            [$this->getBaseType() ?? '', $other->getBaseType() ?? ''],
+            [$this->getRelationName() ?? '', $other->getRelationName() ?? ''],
+        ];
+        foreach($cmps as $cmpvals){
+            $cmp = strcmp($cmpvals[0], $cmpvals[1]);
+            if(0 !== $cmp){
+                return $cmp / abs($cmp);
+            }
         }
-        $thisBase  = $this->getBaseType() ?? '';
-        $otherBase = $other->getBaseType() ?? '';
-        $baseComp  = strcmp($thisBase, $otherBase);
-        if (0 !== $baseComp) {
-            return $baseComp / abs($baseComp);
-        }
-        $thisMethod  = $this->getRelationName() ?? '';
-        $otherMethod = $other->getRelationName() ?? '';
-        $methodComp  = strcmp($thisMethod, $otherMethod);
-        return 0 === $methodComp ? 0 : $methodComp / abs($methodComp);
+        return 0;
     }
 
     /**

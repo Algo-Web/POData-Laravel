@@ -52,7 +52,6 @@ class AssociationStubPolymorphic extends AssociationStubBase
             return false;
         }
 
-
         if ($thisNull && ($thatTarg != $this->getBaseType())) {
             return false;
         }

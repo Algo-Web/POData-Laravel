@@ -111,7 +111,7 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
         }
         $entities = $this->entities[$className];
         $relation = $entities->getStubs()[$relName];
-        return array_reduce($relation->getAssocations(), function ($carry, Association $item) use ($relation) {
+        return array_reduce($relation->getAssociations(), function ($carry, Association $item) use ($relation) {
             $carry[] = ($item->getFirst() === $relation) ? $item->getLast() : $item->getFirst();
             return $carry;
         }, []);
@@ -131,7 +131,7 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
 
         $this->checkClassExists($className);
         return array_reduce($this->entities[$className]->getStubs(), function ($carry, AssociationStubBase $item) {
-            return array_merge($carry, $item->getAssocations());
+            return array_merge($carry, $item->getAssociations());
         }, []);
     }
 
