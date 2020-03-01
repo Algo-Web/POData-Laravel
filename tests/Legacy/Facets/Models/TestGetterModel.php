@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models;
 
@@ -52,7 +54,7 @@ class TestGetterModel extends Model
         }
         return $this->traitmetadata();
     }
-    
+
     public function getWeightCodeAttribute()
     {
         return $this->weight . $this->code;

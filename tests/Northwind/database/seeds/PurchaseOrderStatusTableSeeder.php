@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Seeder;
 
@@ -13,7 +15,7 @@ class PurchaseOrderStatusTableSeeder extends Seeder
     public function run()
     {
         \DB::table('purchase_order_status')->delete();
-        
+
         \DB::table('purchase_order_status')->insert(
             [
                 0 =>

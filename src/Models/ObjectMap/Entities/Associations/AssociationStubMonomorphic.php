@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
@@ -9,7 +11,7 @@ class AssociationStubMonomorphic extends AssociationStubBase
      *
      * @return bool
      */
-    public function isCompatible(AssociationStubBase $otherStub) : bool
+    public function isCompatible(AssociationStubBase $otherStub): bool
     {
         if (!parent::isCompatible($otherStub)) {
             return false;
@@ -29,8 +31,7 @@ class AssociationStubMonomorphic extends AssociationStubBase
      */
     public function isOk(): bool
     {
-
-        $isOk = parent::isOk();
+        $isOk        = parent::isOk();
         $stringCheck = [$this->targType, $this->foreignFieldName];
         $checkResult = array_filter($stringCheck, [$this, 'checkStringInput']);
         $isOk &= $stringCheck == $checkResult;
@@ -40,7 +41,7 @@ class AssociationStubMonomorphic extends AssociationStubBase
     /**
      * {@inheritdoc}
      */
-    public function morphicType() : string
+    public function morphicType(): string
     {
         return 'monomorphic';
     }

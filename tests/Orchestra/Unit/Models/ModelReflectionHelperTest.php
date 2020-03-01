@@ -1,11 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
  * Date: 1/03/20
- * Time: 1:53 PM
+ * Time: 1:53 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Models;
 
 use AlgoWeb\PODataLaravel\Models\ModelReflectionHelper;
@@ -21,7 +22,7 @@ class ModelReflectionHelperTest extends TestCase
      */
     public function testGetCodeForSingleLineMethod()
     {
-        $foo = new OrchestraPolymorphToManySourceMalformedModel();
+        $foo    = new OrchestraPolymorphToManySourceMalformedModel();
         $reflec = new \ReflectionClass($foo);
 
         $method = $reflec->getMethod('sourceChildren');
@@ -38,13 +39,13 @@ class ModelReflectionHelperTest extends TestCase
      */
     public function testGetCodeForSingleLineMethodJustAfterAnotherMethod()
     {
-        $foo = new OrchestraPolymorphToManySourceMalformedModel();
+        $foo    = new OrchestraPolymorphToManySourceMalformedModel();
         $reflec = new \ReflectionClass($foo);
 
         $method = $reflec->getMethod('child');
 
         $expected = 'public function child() { return $this->morphMany(OrchestraMorphToTestModel::class, \'morph\');}';
-        $actual = ModelReflectionHelper::getCodeForMethod($method);
+        $actual   = ModelReflectionHelper::getCodeForMethod($method);
         $this->assertEquals($expected, $actual);
     }
 
@@ -53,7 +54,7 @@ class ModelReflectionHelperTest extends TestCase
      */
     public function testGetCodeForMethodContainingAnonymousFunction()
     {
-        $foo = new OrchestraPolymorphToManySourceMalformedModel();
+        $foo    = new OrchestraPolymorphToManySourceMalformedModel();
         $reflec = new \ReflectionClass($foo);
 
         $method = $reflec->getMethod('voodooChild');

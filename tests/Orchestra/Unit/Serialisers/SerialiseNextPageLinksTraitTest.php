@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
  * Date: 29/02/20
- * Time: 1:31 AM
+ * Time: 1:31 AM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Serialisers;
 
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Serialisers\DummyIronicSerialiser;
@@ -24,7 +25,7 @@ class SerialiseNextPageLinksTraitTest extends TestCase
      */
     public function testGetNextLinkUriWithBadOrderByInfo()
     {
-        $order = new \stdClass;
+        $order = new \stdClass();
 
         $node = m::mock(ExpandedProjectionNode::class);
         $node->shouldReceive('getInternalOrderByInfo')->andReturn($order);
@@ -32,7 +33,7 @@ class SerialiseNextPageLinksTraitTest extends TestCase
         $foo = m::mock(DummyIronicSerialiser::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCurrentExpandedProjectionNode')->andReturn($node);
 
-        $object = new \stdClass;
+        $object = new \stdClass();
 
         $this->expectException(InvalidOperationException::class);
         $this->expectExceptionMessage('stdClass');
@@ -55,7 +56,7 @@ class SerialiseNextPageLinksTraitTest extends TestCase
         $foo->shouldReceive('getCurrentExpandedProjectionNode')->andReturn($node);
         $foo->shouldReceive('getNextPageLinkQueryParametersForRootResourceSet')->andReturn('');
 
-        $object = new \stdClass;
+        $object = new \stdClass();
 
         $this->expectException(InvalidOperationException::class);
         $this->expectExceptionMessage('!is_null($skipToken)');

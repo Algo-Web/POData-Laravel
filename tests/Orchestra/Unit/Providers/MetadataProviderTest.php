@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -70,7 +72,7 @@ class MetadataProviderTest extends TestCase
         $this->assertFalse($foo->isBooted());
     }
 
-    public function runInArtisanProvider() : array
+    public function runInArtisanProvider(): array
     {
         $result = [];
 

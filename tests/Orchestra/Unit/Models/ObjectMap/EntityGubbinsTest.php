@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
  * Date: 1/03/20
- * Time: 11:52 AM
+ * Time: 11:52 AM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Models\ObjectMap;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
@@ -72,7 +73,7 @@ class EntityGubbinsTest extends TestCase
         $this->assertEquals(2, count($foo->getFields()));
 
         $expected = [null, null];
-        $actual = $foo->getFieldNames();
+        $actual   = $foo->getFieldNames();
 
         $this->assertEquals($expected, $actual);
     }
@@ -93,7 +94,7 @@ class EntityGubbinsTest extends TestCase
         $foo->setStubs([$stub, $newstub]);
 
         $expected = ['relName', 'newRelName'];
-        $actual = $foo->getAssociationNames();
+        $actual   = $foo->getAssociationNames();
         $this->assertEquals($expected, $actual);
     }
 }

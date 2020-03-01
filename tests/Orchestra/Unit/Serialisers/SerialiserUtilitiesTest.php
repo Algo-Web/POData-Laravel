@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -105,7 +107,7 @@ class SerialiserUtilitiesTest extends TestCase
     public function testWriteComplexValueBadPropertyType()
     {
         $keyProp = m::mock(ResourceProperty::class);
-        $keyProp->shouldReceive('getInstanceType')->andReturn(new \stdClass);
+        $keyProp->shouldReceive('getInstanceType')->andReturn(new \stdClass());
         $keyProp->shouldReceive('getKind')->andReturn(16);
         $keyProp->shouldReceive('getName')->andReturn('property');
 
@@ -130,7 +132,7 @@ class SerialiserUtilitiesTest extends TestCase
         $keyProp->shouldReceive('getInstanceType')->andReturn($iType);
         $keyProp->shouldReceive('getKind')->andReturn(16);
         $keyProp->shouldReceive('getName')->andReturn('property');
-        $keyProp->shouldReceive('getResourceType->getInstanceType')->andReturn(new \stdClass)->once();
+        $keyProp->shouldReceive('getResourceType->getInstanceType')->andReturn(new \stdClass())->once();
 
         $rType = m::mock(ResourceType::class)->makePartial();
         $rType->shouldReceive('getName')->andReturn('name');

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -15,19 +17,19 @@ use Tests\Regression\AlgoWeb\PODataLaravel\TestCase;
 
 class ExpandTest extends TestCase
 {
-    public static function setUpBeforeClass() : void
+    public static function setUpBeforeClass(): void
     {
         putenv('APP_DISABLE_AUTH=true');
     }
 
-    public static function tearDownAfterClass() : void
+    public static function tearDownAfterClass(): void
     {
         putenv('APP_DISABLE_AUTH=false');
     }
 
     //use DatabaseMigrations;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
         $baz           = new City();

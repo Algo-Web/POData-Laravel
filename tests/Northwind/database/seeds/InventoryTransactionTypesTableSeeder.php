@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Seeder;
 
@@ -13,7 +15,7 @@ class InventoryTransactionTypesTableSeeder extends Seeder
     public function run()
     {
         \DB::table('inventory_transaction_types')->delete();
-        
+
         \DB::table('inventory_transaction_types')->insert(
             [
                 0 =>

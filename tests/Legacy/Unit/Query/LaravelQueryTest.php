@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Query;
 
@@ -79,7 +81,7 @@ class LaravelQueryTest extends TestCase
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
         //$this->object = new \AlgoWeb\PODataLaravel\Query\LaravelQuery();
@@ -100,7 +102,7 @@ class LaravelQueryTest extends TestCase
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */
-    public function tearDown() : void
+    public function tearDown(): void
     {
         parent::tearDown();
     }
@@ -828,9 +830,9 @@ class LaravelQueryTest extends TestCase
         $model          = new TestModel();
         $model->id      = 42;
         $keyDesc        = \Mockery::mock(KeyDescriptor::class);
-        $data           = new \StdClass;
+        $data           = new \StdClass();
         $data->name     = 'Wibble';
-        $data->added_at = new \DateTime;
+        $data->added_at = new \DateTime();
         $data->weight   = 0;
         $data->code     = 'Enigma';
         $data->success  = false;
@@ -897,9 +899,9 @@ class LaravelQueryTest extends TestCase
         $model          = new TestModel();
         $model->id      = 42;
         $keyDesc        = \Mockery::mock(KeyDescriptor::class);
-        $data           = new \StdClass;
+        $data           = new \StdClass();
         $data->name     = 'Wibble';
-        $data->added_at = new \DateTime;
+        $data->added_at = new \DateTime();
         $data->weight   = 0;
         $data->code     = 'Enigma';
         $data->success  = false;
@@ -970,9 +972,9 @@ class LaravelQueryTest extends TestCase
         $model     = new TestModel();
         $model->id = null;
 
-        $data           = new \StdClass;
+        $data           = new \StdClass();
         $data->name     = 'Wibble';
-        $data->added_at = new \DateTime;
+        $data->added_at = new \DateTime();
         $data->weight   = 0;
         $data->code     = 'Enigma';
         $data->success  = false;
@@ -1030,9 +1032,9 @@ class LaravelQueryTest extends TestCase
         $model          = new TestModel();
         $model->id      = null;
         $keyDesc        = \Mockery::mock(KeyDescriptor::class);
-        $data           = new \StdClass;
+        $data           = new \StdClass();
         $data->name     = 'Wibble';
-        $data->added_at = new \DateTime;
+        $data->added_at = new \DateTime();
         $data->weight   = 0;
         $data->code     = 'Enigma';
         $data->success  = false;

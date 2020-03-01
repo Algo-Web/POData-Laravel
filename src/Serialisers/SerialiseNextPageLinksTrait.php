@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -114,7 +116,7 @@ trait SerialiseNextPageLinksTrait
      *                                   is no query parameters
      *                                   required for the next link of top level result set
      */
-    protected function getNextPageLinkQueryParametersForRootResourceSet() : ?string
+    protected function getNextPageLinkQueryParametersForRootResourceSet(): ?string
     {
         /** @var string|null $queryParameterString */
         $queryParameterString = null;

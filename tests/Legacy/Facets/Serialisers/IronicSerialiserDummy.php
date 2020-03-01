@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Serialisers;
 
@@ -49,7 +51,7 @@ class IronicSerialiserDummy extends IronicSerialiser
     {
         $this->expand[$propName] = boolval($toExpand);
     }
-    
+
     public function getConcreteTypeFromAbstractType(
         ResourceEntityType $resourceType,
         IMetadataProvider $metadata,

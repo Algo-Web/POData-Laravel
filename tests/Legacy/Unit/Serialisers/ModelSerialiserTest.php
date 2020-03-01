@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Serialisers;
 
@@ -12,13 +14,13 @@ class ModelSerialiserTest extends TestCase
 {
     private $serialiser;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
         $this->serialiser = new ModelSerialiser();
     }
 
-    public function tearDown() : void
+    public function tearDown(): void
     {
         self::resetModelSerialiser($this->serialiser);
     }

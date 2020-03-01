@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Models;
 
@@ -20,8 +22,8 @@ interface IMetadataRelationshipContainer
     /**
      * returns all relation stubs that are permitted at the other end.
      *
-     * @param string $className
-     * @param string $relName
+     * @param  string                $className
+     * @param  string                $relName
      * @return AssociationStubBase[]
      */
     public function getRelationsByRelationName(string $className, string $relName): array;

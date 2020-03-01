@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models;
 
@@ -72,20 +74,20 @@ class TestModel extends Model
     public static function findOrFail($id, $columns = ['*'])
     {
         if (!is_numeric($id) || !is_int($id) || 0 >= $id) {
-            throw (new ModelNotFoundException)->setModel(TestModel::class, $id);
+            throw (new ModelNotFoundException())->setModel(TestModel::class, $id);
         } else {
-            return new self;
+            return new self();
         }
     }
 
     public static function findMany(array $id, $columns = ['*'])
     {
         if (0 == count($id)) {
-            throw (new ModelNotFoundException)->setModel(TestModel::class);
+            throw (new ModelNotFoundException())->setModel(TestModel::class);
         } else {
             $result = [];
             for ($i = 0; $i < count($id); $i++) {
-                $model     = new self;
+                $model     = new self();
                 $model->id = $id[$i];
                 $result[]  = $model;
             }

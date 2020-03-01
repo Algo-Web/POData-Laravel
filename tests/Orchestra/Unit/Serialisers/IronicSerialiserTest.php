@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
  * Date: 29/02/20
- * Time: 12:19 PM
+ * Time: 12:19 PM.
  */
-
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\MetadataGubbinsHolder;
@@ -59,7 +60,7 @@ class IronicSerialiserTest extends TestCase
         $this->assertNull($result->results);
 
         $expected = null;
-        $actual = $foo->writeTopLevelElement($result);
+        $actual   = $foo->writeTopLevelElement($result);
         $this->assertEquals($expected, $actual);
 
         $this->assertEquals(0, count($foo->getLightStack()));
@@ -83,7 +84,7 @@ class IronicSerialiserTest extends TestCase
 
         $this->expectException(InvalidOperationException::class);
 
-        $result = new QueryResult();
+        $result          = new QueryResult();
         $result->results = [];
 
         $foo->writeTopLevelElements($result);
@@ -99,7 +100,7 @@ class IronicSerialiserTest extends TestCase
 
         $foo = new DummyIronicSerialiser($service, $request);
 
-        $result = new QueryResult();
+        $result          = new QueryResult();
         $result->results = [];
 
         $rType = m::mock(ResourceType::class);
@@ -157,7 +158,7 @@ class IronicSerialiserTest extends TestCase
 
         $kid->parent = [$parent];
 
-        $result = new QueryResult();
+        $result          = new QueryResult();
         $result->results = $kid;
 
         $actual = $foo->buildLinksFromRels($result, [$rProp], 'foo');

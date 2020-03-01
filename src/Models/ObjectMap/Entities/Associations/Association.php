@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
@@ -18,7 +20,7 @@ abstract class Association
     /**
      * @return AssociationStubBase|null
      */
-    public function getFirst() : ?AssociationStubBase
+    public function getFirst(): ?AssociationStubBase
     {
         return $this->first;
     }
@@ -26,7 +28,7 @@ abstract class Association
     /**
      * @param AssociationStubBase $first
      */
-    public function setFirst(AssociationStubBase $first) : void
+    public function setFirst(AssociationStubBase $first): void
     {
         $this->first = $first;
         $first->addAssociation($this);
@@ -40,7 +42,7 @@ abstract class Association
     /**
      * @return bool
      */
-    abstract public function isOk() : bool;
+    abstract public function isOk(): bool;
 
     /**
      * @return AssociationType|AssociationType[]

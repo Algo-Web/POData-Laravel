@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models;
 
@@ -62,9 +64,9 @@ class TestCastModel extends Model
     public static function findOrFail($id, $columns = ['*'])
     {
         if (!is_numeric($id) || !is_int($id) || 0 >= $id) {
-            throw (new ModelNotFoundException)->setModel(TestModel::class, $id);
+            throw (new ModelNotFoundException())->setModel(TestModel::class, $id);
         } else {
-            return new self;
+            return new self();
         }
     }
 
