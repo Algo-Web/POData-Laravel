@@ -201,14 +201,11 @@ class EntityGubbins
      */
     protected function getAssociationNames()
     {
-        if (empty($this->stubs)) {
-            return [];
-        }
-        $assocationNames = [];
+        $associationNames = [];
         foreach ($this->stubs as $stub) {
-            $assocationNames[] = $stub->getRelationName();
+            $associationNames[] = $stub->getRelationName();
         }
-        return $assocationNames;
+        return $associationNames;
     }
 
     /**
