@@ -38,7 +38,7 @@ abstract class AssociationFactory
         $first = -1 === $stubOne->compare($stubTwo);
 
         $association = new AssociationMonomorphic();
-        if ($stubOne->getTargType() == null && self::$marshalPolymorphics) {
+        if (null === $stubOne->getTargType() && self::$marshalPolymorphics) {
             $stubOne->addAssociation($association);
             $stubOne = self::marshalPolyToMono($stubOne, $stubTwo);
         }

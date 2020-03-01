@@ -134,8 +134,11 @@ class EntityGubbinsTest extends TestCase
 
     public function testAddDisconnectedEmptyMonomorphicAssociation()
     {
+        $stub = m::mock(AssociationStubBase::class)->makePartial();
+
         $foo   = new EntityGubbins();
         $assoc = new AssociationMonomorphic();
+        $assoc->setFirst($stub);
 
         $expected = 'Association cannot be connected to this entity';
         $actual   = null;
