@@ -191,7 +191,7 @@ abstract class AssociationStubBase
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getTargType()
     {
