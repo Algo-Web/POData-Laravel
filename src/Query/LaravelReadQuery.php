@@ -112,9 +112,7 @@ class LaravelReadQuery extends LaravelBaseQuery
             $isvalid
         );
 
-        if (isset($top)) {
-            $resultSet = $resultSet->take($top);
-        }
+        $resultSet = $resultSet->take($top);
 
         $this->packageResourceSetResults($queryType, $skip, $result, $resultSet, $resultCount, $bulkSetCount);
         return $result;
