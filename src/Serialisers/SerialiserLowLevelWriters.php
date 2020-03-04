@@ -30,7 +30,7 @@ abstract class SerialiserLowLevelWriters
     /**
      * @param Model           $entryObject
      * @param ModelSerialiser $modelSerialiser
-     * @param $nonRelProp
+     * @param array           $nonRelProp
      * @throws InvalidOperationException
      * @return ODataPropertyContent
      */

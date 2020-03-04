@@ -96,8 +96,8 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
     /**
      * returns all Relation Stubs that are permitted at the other end.
      *
-     * @param $className
-     * @param $relName
+     * @param string                 $className
+     * @param string                 $relName
      * @return AssociationStubBase[]
      */
     public function getRelationsByRelationName(string $className, string $relName): array

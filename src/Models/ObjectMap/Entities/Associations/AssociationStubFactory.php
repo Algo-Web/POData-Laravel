@@ -22,7 +22,6 @@ abstract class AssociationStubFactory
     /**
      * @param  Model                     $parent
      * @param  string                    $name
-     * @param  Relation                  $relation
      * @throws InvalidOperationException
      * @return AssociationStubBase
      */
