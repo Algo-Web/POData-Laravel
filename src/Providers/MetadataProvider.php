@@ -183,13 +183,9 @@ class MetadataProvider extends MetadataBaseProvider
                 break;
             case AssociationType::NULL_ONE_TO_MANY():
             case AssociationType::ONE_TO_MANY():
-                if ($first->getMultiplicity() == AssociationStubRelationType::MANY()) {
-                    $oneSide  = $last;
-                    $manySide = $first;
-                } else {
-                    $oneSide  = $first;
-                    $manySide = $last;
-                }
+                $firstIsMany = $first->getMultiplicity() == AssociationStubRelationType::MANY();
+                $oneSide = $firstIsMany ? $last : $first;
+                $manySide = $firstIsMany ? $first : $last;
                 $meta->addResourceReferencePropertyBidirectional(
                     $objectModel->getEntities()[$oneSide->getBaseType()]->getOdataResourceType(),
                     $objectModel->getEntities()[$manySide->getBaseType()]->getOdataResourceType(),
@@ -344,9 +340,6 @@ class MetadataProvider extends MetadataBaseProvider
      */
     public function resolveReverseProperty(Model $source, string $propName)
     {
-        if (!is_string($propName)) {
-            throw new InvalidOperationException('Property name must be string');
-        }
         $entity = $this->getObjectMap()->resolveEntity(get_class($source));
         if (null === $entity) {
             $msg = 'Source model not defined';
