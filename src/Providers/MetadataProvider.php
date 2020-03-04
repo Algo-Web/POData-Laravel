@@ -342,7 +342,7 @@ class MetadataProvider extends MetadataBaseProvider
      * @return null|string
      * @internal param Model $target
      */
-    public function resolveReverseProperty(Model $source, $propName)
+    public function resolveReverseProperty(Model $source, string $propName)
     {
         if (!is_string($propName)) {
             throw new InvalidOperationException('Property name must be string');
