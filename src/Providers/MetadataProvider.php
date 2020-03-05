@@ -319,14 +319,14 @@ class MetadataProvider extends MetadataBaseProvider
     protected function getCandidateModels()
     {
         return ClassFinder::getClasses($this->getAppNamespace(),
-            function($className){
+            function ($className) {
                 return in_array(\AlgoWeb\PODataLaravel\Models\MetadataTrait::class, class_uses($className)) &&
                     is_subclass_of($className, \Illuminate\Database\Eloquent\Model::class);
-            },true);
+            }, true);
     }
 
     /**
-     * @return IMetadataRelationshipContainer|null
+     * @return IMetadataRelationshipContainer|nul   l
      */
     public function getRelationHolder(): ?IMetadataRelationshipContainer
     {

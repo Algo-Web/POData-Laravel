@@ -44,14 +44,14 @@ class MetadataControllerProvider extends MetadataBaseProvider
         $meta = App::make('metadataControllers');
 
         $classes = ClassFinder::getClasses($this->getAppNamespace(),
-            function($className){
+            function ($className) {
                 return in_array(MetadataControllerTrait::class, class_uses($className)) &&
                     ($this->app->make($className) instanceof Controller);
-            },true);
-        $ends = array_reduce($classes,function ($carry, $item){
+            }, true);
+        $ends = array_reduce($classes, function ($carry, $item) {
             $carry[] = $this->app->make($item);
             return $carry;
-        },[]);
+        }, []);
         // now process each class that uses the metadata controller trait and stick results in $metamix
         $metamix = [];
         foreach ($ends as $end) {
