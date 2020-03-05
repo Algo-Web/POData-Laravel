@@ -15,6 +15,7 @@ use SplFileObject;
 
 abstract class ModelReflectionHelper
 {
+    /** @var string[] */
     protected static $relTypes = [
         'hasMany',
         'hasManyThrough',
@@ -52,7 +53,7 @@ abstract class ModelReflectionHelper
 
     /**
      * @param  Model $model
-     * @return array
+     * @return string[]
      */
     public static function getModelClassMethods(Model $model): array
     {

@@ -69,7 +69,7 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
         return $this->stubs[$baseType][$targetType];
     }
 
-    private function buildAssociationFromStub(AssociationStubBase $item)
+    private function buildAssociationFromStub(AssociationStubBase $item): void
     {
         $baseTypeCheck = ($item instanceof AssociationStubPolymorphic &&
             count($item->getThroughFieldChain()) == 3) ? null : $item->getBaseType();
@@ -87,7 +87,10 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
         $this->addAssociations($associations);
     }
 
-    private function addAssociations(array $additionals)
+    /**
+     * @param Association[] $additionals
+     */
+    private function addAssociations(array $additionals): void
     {
         $this->associations = array_merge($this->associations, $additionals);
     }
@@ -140,7 +143,7 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
     /**
      * @param string $className
      */
-    protected function checkClassExists(string $className)
+    protected function checkClassExists(string $className): void
     {
         if (!$this->hasClass($className)) {
             $msg = '%s does not exist in holder';
