@@ -176,7 +176,7 @@ class EntityGubbins
     {
         if ($association instanceof AssociationMonomorphic) {
             $stub = $isFirst ? $association->getFirst() : $association->getLast();
-            if (null === $stub || (!in_array($stub, $this->stubs) && !($stub instanceof AssociationStubPolymorphic))) {
+            if ((!in_array($stub, $this->stubs) && !($stub instanceof AssociationStubPolymorphic))) {
                 throw new \InvalidArgumentException('Association cannot be connected to this entity');
             }
             $propertyName = $stub->getRelationName();
