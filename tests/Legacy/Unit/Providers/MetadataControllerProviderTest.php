@@ -264,7 +264,6 @@ class MetadataControllerProviderTest extends TestCase
         Cache::shouldReceive('forget')->with('metadataControllers')->once();
 
         $foo = m::mock(MetadataControllerProvider::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getClassMap')->andReturn(['abc', 'def'])->once();
         $foo->shouldReceive('getIsCaching')->andReturn(false)->once();
 
         $foo->boot();
