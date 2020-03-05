@@ -237,35 +237,6 @@ class LaravelReadQueryTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testGetResourceFromRelatedResourceSetBadResult()
-    {
-        $rSet     = m::mock(ResourceSet::class);
-        $targProp = m::mock(ResourceProperty::class);
-        $targProp->shouldReceive('getName')->andReturn('oneSource')->once();
-
-        $foo = m::mock(LaravelReadQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->never();
-        $foo->shouldReceive('getResource')->andReturn('chaboonagoonga')->once();
-
-        $rel = m::mock(HasOne::class)->makePartial();
-
-        $entity = m::mock(TestMonomorphicSource::class)->makePartial();
-        $entity->shouldReceive('oneSource')->andReturn($rel)->once();
-
-        $key = m::mock(KeyDescriptor::class)->makePartial();
-        $key->shouldReceive('getValidatedNamedValues')->andReturn([]);
-
-        $expected = 'GetResourceFromRelatedResourceSet must return an entity or null';
-        $actual   = null;
-
-        try {
-            $foo->getResourceFromRelatedResourceSet($rSet, $entity, $rSet, $targProp, $key);
-        } catch (InvalidOperationException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
     public function testNonTrivialOrderByOnModel()
     {
         $rawModel = $this->generateTestModelWithMetadata();

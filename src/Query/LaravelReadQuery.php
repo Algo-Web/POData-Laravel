@@ -210,7 +210,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         array $whereCondition = [],
         array $eagerLoad = null,
         $sourceEntityInstance = null
-    ) {
+    ): ?Model {
         if (null == $resourceSet && null == $sourceEntityInstance) {
             $msg = 'Must supply at least one of a resource set and source entity.';
             throw new \Exception($msg);
@@ -309,10 +309,6 @@ class LaravelReadQuery extends LaravelBaseQuery
         $sourceEntityInstance = $sourceEntityInstance->{$propertyName}();
         $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
         $result = $this->getResource(null, null, [], [], $sourceEntityInstance);
-        if (!(null == $result || $result instanceof Model)) {
-            $msg = 'GetResourceFromRelatedResourceSet must return an entity or null';
-            throw new InvalidOperationException($msg);
-        }
         return $result;
     }
 
