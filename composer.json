@@ -8,13 +8,14 @@
         "sort-packages": true
     },
     "require": {
-        "algo-web/podata": "0.3.*|dev-master",
-        "doctrine/dbal": "^2.5",
         "php": "^7.1",
-        "laravel/framework": "^5.5|^6.0",
+        "algo-web/podata": "0.3.*|dev-master",
+        "cruxinator/class-finder": "dev-master",
+        "doctrine/dbal": "^2.5",
         "illuminate/http": "^5.5|^6.0",
-        "symfony/yaml": "^2.7|^3.0|^4.0",
-        "symfony/http-foundation": "^2.7|^3.0|^4.0"
+        "laravel/framework": "^5.5|^6.0",
+        "symfony/http-foundation": "^2.7|^3.0|^4.0",
+        "symfony/yaml": "^2.7|^3.0|^4.0"
     },
     "require-dev": {
         "mockery/mockery": "dev-master",
