@@ -14,6 +14,7 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldType;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
+use Cruxinator\ClassFinder\ClassFinder;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
@@ -317,19 +318,11 @@ class MetadataProvider extends MetadataBaseProvider
      */
     protected function getCandidateModels()
     {
-        $classes   = $this->getClassMap();
-        $ends      = [];
-        $startName = $this->getAppNamespace();
-        foreach ($classes as $name) {
-            if (Str::startsWith($name, $startName)) {
-                if (in_array('AlgoWeb\\PODataLaravel\\Models\\MetadataTrait', class_uses($name))) {
-                    if (is_subclass_of($name, '\\Illuminate\\Database\\Eloquent\\Model')) {
-                        $ends[] = $name;
-                    }
-                }
-            }
-        }
-        return $ends;
+        return ClassFinder::getClasses($this->getAppNamespace(),
+            function($className){
+                return in_array(\AlgoWeb\PODataLaravel\Models\MetadataTrait::class, class_uses($className)) &&
+                    is_subclass_of($className, \Illuminate\Database\Eloquent\Model::class);
+            },true);
     }
 
     /**
