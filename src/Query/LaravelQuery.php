@@ -325,9 +325,9 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     }
 
     /**
-     * @param ResourceSet    $resourceSet          The entity set containing the entity to fetch
-     * @param Model|Relation $sourceEntityInstance The source entity instance
-     * @param object         $data                 the New data for the entity instance
+     * @param ResourceSet            $resourceSet          The entity set containing the entity to fetch
+     * @param Model|Relation|null    $sourceEntityInstance The source entity instance
+     * @param object                 $data                 the New data for the entity instance
      *
      * @throws \Exception
      * @return Model|null returns the newly created model if successful,
