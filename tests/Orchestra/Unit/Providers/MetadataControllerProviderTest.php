@@ -45,12 +45,14 @@ class MetadataControllerProviderTest extends TestCase
     public function testFilterControllerWithoutTrait()
     {
         $names    = [OrchestraNonTraitController::class, OrchestraTestController::class];
-        $expected = [new OrchestraTestController()];
+        $expected = [new OrchestraBallastController(), new OrchestraTestController()];
 
         $app = m::mock(Application::class);
         $app->shouldReceive('runningInConsole')->andReturn(true);
         $app->shouldReceive('make')->withArgs([OrchestraTestController::class])
             ->andReturn(new OrchestraTestController());
+        $app->shouldReceive('make')->withArgs([OrchestraBallastController::class])
+            ->andReturn(new OrchestraBallastController());
         $foo = new DummyMetadataControllerProvider($app);
 
         $actual = $foo->getCandidateControllers($names);
@@ -60,33 +62,18 @@ class MetadataControllerProviderTest extends TestCase
     public function testFilterFromOutsideNamespace()
     {
         $names    = [Role::class, OrchestraTestController::class];
-        $expected = [new OrchestraTestController()];
+        $expected = [new OrchestraBallastController(), new OrchestraTestController()];
 
         $app = m::mock(Application::class);
         $app->shouldReceive('runningInConsole')->andReturn(true);
         $app->shouldReceive('make')->withArgs([OrchestraTestController::class])
             ->andReturn(new OrchestraTestController());
+        $app->shouldReceive('make')->withArgs([OrchestraBallastController::class])
+            ->andReturn(new OrchestraBallastController());
 
         $foo = new DummyMetadataControllerProvider($app);
 
         $actual = $foo->getCandidateControllers($names);
         $this->assertEquals($expected, $actual);
-    }
-
-    public function testKaboomOnSwitcheroo()
-    {
-        $names = [OrchestraTestController::class];
-
-        $app = m::mock(\Illuminate\Foundation\Application::class)->makePartial();
-        $app->shouldReceive('make')->withArgs([OrchestraTestController::class])
-            ->andReturn(new OrchestraTestModel());
-        $app->shouldReceive('runningInConsole')->andReturn(false)->once();
-        $foo = new DummyMetadataControllerProvider($app);
-
-        $this->expectException(InvalidOperationException::class);
-        $this->expectExceptionMessage('Resolved result not a controller');
-
-        App::instance('app', $app);
-        $foo->getCandidateControllers($names);
     }
 }

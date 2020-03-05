@@ -18,7 +18,7 @@ class DummyMetadataControllerProvider extends MetadataControllerProvider
      * @throws \Exception
      * @return array
      */
-    public function getCandidateControllers( )
+    public function getCandidateControllers()
     {
         return parent::getCandidateControllers();
     }

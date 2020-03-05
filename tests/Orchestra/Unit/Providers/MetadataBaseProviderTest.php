@@ -40,16 +40,4 @@ class MetadataBaseProviderTest extends TestCase
 
         $foo->handlePostBoot(true, null, 'key', null);
     }
-
-    public function testNotExistInClassMap()
-    {
-        $app = m::mock(Application::class);
-
-        $foo = new DummyMetadataBaseProvider($app);
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('AlgoWeb\PODataLaravel\Providers\MetadataBaseProvider was not found in autoload class map, this usually indicates you need to dump an optimised autoloader (`composer dump-autoload -o`)');
-
-        $foo->checkClassMap([]);
-    }
 }

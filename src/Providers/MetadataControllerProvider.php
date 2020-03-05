@@ -100,7 +100,8 @@ class MetadataControllerProvider extends MetadataBaseProvider
      */
     protected function getCandidateControllers()
     {
-        $classes = ClassFinder::getClasses($this->getAppNamespace(),
+        $classes = ClassFinder::getClasses(
+            $this->getAppNamespace(),
             function ($className) {
                 return in_array(MetadataControllerTrait::class, class_uses($className)) &&
                     ($this->app->make($className) instanceof Controller);
