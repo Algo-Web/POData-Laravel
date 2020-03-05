@@ -318,7 +318,7 @@ class LaravelReadQuery extends LaravelBaseQuery
      *
      * @throws ODataException
      */
-    private function checkAuth($sourceEntityInstance, $checkInstance = null)
+    private function checkAuth($sourceEntityInstance, $checkInstance = null): void
     {
         $check = array_reduce([$sourceEntityInstance, $checkInstance], function ($carry, $item) {
             if ($item instanceof Model || $item instanceof Relation) {
@@ -439,7 +439,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         $resultSet,
         int $resultCount,
         int $bulkSetCount
-    ) {
+    ): void {
         $qVal = $queryType;
         if (QueryType::ENTITIES() == $qVal || QueryType::ENTITIES_WITH_COUNT() == $qVal) {
             $result->results = [];

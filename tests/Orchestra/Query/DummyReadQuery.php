@@ -22,8 +22,8 @@ class DummyReadQuery extends LaravelReadQuery
         $resultSet,
         int $resultCount,
         int $bulkSetCount
-    ) {
-        return parent::packageResourceSetResults($queryType, $skip, $result, $resultSet, $resultCount, $bulkSetCount);
+    ): void {
+        parent::packageResourceSetResults($queryType, $skip, $result, $resultSet, $resultCount, $bulkSetCount);
     }
 
     public function applyBasicFiltering(

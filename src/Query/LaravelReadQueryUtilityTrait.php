@@ -23,6 +23,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 trait LaravelReadQueryUtilityTrait
 {
+    /** @var string|null */
     protected $name;
 
     /**
@@ -39,7 +40,7 @@ trait LaravelReadQueryUtilityTrait
         $values     = $skipToken->getOrderByKeysInToken();
         $numValues  = count($values);
         if ($numValues != count($segments)) {
-            $msg = 'Expected '.count($segments).', got '.$numValues;
+            $msg = 'Expected ' . count($segments) . ', got '.$numValues;
             throw new InvalidOperationException($msg);
         }
 
@@ -103,7 +104,7 @@ trait LaravelReadQueryUtilityTrait
      * @param  KeyDescriptor|null        $keyDescriptor
      * @throws InvalidOperationException
      */
-    protected function processKeyDescriptor(&$sourceEntityInstance, KeyDescriptor $keyDescriptor = null)
+    protected function processKeyDescriptor(&$sourceEntityInstance, KeyDescriptor $keyDescriptor = null): void
     {
         if ($keyDescriptor) {
             $table = ($sourceEntityInstance instanceof Model) ? $sourceEntityInstance->getTable() . '.' : '';
@@ -119,7 +120,7 @@ trait LaravelReadQueryUtilityTrait
      * @throws InvalidOperationException
      * @return array
      */
-    protected function processEagerLoadList(array $eagerLoad = null)
+    protected function processEagerLoadList(array $eagerLoad = null): array
     {
         $load    = (null === $eagerLoad) ? [] : $eagerLoad;
         $rawLoad = [];

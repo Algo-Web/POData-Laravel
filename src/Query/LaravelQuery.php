@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
+use POData\Providers\Expression\IExpressionProvider;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Query\IQueryProvider;
@@ -28,13 +29,21 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
 {
+    /** @var IExpressionProvider */
     protected $expression;
+    /** @var LaravelReadQuery */
     protected $reader;
+    /** @var LaravelHookQuery */
     protected $modelHook;
+    /** @var LaravelBulkQuery */
     protected $bulk;
+    /** @var LaravelWriteQuery */
     protected $writer;
+    /** @var string */
     public $queryProviderClassName;
+    /** @var array */
     protected static $touchList = [];
+    /** @var bool */
     protected static $inBatch;
 
     public function __construct(AuthInterface $auth = null)
@@ -467,7 +476,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * Start database transaction.
      * @param bool $isBulk
      */
-    public function startTransaction($isBulk = false)
+    public function startTransaction($isBulk = false): void
     {
         self::$touchList = [];
         self::$inBatch   = true === $isBulk;
@@ -477,7 +486,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     /**
      * Commit database transaction.
      */
-    public function commitTransaction()
+    public function commitTransaction(): void
     {
         // fire model save again, to give Laravel app final chance to finalise anything that needs finalising after
         // batch processing
@@ -493,14 +502,14 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     /**
      * Abort database transaction.
      */
-    public function rollBackTransaction()
+    public function rollBackTransaction(): void
     {
         DB::rollBack();
         self::$touchList = [];
         self::$inBatch   = false;
     }
 
-    public static function queueModel(Model &$model)
+    public static function queueModel(Model &$model): void
     {
         // if we're not processing a batch, don't queue anything
         if (!self::$inBatch) {
