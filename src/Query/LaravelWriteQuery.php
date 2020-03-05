@@ -25,7 +25,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
     /**
      * @param  array      $data
      * @param  array      $paramList
-     * @param  Model|null $sourceEntityInstance
+     * @param  Model      $sourceEntityInstance
      * @return array
      */
     protected function createUpdateDeleteProcessInput(array $data, array $paramList, Model $sourceEntityInstance)
@@ -242,8 +242,8 @@ class LaravelWriteQuery extends LaravelBaseQuery
     /**
      * @param  ResourceSet               $resourceSet
      * @param  Model|Relation|null       $sourceEntityInstance
-     * @param  mixed                     $data
-     * @param  mixed                     $verb
+     * @param  array                     $data
+     * @param  string                    $verb
      * @throws InvalidOperationException
      * @throws ODataException
      * @return Model|null
