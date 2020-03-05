@@ -6,6 +6,7 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerTrait;
+use Cruxinator\ClassFinder\ClassFinder;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -42,9 +43,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
         /** @var MetadataControllerContainer $meta */
         $meta = App::make('metadataControllers');
 
-        $classes = $this->getClassMap();
-        $ends    = $this->getCandidateControllers($classes);
-
+        $ends = $this->getCandidateControllers();
         // now process each class that uses the metadata controller trait and stick results in $metamix
         $metamix = [];
         foreach ($ends as $end) {
@@ -96,43 +95,21 @@ class MetadataControllerProvider extends MetadataBaseProvider
     }
 
     /**
-     * @param  array      $classes
+     * @return mixed
      * @throws \Exception
-     * @return array
      */
-    protected function getCandidateControllers(array $classes)
+    protected function getCandidateControllers()
     {
-        $ends       = [];
-        $startName  = $this->getAppNamespace();
-        $rawClasses = [];
-        foreach ($classes as $name) {
-            // not in app namespace, keep moving
-            if (!\Illuminate\Support\Str::startsWith($name, $startName)) {
-                continue;
-            }
-            // if class doesn't exist (for whatever reason), skip it now rather than muck about later
-            if (!class_exists($name)) {
-                continue;
-            }
-            $rawClasses[] = $name;
-        }
-
-        foreach ($rawClasses as $name) {
-            try {
-                if (in_array(MetadataControllerTrait::class, class_uses($name, false))) {
-                    $result = $this->app->make($name);
-                    if (!$result instanceof Controller) {
-                        throw new InvalidOperationException('Resolved result not a controller');
-                    }
-                    $ends[] = $result;
-                }
-            } catch (\Exception $e) {
-                if (!$this->app->runningInConsole()) {
-                    throw $e;
-                }
-                // Squash exceptions thrown here when running from CLI so app can continue booting
-            }
-        }
+        $classes = ClassFinder::getClasses(
+            $this->getAppNamespace(),
+            function ($className) {
+                return in_array(MetadataControllerTrait::class, class_uses($className)) &&
+                    ($this->app->make($className) instanceof Controller);
+            }, true);
+        $ends = array_reduce($classes, function ($carry, $item) {
+            $carry[] = $this->app->make($item);
+            return $carry;
+        }, []);
         return $ends;
     }
 }

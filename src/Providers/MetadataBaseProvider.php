@@ -42,37 +42,6 @@ abstract class MetadataBaseProvider extends ServiceProvider
         }
     }
 
-    /**
-     * @return array
-     */
-    protected function getClassMap()
-    {
-        $classes   = get_declared_classes();
-        $autoClass = null;
-        foreach ($classes as $class) {
-            if (\Illuminate\Support\Str::startsWith($class, 'Composer\\Autoload\\ComposerStaticInit')) {
-                $autoClass = $class;
-            }
-        }
-
-        $classes = $autoClass::$classMap;
-        $this->checkClassMap($classes);
-        return array_keys($classes);
-    }
-
-    /**
-     * @param $classMap
-     * @throws \Exception
-     */
-    protected function checkClassMap($classMap)
-    {
-        $class = __CLASS__;
-        if (!isset($classMap[$class])) {
-            throw new \Exception(sprintf('%s was not found in autoload class map, this usually indicates you '.
-            'need to dump an optimised autoloader (`composer dump-autoload -o`)', $class));
-        }
-    }
-
     protected function getAppNamespace()
     {
         try {

@@ -18,8 +18,8 @@ class DummyMetadataControllerProvider extends MetadataControllerProvider
      * @throws \Exception
      * @return array
      */
-    public function getCandidateControllers(array $classes)
+    public function getCandidateControllers()
     {
-        return parent::getCandidateControllers($classes);
+        return parent::getCandidateControllers();
     }
 }
