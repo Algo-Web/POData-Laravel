@@ -10,7 +10,7 @@
     "require": {
         "php": "^7.1",
         "algo-web/podata": "0.3.*|dev-master",
-        "cruxinator/class-finder": "dev-master",
+        "cruxinator/class-finder": "1.0.0-RC2|dev-master",
         "doctrine/dbal": "^2.5",
         "illuminate/http": "^5.5|^6.0",
         "laravel/framework": "^5.5|^6.0",
