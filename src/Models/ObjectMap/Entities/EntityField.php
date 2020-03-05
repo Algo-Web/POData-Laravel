@@ -72,7 +72,7 @@ class EntityField
     /**
      * @param \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType $primitiveType
      */
-    public function setPrimitiveType(EntityFieldPrimitiveType $primitiveType)
+    public function setPrimitiveType(EntityFieldPrimitiveType $primitiveType): void
     {
         $this->primitiveType = $primitiveType;
         $rawType             = $this->primitiveTypeToEdmType($primitiveType);
@@ -90,7 +90,7 @@ class EntityField
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -106,7 +106,7 @@ class EntityField
     /**
      * @param EntityFieldType $fieldType
      */
-    public function setFieldType(EntityFieldType $fieldType)
+    public function setFieldType(EntityFieldType $fieldType): void
     {
         $this->fieldType = $fieldType;
     }
@@ -114,7 +114,7 @@ class EntityField
     /**
      * @return bool
      */
-    public function getIsNullable()
+    public function getIsNullable(): bool
     {
         return $this->isNullable;
     }
@@ -122,7 +122,7 @@ class EntityField
     /**
      * @param bool $isNullable
      */
-    public function setIsNullable($isNullable)
+    public function setIsNullable($isNullable): void
     {
         $this->isNullable = boolval($isNullable);
     }
@@ -138,7 +138,7 @@ class EntityField
     /**
      * @param mixed $defaultValue
      */
-    public function setDefaultValue($defaultValue)
+    public function setDefaultValue($defaultValue): void
     {
         $this->defaultValue = $defaultValue;
     }
@@ -154,7 +154,7 @@ class EntityField
     /**
      * @param bool $readOnly
      */
-    public function setReadOnly($readOnly)
+    public function setReadOnly($readOnly): void
     {
         $this->readOnly = boolval($readOnly);
     }
@@ -170,7 +170,7 @@ class EntityField
     /**
      * @param bool $createOnly
      */
-    public function setCreateOnly($createOnly)
+    public function setCreateOnly($createOnly): void
     {
         $this->createOnly = boolval($createOnly);
     }
@@ -186,13 +186,13 @@ class EntityField
     /**
      * @param bool $keyField
      */
-    public function setIsKeyField($keyField)
+    public function setIsKeyField($keyField): void
     {
         $this->isKeyField = boolval($keyField);
     }
 
     /**
-     * @var array
+     * @var array<string, int|string>
      */
     private static $primitiveToEdmMapping = [
         EntityFieldPrimitiveType::BINARY => EdmPrimitiveType::BINARY,
@@ -212,7 +212,7 @@ class EntityField
     /**
      * @param \AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityFieldPrimitiveType $primitiveType
      *
-     * @return int
+     * @return int|string
      */
     private function primitiveTypeToEdmType(EntityFieldPrimitiveType $primitiveType)
     {

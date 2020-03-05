@@ -122,13 +122,13 @@ class EntityGubbins
     public function setFields(array $fields): void
     {
         if (0 == count($fields)) {
-            $msg = 'Fields array must not be empty for '.$this->getClassName();
+            $msg = 'Fields array must not be empty for ' . $this->getClassName();
             throw new \Exception($msg);
         }
         $keys = [];
         foreach ($fields as $propName => $field) {
             if (!$field instanceof EntityField) {
-                $msg = 'Fields array must only have EntityField objects for '.$this->getClassName();
+                $msg = 'Fields array must only have EntityField objects for ' . $this->getClassName();
                 throw new \Exception($msg);
             }
             if ($field->getIsKeyField()) {
@@ -136,7 +136,7 @@ class EntityGubbins
             }
         }
         if (0 == count($keys)) {
-            $msg = 'No key field supplied in fields array for '.$this->getClassName();
+            $msg = 'No key field supplied in fields array for ' . $this->getClassName();
             throw new \Exception($msg);
         }
         $this->fields    = $fields;

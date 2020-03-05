@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 
 abstract class AssociationFactory
 {
+    /** @var bool */
     public static $marshalPolymorphics = true;
 
     /**

@@ -201,7 +201,7 @@ abstract class AssociationStubFactory
     /**
      * @param  Relation $relation
      * @param  string   $cacheKey
-     * @return array
+     * @return array<array|string>
      */
     private static function getKeyChain(Relation $relation, string $cacheKey): array
     {
@@ -223,6 +223,7 @@ abstract class AssociationStubFactory
         return call_user_func($getter->bindTo($relation, Relation::class));
     }
 
+    /** @var array<string, array> */
     private static $fieldOrderCache = [
         'BelongsTo' => ['foreignKey', 'ownerKey'],
         'BelongsToMany' => ['parentKey','foreignPivotKey','relatedPivotKey','relatedKey'],

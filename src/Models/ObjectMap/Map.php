@@ -22,7 +22,7 @@ class Map
     /**
      * @param EntityGubbins $entity
      */
-    public function addEntity(EntityGubbins $entity)
+    public function addEntity(EntityGubbins $entity): void
     {
         $this->entities[$entity->getClassName()] = $entity;
     }
@@ -35,7 +35,7 @@ class Map
         return $this->entities;
     }
 
-    public function resolveEntity($entityClassName)
+    public function resolveEntity(string $entityClassName): ?EntityGubbins
     {
         return array_key_exists($entityClassName, $this->entities) ? $this->entities[$entityClassName] : null;
     }
@@ -43,7 +43,7 @@ class Map
     /**
      * @param EntityGubbins[] $entities
      */
-    public function setEntities(array $entities)
+    public function setEntities(array $entities): void
     {
         $this->entities = [];
         foreach ($entities as $entity) {
@@ -60,7 +60,7 @@ class Map
      * @param  Association[]                            $associations
      * @throws \POData\Common\InvalidOperationException
      */
-    public function setAssociations(array $associations)
+    public function setAssociations(array $associations): void
     {
         foreach ($associations as $association) {
             $this->addAssociation($association);
@@ -71,7 +71,7 @@ class Map
      * @param  Association                              $association
      * @throws \POData\Common\InvalidOperationException
      */
-    public function addAssociation(Association $association)
+    public function addAssociation(Association $association): void
     {
         if ($association instanceof AssociationMonomorphic) {
             $this->addAssociationMonomorphic($association);
@@ -84,7 +84,7 @@ class Map
     /**
      * @return Association[]
      */
-    public function getAssociations()
+    public function getAssociations(): array
     {
         return $this->associations;
     }
@@ -92,7 +92,7 @@ class Map
     /**
      * @return bool
      */
-    public function isOK()
+    public function isOK(): bool
     {
         foreach ($this->entities as $entity) {
             if (!$entity->isOK()) {
@@ -106,7 +106,7 @@ class Map
      * @param  AssociationMonomorphic                   $association
      * @throws \POData\Common\InvalidOperationException
      */
-    private function addAssociationMonomorphic(AssociationMonomorphic $association)
+    private function addAssociationMonomorphic(AssociationMonomorphic $association): void
     {
         $firstClass  = $this->entities[$association->getFirst()->getBaseType()];
         $secondClass = $this->entities[$association->getLast()->getBaseType()];

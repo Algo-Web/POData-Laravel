@@ -6,6 +6,7 @@ namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
 abstract class Association
 {
+    /** @var array<int, string>  */
     protected $multArray = [
         AssociationStubRelationType::MANY => '*',
         AssociationStubRelationType::ONE => '1',
