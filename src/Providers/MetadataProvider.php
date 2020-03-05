@@ -326,7 +326,7 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * @return IMetadataRelationshipContainer|nul   l
+     * @return IMetadataRelationshipContainer|null
      */
     public function getRelationHolder(): ?IMetadataRelationshipContainer
     {
