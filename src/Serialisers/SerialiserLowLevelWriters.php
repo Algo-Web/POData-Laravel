@@ -71,7 +71,7 @@ abstract class SerialiserLowLevelWriters
         $kVal     = $typeKind;
         if (!(ResourceTypeKind::PRIMITIVE() == $kVal || ResourceTypeKind::COMPLEX() == $kVal)) {
             $msg = '$bagItemResourceTypeKind != ResourceTypeKind::PRIMITIVE'
-                   .' && $bagItemResourceTypeKind != ResourceTypeKind::COMPLEX';
+                   . ' && $bagItemResourceTypeKind != ResourceTypeKind::COMPLEX';
             throw new InvalidOperationException($msg);
         }
         if (null == $result) {

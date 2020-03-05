@@ -501,7 +501,7 @@ class IronicSerialiser implements IObjectSerialiser
         ODataLink $nuLink,
         int $propKind,
         string $propName
-    ) {
+    ): void {
         $nextName             = $prop->getResourceType()->getName();
         $value                = $entryObject->results->{$propName};
         $isCollection         = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
@@ -603,7 +603,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @throws ODataException
      * @throws \ReflectionException
      */
-    protected function buildEntriesFromElements($res, ODataFeed $odata)
+    protected function buildEntriesFromElements($res, ODataFeed $odata): void
     {
         foreach ($res as $entry) {
             if (!$entry instanceof QueryResult) {

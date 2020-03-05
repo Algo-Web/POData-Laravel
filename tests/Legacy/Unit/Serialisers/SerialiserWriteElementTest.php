@@ -1312,8 +1312,8 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $foo->shouldReceive('getService->getProvidersWrapper->resolveResourceType')->andReturn($firstType)->once();
         $foo->shouldReceive('getRequest->getTargetResourceType->getName')->andReturn('TestModel');
 
-        $expected = 'Object being serialised not instance of expected class, ' .TestMonomorphicSource::class
-                    .', is actually ' . \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel::class;
+        $expected = 'Object being serialised not instance of expected class, ' . TestMonomorphicSource::class
+                    . ', is actually ' . \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel::class;
         $actual = null;
 
         try {

@@ -41,7 +41,7 @@ abstract class SerialiserUtilities
      * @param  QueryResult               $entryObjects
      * @throws InvalidOperationException
      */
-    public static function checkElementsInput(QueryResult &$entryObjects)
+    public static function checkElementsInput(QueryResult &$entryObjects): void
     {
         $res = $entryObjects->results;
         if (!(is_array($res) || $res instanceof Collection)) {
@@ -59,7 +59,7 @@ abstract class SerialiserUtilities
      * @param  QueryResult               $entryObject
      * @throws InvalidOperationException
      */
-    public static function checkSingleElementInput(QueryResult $entryObject)
+    public static function checkSingleElementInput(QueryResult $entryObject): void
     {
         if (!$entryObject->results instanceof Model) {
             $res = $entryObject->results;

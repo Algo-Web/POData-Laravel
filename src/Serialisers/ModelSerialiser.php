@@ -13,7 +13,9 @@ class ModelSerialiser
     // Upstream POData implementation has an N+1 lookup problem that interacts badly with how
     // Eloquent handles property accesses
 
+    /** @var array[] */
     private static $mutatorCache  = [];
+    /** @var array[] */
     private static $metadataCache = [];
 
     public function __construct()

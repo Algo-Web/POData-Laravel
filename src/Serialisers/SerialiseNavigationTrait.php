@@ -113,7 +113,7 @@ trait SerialiseNavigationTrait
     abstract public function getRequest();
 
     /**
-     * @return array
+     * @return array[]
      */
     abstract protected function getLightStack();
 }

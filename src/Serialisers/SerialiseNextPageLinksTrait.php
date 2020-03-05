@@ -32,7 +32,7 @@ trait SerialiseNextPageLinksTrait
      * @throws InvalidOperationException
      * @throws ODataException
      */
-    protected function buildNextPageLink(QueryResult $entryObjects, $odata)
+    protected function buildNextPageLink(QueryResult $entryObjects, $odata): void
     {
         $stackSegment = $this->getRequest()->getTargetResourceSetWrapper()->getName();
         /** @var array $res */
@@ -55,7 +55,7 @@ trait SerialiseNextPageLinksTrait
      * @throws InvalidOperationException
      * @return bool                      true if the feed must have a next page link
      */
-    protected function needNextPageLink(int $resultSetCount)
+    protected function needNextPageLink(int $resultSetCount): bool
     {
         $currentResourceSet = $this->getCurrentResourceSetWrapper();
         $recursionLevel     = count($this->getStack()->getSegmentNames());

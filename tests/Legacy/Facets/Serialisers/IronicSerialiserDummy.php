@@ -32,7 +32,7 @@ class IronicSerialiserDummy extends IronicSerialiser
         return parent::getProjectionNodes();
     }
 
-    public function needNextPageLink(int $resultSetCount)
+    public function needNextPageLink(int $resultSetCount): bool
     {
         return parent::needNextPageLink($resultSetCount);
     }

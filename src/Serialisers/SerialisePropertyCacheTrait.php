@@ -13,6 +13,7 @@ use POData\Providers\Metadata\ResourceEntityType;
 
 trait SerialisePropertyCacheTrait
 {
+    /** @var array[] */
     protected $propertiesCache = [];
 
     /**
