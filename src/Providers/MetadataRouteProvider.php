@@ -15,12 +15,12 @@ class MetadataRouteProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->setupRoute();
     }
 
-    private function setupRoute()
+    private function setupRoute(): void
     {
         $authMiddleware   = $this->getAuthMiddleware();
         $controllerMethod = 'AlgoWeb\PODataLaravel\Controllers\ODataController@index';
@@ -37,11 +37,11 @@ class MetadataRouteProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
     }
 
-    private function getAuthMiddleware()
+    private function getAuthMiddleware(): ?string
     {
         $disable = $this->isAuthDisable();
         if ($disable) {
@@ -62,7 +62,7 @@ class MetadataRouteProvider extends ServiceProvider
     /**
      * @return bool
      */
-    protected function isAuthDisable()
+    protected function isAuthDisable(): bool
     {
         return true === boolval(env('APP_DISABLE_AUTH', null));
     }

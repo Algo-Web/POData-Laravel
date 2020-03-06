@@ -11,27 +11,31 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 trait MetadataProviderStepTrait
 {
+    /** @var callable|null */
     protected static $afterExtract;
+    /** @var callable|null */
     protected static $afterUnify;
+    /** @var callable|null */
     protected static $afterVerify;
+    /** @var callable|null */
     protected static $afterImplement;
 
-    public static function setAfterExtract(callable $method = null)
+    public static function setAfterExtract(callable $method = null): void
     {
         self::$afterExtract = $method;
     }
 
-    public static function setAfterUnify(callable $method = null)
+    public static function setAfterUnify(callable $method = null): void
     {
         self::$afterUnify = $method;
     }
 
-    public static function setAfterVerify(callable $method = null)
+    public static function setAfterVerify(callable $method = null): void
     {
         self::$afterVerify = $method;
     }
 
-    public static function setAfterImplement(callable $method = null)
+    public static function setAfterImplement(callable $method = null): void
     {
         self::$afterImplement = $method;
     }
@@ -41,6 +45,8 @@ trait MetadataProviderStepTrait
      *
      * @param mixed         $parm
      * @param callable|null $func
+     *
+     * @return mixed|null
      */
     private function handleCustomFunction($parm, callable $func = null)
     {

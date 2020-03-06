@@ -17,6 +17,7 @@ class MetadataControllerProvider extends MetadataBaseProvider
     /*
      * Optional crud verbs - these need to be deduplicated for empty mappings
      */
+    /** @var string[] */
     protected $optionalVerbs = ['bulkCreate', 'bulkUpdate'];
 
     /**
@@ -105,7 +106,9 @@ class MetadataControllerProvider extends MetadataBaseProvider
             function ($className) {
                 return in_array(MetadataControllerTrait::class, class_uses($className)) &&
                     ($this->app->make($className) instanceof Controller);
-            }, true);
+            },
+            true
+        );
         $ends = array_reduce($classes, function ($carry, $item) {
             $carry[] = $this->app->make($item);
             return $carry;

@@ -30,8 +30,11 @@ class MetadataProvider extends MetadataBaseProvider
 {
     use MetadataProviderStepTrait;
 
+    /** @var array<array>  */
     protected $multConstraints      = ['0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
+    /** @var string  */
     protected static $metaNAMESPACE = 'Data';
+    /** @var bool */
     protected static $isBooted      = false;
     const POLYMORPHIC               = 'polyMorphicPlaceholder';
     const POLYMORPHIC_PLURAL        = 'polyMorphicPlaceholders';
@@ -49,6 +52,7 @@ class MetadataProvider extends MetadataBaseProvider
         return $this->completedObjectMap;
     }
 
+    /** @var IMetadataRelationshipContainer|null */
     protected $relationHolder;
 
     public function __construct($app)
@@ -58,13 +62,13 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * @param  array                        $modelNames
+     * @param  string[]                     $modelNames
      * @throws InvalidOperationException
      * @throws \Doctrine\DBAL\DBALException
      * @throws \ReflectionException
      * @return Map
      */
-    private function extract(array $modelNames)
+    private function extract(array $modelNames): Map
     {
         /** @var Map $objectMap */
         $objectMap = App::make('objectmap');
@@ -105,7 +109,12 @@ class MetadataProvider extends MetadataBaseProvider
         return $objectMap;
     }
 
-    private function verify(Map $objectModel)
+    /**
+     * @param Map $objectModel
+     *
+     * @return void
+     */
+    private function verify(Map $objectModel): void
     {
         $objectModel->isOK();
         $this->handleCustomFunction($objectModel, self::$afterVerify);
@@ -116,7 +125,7 @@ class MetadataProvider extends MetadataBaseProvider
      * @throws InvalidOperationException
      * @throws \ReflectionException
      */
-    private function implement(Map $objectModel)
+    private function implement(Map $objectModel): void
     {
         /** @var SimpleMetadataProvider $meta */
         $meta      = App::make('metadata');
@@ -124,6 +133,7 @@ class MetadataProvider extends MetadataBaseProvider
 
         $entities = $objectModel->getEntities();
         foreach ($entities as $entity) {
+            /** @var class-string $className */
             $className  = $entity->getClassName();
             $entityName = $entity->getName();
             $pluralName = Str::plural($entityName);
@@ -140,7 +150,7 @@ class MetadataProvider extends MetadataBaseProvider
         $entityCount = count($entities);
         $expected    = 2 * $entityCount;
         if ($metaCount != $expected) {
-            $msg = 'Expected ' . $expected . ' items, actually got '. $metaCount;
+            $msg = 'Expected ' . $expected . ' items, actually got ' . $metaCount;
             throw new InvalidOperationException($msg);
         }
 
@@ -148,6 +158,9 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
         $assoc = $objectModel->getAssociations();
+        $assoc = array_filter($assoc, function ($value) {
+            return $value instanceof AssociationMonomorphic;
+        });
         foreach ($assoc as $association) {
             if (!$association->isOk()) {
                 throw new InvalidOperationException('');
@@ -163,8 +176,10 @@ class MetadataProvider extends MetadataBaseProvider
      * @throws InvalidOperationException
      * @throws \ReflectionException
      */
-    private function implementAssociationsMonomorphic(Map $objectModel, AssociationMonomorphic $associationUnderHammer)
-    {
+    private function implementAssociationsMonomorphic(
+        Map $objectModel,
+        AssociationMonomorphic $associationUnderHammer
+    ): void {
         /** @var SimpleMetadataProvider $meta */
         $meta  = App::make('metadata');
         $first = $associationUnderHammer->getFirst();
@@ -207,7 +222,7 @@ class MetadataProvider extends MetadataBaseProvider
      * @throws InvalidOperationException
      * @throws \ReflectionException
      */
-    private function implementProperties(EntityGubbins $unifiedEntity)
+    private function implementProperties(EntityGubbins $unifiedEntity): void
     {
         /** @var SimpleMetadataProvider $meta */
         $meta        = App::make('metadata');
@@ -310,9 +325,9 @@ class MetadataProvider extends MetadataBaseProvider
 
     /**
      * @throws \Exception
-     * @return array
+     * @return string[]
      */
-    protected function getCandidateModels()
+    protected function getCandidateModels(): array
     {
         return ClassFinder::getClasses(
             $this->getAppNamespace(),
@@ -364,7 +379,7 @@ class MetadataProvider extends MetadataBaseProvider
         return $association->getLast()->getRelationName();
     }
 
-    public function isRunningInArtisan()
+    public function isRunningInArtisan(): bool
     {
         return App::runningInConsole() && !App::runningUnitTests();
     }

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
+use AlgoWeb\PODataLaravel\Models\IMetadataRelationshipContainer;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -23,12 +26,12 @@ abstract class MetadataBaseProvider extends ServiceProvider
     }
 
     /**
-     * @param bool      $isCaching
-     * @param bool|null $hasCache
-     * @param string    $key
-     * @param $meta
+     * @param bool          $isCaching
+     * @param bool|null     $hasCache
+     * @param string        $key
+     * @param mixed         $meta
      */
-    protected function handlePostBoot(bool $isCaching, $hasCache, string $key, $meta)
+    protected function handlePostBoot(bool $isCaching, ?bool $hasCache, string $key, $meta): void
     {
         if (!$isCaching) {
             Cache::forget($key);
@@ -42,7 +45,10 @@ abstract class MetadataBaseProvider extends ServiceProvider
         }
     }
 
-    protected function getAppNamespace()
+    /**
+     * @return string
+     */
+    protected function getAppNamespace(): string
     {
         try {
             $startName = App::getNamespace();
