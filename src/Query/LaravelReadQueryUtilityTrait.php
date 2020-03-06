@@ -40,7 +40,7 @@ trait LaravelReadQueryUtilityTrait
         $values     = $skipToken->getOrderByKeysInToken();
         $numValues  = count($values);
         if ($numValues != count($segments)) {
-            $msg = 'Expected ' . count($segments) . ', got '.$numValues;
+            $msg = 'Expected ' . count($segments) . ', got ' . $numValues;
             throw new InvalidOperationException($msg);
         }
 
@@ -124,7 +124,7 @@ trait LaravelReadQueryUtilityTrait
     /**
      * @param  string[]|null             $eagerLoad
      * @throws InvalidOperationException
-     * @return array
+     * @return string[]
      */
     protected function processEagerLoadList(array $eagerLoad = null): array
     {

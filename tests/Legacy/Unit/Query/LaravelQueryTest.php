@@ -982,7 +982,8 @@ class LaravelQueryTest extends TestCase
         $key            = m::mock(KeyDescriptor::class);
 
         $foo          = new LaravelQuery();
-        $expected     = 'No query results for model ['. \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel::class . ']';
+        $expected     = 'No query results for model ['
+                        . \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel::class . ']';
         $actual       = null;
         $expectedCode = 500;
         $actualCode   = null;
@@ -1423,7 +1424,7 @@ class LaravelQueryTest extends TestCase
         $foo  = m::mock(LaravelQuery::class)->makePartial();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
 
-        $expected = 'Target instance must be of type compatible with relation declared in method '.$navPropName;
+        $expected = 'Target instance must be of type compatible with relation declared in method ' . $navPropName;
         $actual   = null;
 
         try {

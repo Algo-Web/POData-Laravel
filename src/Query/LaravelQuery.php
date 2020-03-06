@@ -41,7 +41,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     protected $writer;
     /** @var string */
     public $queryProviderClassName;
-    /** @var array */
+    /** @var Model[] */
     protected static $touchList = [];
     /** @var bool */
     protected static $inBatch;
@@ -57,6 +57,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         $this->bulk                   = new LaravelBulkQuery($this, $this->getAuth());
         $this->writer                 = new LaravelWriteQuery($this->getAuth());
 
+        /** @var Model[] touchList */
         self::$touchList = [];
         self::$inBatch   = false;
     }

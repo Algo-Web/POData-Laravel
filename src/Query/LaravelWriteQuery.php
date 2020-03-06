@@ -23,10 +23,10 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 class LaravelWriteQuery extends LaravelBaseQuery
 {
     /**
-     * @param  array      $data
-     * @param  array      $paramList
+     * @param  mixed[]    $data
+     * @param  array[]    $paramList
      * @param  Model      $sourceEntityInstance
-     * @return array
+     * @return mixed[]
      */
     protected function createUpdateDeleteProcessInput(array $data, array $paramList, Model $sourceEntityInstance)
     {
@@ -70,8 +70,8 @@ class LaravelWriteQuery extends LaravelBaseQuery
     }
 
     /**
-     * @param ResourceSet $sourceResourceSet
-     * @param array       $data
+     * @param ResourceSet                $sourceResourceSet
+     * @param mixed[]                    $data
      * @param string                     $verb
      * @param  Model|null                $source
      * @throws InvalidOperationException
@@ -108,7 +108,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
 
     /**
      * @param Model $sourceEntityInstance
-     * @param array $data
+     * @param mixed[] $data
      * @param string $class
      * @param string $verb
      *
@@ -225,7 +225,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
      *
      * @param ResourceSet   $resourceSet   The entity set containing the entity to update
      * @param KeyDescriptor $keyDescriptor The key identifying the entity to update
-     * @param array $data
+     * @param mixed[]       $data
      *
      * @return bool|null Returns result of executing query
      */
@@ -242,7 +242,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
     /**
      * @param  ResourceSet               $resourceSet
      * @param  Model|Relation|null       $sourceEntityInstance
-     * @param  array                     $data
+     * @param  mixed[]                   $data
      * @param  string                    $verb
      * @throws InvalidOperationException
      * @throws ODataException

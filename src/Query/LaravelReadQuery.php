@@ -7,9 +7,9 @@ namespace AlgoWeb\PODataLaravel\Query;
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
@@ -195,11 +195,11 @@ class LaravelReadQuery extends LaravelBaseQuery
     /**
      * Common method for getResourceFromRelatedResourceSet() and getResourceFromResourceSet().
      *
-     * @param ResourceSet|null    $resourceSet
-     * @param KeyDescriptor|null  $keyDescriptor
-     * @param Model|Relation|null $sourceEntityInstance Starting point of query
-     * @param array               $whereCondition
-     * @param string[]|null       $eagerLoad            array of relations to eager load
+     * @param ResourceSet|null      $resourceSet
+     * @param KeyDescriptor|null    $keyDescriptor
+     * @param Model|Relation|null   $sourceEntityInstance Starting point of query
+     * @param array<string, string> $whereCondition
+     * @param string[]|null         $eagerLoad            array of relations to eager load
      *
      * @throws \Exception
      * @return Model|null
@@ -334,12 +334,12 @@ class LaravelReadQuery extends LaravelBaseQuery
     /**
      * @param  Model|Builder             $sourceEntityInstance
      * @param  bool                      $nullFilter
-     * @param  array                     $rawLoad
+     * @param  string[]                  $rawLoad
      * @param  int                       $top
      * @param  int                       $skip
      * @param  callable|null             $isvalid
      * @throws InvalidOperationException
-     * @return array
+     * @return mixed[]
      */
     protected function applyFiltering(
         $sourceEntityInstance,
@@ -425,12 +425,12 @@ class LaravelReadQuery extends LaravelBaseQuery
     }
 
     /**
-     * @param QueryType   $queryType
-     * @param int         $skip
-     * @param QueryResult $result
-     * @param array       $resultSet
-     * @param int $resultCount
-     * @param int $bulkSetCount
+     * @param QueryType             $queryType
+     * @param int                   $skip
+     * @param QueryResult           $result
+     * @param Collection|Model[]    $resultSet
+     * @param int                   $resultCount
+     * @param int                   $bulkSetCount
      */
     protected function packageResourceSetResults(
         QueryType $queryType,

@@ -35,7 +35,7 @@ class LaravelExpressionProvider implements IExpressionProvider
     const OPEN_BRACKET          = '(';
     const TYPE_NAMESPACE        = 'POData\\Providers\\Metadata\\Type\\';
 
-    /** @var array */
+    /** @var array<string, callable> */
     private $functionDescriptionParsers;
 
     /**

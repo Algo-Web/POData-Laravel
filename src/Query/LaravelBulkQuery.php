@@ -140,11 +140,11 @@ class LaravelBulkQuery
      * Prepare bulk request from supplied data.  If $keyDescriptors is not null, its elements are assumed to
      * correspond 1-1 to those in $data.
      *
-     * @param  array                     $paramList
-     * @param  array                     $data
+     * @param  mixed[]                   $paramList
+     * @param  mixed[]                   $data
      * @param  KeyDescriptor[]|null      $keyDescriptors
      * @throws InvalidOperationException
-     * @return array
+     * @return Request[]
      */
     protected function prepareBulkRequestInput(array $paramList, array $data, array $keyDescriptors = null)
     {
@@ -186,14 +186,14 @@ class LaravelBulkQuery
 
     /**
      * @param  ResourceSet               $sourceResourceSet
-     * @param  array                     $data
+     * @param  mixed[]                   $data
      * @param  array[]|string[]          $mapping
      * @param  string                    $pastVerb
      * @param  KeyDescriptor[]|null      $keyDescriptor
      * @throws ODataException
      * @throws \ReflectionException
      * @throws InvalidOperationException
-     * @return array
+     * @return mixed[]
      */
     protected function processBulkCustom(
         ResourceSet $sourceResourceSet,
@@ -236,7 +236,7 @@ class LaravelBulkQuery
      * @param  string                    $verbName
      * @throws InvalidOperationException
      * @throws \ReflectionException
-     * @return array|null
+     * @return mixed[]|null
      */
     protected function getOptionalVerbMapping(ResourceSet $sourceResourceSet, string $verbName)
     {
