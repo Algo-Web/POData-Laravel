@@ -124,24 +124,23 @@ class MetadataProvider extends MetadataBaseProvider
 
         $entities = $objectModel->getEntities();
         foreach ($entities as $entity) {
-            $baseType   = null;
             $className  = $entity->getClassName();
             $entityName = $entity->getName();
             $pluralName = Str::plural($entityName);
-            $entityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, null, false, $baseType);
-            if ($entityType->hasBaseType() !== isset($baseType)) {
+            $entityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, null, false, null);
+            if ($entityType->hasBaseType() !== false) {
                 throw new InvalidOperationException('');
             }
             $entity->setOdataResourceType($entityType);
             $this->implementProperties($entity);
             $meta->addResourceSet($pluralName, $entityType);
-            $meta->oDataEntityMap[$className] = $meta->oDataEntityMap[$namespace.$entityName];
+            $meta->oDataEntityMap[$className] = $meta->oDataEntityMap[$namespace . $entityName];
         }
         $metaCount   = count($meta->oDataEntityMap);
         $entityCount = count($entities);
         $expected    = 2 * $entityCount;
         if ($metaCount != $expected) {
-            $msg = 'Expected ' . $expected . ' items, actually got '.$metaCount;
+            $msg = 'Expected ' . $expected . ' items, actually got '. $metaCount;
             throw new InvalidOperationException($msg);
         }
 
