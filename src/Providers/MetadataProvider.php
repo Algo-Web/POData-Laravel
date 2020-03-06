@@ -120,7 +120,7 @@ class MetadataProvider extends MetadataBaseProvider
     {
         /** @var SimpleMetadataProvider $meta */
         $meta      = App::make('metadata');
-        $namespace = $meta->getContainerNamespace().'.';
+        $namespace = $meta->getContainerNamespace() . '.';
 
         $entities = $objectModel->getEntities();
         foreach ($entities as $entity) {
@@ -249,6 +249,7 @@ class MetadataProvider extends MetadataBaseProvider
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @throws \Doctrine\DBAL\DBALException
+     * @throws \Exception
      * @return void
      */
     public function boot()
@@ -260,7 +261,7 @@ class MetadataProvider extends MetadataBaseProvider
         self::$metaNAMESPACE = env('ODataMetaNamespace', 'Data');
         // If we aren't migrated, there's no DB tables to pull metadata _from_, so bail out early
         try {
-            if (!Schema::hasTable(config('database.migrations'))) {
+            if (!Schema::hasTable(strval(config('database.migrations')))) {
                 return;
             }
         } catch (\Exception $e) {
@@ -314,11 +315,14 @@ class MetadataProvider extends MetadataBaseProvider
      */
     protected function getCandidateModels()
     {
-        return ClassFinder::getClasses($this->getAppNamespace(),
+        return ClassFinder::getClasses(
+            $this->getAppNamespace(),
             function ($className) {
-                return in_array(\AlgoWeb\PODataLaravel\Models\MetadataTrait::class, class_uses($className)) &&
-                    is_subclass_of($className, \Illuminate\Database\Eloquent\Model::class);
-            }, true);
+                return in_array(MetadataTrait::class, class_uses($className)) &&
+                    is_subclass_of($className, Model::class);
+            },
+            true
+        );
     }
 
     /**
