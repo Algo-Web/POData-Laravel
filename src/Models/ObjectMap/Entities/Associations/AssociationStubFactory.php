@@ -61,6 +61,7 @@ abstract class AssociationStubFactory
      */
     protected static function handleBelongsTo(string $name, Relation $relation, $cacheKey = 'BelongsTo'): AssociationStubMonomorphic
     {
+        /** @var string[] $keyChain */
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub     = new AssociationStubMonomorphic($name, $keyChain[0], $keyChain, AssociationStubRelationType::ONE());
         $stub->setForeignFieldName($keyChain[1]);
@@ -76,6 +77,7 @@ abstract class AssociationStubFactory
      */
     protected static function handleMorphTo(string $name, Relation $relation, $cacheKey = 'MorphTo'): AssociationStubPolymorphic
     {
+        /** @var string[] $keyChain */
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub     = new AssociationStubPolymorphic($name, $keyChain[0], $keyChain, AssociationStubRelationType::ONE());
         $stub->setForeignFieldName($keyChain[2]);
@@ -93,6 +95,7 @@ abstract class AssociationStubFactory
      */
     protected static function handleBelongsToMany(string $name, Relation $relation, $cacheKey = 'BelongsToMany'): AssociationStubMonomorphic
     {
+        /** @var string[] $keyChain */
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub     = new AssociationStubMonomorphic($name, $keyChain[0], $keyChain, AssociationStubRelationType::MANY());
         $stub->setTargType(get_class($relation->getRelated()));
@@ -107,6 +110,7 @@ abstract class AssociationStubFactory
      */
     protected static function handleHasManyThrough(string $name, Relation $relation, $cacheKey = 'HasManyThrough'): AssociationStubMonomorphic
     {
+        /** @var string[] $keyChain */
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub     = new AssociationStubMonomorphic($name, $keyChain[0], $keyChain, AssociationStubRelationType::MANY());
         $stub->setTargType(get_class($relation->getRelated()));
@@ -124,6 +128,7 @@ abstract class AssociationStubFactory
     {
         //return self::handleBelongsToMany($name,$relation);
         //TODO: investigate if this could be treated as a BelongsToMany Or more importantly a Monomorphic as we know both sides
+        /** @var string[] $keyChain */
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub     = new AssociationStubPolymorphic($name, $keyChain[0], $keyChain, AssociationStubRelationType::MANY());
         //$stub->setRelationName($name);
@@ -144,6 +149,7 @@ abstract class AssociationStubFactory
      */
     protected static function handleHasOne(string $name, Relation $relation, $cacheKey = 'HasOneOrMany'): AssociationStubMonomorphic
     {
+        /** @var string[] $keyChain */
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub     = new AssociationStubMonomorphic($name, $keyChain[0], $keyChain, AssociationStubRelationType::NULL_ONE());
         $stub->setForeignFieldName($keyChain[1]);
@@ -159,6 +165,7 @@ abstract class AssociationStubFactory
      */
     protected static function handleHasMany(string $name, Relation $relation, $cacheKey = 'HasOneOrMany'): AssociationStubMonomorphic
     {
+        /** @var string[] $keyChain */
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub     = new AssociationStubMonomorphic($name, $keyChain[0], $keyChain, AssociationStubRelationType::MANY());
         $stub->setForeignFieldName($keyChain[1]);
@@ -174,6 +181,7 @@ abstract class AssociationStubFactory
      */
     protected static function handleMorphOne(string $name, Relation $relation, $cacheKey = 'MorphOneOrMany'): AssociationStubPolymorphic
     {
+        /** @var string[] $keyChain */
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub     = new AssociationStubPolymorphic($name, $keyChain[0], $keyChain, AssociationStubRelationType::NULL_ONE());
         $stub->setForeignFieldName($keyChain[2]);
@@ -190,6 +198,7 @@ abstract class AssociationStubFactory
      */
     protected static function handleMorphMany(string $name, Relation $relation, $cacheKey = 'MorphOneOrMany'): AssociationStubPolymorphic
     {
+        /** @var string[] $keyChain */
         $keyChain = self::getKeyChain($relation, $cacheKey);
         $stub     = new AssociationStubPolymorphic($name, $keyChain[0], $keyChain, AssociationStubRelationType::MANY());
         $stub->setMorphType($keyChain[1]);

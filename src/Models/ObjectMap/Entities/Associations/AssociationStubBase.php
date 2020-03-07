@@ -261,7 +261,7 @@ abstract class AssociationStubBase
     }
 
     /**
-     * @return string[]|null
+     * @return string[]
      */
     public function getThroughFieldChain(): array
     {
@@ -269,9 +269,9 @@ abstract class AssociationStubBase
     }
 
     /**
-     * @param string[]|null $keyChain
+     * @param string[] $keyChain
      */
-    public function setThroughFieldChain(?array $keyChain): void
+    public function setThroughFieldChain(array $keyChain): void
     {
         $this->throughFieldChain = $keyChain;
     }

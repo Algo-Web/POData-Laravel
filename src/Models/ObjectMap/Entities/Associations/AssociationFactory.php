@@ -55,10 +55,12 @@ abstract class AssociationFactory
         AssociationStubBase $stubTwo
     ): AssociationStubBase {
         $stubNew         = clone $stub;
-        $relPolyTypeName = substr($stubTwo->getBaseType(), strrpos($stubTwo->getBaseType(), '\\')+1);
+        /** @var string $baseTwo */
+        $baseTwo = $stubTwo->getBaseType();
+        $relPolyTypeName = substr($baseTwo, strrpos($baseTwo, '\\')+1);
         $relPolyTypeName = Str::plural($relPolyTypeName, 1);
         $stubNew->setRelationName($stub->getRelationName() . '_' . $relPolyTypeName);
-        $stubNew->setTargType($stubTwo->getBaseType());
+        $stubNew->setTargType($baseTwo);
         $stubNew->setForeignFieldName($stubTwo->getKeyFieldName());
         $entity = $stub->getEntity();
         $stubs  = $entity->getStubs();
