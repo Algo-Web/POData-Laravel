@@ -177,7 +177,7 @@ trait SerialiseNextPageLinksTrait
      * @throws InvalidOperationException
      * @return ResourceSetWrapper
      */
-    abstract protected function getCurrentResourceSetWrapper();
+    abstract protected function getCurrentResourceSetWrapper(): ResourceSetWrapper;
 
     /**
      * Find a 'ExpandedProjectionNode' instance in the projection tree
