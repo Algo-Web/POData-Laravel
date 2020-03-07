@@ -303,7 +303,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         /** @var Relation $sourceEntityInstance */
         $sourceEntityInstance = $sourceEntityInstance->{$propertyName}();
         $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
-        $result = $this->getResource(null, null, [], [], $sourceEntityInstance);
+        $result = $this->getResource($sourceResourceSet, null, [], [], $sourceEntityInstance);
         return $result;
     }
 

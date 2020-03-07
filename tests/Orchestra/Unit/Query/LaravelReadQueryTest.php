@@ -165,22 +165,6 @@ class LaravelReadQueryTest extends TestCase
         $foo->getRelatedResourceSet(QueryType::COUNT(), $rSet, $model, $tSet, $targProp);
     }
 
-    public function testGetNullResource()
-    {
-        $src = new OrchestraHasManyTestModel(['name' => 'notfoobar']);
-        $this->assertTrue($src->save());
-
-        $model = new OrchestraHasManyTestModel();
-        $model->setEagerLoad(['parent']);
-
-        /** @var LaravelReadQuery $foo */
-        $foo = App::make(LaravelReadQuery::class);
-
-        $result = $foo->getResource(null, null, ['name' => 'foobar'], null, $model);
-
-        $this->assertNull($result);
-    }
-
     public function testGetNullModelLoadOnGetResourceKabooms()
     {
         $model = new OrchestraHasManyTestModel();
@@ -193,9 +177,11 @@ class LaravelReadQueryTest extends TestCase
         $foo->shouldReceive('getAuth->canAuth')->andReturn(true)->once();
         $foo->shouldReceive('checkSourceInstance')->andReturn($nullModel)->once();
 
+        $rSet = m::mock(ResourceSet::class);
+
         $this->expectException(InvalidOperationException::class);
 
-        $foo->getResource(null, null, [], null, $model);
+        $foo->getResource($rSet, null, [], null, $model);
     }
 
     public function testPackageResultsFlagHasMore()

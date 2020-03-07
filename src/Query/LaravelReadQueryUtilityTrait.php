@@ -87,11 +87,11 @@ trait LaravelReadQueryUtilityTrait
 
     /**
      * @param  Model|Relation|null       $source
-     * @param  ResourceSet|null          $resourceSet
+     * @param  ResourceSet               $resourceSet
      * @throws \ReflectionException
      * @return Model|Relation|mixed|null
      */
-    protected function checkSourceInstance($source, ResourceSet $resourceSet = null)
+    protected function checkSourceInstance($source, ResourceSet $resourceSet)
     {
         if (!(null == $source || $source instanceof Model || $source instanceof Relation)) {
             $msg = 'Source entity instance must be null, a model, or a relation.';
