@@ -185,7 +185,7 @@ class MetadataProvider extends MetadataBaseProvider
         $first          = $associationUnderHammer->getFirst();
         $last           = $associationUnderHammer->getLast();
         $assocType      = $associationUnderHammer->getAssociationType();
-        $firstIsMany    = (AssociationType::NULL_ONE_TO_MANY() === $assocType || AssociationType::ONE_TO_MANY() === $assocType) &&
+        $firstIsMany    = (AssociationType::NULL_ONE_TO_MANY() == $assocType || AssociationType::ONE_TO_MANY() == $assocType) &&
                           ($first->getMultiplicity() == AssociationStubRelationType::MANY());
 
         $firstSide      = $firstIsMany ? $last : $first;
@@ -204,14 +204,11 @@ class MetadataProvider extends MetadataBaseProvider
                 break;
             case AssociationType::NULL_ONE_TO_MANY():
             case AssociationType::ONE_TO_MANY():
-                $firstIsMany = $first->getMultiplicity() == AssociationStubRelationType::MANY();
-                $oneSide = $firstIsMany ? $last : $first;
-                $manySide = $firstIsMany ? $first : $last;
                 $meta->addResourceReferencePropertyBidirectional(
-                    $objectModel->getEntities()[$oneSide->getBaseType()]->getOdataResourceType(),
-                    $objectModel->getEntities()[$manySide->getBaseType()]->getOdataResourceType(),
-                    $oneSide->getRelationName(),
-                    $manySide->getRelationName()
+                    $objectModel->getEntities()[$firstSide->getBaseType()]->getOdataResourceType(),
+                    $objectModel->getEntities()[$lastSide->getBaseType()]->getOdataResourceType(),
+                    $firstSide->getRelationName(),
+                    $lastSide->getRelationName()
                 );
                 break;
             case AssociationType::MANY_TO_MANY():
