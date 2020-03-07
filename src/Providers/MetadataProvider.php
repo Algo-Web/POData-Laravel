@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema as Schema;
 use Illuminate\Support\Str;
 use POData\Common\InvalidOperationException;
+use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceStreamInfo;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Metadata\Type\TypeCode;
@@ -135,6 +136,7 @@ class MetadataProvider extends MetadataBaseProvider
         foreach ($entities as $entity) {
             /** @var class-string $className */
             $className  = $entity->getClassName();
+            /** @var string $entityName */
             $entityName = $entity->getName();
             $pluralName = Str::plural($entityName);
             $entityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, null, false, null);
@@ -191,32 +193,40 @@ class MetadataProvider extends MetadataBaseProvider
         $firstSide      = $firstIsMany ? $last : $first;
         $lastSide       = $firstIsMany ? $first : $last;
 
+        /** @var ResourceEntityType $firstType */
+        $firstType      = $objectModel->getEntities()[$firstSide->getBaseType()]->getOdataResourceType();
+        /** @var ResourceEntityType $secondType */
+        $secondType     = $objectModel->getEntities()[$lastSide->getBaseType()]->getOdataResourceType();
+
+        $firstName      = $firstSide->getRelationName();
+        $lastName       = $lastSide->getRelationName();
+
         switch ($assocType) {
             case AssociationType::NULL_ONE_TO_NULL_ONE():
             case AssociationType::NULL_ONE_TO_ONE():
             case AssociationType::ONE_TO_ONE():
                 $meta->addResourceReferenceSinglePropertyBidirectional(
-                    $objectModel->getEntities()[$firstSide->getBaseType()]->getOdataResourceType(),
-                    $objectModel->getEntities()[$lastSide->getBaseType()]->getOdataResourceType(),
-                    $firstSide->getRelationName(),
-                    $lastSide->getRelationName()
+                    $firstType,
+                    $secondType,
+                    $firstName,
+                    $lastName
                 );
                 break;
             case AssociationType::NULL_ONE_TO_MANY():
             case AssociationType::ONE_TO_MANY():
                 $meta->addResourceReferencePropertyBidirectional(
-                    $objectModel->getEntities()[$firstSide->getBaseType()]->getOdataResourceType(),
-                    $objectModel->getEntities()[$lastSide->getBaseType()]->getOdataResourceType(),
-                    $firstSide->getRelationName(),
-                    $lastSide->getRelationName()
+                    $firstType,
+                    $secondType,
+                    $firstName,
+                    $lastName
                 );
                 break;
             case AssociationType::MANY_TO_MANY():
                 $meta->addResourceSetReferencePropertyBidirectional(
-                    $objectModel->getEntities()[$firstSide->getBaseType()]->getOdataResourceType(),
-                    $objectModel->getEntities()[$lastSide->getBaseType()]->getOdataResourceType(),
-                    $firstSide->getRelationName(),
-                    $lastSide->getRelationName()
+                    $firstType,
+                    $secondType,
+                    $firstName,
+                    $lastName
                 );
         }
     }
