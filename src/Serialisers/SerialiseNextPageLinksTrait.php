@@ -35,7 +35,7 @@ trait SerialiseNextPageLinksTrait
     protected function buildNextPageLink(QueryResult $entryObjects, $odata): void
     {
         $stackSegment = $this->getRequest()->getTargetResourceSetWrapper()->getName();
-        /** @var array $res */
+        /** @var mixed[] $res */
         $res                 = $entryObjects->results;
         $lastObject          = end($res);
         $segment             = $this->getNextLinkUri($lastObject);
@@ -84,6 +84,7 @@ trait SerialiseNextPageLinksTrait
      */
     protected function getNextLinkUri(&$lastObject)
     {
+        /** @var RootProjectionNode|ExpandedProjectionNode $currentExpandedProjectionNode */
         $currentExpandedProjectionNode = $this->getCurrentExpandedProjectionNode();
         $internalOrderByInfo           = $currentExpandedProjectionNode->getInternalOrderByInfo();
         if (null === $internalOrderByInfo) {

@@ -37,13 +37,14 @@ class ModelSerialiser
             self::$metadataCache[$class] = $model->metadata();
         }
         $meta = self::$metadataCache[$class];
+        /** @var string[] $keys */
         $keys = array_keys($meta);
         // dig up getter list - we only care about the mutators that end up in metadata
         if (!isset(self::$mutatorCache[$class])) {
             $getterz = [];
-            /** @var array $datez */
+            /** @var \DateTime[] $datez */
             $datez = $model->getDates();
-            /** @var array $castz */
+            /** @var string[] $castz */
             $castz = $model->retrieveCasts();
             foreach ($keys as $key) {
                 if ($model->hasGetMutator($key) || in_array($key, $datez) || array_key_exists($key, $castz)) {

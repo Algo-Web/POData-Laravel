@@ -30,14 +30,14 @@ abstract class SerialiserLowLevelWriters
     /**
      * @param Model           $entryObject
      * @param ModelSerialiser $modelSerialiser
-     * @param array           $nonRelProp
+     * @param array[]         $nonRelProp
      * @throws InvalidOperationException
      * @return ODataPropertyContent
      */
     public static function writePrimitiveProperties(
         Model $entryObject,
         ModelSerialiser $modelSerialiser,
-        $nonRelProp
+        array $nonRelProp
     ): ODataPropertyContent {
         $propertyContent = new ODataPropertyContent();
         $cereal          = $modelSerialiser->bulkSerialise($entryObject);
@@ -59,7 +59,7 @@ abstract class SerialiserLowLevelWriters
 
     /**
      * @param ResourceType $resourceType
-     * @param array|null $result
+     * @param mixed[]|null $result
      * @return ODataBagContent|null
      * @throws InvalidOperationException
      * @throws \ReflectionException
@@ -97,7 +97,7 @@ abstract class SerialiserLowLevelWriters
      * @param  ResourceType              $resourceType
      * @param  object                    $result
      * @param  string|null               $propertyName
-     * @param  array                     $instanceCollection
+     * @param  object[]                  $instanceCollection
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @return ODataPropertyContent
