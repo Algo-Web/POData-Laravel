@@ -196,10 +196,10 @@ class MetadataProvider extends MetadataBaseProvider
             case AssociationType::NULL_ONE_TO_ONE():
             case AssociationType::ONE_TO_ONE():
                 $meta->addResourceReferenceSinglePropertyBidirectional(
-                    $objectModel->getEntities()[$first->getBaseType()]->getOdataResourceType(),
-                    $objectModel->getEntities()[$last->getBaseType()]->getOdataResourceType(),
-                    $first->getRelationName(),
-                    $last->getRelationName()
+                    $objectModel->getEntities()[$firstSide->getBaseType()]->getOdataResourceType(),
+                    $objectModel->getEntities()[$lastSide->getBaseType()]->getOdataResourceType(),
+                    $firstSide->getRelationName(),
+                    $lastSide->getRelationName()
                 );
                 break;
             case AssociationType::NULL_ONE_TO_MANY():
