@@ -195,7 +195,7 @@ class LaravelReadQuery extends LaravelBaseQuery
     /**
      * Common method for getResourceFromRelatedResourceSet() and getResourceFromResourceSet().
      *
-     * @param ResourceSet|null      $resourceSet
+     * @param ResourceSet           $resourceSet
      * @param KeyDescriptor|null    $keyDescriptor
      * @param Model|Relation|null   $sourceEntityInstance Starting point of query
      * @param array<string, string> $whereCondition
@@ -205,17 +205,12 @@ class LaravelReadQuery extends LaravelBaseQuery
      * @return Model|null
      */
     public function getResource(
-        ResourceSet $resourceSet = null,
+        ResourceSet $resourceSet,
         KeyDescriptor $keyDescriptor = null,
         array $whereCondition = [],
         array $eagerLoad = null,
         $sourceEntityInstance = null
     ): ?Model {
-        if (null == $resourceSet && null == $sourceEntityInstance) {
-            $msg = 'Must supply at least one of a resource set and source entity.';
-            throw new \Exception($msg);
-        }
-
         $sourceEntityInstance = $this->checkSourceInstance($sourceEntityInstance, $resourceSet);
 
         $this->checkAuth($sourceEntityInstance);
@@ -325,6 +320,7 @@ class LaravelReadQuery extends LaravelBaseQuery
                 return $item;
             }
         }, null);
+        /** @var class-string|null $sourceName */
         $sourceName = null !== $check ? get_class($check) : null;
         if (!$this->getAuth()->canAuth(ActionVerb::READ(), $sourceName, $check)) {
             throw new ODataException('Access denied', 403);

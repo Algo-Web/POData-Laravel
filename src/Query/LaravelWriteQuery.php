@@ -74,6 +74,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @param mixed[]                    $data
      * @param string                     $verb
      * @param  Model|null                $source
+     * @param bool                       $shouldUpdate
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \Exception
@@ -83,7 +84,8 @@ class LaravelWriteQuery extends LaravelBaseQuery
         ResourceSet $sourceResourceSet,
         array $data,
         string $verb,
-        Model $source = null
+        Model $source = null,
+        bool $shouldUpdate
     ) {
         $lastWord = 'update' == $verb ? 'updated' : 'created';
         $class    = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
@@ -166,6 +168,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
         $id    = $source->getKey();
         $name  = $source->getKeyName();
+
         $data  = [$name => $id];
 
         $data = $this->createUpdateDeleteCore($source, $data, $class, $verb);
@@ -178,9 +181,9 @@ class LaravelWriteQuery extends LaravelBaseQuery
     }
 
     /**
-     * @param ResourceSet    $resourceSet          The entity set containing the entity to fetch
-     * @param Model|Relation $sourceEntityInstance The source entity instance
-     * @param object         $data                 the New data for the entity instance
+     * @param ResourceSet           $resourceSet          The entity set containing the entity to fetch
+     * @param Model|Relation|null   $sourceEntityInstance The source entity instance
+     * @param object                $data                 The new data for the entity instance
      *
      * @throws \Exception
      * @return Model|null returns the newly created model if successful,
@@ -193,7 +196,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
     ) {
         $verb = 'create';
         $data = (array) $data;
-        return $this->createUpdateMainWrapper($resourceSet, $sourceEntityInstance, $data, $verb);
+        return $this->createUpdateMainWrapper($resourceSet, $sourceEntityInstance, $data, $verb, false);
     }
 
     /**
@@ -213,11 +216,11 @@ class LaravelWriteQuery extends LaravelBaseQuery
         $sourceEntityInstance,
         KeyDescriptor $keyDescriptor,
         $data,
-        $shouldUpdate = false
+        bool $shouldUpdate = false
     ) {
         $verb = 'update';
         $data = (array) $data;
-        return $this->createUpdateMainWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb);
+        return $this->createUpdateMainWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb, $shouldUpdate);
     }
 
     /**
@@ -244,6 +247,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @param  Model|Relation|null       $sourceEntityInstance
      * @param  mixed[]                   $data
      * @param  string                    $verb
+     * @param  bool                      $shouldUpdate
      * @throws InvalidOperationException
      * @throws ODataException
      * @return Model|null
@@ -252,12 +256,13 @@ class LaravelWriteQuery extends LaravelBaseQuery
         ResourceSet $resourceSet,
         $sourceEntityInstance,
         array $data,
-        string $verb
+        string $verb,
+        bool $shouldUpdate
     ) {
         /** @var Model|null $source */
         $source = $this->unpackSourceEntity($sourceEntityInstance);
 
-        $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source);
+        $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source, false);
         if (null !== $result) {
             LaravelQuery::queueModel($result);
         }

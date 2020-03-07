@@ -708,21 +708,6 @@ class LaravelQueryTest extends TestCase
         $this->assertTrue($result instanceof TestMorphTarget);
     }
 
-    public function testGetResourceWithNullResourceSetAndEntityInstance()
-    {
-        $foo = new LaravelReadQuery();
-
-        $expected = 'Must supply at least one of a resource set and source entity.';
-        $actual   = null;
-
-        try {
-            $foo->getResource();
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getRelatedResourceReference
      */

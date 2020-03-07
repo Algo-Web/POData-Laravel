@@ -88,7 +88,7 @@ abstract class LaravelBaseQuery
     }
 
     /**
-     * @param QueryResult|Model|Relation $sourceEntityInstance
+     * @param QueryResult|Model|Relation|null $sourceEntityInstance
      * @return Model|Relation|null
      */
     protected function unpackSourceEntity($sourceEntityInstance)

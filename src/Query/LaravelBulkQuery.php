@@ -203,8 +203,10 @@ class LaravelBulkQuery
         array $keyDescriptor = null
     ) {
         $class        = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
+        /** @var string $controlClass */
         $controlClass = $mapping['controller'];
         $method       = $mapping['method'];
+        /** @var array[] $paramList */
         $paramList    = $mapping['parameters'];
         $controller   = App::make($controlClass);
         $parms        = $this->prepareBulkRequestInput($paramList, $data, $keyDescriptor);
