@@ -35,17 +35,21 @@ abstract class ModelReflectionHelper
      */
     public static function getCodeForMethod(ReflectionMethod $method): string
     {
+        /** @var string $fileName */
         $fileName = $method->getFileName();
 
         $file = new SplFileObject($fileName);
         $file->seek($method->getStartLine() - 1);
+        /** @var string $code */
         $code = '';
         while ($file->key() < $method->getEndLine()) {
             $code .= $file->current();
             $file->next();
         }
 
+        /** @var string $code */
         $code  = preg_replace('/\s\s+/', '', $code);
+        /** @var int $begin */
         $begin = strpos($code, 'function(');
         $code  = substr($code, (int)$begin, strrpos($code, '}') - $begin + 1);
         return $code;

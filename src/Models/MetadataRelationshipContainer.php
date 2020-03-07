@@ -38,6 +38,7 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
      */
     public function addEntity(EntityGubbins $entity): void
     {
+        /** @var string $baseType */
         $baseType                  = $entity->getClassName();
         $this->entities[$baseType] = $entity;
         if (array_key_exists($baseType, $this->stubs)) {
