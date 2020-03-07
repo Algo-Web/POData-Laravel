@@ -216,10 +216,10 @@ class MetadataProvider extends MetadataBaseProvider
                 break;
             case AssociationType::MANY_TO_MANY():
                 $meta->addResourceSetReferencePropertyBidirectional(
-                    $objectModel->getEntities()[$first->getBaseType()]->getOdataResourceType(),
-                    $objectModel->getEntities()[$last->getBaseType()]->getOdataResourceType(),
-                    $first->getRelationName(),
-                    $last->getRelationName()
+                    $objectModel->getEntities()[$firstSide->getBaseType()]->getOdataResourceType(),
+                    $objectModel->getEntities()[$lastSide->getBaseType()]->getOdataResourceType(),
+                    $firstSide->getRelationName(),
+                    $lastSide->getRelationName()
                 );
         }
     }
