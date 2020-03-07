@@ -181,10 +181,17 @@ class MetadataProvider extends MetadataBaseProvider
         AssociationMonomorphic $associationUnderHammer
     ): void {
         /** @var SimpleMetadataProvider $meta */
-        $meta  = App::make('metadata');
-        $first = $associationUnderHammer->getFirst();
-        $last  = $associationUnderHammer->getLast();
-        switch ($associationUnderHammer->getAssociationType()) {
+        $meta           = App::make('metadata');
+        $first          = $associationUnderHammer->getFirst();
+        $last           = $associationUnderHammer->getLast();
+        $assocType      = $associationUnderHammer->getAssociationType();
+        $firstIsMany    = (AssociationType::NULL_ONE_TO_MANY() === $assocType || AssociationType::ONE_TO_MANY() === $assocType) &&
+                          ($first->getMultiplicity() == AssociationStubRelationType::MANY());
+
+        $firstSide      = $firstIsMany ? $last : $first;
+        $lastSide       = $firstIsMany ? $first : $last;
+
+        switch ($assocType) {
             case AssociationType::NULL_ONE_TO_NULL_ONE():
             case AssociationType::NULL_ONE_TO_ONE():
             case AssociationType::ONE_TO_ONE():
