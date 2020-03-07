@@ -25,17 +25,17 @@ class LaravelWriteQuery extends LaravelBaseQuery
     /**
      * @param  mixed[]    $data
      * @param  array[]    $paramList
-     * @param  Model      $sourceEntityInstance
+     * @param  Model|null $sourceEntityInstance
      * @return mixed[]
      */
-    protected function createUpdateDeleteProcessInput(array $data, array $paramList, Model $sourceEntityInstance)
+    protected function createUpdateDeleteProcessInput(array $data, array $paramList, ?Model $sourceEntityInstance)
     {
         $parms = [];
 
         foreach ($paramList as $spec) {
             $varType = isset($spec['type']) ? $spec['type'] : null;
             $varName = $spec['name'];
-            if (null == $varType) {
+            if (null == $varType && null !== $sourceEntityInstance) {
                 $parms[] = ('id' == $varName) ? $sourceEntityInstance->getKey() : $sourceEntityInstance->{$varName};
                 continue;
             }
@@ -109,7 +109,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
 
 
     /**
-     * @param Model $sourceEntityInstance
+     * @param Model|null $sourceEntityInstance
      * @param mixed[] $data
      * @param string $class
      * @param string $verb
@@ -118,7 +118,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @throws InvalidOperationException
      * @return array|mixed
      */
-    protected function createUpdateDeleteCore($sourceEntityInstance, array $data, string $class, string $verb)
+    protected function createUpdateDeleteCore(?Model $sourceEntityInstance, array $data, string $class, string $verb)
     {
         $raw = $this->getControllerContainer();
         $map = $raw->getMetadata();
