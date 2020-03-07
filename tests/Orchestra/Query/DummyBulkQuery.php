@@ -16,7 +16,7 @@ use POData\Providers\Metadata\ResourceSet;
 
 class DummyBulkQuery extends LaravelBulkQuery
 {
-    public function prepareBulkRequestInput(array $paramList, array $data, array $keyDescriptors = null)
+    public function prepareBulkRequestInput(array $paramList, array $data, array $keyDescriptors = [])
     {
         return parent::prepareBulkRequestInput($paramList, $data, $keyDescriptors);
     }
@@ -26,7 +26,7 @@ class DummyBulkQuery extends LaravelBulkQuery
         array $data,
         array $mapping,
         string $pastVerb,
-        array $keyDescriptor = null
+        array $keyDescriptor = []
     ) {
         return parent::processBulkCustom(
             $sourceResourceSet,

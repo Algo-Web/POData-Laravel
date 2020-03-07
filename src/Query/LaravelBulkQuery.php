@@ -69,7 +69,7 @@ class LaravelBulkQuery
                     $result[] = $raw;
                 }
             } else {
-                $keyDescriptor = null;
+                $keyDescriptor = [];
                 $pastVerb      = 'created';
                 $result        = $this->processBulkCustom($sourceResourceSet, $data, $mapping, $pastVerb, $keyDescriptor);
             }
@@ -142,14 +142,14 @@ class LaravelBulkQuery
      *
      * @param  mixed[]                   $paramList
      * @param  mixed[]                   $data
-     * @param  KeyDescriptor[]|null      $keyDescriptors
+     * @param  KeyDescriptor[]           $keyDescriptors
      * @throws InvalidOperationException
      * @return Request[]
      */
-    protected function prepareBulkRequestInput(array $paramList, array $data, array $keyDescriptors = null)
+    protected function prepareBulkRequestInput(array $paramList, array $data, array $keyDescriptors = [])
     {
         $parms    = [];
-        $isCreate = null === $keyDescriptors;
+        $isCreate = empty($keyDescriptors);
 
         // for moment, we're only processing parameters of type Request
         foreach ($paramList as $spec) {
@@ -189,7 +189,7 @@ class LaravelBulkQuery
      * @param  mixed[]                   $data
      * @param  array[]|string[]          $mapping
      * @param  string                    $pastVerb
-     * @param  KeyDescriptor[]|null      $keyDescriptor
+     * @param  KeyDescriptor[]           $keyDescriptor
      * @throws ODataException
      * @throws \ReflectionException
      * @throws InvalidOperationException
@@ -200,7 +200,7 @@ class LaravelBulkQuery
         array $data,
         array $mapping,
         string $pastVerb,
-        array $keyDescriptor = null
+        array $keyDescriptor = []
     ) {
         $class        = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
         /** @var string $controlClass */
