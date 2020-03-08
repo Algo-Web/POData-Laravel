@@ -34,11 +34,12 @@ class CloneInMemoryPDO
     {
         $tables = $from->query("SELECT name FROM sqlite_master WHERE type ='table' AND name NOT LIKE 'sqlite_%';");
         $sql = '';
-        while ($table = $tables->fetch(PDO::FETCH_BOTH)) {
-            $sql .= self::pdoQuery($from, "SELECT sql FROM sqlite_master WHERE name = '{$table[0]}'")->fetchColumn() . ";\n\n";
-            $rows = $from->query("SELECT * FROM {$table[0]}");
-            $sql .= "INSERT INTO {$table[0]} (";
-            $columns = $from->query("PRAGMA table_info({$table[0]})");
+        while ($table = $tables->fetch(PDO::FETCH_ASSOC)) {
+            $tableName = $table['name'];
+            $sql .= self::pdoQuery($from, "SELECT sql FROM sqlite_master WHERE name = '{$tableName}'")->fetchColumn() . ";\n\n";
+            $rows = $from->query("SELECT * FROM {$tableName}");
+            $sql .= "INSERT INTO {$tableName} (";
+            $columns = $from->query("PRAGMA table_info({$tableName})");
             $fieldnames = [];
             while ($column = $columns->fetch(PDO::FETCH_ASSOC)) {
                 $fieldnames[] = $column["name"];
