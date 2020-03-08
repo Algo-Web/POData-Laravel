@@ -13,9 +13,11 @@ use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema as Schema;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use POData\Providers\Metadata\SimpleMetadataProvider;
+use AlgoWeb\PODataLaravel\Tests\Connections\CloneInMemoryPDO;
 
 class TestServiceProvider extends BaseServiceProvider
 {
@@ -39,5 +41,10 @@ class TestServiceProvider extends BaseServiceProvider
         $migrationRepository->setSource('testbench');
         $migrationRepository->createRepository();
         $migrator->run($path);
+
+        $src = DB::connection('testbench')->getPdo();
+        $dst = DB::connection('testbench-master')->getPdo();
+
+        CloneInMemoryPDO::clone($src, $dst);
     }
 }

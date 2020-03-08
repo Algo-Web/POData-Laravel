@@ -6,7 +6,7 @@
  * Time: 12:29 PM
  */
 
-namespace Tests\Connections;
+namespace AlgoWeb\PODataLaravel\Tests\Connections;
 
 use PDO;
 use SQLite3;
@@ -34,7 +34,7 @@ class CloneInMemoryPDO
     {
         $tables = $from->query("SELECT name FROM sqlite_master WHERE type ='table' AND name NOT LIKE 'sqlite_%';");
         $sql = '';
-        while ($table = $tables->fetch(PDO::FETCH_ASSOC)) {
+        while ($table = $tables->fetch(PDO::FETCH_BOTH)) {
             $sql .= self::pdoQuery($from, "SELECT sql FROM sqlite_master WHERE name = '{$table[0]}'")->fetchColumn() . ";\n\n";
             $rows = $from->query("SELECT * FROM {$table[0]}");
             $sql .= "INSERT INTO {$table[0]} (";
