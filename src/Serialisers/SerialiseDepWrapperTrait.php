@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\IService;
 use POData\Providers\Metadata\IMetadataProvider;
+use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSetWrapper;
 use POData\UriProcessor\RequestDescription;
 use POData\UriProcessor\SegmentStack;
@@ -35,7 +36,7 @@ trait SerialiseDepWrapperTrait
 
     /**
      * Lightweight stack tracking for recursive descent fill.
-     * @var array
+     * @var array[]
      */
     protected $lightStack = [];
 
@@ -43,7 +44,7 @@ trait SerialiseDepWrapperTrait
      * Request description instance describes OData request the
      * the client has submitted and result of the request.
      *
-     * @var RequestDescription
+     * @var RequestDescription|null
      */
     protected $request;
 
@@ -88,7 +89,7 @@ trait SerialiseDepWrapperTrait
      * @param  IService $service
      * @return void
      */
-    public function setService(IService $service)
+    public function setService(IService $service): void
     {
         $this->service                     = $service;
         $this->absoluteServiceUri          = $service->getHost()->getAbsoluteServiceUri()->getUrlAsString();
@@ -125,7 +126,7 @@ trait SerialiseDepWrapperTrait
      *
      * @param RequestDescription $request
      */
-    public function setRequest(RequestDescription $request)
+    public function setRequest(RequestDescription $request): void
     {
         $this->request = $request;
         $this->stack->setRequest($request);
@@ -142,7 +143,7 @@ trait SerialiseDepWrapperTrait
     /**
      * @return IMetadataProvider
      */
-    protected function getMetadata()
+    protected function getMetadata(): IMetadataProvider
     {
         if (null == $this->metaProvider) {
             $this->metaProvider = App::make('metadata');
@@ -151,7 +152,7 @@ trait SerialiseDepWrapperTrait
     }
 
     /**
-     * @return array
+     * @return array[]
      */
     protected function getLightStack()
     {
@@ -161,10 +162,12 @@ trait SerialiseDepWrapperTrait
     /**
      * @throws InvalidOperationException
      */
-    protected function loadStackIfEmpty()
+    protected function loadStackIfEmpty(): void
     {
         if (0 == count($this->lightStack)) {
-            $typeName = $this->getRequest()->getTargetResourceType()->getName();
+            /** @var ResourceEntityType $type */
+            $type = $this->getRequest()->getTargetResourceType();
+            $typeName = $type->getName();
             array_push($this->lightStack, ['type' => $typeName, 'property' => $typeName, 'count' => 1]);
         }
     }
@@ -175,7 +178,7 @@ trait SerialiseDepWrapperTrait
      * @throws InvalidOperationException
      * @return ResourceSetWrapper
      */
-    protected function getCurrentResourceSetWrapper()
+    protected function getCurrentResourceSetWrapper(): ResourceSetWrapper
     {
         $segmentWrappers = $this->getStack()->getSegmentWrappers();
         $count           = count($segmentWrappers);
@@ -186,7 +189,7 @@ trait SerialiseDepWrapperTrait
     /**
      * @param int $newCount
      */
-    protected function updateLightStack(int $newCount)
+    protected function updateLightStack(int $newCount): void
     {
         $this->lightStack[$newCount - 1]['count']--;
         if (0 == $this->lightStack[$newCount - 1]['count']) {

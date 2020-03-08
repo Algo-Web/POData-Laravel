@@ -1,0 +1,10 @@
+includes:
+    - ./vendor/nunomaduro/larastan/extension.neon
+parameters:
+    level: max
+    ignoreErrors:
+        - "#Internal error: Facade does not implement getFacadeAccessor method.#"
+        - '#this in static method AlgoWeb\\PODataLaravel\\Models\\ObjectMap\\Entities\\Associations\\AssociationStubFactory::getKeyChain#'
+        - '#PHPDoc tag \@return with type array<string>\|null is not subtype of native type array#'
+    paths:
+        - src

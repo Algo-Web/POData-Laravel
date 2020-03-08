@@ -30,13 +30,13 @@ trait MetadataControllerTrait
     /*
      * Given model and verb, get method name and parameter list
      *
-     * @param $modelName
+     * @param string $modelName
      * @param $crudVerb
      * @return null|array
      * @throws \Exception
      */
     /**
-     * @param $modelName
+     * @param string $modelName
      * @param $crudVerb
      * @throws InvalidOperationException
      * @throws \ReflectionException

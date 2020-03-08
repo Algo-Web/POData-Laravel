@@ -49,8 +49,18 @@ use Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Serialisers\TestDataService;
 
 class SerialiserWriteElementTest extends SerialiserTestBase
 {
+    /**
+     * @throws InvalidOperationException
+     * @throws \POData\Common\ODataException
+     * @throws \POData\Common\UrlFormatException
+     * @throws \ReflectionException
+     * @throws \Exception
+     */
     public function testCompareWriteSingleModelWithPropertiesNulled()
     {
+        $now = Carbon::create(2017, 10, 9, 8, 7, 6);
+        Carbon::setTestNow($now);
+
         $request = $this->setUpRequest();
         $request->shouldReceive('prepareRequestUri')->andReturn('/odata.svc/TestModels');
         $request->shouldReceive('fullUrl')->andReturn('http://localhost/odata.svc/TestModels');
@@ -62,6 +72,8 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $testModel     = new TestModel($metadata, null);
         $testModel->id = 1;
+        $testModel->created_at = $now;
+        $testModel->updated_at = $now;
         App::instance(TestModel::class, $testModel);
 
         $op   = new OperationContextAdapter($request);
@@ -94,6 +106,8 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $model     = new TestModel($metadata, null);
         $model->id = 4;
+        $testModel->created_at = $now;
+        $testModel->updated_at = $now;
 
         $result          = new QueryResult();
         $result->results = $model;
@@ -1312,8 +1326,8 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $foo->shouldReceive('getService->getProvidersWrapper->resolveResourceType')->andReturn($firstType)->once();
         $foo->shouldReceive('getRequest->getTargetResourceType->getName')->andReturn('TestModel');
 
-        $expected = 'Object being serialised not instance of expected class, ' .TestMonomorphicSource::class
-                    .', is actually ' . \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel::class;
+        $expected = 'Object being serialised not instance of expected class, ' . TestMonomorphicSource::class
+                    . ', is actually ' . \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel::class;
         $actual = null;
 
         try {

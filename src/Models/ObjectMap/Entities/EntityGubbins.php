@@ -122,13 +122,13 @@ class EntityGubbins
     public function setFields(array $fields): void
     {
         if (0 == count($fields)) {
-            $msg = 'Fields array must not be empty for '.$this->getClassName();
+            $msg = 'Fields array must not be empty for ' . $this->getClassName();
             throw new \Exception($msg);
         }
         $keys = [];
         foreach ($fields as $propName => $field) {
             if (!$field instanceof EntityField) {
-                $msg = 'Fields array must only have EntityField objects for '.$this->getClassName();
+                $msg = 'Fields array must only have EntityField objects for ' . $this->getClassName();
                 throw new \Exception($msg);
             }
             if ($field->getIsKeyField()) {
@@ -136,7 +136,7 @@ class EntityGubbins
             }
         }
         if (0 == count($keys)) {
-            $msg = 'No key field supplied in fields array for '.$this->getClassName();
+            $msg = 'No key field supplied in fields array for ' . $this->getClassName();
             throw new \Exception($msg);
         }
         $this->fields    = $fields;
@@ -176,7 +176,10 @@ class EntityGubbins
     {
         if ($association instanceof AssociationMonomorphic) {
             $stub = $isFirst ? $association->getFirst() : $association->getLast();
-            if (null === $stub || (!in_array($stub, $this->stubs) && !($stub instanceof AssociationStubPolymorphic))) {
+            // $stub is required to be not null, as getFirst and getLast return type hints prohibit returning null
+            $exists = in_array($stub, $this->stubs);
+
+            if (!($exists || ($stub instanceof AssociationStubPolymorphic))) {
                 throw new \InvalidArgumentException('Association cannot be connected to this entity');
             }
             $propertyName = $stub->getRelationName();
@@ -220,7 +223,7 @@ class EntityGubbins
     }
 
     /**
-     * @param $relName
+     * @param string $relName
      * @return Association|null
      */
     public function resolveAssociation($relName): ?Association

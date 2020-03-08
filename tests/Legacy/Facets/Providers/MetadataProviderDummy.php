@@ -8,12 +8,12 @@ use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 
 class MetadataProviderDummy extends MetadataProvider
 {
-    public function getCandidateModels()
+    public function getCandidateModels(): array
     {
         return parent::getCandidateModels();
     }
 
-    public function getAppNamespace()
+    public function getAppNamespace(): string
     {
         return parent::getAppNamespace();
     }

@@ -11,7 +11,7 @@ use Illuminate\Http\JsonResponse;
 
 class LaravelBulkQueryDummy extends LaravelBulkQuery
 {
-    public function prepareBulkRequestInput(array $paramList, array $data, array $keyDescriptors = null)
+    public function prepareBulkRequestInput(array $paramList, array $data, array $keyDescriptors = [])
     {
         return parent::prepareBulkRequestInput($paramList, $data, $keyDescriptors);
     }

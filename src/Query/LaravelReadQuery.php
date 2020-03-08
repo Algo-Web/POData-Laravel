@@ -7,9 +7,9 @@ namespace AlgoWeb\PODataLaravel\Query;
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
@@ -112,9 +112,7 @@ class LaravelReadQuery extends LaravelBaseQuery
             $isvalid
         );
 
-        if (isset($top)) {
-            $resultSet = $resultSet->take($top);
-        }
+        $resultSet = $resultSet->take($top);
 
         $this->packageResourceSetResults($queryType, $skip, $result, $resultSet, $resultCount, $bulkSetCount);
         return $result;
@@ -197,27 +195,22 @@ class LaravelReadQuery extends LaravelBaseQuery
     /**
      * Common method for getResourceFromRelatedResourceSet() and getResourceFromResourceSet().
      *
-     * @param ResourceSet|null    $resourceSet
-     * @param KeyDescriptor|null  $keyDescriptor
-     * @param Model|Relation|null $sourceEntityInstance Starting point of query
-     * @param array               $whereCondition
-     * @param string[]|null       $eagerLoad            array of relations to eager load
+     * @param ResourceSet           $resourceSet
+     * @param KeyDescriptor|null    $keyDescriptor
+     * @param Model|Relation|null   $sourceEntityInstance Starting point of query
+     * @param array<string, string> $whereCondition
+     * @param string[]|null         $eagerLoad            array of relations to eager load
      *
      * @throws \Exception
      * @return Model|null
      */
     public function getResource(
-        ResourceSet $resourceSet = null,
+        ResourceSet $resourceSet,
         KeyDescriptor $keyDescriptor = null,
         array $whereCondition = [],
         array $eagerLoad = null,
         $sourceEntityInstance = null
-    ) {
-        if (null == $resourceSet && null == $sourceEntityInstance) {
-            $msg = 'Must supply at least one of a resource set and source entity.';
-            throw new \Exception($msg);
-        }
-
+    ): ?Model {
         $sourceEntityInstance = $this->checkSourceInstance($sourceEntityInstance, $resourceSet);
 
         $this->checkAuth($sourceEntityInstance);
@@ -310,11 +303,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         /** @var Relation $sourceEntityInstance */
         $sourceEntityInstance = $sourceEntityInstance->{$propertyName}();
         $this->processKeyDescriptor($sourceEntityInstance, $keyDescriptor);
-        $result = $this->getResource(null, null, [], [], $sourceEntityInstance);
-        if (!(null == $result || $result instanceof Model)) {
-            $msg = 'GetResourceFromRelatedResourceSet must return an entity or null';
-            throw new InvalidOperationException($msg);
-        }
+        $result = $this->getResource($sourceResourceSet, null, [], [], $sourceEntityInstance);
         return $result;
     }
 
@@ -324,13 +313,14 @@ class LaravelReadQuery extends LaravelBaseQuery
      *
      * @throws ODataException
      */
-    private function checkAuth($sourceEntityInstance, $checkInstance = null)
+    private function checkAuth($sourceEntityInstance, $checkInstance = null): void
     {
         $check = array_reduce([$sourceEntityInstance, $checkInstance], function ($carry, $item) {
             if ($item instanceof Model || $item instanceof Relation) {
                 return $item;
             }
         }, null);
+        /** @var class-string|null $sourceName */
         $sourceName = null !== $check ? get_class($check) : null;
         if (!$this->getAuth()->canAuth(ActionVerb::READ(), $sourceName, $check)) {
             throw new ODataException('Access denied', 403);
@@ -340,12 +330,12 @@ class LaravelReadQuery extends LaravelBaseQuery
     /**
      * @param  Model|Builder             $sourceEntityInstance
      * @param  bool                      $nullFilter
-     * @param  array                     $rawLoad
+     * @param  string[]                  $rawLoad
      * @param  int                       $top
      * @param  int                       $skip
      * @param  callable|null             $isvalid
      * @throws InvalidOperationException
-     * @return array
+     * @return mixed[]
      */
     protected function applyFiltering(
         $sourceEntityInstance,
@@ -408,7 +398,7 @@ class LaravelReadQuery extends LaravelBaseQuery
     }
 
     /**
-     * @param $sourceEntityInstance
+     * @param  Model|Relation           $sourceEntityInstance
      * @param  string                   $tableName
      * @param  InternalOrderByInfo|null $orderBy
      * @return mixed
@@ -431,12 +421,12 @@ class LaravelReadQuery extends LaravelBaseQuery
     }
 
     /**
-     * @param QueryType   $queryType
-     * @param int         $skip
-     * @param QueryResult $result
-     * @param $resultSet
-     * @param int $resultCount
-     * @param int $bulkSetCount
+     * @param QueryType             $queryType
+     * @param int                   $skip
+     * @param QueryResult           $result
+     * @param Collection|Model[]    $resultSet
+     * @param int                   $resultCount
+     * @param int                   $bulkSetCount
      */
     protected function packageResourceSetResults(
         QueryType $queryType,
@@ -445,7 +435,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         $resultSet,
         int $resultCount,
         int $bulkSetCount
-    ) {
+    ): void {
         $qVal = $queryType;
         if (QueryType::ENTITIES() == $qVal || QueryType::ENTITIES_WITH_COUNT() == $qVal) {
             $result->results = [];

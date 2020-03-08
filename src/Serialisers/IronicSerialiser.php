@@ -204,7 +204,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level feed element.
      *
-     * @param QueryResult &$entryObjects Array of entry resources to be written
+     * @param QueryResult $entryObjects Array of entry resources to be written
      *
      * @throws InvalidOperationException
      * @throws ODataException
@@ -217,6 +217,7 @@ class IronicSerialiser implements IObjectSerialiser
 
         $this->loadStackIfEmpty();
 
+        /** @var string $title */
         $title       = $this->getRequest()->getContainerName();
         $relativeUri = $this->getRequest()->getIdentifier();
         $absoluteUri = $this->getRequest()->getRequestUrl()->getUrlAsString();
@@ -312,7 +313,7 @@ class IronicSerialiser implements IObjectSerialiser
         }
 
         if ($this->getRequest()->queryType == QueryType::ENTITIES_WITH_COUNT()) {
-            $urls->count = $this->getRequest()->getCountValue();
+            $urls->count = intval($this->getRequest()->getCountValue());
         }
 
         return $urls;
@@ -321,9 +322,9 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level complex resource.
      *
-     * @param QueryResult  &$complexValue The complex object to be written
+     * @param QueryResult  $complexValue  The complex object to be written
      * @param string       $propertyName  The name of the complex property
-     * @param ResourceType &$resourceType Describes the type of complex object
+     * @param ResourceType $resourceType  Describes the type of complex object
      *
      * @throws InvalidOperationException
      * @throws \ReflectionException
@@ -351,11 +352,11 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level bag resource.
      *
-     * @param QueryResult  &$BagValue     The bag object to be
+     * @param QueryResult  $BagValue      The bag object to be
      *                                    written
      * @param string       $propertyName  The name of the
      *                                    bag property
-     * @param ResourceType &$resourceType Describes the type of
+     * @param ResourceType $resourceType  Describes the type of
      *                                    bag object
      *
      * @throws InvalidOperationException
@@ -364,6 +365,7 @@ class IronicSerialiser implements IObjectSerialiser
      */
     public function writeTopLevelBagObject(QueryResult &$BagValue, $propertyName, ResourceType &$resourceType)
     {
+        /** @var mixed[]|null $result */
         $result = $BagValue->results;
 
         $propertyContent         = new ODataPropertyContent();
@@ -379,9 +381,9 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * Write top level primitive value.
      *
-     * @param  QueryResult               &$primitiveValue   The primitive value to be
+     * @param  QueryResult               $primitiveValue    The primitive value to be
      *                                                      written
-     * @param  ResourceProperty          &$resourceProperty Resource property describing the
+     * @param  ResourceProperty          $resourceProperty  Resource property describing the
      *                                                      primitive property to be written
      * @throws InvalidOperationException
      * @throws \ReflectionException
@@ -427,9 +429,9 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param $entryObject
-     * @param $type
-     * @param $relativeUri
+     * @param  mixed                     $entryObject
+     * @param  string                    $type
+     * @param  string                    $relativeUri
      * @param  ResourceType              $resourceType
      * @param  ODataMediaLink|null       $mediaLink
      * @param  ODataMediaLink[]          $mediaLinks
@@ -487,7 +489,7 @@ class IronicSerialiser implements IObjectSerialiser
     /**
      * @param  QueryResult               $entryObject
      * @param  ResourceProperty          $prop
-     * @param  OdataLink                 $nuLink
+     * @param  ODataLink                 $nuLink
      * @param  int                       $propKind
      * @param  string                    $propName
      * @throws InvalidOperationException
@@ -500,7 +502,7 @@ class IronicSerialiser implements IObjectSerialiser
         ODataLink $nuLink,
         int $propKind,
         string $propName
-    ) {
+    ): void {
         $nextName             = $prop->getResourceType()->getName();
         $value                = $entryObject->results->{$propName};
         $isCollection         = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
@@ -532,6 +534,7 @@ class IronicSerialiser implements IObjectSerialiser
             }
             $nuLink->expandedResult = $expandedResult;
         } else {
+            /** @var ResourceType $type */
             $type = $this->getService()->getProvidersWrapper()->resolveResourceType($nextName);
             if (!$isCollection) {
                 $result                  = new ODataEntry();
@@ -543,7 +546,7 @@ class IronicSerialiser implements IObjectSerialiser
             }
             $nuLink->expandedResult = $result;
         }
-        if (isset($nuLink->expandedResult->selfLink)) {
+        if (isset($nuLink->expandedResult) && isset($nuLink->expandedResult->selfLink)) {
             $nuLink->expandedResult->selfLink->title = $propName;
             $nuLink->expandedResult->selfLink->url   = $nuLink->url;
             $nuLink->expandedResult->title           = new ODataTitle($propName);
@@ -558,7 +561,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \ReflectionException
-     * @return array
+     * @return ODataLink[]
      */
     protected function buildLinksFromRels(QueryResult $entryObject, array $relProp, string $relativeUri): array
     {
@@ -596,13 +599,13 @@ class IronicSerialiser implements IObjectSerialiser
     }
 
     /**
-     * @param  array|object              $res
+     * @param  object[]|Collection       $res
      * @param  ODataFeed                 $odata
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \ReflectionException
      */
-    protected function buildEntriesFromElements($res, ODataFeed $odata)
+    protected function buildEntriesFromElements($res, ODataFeed $odata): void
     {
         foreach ($res as $entry) {
             if (!$entry instanceof QueryResult) {

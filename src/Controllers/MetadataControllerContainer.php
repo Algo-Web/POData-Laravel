@@ -6,18 +6,19 @@ namespace AlgoWeb\PODataLaravel\Controllers;
 
 class MetadataControllerContainer
 {
+    /** @var array[] */
     private $metadata;
 
     /**
-     * @param array $meta
+     * @param array[] $meta
      */
-    public function setMetadata(array $meta)
+    public function setMetadata(array $meta): void
     {
         $this->metadata = $meta;
     }
 
     /**
-     * @return array
+     * @return array[]
      */
     public function getMetadata()
     {
@@ -27,7 +28,7 @@ class MetadataControllerContainer
     /**
      * @param  string $modelName
      * @param  string $verb
-     * @return array
+     * @return mixed
      */
     public function getMapping($modelName, $verb)
     {

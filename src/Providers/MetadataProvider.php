@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema as Schema;
 use Illuminate\Support\Str;
 use POData\Common\InvalidOperationException;
+use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceStreamInfo;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Metadata\Type\TypeCode;
@@ -30,8 +31,11 @@ class MetadataProvider extends MetadataBaseProvider
 {
     use MetadataProviderStepTrait;
 
+    /** @var array<array>  */
     protected $multConstraints      = ['0..1' => ['1'], '1' => ['0..1', '*'], '*' => ['1', '*']];
+    /** @var string  */
     protected static $metaNAMESPACE = 'Data';
+    /** @var bool */
     protected static $isBooted      = false;
     const POLYMORPHIC               = 'polyMorphicPlaceholder';
     const POLYMORPHIC_PLURAL        = 'polyMorphicPlaceholders';
@@ -49,6 +53,7 @@ class MetadataProvider extends MetadataBaseProvider
         return $this->completedObjectMap;
     }
 
+    /** @var IMetadataRelationshipContainer|null */
     protected $relationHolder;
 
     public function __construct($app)
@@ -58,13 +63,13 @@ class MetadataProvider extends MetadataBaseProvider
     }
 
     /**
-     * @param  array                        $modelNames
+     * @param  string[]                     $modelNames
      * @throws InvalidOperationException
      * @throws \Doctrine\DBAL\DBALException
      * @throws \ReflectionException
      * @return Map
      */
-    private function extract(array $modelNames)
+    private function extract(array $modelNames): Map
     {
         /** @var Map $objectMap */
         $objectMap = App::make('objectmap');
@@ -105,7 +110,12 @@ class MetadataProvider extends MetadataBaseProvider
         return $objectMap;
     }
 
-    private function verify(Map $objectModel)
+    /**
+     * @param Map $objectModel
+     *
+     * @return void
+     */
+    private function verify(Map $objectModel): void
     {
         $objectModel->isOK();
         $this->handleCustomFunction($objectModel, self::$afterVerify);
@@ -116,32 +126,33 @@ class MetadataProvider extends MetadataBaseProvider
      * @throws InvalidOperationException
      * @throws \ReflectionException
      */
-    private function implement(Map $objectModel)
+    private function implement(Map $objectModel): void
     {
         /** @var SimpleMetadataProvider $meta */
         $meta      = App::make('metadata');
-        $namespace = $meta->getContainerNamespace().'.';
+        $namespace = $meta->getContainerNamespace() . '.';
 
         $entities = $objectModel->getEntities();
         foreach ($entities as $entity) {
-            $baseType   = null;
+            /** @var class-string $className */
             $className  = $entity->getClassName();
+            /** @var string $entityName */
             $entityName = $entity->getName();
             $pluralName = Str::plural($entityName);
-            $entityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, null, false, $baseType);
-            if ($entityType->hasBaseType() !== isset($baseType)) {
+            $entityType = $meta->addEntityType(new \ReflectionClass($className), $entityName, null, false, null);
+            if ($entityType->hasBaseType() !== false) {
                 throw new InvalidOperationException('');
             }
             $entity->setOdataResourceType($entityType);
             $this->implementProperties($entity);
             $meta->addResourceSet($pluralName, $entityType);
-            $meta->oDataEntityMap[$className] = $meta->oDataEntityMap[$namespace.$entityName];
+            $meta->oDataEntityMap[$className] = $meta->oDataEntityMap[$namespace . $entityName];
         }
         $metaCount   = count($meta->oDataEntityMap);
         $entityCount = count($entities);
         $expected    = 2 * $entityCount;
         if ($metaCount != $expected) {
-            $msg = 'Expected ' . $expected . ' items, actually got '.$metaCount;
+            $msg = 'Expected ' . $expected . ' items, actually got ' . $metaCount;
             throw new InvalidOperationException($msg);
         }
 
@@ -149,6 +160,9 @@ class MetadataProvider extends MetadataBaseProvider
             return;
         }
         $assoc = $objectModel->getAssociations();
+        $assoc = array_filter($assoc, function ($value) {
+            return $value instanceof AssociationMonomorphic;
+        });
         foreach ($assoc as $association) {
             if (!$association->isOk()) {
                 throw new InvalidOperationException('');
@@ -164,45 +178,55 @@ class MetadataProvider extends MetadataBaseProvider
      * @throws InvalidOperationException
      * @throws \ReflectionException
      */
-    private function implementAssociationsMonomorphic(Map $objectModel, AssociationMonomorphic $associationUnderHammer)
-    {
+    private function implementAssociationsMonomorphic(
+        Map $objectModel,
+        AssociationMonomorphic $associationUnderHammer
+    ): void {
         /** @var SimpleMetadataProvider $meta */
-        $meta  = App::make('metadata');
-        $first = $associationUnderHammer->getFirst();
-        $last  = $associationUnderHammer->getLast();
-        switch ($associationUnderHammer->getAssociationType()) {
+        $meta           = App::make('metadata');
+        $first          = $associationUnderHammer->getFirst();
+        $last           = $associationUnderHammer->getLast();
+        $assocType      = $associationUnderHammer->getAssociationType();
+        $firstIsMany    = (AssociationType::NULL_ONE_TO_MANY() == $assocType || AssociationType::ONE_TO_MANY() == $assocType) &&
+                          ($first->getMultiplicity() == AssociationStubRelationType::MANY());
+
+        $firstSide      = $firstIsMany ? $last : $first;
+        $lastSide       = $firstIsMany ? $first : $last;
+
+        /** @var ResourceEntityType $firstType */
+        $firstType      = $objectModel->getEntities()[$firstSide->getBaseType()]->getOdataResourceType();
+        /** @var ResourceEntityType $secondType */
+        $secondType     = $objectModel->getEntities()[$lastSide->getBaseType()]->getOdataResourceType();
+
+        $firstName      = $firstSide->getRelationName();
+        $lastName       = $lastSide->getRelationName();
+
+        switch ($assocType) {
             case AssociationType::NULL_ONE_TO_NULL_ONE():
             case AssociationType::NULL_ONE_TO_ONE():
             case AssociationType::ONE_TO_ONE():
                 $meta->addResourceReferenceSinglePropertyBidirectional(
-                    $objectModel->getEntities()[$first->getBaseType()]->getOdataResourceType(),
-                    $objectModel->getEntities()[$last->getBaseType()]->getOdataResourceType(),
-                    $first->getRelationName(),
-                    $last->getRelationName()
+                    $firstType,
+                    $secondType,
+                    $firstName,
+                    $lastName
                 );
                 break;
             case AssociationType::NULL_ONE_TO_MANY():
             case AssociationType::ONE_TO_MANY():
-                if ($first->getMultiplicity() == AssociationStubRelationType::MANY()) {
-                    $oneSide  = $last;
-                    $manySide = $first;
-                } else {
-                    $oneSide  = $first;
-                    $manySide = $last;
-                }
                 $meta->addResourceReferencePropertyBidirectional(
-                    $objectModel->getEntities()[$oneSide->getBaseType()]->getOdataResourceType(),
-                    $objectModel->getEntities()[$manySide->getBaseType()]->getOdataResourceType(),
-                    $oneSide->getRelationName(),
-                    $manySide->getRelationName()
+                    $firstType,
+                    $secondType,
+                    $firstName,
+                    $lastName
                 );
                 break;
             case AssociationType::MANY_TO_MANY():
                 $meta->addResourceSetReferencePropertyBidirectional(
-                    $objectModel->getEntities()[$first->getBaseType()]->getOdataResourceType(),
-                    $objectModel->getEntities()[$last->getBaseType()]->getOdataResourceType(),
-                    $first->getRelationName(),
-                    $last->getRelationName()
+                    $firstType,
+                    $secondType,
+                    $firstName,
+                    $lastName
                 );
         }
     }
@@ -212,7 +236,7 @@ class MetadataProvider extends MetadataBaseProvider
      * @throws InvalidOperationException
      * @throws \ReflectionException
      */
-    private function implementProperties(EntityGubbins $unifiedEntity)
+    private function implementProperties(EntityGubbins $unifiedEntity): void
     {
         /** @var SimpleMetadataProvider $meta */
         $meta        = App::make('metadata');
@@ -253,6 +277,7 @@ class MetadataProvider extends MetadataBaseProvider
      * @throws InvalidOperationException
      * @throws \ReflectionException
      * @throws \Doctrine\DBAL\DBALException
+     * @throws \Exception
      * @return void
      */
     public function boot()
@@ -264,7 +289,7 @@ class MetadataProvider extends MetadataBaseProvider
         self::$metaNAMESPACE = env('ODataMetaNamespace', 'Data');
         // If we aren't migrated, there's no DB tables to pull metadata _from_, so bail out early
         try {
-            if (!Schema::hasTable(config('database.migrations'))) {
+            if (!Schema::hasTable(strval(config('database.migrations')))) {
                 return;
             }
         } catch (\Exception $e) {
@@ -314,15 +339,18 @@ class MetadataProvider extends MetadataBaseProvider
 
     /**
      * @throws \Exception
-     * @return array
+     * @return string[]
      */
-    protected function getCandidateModels()
+    protected function getCandidateModels(): array
     {
-        return ClassFinder::getClasses($this->getAppNamespace(),
+        return ClassFinder::getClasses(
+            $this->getAppNamespace(),
             function ($className) {
-                return in_array(\AlgoWeb\PODataLaravel\Models\MetadataTrait::class, class_uses($className)) &&
-                    is_subclass_of($className, \Illuminate\Database\Eloquent\Model::class);
-            }, true);
+                return in_array(MetadataTrait::class, class_uses($className)) &&
+                    is_subclass_of($className, Model::class);
+            },
+            true
+        );
     }
 
     /**
@@ -337,16 +365,13 @@ class MetadataProvider extends MetadataBaseProvider
      * Resolve possible reverse relation property names.
      *
      * @param Model $source
-     * @param $propName
+     * @param string $propName
      * @throws InvalidOperationException
      * @return null|string
      * @internal param Model $target
      */
-    public function resolveReverseProperty(Model $source, $propName)
+    public function resolveReverseProperty(Model $source, string $propName)
     {
-        if (!is_string($propName)) {
-            throw new InvalidOperationException('Property name must be string');
-        }
         $entity = $this->getObjectMap()->resolveEntity(get_class($source));
         if (null === $entity) {
             $msg = 'Source model not defined';
@@ -368,7 +393,7 @@ class MetadataProvider extends MetadataBaseProvider
         return $association->getLast()->getRelationName();
     }
 
-    public function isRunningInArtisan()
+    public function isRunningInArtisan(): bool
     {
         return App::runningInConsole() && !App::runningUnitTests();
     }

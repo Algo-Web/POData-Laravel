@@ -242,24 +242,6 @@ class MetadataProviderReverseTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testMetadataResolveReversePropertyMappingNameNotString()
-    {
-        $foo = m::mock(MetadataProvider::class)->makePartial();
-        $foo->shouldReceive('getObjectMap->resolveEntity')->andReturn(null)->never();
-
-        $expected = 'Property name must be string';
-        $actual   = null;
-
-        $left = new TestMorphManySource([]);
-
-        try {
-            $foo->resolveReverseProperty($left, new \stdClass());
-        } catch (InvalidOperationException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
     public function testMetadataResolveReversePropertyMappingAcrossPolymorphicMapping()
     {
         $assoc = m::mock(Association::class);

@@ -28,6 +28,7 @@ abstract class LaravelBaseQuery
     protected $metadataProvider;
     /** @var MetadataControllerContainer */
     protected $controllerContainer;
+    /** @var ActionVerb[]  */
     protected $verbMap = [];
 
     /**
@@ -66,7 +67,7 @@ abstract class LaravelBaseQuery
     }
 
     /**
-     * @return array
+     * @return ActionVerb[]
      */
     public function getVerbMap()
     {
@@ -87,7 +88,7 @@ abstract class LaravelBaseQuery
     }
 
     /**
-     * @param $sourceEntityInstance
+     * @param QueryResult|Model|Relation|null $sourceEntityInstance
      * @return Model|Relation|null
      */
     protected function unpackSourceEntity($sourceEntityInstance)

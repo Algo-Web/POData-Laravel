@@ -69,7 +69,7 @@ class LaravelBulkQuery
                     $result[] = $raw;
                 }
             } else {
-                $keyDescriptor = null;
+                $keyDescriptor = [];
                 $pastVerb      = 'created';
                 $result        = $this->processBulkCustom($sourceResourceSet, $data, $mapping, $pastVerb, $keyDescriptor);
             }
@@ -140,16 +140,16 @@ class LaravelBulkQuery
      * Prepare bulk request from supplied data.  If $keyDescriptors is not null, its elements are assumed to
      * correspond 1-1 to those in $data.
      *
-     * @param  array                     $paramList
-     * @param  array                     $data
-     * @param  KeyDescriptor[]|null      $keyDescriptors
+     * @param  mixed[]                   $paramList
+     * @param  mixed[]                   $data
+     * @param  KeyDescriptor[]           $keyDescriptors
      * @throws InvalidOperationException
-     * @return array
+     * @return Request[]
      */
-    protected function prepareBulkRequestInput(array $paramList, array $data, array $keyDescriptors = null)
+    protected function prepareBulkRequestInput(array $paramList, array $data, array $keyDescriptors = [])
     {
         $parms    = [];
-        $isCreate = null === $keyDescriptors;
+        $isCreate = empty($keyDescriptors);
 
         // for moment, we're only processing parameters of type Request
         foreach ($paramList as $spec) {
@@ -186,25 +186,27 @@ class LaravelBulkQuery
 
     /**
      * @param  ResourceSet               $sourceResourceSet
-     * @param  array                     $data
-     * @param  array                     $mapping
+     * @param  mixed[]                   $data
+     * @param  array[]|string[]          $mapping
      * @param  string                    $pastVerb
-     * @param  KeyDescriptor[]|null      $keyDescriptor
+     * @param  KeyDescriptor[]           $keyDescriptor
      * @throws ODataException
      * @throws \ReflectionException
      * @throws InvalidOperationException
-     * @return array
+     * @return mixed[]
      */
     protected function processBulkCustom(
         ResourceSet $sourceResourceSet,
         array $data,
         array $mapping,
         string $pastVerb,
-        array $keyDescriptor = null
+        array $keyDescriptor = []
     ) {
         $class        = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
+        /** @var string $controlClass */
         $controlClass = $mapping['controller'];
         $method       = $mapping['method'];
+        /** @var array[] $paramList */
         $paramList    = $mapping['parameters'];
         $controller   = App::make($controlClass);
         $parms        = $this->prepareBulkRequestInput($paramList, $data, $keyDescriptor);
@@ -236,7 +238,7 @@ class LaravelBulkQuery
      * @param  string                    $verbName
      * @throws InvalidOperationException
      * @throws \ReflectionException
-     * @return array|null
+     * @return mixed[]|null
      */
     protected function getOptionalVerbMapping(ResourceSet $sourceResourceSet, string $verbName)
     {
@@ -273,7 +275,7 @@ class LaravelBulkQuery
     }
 
     /**
-     * @param $result
+     * @param JsonResponse $result
      * @throws ODataException
      * @return array|mixed
      */

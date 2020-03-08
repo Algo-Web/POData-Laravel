@@ -11,6 +11,7 @@ namespace AlgoWeb\PODataLaravel\Query;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
@@ -22,19 +23,19 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 class LaravelWriteQuery extends LaravelBaseQuery
 {
     /**
-     * @param  array      $data
-     * @param  array      $paramList
+     * @param  mixed[]    $data
+     * @param  array[]    $paramList
      * @param  Model|null $sourceEntityInstance
-     * @return array
+     * @return mixed[]
      */
-    protected function createUpdateDeleteProcessInput(array $data, array $paramList, Model $sourceEntityInstance)
+    protected function createUpdateDeleteProcessInput(array $data, array $paramList, ?Model $sourceEntityInstance)
     {
         $parms = [];
 
         foreach ($paramList as $spec) {
             $varType = isset($spec['type']) ? $spec['type'] : null;
             $varName = $spec['name'];
-            if (null == $varType) {
+            if (null == $varType && null !== $sourceEntityInstance) {
                 $parms[] = ('id' == $varName) ? $sourceEntityInstance->getKey() : $sourceEntityInstance->{$varName};
                 continue;
             }
@@ -52,23 +53,14 @@ class LaravelWriteQuery extends LaravelBaseQuery
 
 
     /**
-     * @param $result
+     * @param JsonResponse $result
      * @throws ODataException
      * @return array|mixed
      */
-    protected function createUpdateDeleteProcessOutput($result)
+    protected function createUpdateDeleteProcessOutput(JsonResponse $result)
     {
-        if (!($result instanceof \Illuminate\Http\JsonResponse)) {
-            throw ODataException::createInternalServerError('Controller response not well-formed json.');
-        }
-        $outData = $result->getData();
-        if (is_object($outData)) {
-            $outData = (array) $outData;
-        }
+        $outData = $result->getData(true);
 
-        if (!is_array($outData)) {
-            throw ODataException::createInternalServerError('Controller response does not have an array.');
-        }
         if (!(key_exists('id', $outData) && key_exists('status', $outData) && key_exists('errors', $outData))) {
             throw ODataException::createInternalServerError(
                 'Controller response array missing at least one of id, status and/or errors fields.'
@@ -78,10 +70,11 @@ class LaravelWriteQuery extends LaravelBaseQuery
     }
 
     /**
-     * @param ResourceSet $sourceResourceSet
-     * @param $data
-     * @param                            $verb
+     * @param ResourceSet                $sourceResourceSet
+     * @param mixed[]                    $data
+     * @param string                     $verb
      * @param  Model|null                $source
+     * @param bool                       $shouldUpdate
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \Exception
@@ -91,7 +84,8 @@ class LaravelWriteQuery extends LaravelBaseQuery
         ResourceSet $sourceResourceSet,
         array $data,
         string $verb,
-        Model $source = null
+        Model $source = null,
+        bool $shouldUpdate
     ) {
         $lastWord = 'update' == $verb ? 'updated' : 'created';
         $class    = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
@@ -115,8 +109,8 @@ class LaravelWriteQuery extends LaravelBaseQuery
 
 
     /**
-     * @param $sourceEntityInstance
-     * @param $data
+     * @param Model|null $sourceEntityInstance
+     * @param mixed[] $data
      * @param string $class
      * @param string $verb
      *
@@ -124,7 +118,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @throws InvalidOperationException
      * @return array|mixed
      */
-    protected function createUpdateDeleteCore($sourceEntityInstance, array $data, string $class, string $verb)
+    protected function createUpdateDeleteCore(?Model $sourceEntityInstance, array $data, string $class, string $verb)
     {
         $raw = $this->getControllerContainer();
         $map = $raw->getMetadata();
@@ -158,7 +152,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @param object      $sourceEntityInstance
      *
      * @throws \Exception
-     * @return bool       true if resources sucessfully deteled, otherwise false
+     * @return bool       true if resources successfully deleted, otherwise false
      */
     public function deleteResource(
         ResourceSet $sourceResourceSet,
@@ -174,6 +168,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
         $class = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
         $id    = $source->getKey();
         $name  = $source->getKeyName();
+
         $data  = [$name => $id];
 
         $data = $this->createUpdateDeleteCore($source, $data, $class, $verb);
@@ -186,9 +181,9 @@ class LaravelWriteQuery extends LaravelBaseQuery
     }
 
     /**
-     * @param ResourceSet    $resourceSet          The entity set containing the entity to fetch
-     * @param Model|Relation $sourceEntityInstance The source entity instance
-     * @param object         $data                 the New data for the entity instance
+     * @param ResourceSet           $resourceSet          The entity set containing the entity to fetch
+     * @param Model|Relation|null   $sourceEntityInstance The source entity instance
+     * @param object                $data                 The new data for the entity instance
      *
      * @throws \Exception
      * @return Model|null returns the newly created model if successful,
@@ -201,7 +196,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
     ) {
         $verb = 'create';
         $data = (array) $data;
-        return $this->createUpdateMainWrapper($resourceSet, $sourceEntityInstance, $data, $verb);
+        return $this->createUpdateMainWrapper($resourceSet, $sourceEntityInstance, $data, $verb, false);
     }
 
     /**
@@ -221,11 +216,11 @@ class LaravelWriteQuery extends LaravelBaseQuery
         $sourceEntityInstance,
         KeyDescriptor $keyDescriptor,
         $data,
-        $shouldUpdate = false
+        bool $shouldUpdate = false
     ) {
         $verb = 'update';
         $data = (array) $data;
-        return $this->createUpdateMainWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb);
+        return $this->createUpdateMainWrapper($sourceResourceSet, $sourceEntityInstance, $data, $verb, $shouldUpdate);
     }
 
     /**
@@ -233,7 +228,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
      *
      * @param ResourceSet   $resourceSet   The entity set containing the entity to update
      * @param KeyDescriptor $keyDescriptor The key identifying the entity to update
-     * @param $data
+     * @param mixed[]       $data
      *
      * @return bool|null Returns result of executing query
      */
@@ -250,8 +245,9 @@ class LaravelWriteQuery extends LaravelBaseQuery
     /**
      * @param  ResourceSet               $resourceSet
      * @param  Model|Relation|null       $sourceEntityInstance
-     * @param  mixed                     $data
-     * @param  mixed                     $verb
+     * @param  mixed[]                   $data
+     * @param  string                    $verb
+     * @param  bool                      $shouldUpdate
      * @throws InvalidOperationException
      * @throws ODataException
      * @return Model|null
@@ -260,12 +256,13 @@ class LaravelWriteQuery extends LaravelBaseQuery
         ResourceSet $resourceSet,
         $sourceEntityInstance,
         array $data,
-        string $verb
+        string $verb,
+        bool $shouldUpdate
     ) {
         /** @var Model|null $source */
         $source = $this->unpackSourceEntity($sourceEntityInstance);
 
-        $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source);
+        $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source, false);
         if (null !== $result) {
             LaravelQuery::queueModel($result);
         }

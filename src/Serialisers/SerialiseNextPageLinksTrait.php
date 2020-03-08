@@ -32,10 +32,10 @@ trait SerialiseNextPageLinksTrait
      * @throws InvalidOperationException
      * @throws ODataException
      */
-    protected function buildNextPageLink(QueryResult $entryObjects, $odata)
+    protected function buildNextPageLink(QueryResult $entryObjects, $odata): void
     {
         $stackSegment = $this->getRequest()->getTargetResourceSetWrapper()->getName();
-        /** @var array $res */
+        /** @var mixed[] $res */
         $res                 = $entryObjects->results;
         $lastObject          = end($res);
         $segment             = $this->getNextLinkUri($lastObject);
@@ -55,7 +55,7 @@ trait SerialiseNextPageLinksTrait
      * @throws InvalidOperationException
      * @return bool                      true if the feed must have a next page link
      */
-    protected function needNextPageLink(int $resultSetCount)
+    protected function needNextPageLink(int $resultSetCount): bool
     {
         $currentResourceSet = $this->getCurrentResourceSetWrapper();
         $recursionLevel     = count($this->getStack()->getSegmentNames());
@@ -75,7 +75,7 @@ trait SerialiseNextPageLinksTrait
     /**
      * Get next page link from the given entity instance.
      *
-     * @param  mixed                     &$lastObject Last object serialized to be
+     * @param  mixed                     $lastObject  Last object serialized to be
      *                                                used for generating
      *                                                $skiptoken
      * @throws ODataException
@@ -84,6 +84,7 @@ trait SerialiseNextPageLinksTrait
      */
     protected function getNextLinkUri(&$lastObject)
     {
+        /** @var RootProjectionNode|ExpandedProjectionNode $currentExpandedProjectionNode */
         $currentExpandedProjectionNode = $this->getCurrentExpandedProjectionNode();
         $internalOrderByInfo           = $currentExpandedProjectionNode->getInternalOrderByInfo();
         if (null === $internalOrderByInfo) {
@@ -176,7 +177,7 @@ trait SerialiseNextPageLinksTrait
      * @throws InvalidOperationException
      * @return ResourceSetWrapper
      */
-    abstract protected function getCurrentResourceSetWrapper();
+    abstract protected function getCurrentResourceSetWrapper(): ResourceSetWrapper;
 
     /**
      * Find a 'ExpandedProjectionNode' instance in the projection tree

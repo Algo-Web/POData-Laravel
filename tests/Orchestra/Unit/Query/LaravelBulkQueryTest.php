@@ -32,7 +32,7 @@ class LaravelBulkQueryTest extends TestCase
     {
         $paramList = [];
         $data      = [];
-        $keyDesc   = null;
+        $keyDesc   = [];
 
         $query = m::mock(LaravelQuery::class)->makePartial();
         $foo   = new DummyBulkQuery($query);
@@ -46,7 +46,7 @@ class LaravelBulkQueryTest extends TestCase
     {
         $paramList = ['foo'];
         $data      = [11];
-        $keyDesc   = null;
+        $keyDesc   = [];
 
         $query = m::mock(LaravelQuery::class)->makePartial();
         $foo   = new DummyBulkQuery($query);

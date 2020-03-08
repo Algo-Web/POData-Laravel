@@ -15,7 +15,7 @@ class MetadataProviderDummy extends MetadataProvider
         $this->candidates = $cand;
     }
 
-    public function getCandidateModels()
+    public function getCandidateModels(): array
     {
         if (null !== $this->candidates) {
             return $this->candidates;

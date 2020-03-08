@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
+use POData\Providers\Expression\IExpressionProvider;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Query\IQueryProvider;
@@ -28,13 +29,21 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
 {
+    /** @var IExpressionProvider */
     protected $expression;
+    /** @var LaravelReadQuery */
     protected $reader;
+    /** @var LaravelHookQuery */
     protected $modelHook;
+    /** @var LaravelBulkQuery */
     protected $bulk;
+    /** @var LaravelWriteQuery */
     protected $writer;
+    /** @var string */
     public $queryProviderClassName;
+    /** @var Model[] */
     protected static $touchList = [];
+    /** @var bool */
     protected static $inBatch;
 
     public function __construct(AuthInterface $auth = null)
@@ -48,6 +57,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         $this->bulk                   = new LaravelBulkQuery($this, $this->getAuth());
         $this->writer                 = new LaravelWriteQuery($this->getAuth());
 
+        /** @var Model[] touchList */
         self::$touchList = [];
         self::$inBatch   = false;
     }
@@ -325,9 +335,9 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     }
 
     /**
-     * @param ResourceSet    $resourceSet          The entity set containing the entity to fetch
-     * @param Model|Relation $sourceEntityInstance The source entity instance
-     * @param object         $data                 the New data for the entity instance
+     * @param ResourceSet            $resourceSet          The entity set containing the entity to fetch
+     * @param Model|Relation|null    $sourceEntityInstance The source entity instance
+     * @param object                 $data                 the New data for the entity instance
      *
      * @throws \Exception
      * @return Model|null returns the newly created model if successful,
@@ -346,7 +356,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      *
      * @param ResourceSet   $resourceSet   The entity set containing the entity to update
      * @param KeyDescriptor $keyDescriptor The key identifying the entity to update
-     * @param $data
+     * @param mixed $data
      *
      * @return bool|null Returns result of executing query
      */
@@ -414,7 +424,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * @param Model       $sourceEntityInstance
      * @param ResourceSet $targetResourceSet
      * @param Model       $targetEntityInstance
-     * @param $navPropName
+     * @param string      $navPropName
      *
      * @throws InvalidOperationException
      * @return bool
@@ -442,7 +452,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * @param Model       $sourceEntityInstance
      * @param ResourceSet $targetResourceSet
      * @param Model       $targetEntityInstance
-     * @param $navPropName
+     * @param string      $navPropName
      *
      * @throws InvalidOperationException
      * @return bool
@@ -467,7 +477,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
      * Start database transaction.
      * @param bool $isBulk
      */
-    public function startTransaction($isBulk = false)
+    public function startTransaction($isBulk = false): void
     {
         self::$touchList = [];
         self::$inBatch   = true === $isBulk;
@@ -477,7 +487,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     /**
      * Commit database transaction.
      */
-    public function commitTransaction()
+    public function commitTransaction(): void
     {
         // fire model save again, to give Laravel app final chance to finalise anything that needs finalising after
         // batch processing
@@ -493,14 +503,14 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     /**
      * Abort database transaction.
      */
-    public function rollBackTransaction()
+    public function rollBackTransaction(): void
     {
         DB::rollBack();
         self::$touchList = [];
         self::$inBatch   = false;
     }
 
-    public static function queueModel(Model &$model)
+    public static function queueModel(Model &$model): void
     {
         // if we're not processing a batch, don't queue anything
         if (!self::$inBatch) {

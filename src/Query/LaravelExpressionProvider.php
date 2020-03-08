@@ -10,6 +10,7 @@ use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\Type\IType;
 use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\ExpressionType;
 use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\PropertyAccessExpression;
+use POData\UriProcessor\QueryProcessor\FunctionDescription;
 
 class LaravelExpressionProvider implements IExpressionProvider
 {
@@ -34,6 +35,7 @@ class LaravelExpressionProvider implements IExpressionProvider
     const OPEN_BRACKET          = '(';
     const TYPE_NAMESPACE        = 'POData\\Providers\\Metadata\\Type\\';
 
+    /** @var array<string, callable> */
     private $functionDescriptionParsers;
 
     /**
@@ -56,7 +58,7 @@ class LaravelExpressionProvider implements IExpressionProvider
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_ENDSWITH] = function ($params) {
             return '(strcmp(substr(' . $params[0] . ', strlen(' . $params[0] . ') - strlen(' . $params[1] . ')), '
-                   .$params[1] . ') === 0)';
+                   . $params[1] . ') === 0)';
         };
         $this->functionDescriptionParsers[ODataConstants::STRFUN_INDEXOF] = function ($params) {
             return 'strpos(' . $params[0] . ', ' . $params[1] . ')';
@@ -156,7 +158,7 @@ class LaravelExpressionProvider implements IExpressionProvider
      * @param ResourceType $resourceType The resource type on which the filter
      *                                   is going to be applied
      */
-    public function setResourceType(ResourceType $resourceType)
+    public function setResourceType(ResourceType $resourceType): void
     {
         $this->iteratorName = '$' . $resourceType->getName();
         $this->resourceType = $resourceType;
@@ -308,9 +310,6 @@ class LaravelExpressionProvider implements IExpressionProvider
      */
     public function onFunctionCallExpression($functionDescription, $params)
     {
-        if (!isset($functionDescription)) {
-            throw new \InvalidArgumentException('onFunctionCallExpression');
-        }
         if (!array_key_exists($functionDescription->name, $this->functionDescriptionParsers)) {
             throw new \InvalidArgumentException('onFunctionCallExpression');
         }
@@ -343,7 +342,7 @@ class LaravelExpressionProvider implements IExpressionProvider
     }
 
     /**
-     * @param $expressionType
+     * @param ExpressionType|int $expressionType
      * @return mixed
      */
     private function unpackExpressionType($expressionType)

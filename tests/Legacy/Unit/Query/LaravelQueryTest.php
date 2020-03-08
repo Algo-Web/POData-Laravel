@@ -708,21 +708,6 @@ class LaravelQueryTest extends TestCase
         $this->assertTrue($result instanceof TestMorphTarget);
     }
 
-    public function testGetResourceWithNullResourceSetAndEntityInstance()
-    {
-        $foo = new LaravelReadQuery();
-
-        $expected = 'Must supply at least one of a resource set and source entity.';
-        $actual   = null;
-
-        try {
-            $foo->getResource();
-        } catch (\Exception $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
     /**
      * @covers \AlgoWeb\PODataLaravel\Query\LaravelQuery::getRelatedResourceReference
      */
@@ -982,7 +967,8 @@ class LaravelQueryTest extends TestCase
         $key            = m::mock(KeyDescriptor::class);
 
         $foo          = new LaravelQuery();
-        $expected     = 'No query results for model ['. \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel::class . ']';
+        $expected     = 'No query results for model ['
+                        . \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel::class . ']';
         $actual       = null;
         $expectedCode = 500;
         $actualCode   = null;
@@ -1045,84 +1031,6 @@ class LaravelQueryTest extends TestCase
         $actual       = '';
         $expectedCode = 422;
         $actualCode   = null;
-        try {
-            $result = $foo->deleteResource($mockResource, $model);
-        } catch (ODataException $e) {
-            $actual     = $e->getMessage();
-            $actualCode = $e->getStatusCode();
-        }
-        $this->assertEquals($expected, $actual);
-        $this->assertEquals($expectedCode, $actualCode);
-    }
-
-    public function testAttemptDeleteMalformedControllerResponse()
-    {
-        $controller = new TestController();
-
-        $testName       = TestController::class;
-        $mockController = m::mock($testName)->makePartial();
-        $mockController->shouldReceive('destroyTestModel')->withAnyArgs()->andReturnNull()->once();
-
-        $this->seedControllerMetadata($controller);
-
-        $metaProv = new SimpleMetadataProvider('Data', 'Data');
-
-        App::instance('metadata', $metaProv);
-        App::instance($testName, $mockController);
-
-        $std = m::mock(IType::class);
-        $std->shouldReceive('getName')->andReturn(TestModel::class);
-        $mockResource = \Mockery::mock(ResourceSet::class);
-        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
-        $model     = new TestModel();
-        $model->id = null;
-
-        $foo          = new LaravelQuery();
-        $expected     = 'Controller response not well-formed json.';
-        $actual       = null;
-        $expectedCode = 500;
-        $actualCode   = null;
-        try {
-            $result = $foo->deleteResource($mockResource, $model);
-        } catch (ODataException $e) {
-            $actual     = $e->getMessage();
-            $actualCode = $e->getStatusCode();
-        }
-        $this->assertEquals($expected, $actual);
-        $this->assertEquals($expectedCode, $actualCode);
-    }
-
-    public function testAttemptDeleteMalformedResponseData()
-    {
-        $controller = new TestController();
-
-        $json = m::mock(JsonResponse::class)->makePartial();
-        $json->shouldReceive('getData')->andReturnNull()->once();
-
-        $testName       = TestController::class;
-        $mockController = m::mock($testName)->makePartial();
-        $mockController->shouldReceive('destroyTestModel')->withAnyArgs()->andReturn($json)->once();
-
-        $this->seedControllerMetadata($controller);
-
-        $metaProv = new SimpleMetadataProvider('Data', 'Data');
-
-        App::instance('metadata', $metaProv);
-        App::instance($testName, $mockController);
-
-        $std = m::mock(IType::class);
-        $std->shouldReceive('getName')->andReturn(TestModel::class);
-        $mockResource = \Mockery::mock(ResourceSet::class);
-        $mockResource->shouldReceive('getResourceType->getInstanceType')->andReturn($std);
-        $model     = new TestModel();
-        $model->id = null;
-
-        $foo          = new LaravelQuery();
-        $expected     = 'Controller response does not have an array.';
-        $actual       = null;
-        $expectedCode = 500;
-        $actualCode   = null;
-
         try {
             $result = $foo->deleteResource($mockResource, $model);
         } catch (ODataException $e) {
@@ -1501,7 +1409,7 @@ class LaravelQueryTest extends TestCase
         $foo  = m::mock(LaravelQuery::class)->makePartial();
         $foo->shouldReceive('getModelHook')->andReturn($hook);
 
-        $expected = 'Target instance must be of type compatible with relation declared in method '.$navPropName;
+        $expected = 'Target instance must be of type compatible with relation declared in method ' . $navPropName;
         $actual   = null;
 
         try {
@@ -1734,6 +1642,102 @@ class LaravelQueryTest extends TestCase
         $foo->shouldReceive('getModelHook')->andReturn($hook);
 
         $this->assertTrue($foo->unhookSingleModel($source, $srcInstance, $target, $targInstance, 'manySource'));
+    }
+
+    public function testUnhookSingleModelBothInputsNotModel()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMorphOneSource($meta);
+        $morphOne = m::mock(MorphTo::class)->makePartial();
+        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
+        $morphOne->shouldReceive('associate')->andReturn(null)->never();
+        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
+        $targInstance = new TestMorphOneSource($meta);
+        $navPropName = 'morphTarget';
+
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
+
+        $expected = 'Argument 1 passed to';
+        $this->expectExceptionMessage($expected);
+        $this->expectException(\TypeError::class);
+
+        $foo->unhookSingleModel($source, null, $target, null, $navPropName);
+    }
+
+    public function testUnhookSingleModelFirstInputNotModel()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMorphOneSource($meta);
+        $morphOne = m::mock(MorphTo::class)->makePartial();
+        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
+        $morphOne->shouldReceive('associate')->andReturn(null)->never();
+        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
+        $targInstance = new TestMorphOneSource($meta);
+        $navPropName = 'morphTarget';
+
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
+
+        $expected = 'Argument 1 passed to';
+        $this->expectExceptionMessage($expected);
+        $this->expectException(\TypeError::class);
+
+        $foo->unhookSingleModel($source, null, $target, $targInstance, $navPropName);
+    }
+
+    public function testUnhookSingleModelSecondInputNotModel()
+    {
+        $meta = [];
+        $meta['id'] = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
+        $meta['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['weight'] = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
+        $meta['code'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
+
+        $source = m::mock(ResourceSet::class);
+        $target = m::mock(ResourceSet::class);
+
+        $relInstance = new TestMorphOneSource($meta);
+        $morphOne = m::mock(MorphTo::class)->makePartial();
+        $morphOne->shouldReceive('getRelated')->andReturn($relInstance);
+        $morphOne->shouldReceive('associate')->andReturn(null)->never();
+        $srcInstance = m::mock(TestMorphTarget::class)->makePartial();
+        $targInstance = new TestMorphOneSource($meta);
+        $navPropName = 'morphTarget';
+
+        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+
+        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('getModelHook')->andReturn($hook);
+
+        $expected = 'Argument 2 passed to';
+        $this->expectExceptionMessage($expected);
+        $this->expectException(\TypeError::class);
+
+        $foo->unhookSingleModel($source, $srcInstance, $target, null, $navPropName);
     }
 
     public function testStartTransaction()

@@ -23,6 +23,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 trait LaravelReadQueryUtilityTrait
 {
+    /** @var string|null */
     protected $name;
 
     /**
@@ -39,14 +40,21 @@ trait LaravelReadQueryUtilityTrait
         $values     = $skipToken->getOrderByKeysInToken();
         $numValues  = count($values);
         if ($numValues != count($segments)) {
-            $msg = 'Expected '.count($segments).', got '.$numValues;
+            $msg = 'Expected ' . count($segments) . ', got ' . $numValues;
             throw new InvalidOperationException($msg);
         }
 
         for ($i = 0; $i < $numValues; $i++) {
             $relation          = $segments[$i]->isAscending() ? '>' : '<';
             $name              = $segments[$i]->getSubPathSegments()[0]->getName();
-            $parameters[$name] = ['direction' => $relation, 'value' => trim($values[$i][0], '\'')];
+            /** @var string $rawValue */
+            $rawValue          = is_string($values[$i][0])
+                ? $values[$i][0]
+                : $values[$i][0]->/** @scrutinizer ignore-call */toString();
+            $parameters[$name] = [
+                'direction' => $relation,
+                'value' => trim(/** @scrutinizer ignore-type */$rawValue, '\'')
+            ];
         }
 
         foreach ($parameters as $name => $line) {
@@ -79,11 +87,11 @@ trait LaravelReadQueryUtilityTrait
 
     /**
      * @param  Model|Relation|null       $source
-     * @param  ResourceSet|null          $resourceSet
+     * @param  ResourceSet               $resourceSet
      * @throws \ReflectionException
      * @return Model|Relation|mixed|null
      */
-    protected function checkSourceInstance($source, ResourceSet $resourceSet = null)
+    protected function checkSourceInstance($source, ResourceSet $resourceSet)
     {
         if (!(null == $source || $source instanceof Model || $source instanceof Relation)) {
             $msg = 'Source entity instance must be null, a model, or a relation.';
@@ -102,7 +110,7 @@ trait LaravelReadQueryUtilityTrait
      * @param  KeyDescriptor|null        $keyDescriptor
      * @throws InvalidOperationException
      */
-    protected function processKeyDescriptor(&$sourceEntityInstance, KeyDescriptor $keyDescriptor = null)
+    protected function processKeyDescriptor(&$sourceEntityInstance, KeyDescriptor $keyDescriptor = null): void
     {
         if ($keyDescriptor) {
             $table = ($sourceEntityInstance instanceof Model) ? $sourceEntityInstance->getTable() . '.' : '';
@@ -116,9 +124,9 @@ trait LaravelReadQueryUtilityTrait
     /**
      * @param  string[]|null             $eagerLoad
      * @throws InvalidOperationException
-     * @return array
+     * @return string[]
      */
-    protected function processEagerLoadList(array $eagerLoad = null)
+    protected function processEagerLoadList(array $eagerLoad = null): array
     {
         $load    = (null === $eagerLoad) ? [] : $eagerLoad;
         $rawLoad = [];
