@@ -30,13 +30,13 @@ class TestServiceProvider extends BaseServiceProvider
 
     protected function loadMigrationsFrom($path)
     {
-        $src = DB::connection('testbench-master')->getPdo();
-        $dst = DB::connection('testbench')->getPdo();
+        $src = DB::connection('testbench-reg-master')->getPdo();
+        $dst = DB::connection('testbench-reg')->getPdo();
 
-        if (!Schema::connection('testbench-master')->hasTable('migrations')) {
+        if (!Schema::connection('testbench-reg-master')->hasTable('migrations')) {
             $migrator = $this->app->make('migrator');
             $migrationRepository = $migrator->getRepository();
-            $migrationRepository->setSource('testbench-master');
+            $migrationRepository->setSource('testbench-reg-master');
             $migrationRepository->createRepository();
             $migrator->run($path);
         }

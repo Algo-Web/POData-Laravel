@@ -37,13 +37,13 @@ class TestCase extends BaseTestCase
         $prop->setValue($app, __NAMESPACE__ . '\\' . $regressionName);
         $app['config']->set('testRegressionName', $regressionName);
         // Setup default database to use sqlite :memory:
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
+        $app['config']->set('database.default', 'testbench-reg');
+        $app['config']->set('database.connections.testbench-reg', [
             'driver'   => 'sqlite',
             'database' => ':memory:',
             'prefix'   => '',
         ]);
-        $app['config']->set('database.connections.testbench-master', [
+        $app['config']->set('database.connections.testbench-reg-master', [
             'driver'   => 'sqlite',
             'database' => ':memory:',
             'prefix'   => '',

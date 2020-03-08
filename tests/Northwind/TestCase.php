@@ -46,8 +46,13 @@ class TestCase extends BaseTestCase
         $prop->setAccessible(true);
         $prop->setValue($app, 'Tests\\System\\AlgoWeb\\PODataLaravel');
         // Setup default database to use sqlite :memory:
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
+        $app['config']->set('database.default', 'testbench-nw');
+        $app['config']->set('database.connections.testbench-nw', [
+            'driver'   => 'sqlite',
+            'database' => ':memory:',
+            'prefix'   => '',
+        ]);
+        $app['config']->set('database.connections.testbench-nw-master', [
             'driver'   => 'sqlite',
             'database' => ':memory:',
             'prefix'   => '',
