@@ -23,6 +23,8 @@ class TestServiceProvider extends BaseServiceProvider
 {
     protected $defer = false;
 
+    protected static $isBooted = false;
+
     public function register()
     {
     }
@@ -36,14 +38,16 @@ class TestServiceProvider extends BaseServiceProvider
 
     protected function loadMigrationsFrom($path)
     {
-        $migrator            = $this->app->make('migrator');
-        $migrationRepository = $migrator->getRepository();
-        $migrationRepository->setSource('testbench');
-        $migrationRepository->createRepository();
-        $migrator->run($path);
+        $src = DB::connection('testbench-master')->getPdo();
+        $dst = DB::connection('testbench')->getPdo();
 
-        $src = DB::connection('testbench')->getPdo();
-        $dst = DB::connection('testbench-master')->getPdo();
+        if (!Schema::connection('testbench-master')->hasTable('migrations')) {
+            $migrator = $this->app->make('migrator');
+            $migrationRepository = $migrator->getRepository();
+            $migrationRepository->setSource('testbench-master');
+            $migrationRepository->createRepository();
+            $migrator->run($path);
+        }
 
         CloneInMemoryPDO::clone($src, $dst);
     }
