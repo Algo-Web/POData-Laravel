@@ -57,11 +57,11 @@ class DummyReadQuery extends LaravelReadQuery
     }
 
     /**
-     * @param  string[]|null             $eagerLoad
+     * @param  string[]                  $eagerLoad
      * @throws InvalidOperationException
      * @return string[]
      */
-    public function processEagerLoadList(array $eagerLoad = null): array
+    public function processEagerLoadList(array $eagerLoad = []): array
     {
         return parent::processEagerLoadList($eagerLoad);
     }

@@ -61,7 +61,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         array $eagerLoad = null,
         $sourceEntityInstance = null
     ) {
-        $rawLoad = $this->processEagerLoadList($eagerLoad);
+        $rawLoad = $this->processEagerLoadList($eagerLoad ?? []);
 
         $sourceEntityInstance = $this->checkSourceInstance($sourceEntityInstance, $resourceSet);
 

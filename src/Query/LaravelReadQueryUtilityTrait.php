@@ -121,15 +121,14 @@ trait LaravelReadQueryUtilityTrait
     }
 
     /**
-     * @param  string[]|null             $eagerLoad
+     * @param  string[]                  $eagerLoad
      * @throws InvalidOperationException
      * @return string[]
      */
-    protected function processEagerLoadList(array $eagerLoad = null): array
+    protected function processEagerLoadList(array $eagerLoad = []): array
     {
-        $load    = (null === $eagerLoad) ? [] : $eagerLoad;
         $rawLoad = [];
-        foreach ($load as $line) {
+        foreach ($eagerLoad as $line) {
             if (!is_string($line)) {
                 throw new InvalidOperationException('Eager-load elements must be non-empty strings');
             }
