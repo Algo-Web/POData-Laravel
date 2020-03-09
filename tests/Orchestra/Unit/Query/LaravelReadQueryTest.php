@@ -13,6 +13,7 @@ use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraHasManyTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraPolymorphToManySourceModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraPolymorphToManyTestModel;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Query\DummyReadQuery;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use AlgoWeb\PODataLaravel\Query\LaravelReadQuery;
@@ -29,6 +30,9 @@ use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
+use POData\UriProcessor\QueryProcessor\OrderByParser\OrderByPathSegment;
+use POData\UriProcessor\QueryProcessor\OrderByParser\OrderBySubPathSegment;
+use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 
 class LaravelReadQueryTest extends TestCase
 {
@@ -302,5 +306,44 @@ class LaravelReadQueryTest extends TestCase
         $this->assertEquals(20001, $bulkSetCount);
         $this->assertEquals(0, $skip);
         $this->assertEquals(1, $resultCount);
+    }
+
+
+    public function testSkipTokenProcessingWithTrim()
+    {
+        $subsegment = m::mock(OrderBySubPathSegment::class);
+        $subsegment->shouldReceive('getName')->andReturn('id');
+
+        $segment = m::mock(OrderByPathSegment::class);
+        $segment->shouldReceive('isAscending')->andReturn(true)->once();
+        $segment->shouldReceive('getSubPathSegments')->andReturn([$subsegment]);
+
+        $source = new OrchestraTestModel();
+
+        $skip = m::mock(SkipTokenInfo::class);
+        $skip->shouldReceive('getOrderByInfo->getOrderByPathSegments')->andReturn([$segment]);
+        $skip->shouldReceive('getOrderByKeysInToken')->andReturn([['\'1']]);
+
+        $foo = new DummyReadQuery();
+
+        /** @var Builder $result */
+        $result = $foo->processSkipToken($skip, $source);
+
+        $expected = [0 => '1'];
+        $actual = $result->toBase()->getBindings();
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @throws InvalidOperationException
+     */
+    public function testProcessEagerLoadOneFirstLevelArray()
+    {
+        $foo = new DummyReadQuery();
+
+        $expected = ['foo'];
+        $actual = $foo->processEagerLoadList(['foo_bar']);
+
+        $this->assertEquals($expected, $actual);
     }
 }

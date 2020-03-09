@@ -47,10 +47,9 @@ trait LaravelReadQueryUtilityTrait
         for ($i = 0; $i < $numValues; $i++) {
             $relation          = $segments[$i]->isAscending() ? '>' : '<';
             $name              = $segments[$i]->getSubPathSegments()[0]->getName();
+            $baseVal           = $values[$i][0];
             /** @var string $rawValue */
-            $rawValue          = is_string($values[$i][0])
-                ? $values[$i][0]
-                : $values[$i][0]->/** @scrutinizer ignore-call */toString();
+            $rawValue          = is_string($baseVal) ? $baseVal : $baseVal->/** @scrutinizer ignore-call */toString();
             $parameters[$name] = [
                 'direction' => $relation,
                 'value' => trim(/** @scrutinizer ignore-type */$rawValue, '\'')
