@@ -23,6 +23,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
 use POData\Common\InvalidOperationException;
@@ -376,8 +377,10 @@ class LaravelReadQueryTest extends TestCase
      */
     public function testCheckAuthSourceIsModel()
     {
+        $targClass = OrchestraTestModel::class;
+
         $auth = m::mock(AuthInterface::class);
-        $auth->shouldReceive('canAuth')->withArgs([m::any(), null, null])->andReturn(true)
+        $auth->shouldReceive('canAuth')->withArgs([m::any(), $targClass, m::type($targClass)])->andReturn(true)
             ->once();
 
         $foo = new DummyReadQuery($auth);
@@ -398,8 +401,10 @@ class LaravelReadQueryTest extends TestCase
      */
     public function testCheckAuthSourceIsRelation()
     {
+        $targClass = BelongsTo::class;
+
         $auth = m::mock(AuthInterface::class);
-        $auth->shouldReceive('canAuth')->withArgs([m::any(), null, null])->andReturn(true)
+        $auth->shouldReceive('canAuth')->withArgs([m::any(), $targClass, m::type($targClass)])->andReturn(true)
             ->once();
 
         $foo = new DummyReadQuery($auth);
@@ -445,9 +450,11 @@ class LaravelReadQueryTest extends TestCase
      */
     public function testCheckAuthSourceIsModelAndInstanceIsDifferentModel()
     {
+        $targClass = OrchestraHasManyTestModel::class;
+
         $auth = m::mock(AuthInterface::class);
         $auth->shouldReceive('canAuth')
-            ->withArgs([m::any(), OrchestraTestModel::class, m::type(OrchestraTestModel::class)])
+            ->withArgs([m::any(), $targClass, m::type($targClass)])
             ->andReturn(true)
             ->once();
 
@@ -469,9 +476,11 @@ class LaravelReadQueryTest extends TestCase
      */
     public function testCheckAuthSourceIsRelationAndInstanceIsModel()
     {
+        $targClass = BelongsTo::class;
+
         $auth = m::mock(AuthInterface::class);
         $auth->shouldReceive('canAuth')
-            ->withArgs([m::any(), OrchestraBelongsToTestModel::class, m::type(OrchestraBelongsToTestModel::class)])
+            ->withArgs([m::any(), $targClass, m::type($targClass)])
             ->andReturn(true)
             ->once();
 
