@@ -37,7 +37,7 @@ script:
 
       echo "CHANGED_FILES=$CHANGED_FILES";
     fi
-  - php vendor/bin/infection --threads=4 --min-msi=92 --min-covered-msi=93 --log-verbosity=none $INFECTION_FILTER
+  - php vendor/bin/infection --threads=4 --min-msi=93 --min-covered-msi=93 --log-verbosity=none $INFECTION_FILTER
 after_script:
   - php vendor/bin/php-coveralls --exclude-no-stmt
 
