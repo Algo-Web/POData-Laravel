@@ -9,16 +9,22 @@ declare(strict_types=1);
  */
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Providers;
 
+use _HumbugBox7a5b998f2c3f\Roave\BetterReflection\Reflection\ReflectionClass;
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\RelationTestDummyModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Providers\DummyMetadataProvider;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use AlgoWeb\PODataLaravel\Query\LaravelReadQuery;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Mockery as m;
+use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\IMetadataProvider;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\SimpleMetadataProvider;
@@ -136,5 +142,132 @@ class MetadataProviderTest extends TestCase
         $this->assertTrue($foo->isBooted());
         $this->assertTrue(App::make('metadata') instanceof SimpleMetadataProvider);
         $this->assertTrue(App::make('objectmap') instanceof Map);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testExtractHandlesBindingException()
+    {
+        $map = new Map();
+
+        $app = App::make('app');
+        $foo = new MetadataProvider($app);
+
+        App::shouldReceive('make')->withArgs(['objectmap'])->andReturn($map)->once();
+        App::shouldReceive('make')->withArgs(['app'])->andReturn($app);
+        App::shouldReceive('make')->withArgs([OrchestraTestModel::class])->andThrows(BindingResolutionException::class);
+
+        $reflec = new \ReflectionClass($foo);
+        $method = $reflec->getMethod('extract');
+        $method->setAccessible(true);
+
+        $names = [OrchestraTestModel::class];
+
+        /** @var Map $result */
+        $result = $method->invoke($foo, $names);
+        $this->assertEquals(0, count($result->getEntities()));
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testImplementHandlesBadBaseType()
+    {
+        $badType = m::mock(ResourceEntityType::class);
+        $badType->shouldReceive('hasBaseType')->andReturn(true)->once();
+
+        $meta = m::mock(SimpleMetadataProvider::class);
+        $meta->shouldReceive('getContainerNamespace')->andReturn('Data');
+        $meta->shouldReceive('addEntityType')->andReturn($badType);
+
+        $app = App::make('app');
+        $foo = new MetadataProvider($app);
+
+        App::shouldReceive('make')->withArgs(['metadata'])->andReturn($meta)->once();
+
+        $reflec = new \ReflectionClass($foo);
+        $method = $reflec->getMethod('implement');
+        $method->setAccessible(true);
+
+        $gubbins = m::mock(EntityGubbins::class);
+        $gubbins->shouldReceive('getClassName')->andReturn(OrchestraTestModel::class)->once();
+        $gubbins->shouldReceive('getName')->andReturn('OrchestraTestModel')->once();
+
+        $map = m::mock(Map::class);
+        $map->shouldReceive('getEntities')->andReturn([$gubbins])->once();
+
+        $this->expectException(InvalidOperationException::class);
+
+        $method->invoke($foo, $map);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testImplementDetectsCountMismatch()
+    {
+        $badType = m::mock(ResourceEntityType::class)->makePartial();
+        $badType->shouldReceive('hasBaseType')->andReturn(false)->once();
+        $badType->shouldReceive('isAbstract')->andReturn(false);
+        $badType->shouldReceive('getFullName')->andReturn('fullName');
+
+        $meta = m::mock(SimpleMetadataProvider::class);
+        $meta->shouldReceive('getContainerNamespace')->andReturn('Data');
+        $meta->shouldReceive('addEntityType')->andReturn($badType);
+        $meta->shouldReceive('addResourceSet')->passthru()->once();
+        $meta->oDataEntityMap['all.your'] = ['base.are.belong.to.us'];
+        $meta->oDataEntityMap['Data.OrchestraTestModel'] = null;
+
+        $app = App::make('app');
+        $foo = new MetadataProvider($app);
+
+        App::shouldReceive('make')->withArgs(['metadata'])->andReturn($meta);
+
+        $reflec = new \ReflectionClass($foo);
+        $method = $reflec->getMethod('implement');
+        $method->setAccessible(true);
+
+        $gubbins = m::mock(EntityGubbins::class)->makePartial();
+        $gubbins->shouldReceive('getClassName')->andReturn(OrchestraTestModel::class)->once();
+        $gubbins->shouldReceive('getName')->andReturn('OrchestraTestModel')->once();
+
+        $map = m::mock(Map::class);
+        $map->shouldReceive('getEntities')->andReturn([$gubbins])->once();
+
+        $this->expectException(InvalidOperationException::class);
+        $this->expectExceptionMessage('Expected 2 items, actually got 3');
+
+        $method->invoke($foo, $map);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testImplementHandlesBadAssociation()
+    {
+        $badAssociation = m::mock(AssociationMonomorphic::class);
+        $badAssociation->shouldReceive('isOk')->andReturn(false)->once();
+
+        $app = App::make('app');
+        $foo = new MetadataProvider($app);
+
+        $meta = m::mock(SimpleMetadataProvider::class);
+        $meta->shouldReceive('getContainerNamespace')->andReturn('Data');
+
+        App::shouldReceive('make')->withArgs(['metadata'])->andReturn($meta);
+
+        $reflec = new \ReflectionClass($foo);
+        $method = $reflec->getMethod('implement');
+        $method->setAccessible(true);
+
+        $map = m::mock(Map::class);
+        $map->shouldReceive('getEntities')->andReturn([])->once();
+        $map->shouldReceive('getAssociations')->andReturn([$badAssociation])->twice();
+
+        $this->expectException(InvalidOperationException::class);
+        $this->expectExceptionMessage('');
+
+        $method->invoke($foo, $map);
     }
 }
