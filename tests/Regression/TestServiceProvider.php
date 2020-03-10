@@ -24,7 +24,7 @@ class TestServiceProvider extends BaseServiceProvider
     public function boot()
     {
         $this->loadMigrationsFrom(
-            __DIR__ . DIRECTORY_SEPARATOR . config('testRegressionName') .'/database/migrations'
+            __DIR__ . DIRECTORY_SEPARATOR . config('testRegressionName') . '/database/migrations'
         );
     }
 
