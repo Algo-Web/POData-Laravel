@@ -309,11 +309,11 @@ class LaravelReadQuery extends LaravelBaseQuery
 
     /**
      * @param Model|Relation|null $sourceEntityInstance
-     * @param null|mixed          $checkInstance
+     * @param Model|null          $checkInstance
      *
      * @throws ODataException
      */
-    private function checkAuth($sourceEntityInstance, $checkInstance = null): void
+    private function checkAuth($sourceEntityInstance, Model $checkInstance = null): void
     {
         $check = array_reduce([$sourceEntityInstance, $checkInstance], function ($carry, $item) {
             if ($item instanceof Model || $item instanceof Relation) {

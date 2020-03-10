@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Query;
 
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
+use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraBelongsToTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraHasManyTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraPolymorphToManySourceModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraPolymorphToManyTestModel;
@@ -345,5 +347,145 @@ class LaravelReadQueryTest extends TestCase
         $actual = $foo->processEagerLoadList(['foo_bar']);
 
         $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testCheckAuthSourceIsNull()
+    {
+        $auth = m::mock(AuthInterface::class);
+        $auth->shouldReceive('canAuth')->withArgs([m::any(), null, null])->andReturn(true)
+            ->once();
+
+        $foo = new DummyReadQuery($auth);
+
+        $reflec = new \ReflectionClass($foo);
+
+        $method = $reflec->getMethod('checkAuth');
+        $method->setAccessible(true);
+
+        $source = null;
+        $instance = null;
+
+        $method->invoke($foo, $source, $instance);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testCheckAuthSourceIsModel()
+    {
+        $auth = m::mock(AuthInterface::class);
+        $auth->shouldReceive('canAuth')->withArgs([m::any(), null, null])->andReturn(true)
+            ->once();
+
+        $foo = new DummyReadQuery($auth);
+
+        $reflec = new \ReflectionClass($foo);
+
+        $method = $reflec->getMethod('checkAuth');
+        $method->setAccessible(true);
+
+        $source = new OrchestraTestModel();
+        $instance = null;
+
+        $method->invoke($foo, $source, $instance);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testCheckAuthSourceIsRelation()
+    {
+        $auth = m::mock(AuthInterface::class);
+        $auth->shouldReceive('canAuth')->withArgs([m::any(), null, null])->andReturn(true)
+            ->once();
+
+        $foo = new DummyReadQuery($auth);
+
+        $reflec = new \ReflectionClass($foo);
+
+        $method = $reflec->getMethod('checkAuth');
+        $method->setAccessible(true);
+
+        $source = new OrchestraHasManyTestModel();
+        $source = $source->parent();
+        $instance = null;
+
+        $method->invoke($foo, $source, $instance);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testCheckAuthSourceIsModelAndInstanceIsModel()
+    {
+        $auth = m::mock(AuthInterface::class);
+        $auth->shouldReceive('canAuth')
+            ->withArgs([m::any(), OrchestraHasManyTestModel::class, m::type(OrchestraHasManyTestModel::class)])
+            ->andReturn(true)
+            ->once();
+
+        $foo = new DummyReadQuery($auth);
+
+        $reflec = new \ReflectionClass($foo);
+
+        $method = $reflec->getMethod('checkAuth');
+        $method->setAccessible(true);
+
+        $source = new OrchestraHasManyTestModel();
+        $instance = new OrchestraHasManyTestModel();
+
+        $method->invoke($foo, $source, $instance);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testCheckAuthSourceIsModelAndInstanceIsDifferentModel()
+    {
+        $auth = m::mock(AuthInterface::class);
+        $auth->shouldReceive('canAuth')
+            ->withArgs([m::any(), OrchestraTestModel::class, m::type(OrchestraTestModel::class)])
+            ->andReturn(true)
+            ->once();
+
+        $foo = new DummyReadQuery($auth);
+
+        $reflec = new \ReflectionClass($foo);
+
+        $method = $reflec->getMethod('checkAuth');
+        $method->setAccessible(true);
+
+        $source = new OrchestraHasManyTestModel();
+        $instance = new OrchestraTestModel();
+
+        $method->invoke($foo, $source, $instance);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testCheckAuthSourceIsRelationAndInstanceIsModel()
+    {
+        $auth = m::mock(AuthInterface::class);
+        $auth->shouldReceive('canAuth')
+            ->withArgs([m::any(), OrchestraBelongsToTestModel::class, m::type(OrchestraBelongsToTestModel::class)])
+            ->andReturn(true)
+            ->once();
+
+        $foo = new DummyReadQuery($auth);
+
+        $reflec = new \ReflectionClass($foo);
+
+        $method = $reflec->getMethod('checkAuth');
+        $method->setAccessible(true);
+
+        $source = new OrchestraHasManyTestModel();
+        $source = $source->parent();
+        $instance = new OrchestraBelongsToTestModel();
+
+        $method->invoke($foo, $source, $instance);
     }
 }
