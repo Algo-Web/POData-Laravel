@@ -5,7 +5,10 @@ declare(strict_types=1);
 
 namespace Tests\Northwind\AlgoWeb\PODataLaravel;
 
+use AlgoWeb\PODataLaravel\Tests\Connections\CloneInMemoryPDO;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 class TestServiceProvider extends BaseServiceProvider
@@ -22,10 +25,17 @@ class TestServiceProvider extends BaseServiceProvider
      */
     public function boot()
     {
-        $this->loadMigrationsFrom(
-            __DIR__  .'/database/migrations'
-        );
-        $this->seed();
+        $src = DB::connection('testbench-nw-master')->getPdo();
+        $dst = DB::connection('testbench-nw')->getPdo();
+
+        if (!Schema::connection('testbench-nw-master')->hasTable('migrations')) {
+            $this->loadMigrationsFrom(
+                __DIR__ . '/database/migrations'
+            );
+            $this->seed();
+        }
+
+        CloneInMemoryPDO::clone($src, $dst);
     }
 
     /**
@@ -36,7 +46,7 @@ class TestServiceProvider extends BaseServiceProvider
     {
         $migrator            = $this->app->make('migrator');
         $migrationRepository = $migrator->getRepository();
-        $migrationRepository->setSource('testbench');
+        $migrationRepository->setSource('testbench-nw-master');
         $migrationRepository->createRepository();
         $migrator->run($path);
     }

@@ -61,7 +61,7 @@ class LaravelReadQuery extends LaravelBaseQuery
         array $eagerLoad = null,
         $sourceEntityInstance = null
     ) {
-        $rawLoad = $this->processEagerLoadList($eagerLoad);
+        $rawLoad = $this->processEagerLoadList($eagerLoad ?? []);
 
         $sourceEntityInstance = $this->checkSourceInstance($sourceEntityInstance, $resourceSet);
 
@@ -309,17 +309,21 @@ class LaravelReadQuery extends LaravelBaseQuery
 
     /**
      * @param Model|Relation|null $sourceEntityInstance
-     * @param null|mixed          $checkInstance
+     * @param Model|null          $checkInstance
      *
      * @throws ODataException
      */
     private function checkAuth($sourceEntityInstance, $checkInstance = null): void
     {
         $check = array_reduce([$sourceEntityInstance, $checkInstance], function ($carry, $item) {
-            if ($item instanceof Model || $item instanceof Relation) {
+            if (null === $carry && ($item instanceof Model || $item instanceof Relation)) {
                 return $item;
+            } else {
+                return $carry;
             }
         }, null);
+
+
         /** @var class-string|null $sourceName */
         $sourceName = null !== $check ? get_class($check) : null;
         if (!$this->getAuth()->canAuth(ActionVerb::READ(), $sourceName, $check)) {

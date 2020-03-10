@@ -10,9 +10,12 @@ declare(strict_types=1);
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Query;
 
 use AlgoWeb\PODataLaravel\Enums\ActionVerb;
+use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraBelongsToTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraHasManyTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraPolymorphToManySourceModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraPolymorphToManyTestModel;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Query\DummyReadQuery;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use AlgoWeb\PODataLaravel\Query\LaravelReadQuery;
@@ -20,6 +23,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
 use POData\Common\InvalidOperationException;
@@ -29,6 +33,9 @@ use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
+use POData\UriProcessor\QueryProcessor\OrderByParser\OrderByPathSegment;
+use POData\UriProcessor\QueryProcessor\OrderByParser\OrderBySubPathSegment;
+use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 
 class LaravelReadQueryTest extends TestCase
 {
@@ -302,5 +309,192 @@ class LaravelReadQueryTest extends TestCase
         $this->assertEquals(20001, $bulkSetCount);
         $this->assertEquals(0, $skip);
         $this->assertEquals(1, $resultCount);
+    }
+
+
+    public function testSkipTokenProcessingWithTrim()
+    {
+        $subsegment = m::mock(OrderBySubPathSegment::class);
+        $subsegment->shouldReceive('getName')->andReturn('id');
+
+        $segment = m::mock(OrderByPathSegment::class);
+        $segment->shouldReceive('isAscending')->andReturn(true)->once();
+        $segment->shouldReceive('getSubPathSegments')->andReturn([$subsegment]);
+
+        $source = new OrchestraTestModel();
+
+        $skip = m::mock(SkipTokenInfo::class);
+        $skip->shouldReceive('getOrderByInfo->getOrderByPathSegments')->andReturn([$segment]);
+        $skip->shouldReceive('getOrderByKeysInToken')->andReturn([['\'1']]);
+
+        $foo = new DummyReadQuery();
+
+        /** @var Builder $result */
+        $result = $foo->processSkipToken($skip, $source);
+
+        $expected = [0 => '1'];
+        $actual = $result->toBase()->getBindings();
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @throws InvalidOperationException
+     */
+    public function testProcessEagerLoadOneFirstLevelArray()
+    {
+        $foo = new DummyReadQuery();
+
+        $expected = ['foo'];
+        $actual = $foo->processEagerLoadList(['foo_bar']);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testCheckAuthSourceIsNull()
+    {
+        $auth = m::mock(AuthInterface::class);
+        $auth->shouldReceive('canAuth')->withArgs([m::any(), null, null])->andReturn(true)
+            ->once();
+
+        $foo = new DummyReadQuery($auth);
+
+        $reflec = new \ReflectionClass($foo);
+
+        $method = $reflec->getMethod('checkAuth');
+        $method->setAccessible(true);
+
+        $source = null;
+        $instance = null;
+
+        $method->invoke($foo, $source, $instance);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testCheckAuthSourceIsModel()
+    {
+        $targClass = OrchestraTestModel::class;
+
+        $auth = m::mock(AuthInterface::class);
+        $auth->shouldReceive('canAuth')->withArgs([m::any(), $targClass, m::type($targClass)])->andReturn(true)
+            ->once();
+
+        $foo = new DummyReadQuery($auth);
+
+        $reflec = new \ReflectionClass($foo);
+
+        $method = $reflec->getMethod('checkAuth');
+        $method->setAccessible(true);
+
+        $source = new OrchestraTestModel();
+        $instance = null;
+
+        $method->invoke($foo, $source, $instance);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testCheckAuthSourceIsRelation()
+    {
+        $targClass = BelongsTo::class;
+
+        $auth = m::mock(AuthInterface::class);
+        $auth->shouldReceive('canAuth')->withArgs([m::any(), $targClass, m::type($targClass)])->andReturn(true)
+            ->once();
+
+        $foo = new DummyReadQuery($auth);
+
+        $reflec = new \ReflectionClass($foo);
+
+        $method = $reflec->getMethod('checkAuth');
+        $method->setAccessible(true);
+
+        $source = new OrchestraHasManyTestModel();
+        $source = $source->parent();
+        $instance = null;
+
+        $method->invoke($foo, $source, $instance);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testCheckAuthSourceIsModelAndInstanceIsModel()
+    {
+        $auth = m::mock(AuthInterface::class);
+        $auth->shouldReceive('canAuth')
+            ->withArgs([m::any(), OrchestraHasManyTestModel::class, m::type(OrchestraHasManyTestModel::class)])
+            ->andReturn(true)
+            ->once();
+
+        $foo = new DummyReadQuery($auth);
+
+        $reflec = new \ReflectionClass($foo);
+
+        $method = $reflec->getMethod('checkAuth');
+        $method->setAccessible(true);
+
+        $source = new OrchestraHasManyTestModel();
+        $instance = new OrchestraHasManyTestModel();
+
+        $method->invoke($foo, $source, $instance);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testCheckAuthSourceIsModelAndInstanceIsDifferentModel()
+    {
+        $targClass = OrchestraHasManyTestModel::class;
+
+        $auth = m::mock(AuthInterface::class);
+        $auth->shouldReceive('canAuth')
+            ->withArgs([m::any(), $targClass, m::type($targClass)])
+            ->andReturn(true)
+            ->once();
+
+        $foo = new DummyReadQuery($auth);
+
+        $reflec = new \ReflectionClass($foo);
+
+        $method = $reflec->getMethod('checkAuth');
+        $method->setAccessible(true);
+
+        $source = new OrchestraHasManyTestModel();
+        $instance = new OrchestraTestModel();
+
+        $method->invoke($foo, $source, $instance);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testCheckAuthSourceIsRelationAndInstanceIsModel()
+    {
+        $targClass = BelongsTo::class;
+
+        $auth = m::mock(AuthInterface::class);
+        $auth->shouldReceive('canAuth')
+            ->withArgs([m::any(), $targClass, m::type($targClass)])
+            ->andReturn(true)
+            ->once();
+
+        $foo = new DummyReadQuery($auth);
+
+        $reflec = new \ReflectionClass($foo);
+
+        $method = $reflec->getMethod('checkAuth');
+        $method->setAccessible(true);
+
+        $source = new OrchestraHasManyTestModel();
+        $source = $source->parent();
+        $instance = new OrchestraBelongsToTestModel();
+
+        $method->invoke($foo, $source, $instance);
     }
 }

@@ -13,13 +13,17 @@ use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
 use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema as Schema;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use POData\Providers\Metadata\SimpleMetadataProvider;
+use AlgoWeb\PODataLaravel\Tests\Connections\CloneInMemoryPDO;
 
 class TestServiceProvider extends BaseServiceProvider
 {
     protected $defer = false;
+
+    protected static $isBooted = false;
 
     public function register()
     {
@@ -34,10 +38,17 @@ class TestServiceProvider extends BaseServiceProvider
 
     protected function loadMigrationsFrom($path)
     {
-        $migrator            = $this->app->make('migrator');
-        $migrationRepository = $migrator->getRepository();
-        $migrationRepository->setSource('testbench');
-        $migrationRepository->createRepository();
-        $migrator->run($path);
+        $src = DB::connection('testbench-master')->getPdo();
+        $dst = DB::connection('testbench')->getPdo();
+
+        if (!Schema::connection('testbench-master')->hasTable('migrations')) {
+            $migrator = $this->app->make('migrator');
+            $migrationRepository = $migrator->getRepository();
+            $migrationRepository->setSource('testbench-master');
+            $migrationRepository->createRepository();
+            $migrator->run($path);
+        }
+
+        CloneInMemoryPDO::clone($src, $dst);
     }
 }

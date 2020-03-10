@@ -5,6 +5,9 @@ declare(strict_types=1);
 
 namespace Tests\Regression\AlgoWeb\PODataLaravel;
 
+use AlgoWeb\PODataLaravel\Tests\Connections\CloneInMemoryPDO;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 class TestServiceProvider extends BaseServiceProvider
@@ -21,20 +24,23 @@ class TestServiceProvider extends BaseServiceProvider
     public function boot()
     {
         $this->loadMigrationsFrom(
-            __DIR__ . DIRECTORY_SEPARATOR . config('testRegressionName') .'/database/migrations'
+            __DIR__ . DIRECTORY_SEPARATOR . config('testRegressionName') . '/database/migrations'
         );
     }
 
-    /**
-     * @param  array|string                                               $path
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     */
     protected function loadMigrationsFrom($path)
     {
-        $migrator            = $this->app->make('migrator');
-        $migrationRepository = $migrator->getRepository();
-        $migrationRepository->setSource('testbench');
-        $migrationRepository->createRepository();
-        $migrator->run($path);
+        $src = DB::connection('testbench-reg-master')->getPdo();
+        $dst = DB::connection('testbench-reg')->getPdo();
+
+        if (!Schema::connection('testbench-reg-master')->hasTable('migrations')) {
+            $migrator = $this->app->make('migrator');
+            $migrationRepository = $migrator->getRepository();
+            $migrationRepository->setSource('testbench-reg-master');
+            $migrationRepository->createRepository();
+            $migrator->run($path);
+        }
+
+        CloneInMemoryPDO::clone($src, $dst);
     }
 }

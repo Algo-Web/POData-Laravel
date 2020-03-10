@@ -10,8 +10,12 @@ declare(strict_types=1);
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Query;
 
 use AlgoWeb\PODataLaravel\Query\LaravelReadQuery;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use POData\Common\InvalidOperationException;
 use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
+use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 
 class DummyReadQuery extends LaravelReadQuery
 {
@@ -39,5 +43,26 @@ class DummyReadQuery extends LaravelReadQuery
         callable $isvalid = null
     ) {
         return parent::applyFiltering($sourceEntityInstance, $nullFilter, [], PHP_INT_MAX, 0, $isvalid);
+    }
+
+    /**
+     * @param  SkipTokenInfo             $skipToken
+     * @param  Model|Builder             $sourceEntityInstance
+     * @throws InvalidOperationException
+     * @return mixed
+     */
+    public function processSkipToken(SkipTokenInfo $skipToken, $sourceEntityInstance)
+    {
+        return parent::processSkipToken($skipToken, $sourceEntityInstance);
+    }
+
+    /**
+     * @param  string[]                  $eagerLoad
+     * @throws InvalidOperationException
+     * @return string[]
+     */
+    public function processEagerLoadList(array $eagerLoad = []): array
+    {
+        return parent::processEagerLoadList($eagerLoad);
     }
 }

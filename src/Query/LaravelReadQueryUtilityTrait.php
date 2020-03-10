@@ -47,10 +47,9 @@ trait LaravelReadQueryUtilityTrait
         for ($i = 0; $i < $numValues; $i++) {
             $relation          = $segments[$i]->isAscending() ? '>' : '<';
             $name              = $segments[$i]->getSubPathSegments()[0]->getName();
+            $baseVal           = $values[$i][0];
             /** @var string $rawValue */
-            $rawValue          = is_string($values[$i][0])
-                ? $values[$i][0]
-                : $values[$i][0]->/** @scrutinizer ignore-call */toString();
+            $rawValue          = is_string($baseVal) ? $baseVal : $baseVal->/** @scrutinizer ignore-call */toString();
             $parameters[$name] = [
                 'direction' => $relation,
                 'value' => trim(/** @scrutinizer ignore-type */$rawValue, '\'')
@@ -122,15 +121,14 @@ trait LaravelReadQueryUtilityTrait
     }
 
     /**
-     * @param  string[]|null             $eagerLoad
+     * @param  string[]                  $eagerLoad
      * @throws InvalidOperationException
      * @return string[]
      */
-    protected function processEagerLoadList(array $eagerLoad = null): array
+    protected function processEagerLoadList(array $eagerLoad = []): array
     {
-        $load    = (null === $eagerLoad) ? [] : $eagerLoad;
         $rawLoad = [];
-        foreach ($load as $line) {
+        foreach ($eagerLoad as $line) {
             if (!is_string($line)) {
                 throw new InvalidOperationException('Eager-load elements must be non-empty strings');
             }
