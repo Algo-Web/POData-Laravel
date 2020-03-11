@@ -88,8 +88,7 @@ abstract class ModelReflectionHelper
             $code       = self::getCodeForMethod($reflection);
             foreach (static::$relTypes as $relation) {
                 //Resolve the relation's model to a Relation object.
-                if (
-                    !stripos($code, sprintf('$this->%s(', $relation)) ||
+                if (!stripos($code, sprintf('$this->%s(', $relation)) ||
                     !(($relationObj = $model->{$method}()) instanceof Relation) ||
                     !in_array(MetadataTrait::class, class_uses($relationObj->getRelated()))
                 ) {

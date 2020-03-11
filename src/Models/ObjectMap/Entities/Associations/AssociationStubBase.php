@@ -297,8 +297,7 @@ abstract class AssociationStubBase
     {
         $thisFirst  = null === $this->getKeyField() ? false : $this->getKeyField()->getIsKeyField();
         $otherFirst = null === $other->getKeyField() ? false : $other->getKeyField()->getIsKeyField();
-        if (
-            ($thisFirst || $otherFirst) &&
+        if (($thisFirst || $otherFirst) &&
             !($thisFirst && $otherFirst)
             ) {
             return $thisFirst ? -1 : 1;
