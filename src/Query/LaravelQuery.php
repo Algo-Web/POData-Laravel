@@ -388,7 +388,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         ResourceSet $sourceResourceSet,
         array $data
     ) {
-        return $this->getBulk()->createBulkResourceForResourceSet($sourceResourceSet, $data);
+        return $this->getBulk()->createBulkResourceforResourceSet($sourceResourceSet, $data);
     }
 
     /**
