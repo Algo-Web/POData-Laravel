@@ -9,6 +9,10 @@ declare(strict_types=1);
  */
 namespace AlgoWeb\PODataLaravel\Providers;
 
+/**
+ * Trait MetadataProviderStepTrait
+ * @package AlgoWeb\PODataLaravel\Providers
+ */
 trait MetadataProviderStepTrait
 {
     /** @var callable|null */

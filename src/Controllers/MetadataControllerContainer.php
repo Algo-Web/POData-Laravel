@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Controllers;
 
+/**
+ * Class MetadataControllerContainer
+ * @package AlgoWeb\PODataLaravel\Controllers
+ */
 class MetadataControllerContainer
 {
     /** @var array[] */

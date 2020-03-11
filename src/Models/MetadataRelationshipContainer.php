@@ -13,6 +13,10 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStub
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 use POData\Common\InvalidOperationException;
 
+/**
+ * Class MetadataRelationshipContainer
+ * @package AlgoWeb\PODataLaravel\Models
+ */
 class MetadataRelationshipContainer implements IMetadataRelationshipContainer
 {
     /**

@@ -19,6 +19,10 @@ use POData\Common\ODataException;
 use POData\Providers\Metadata\ResourceSet;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 
+/**
+ * Class LaravelBulkQuery
+ * @package AlgoWeb\PODataLaravel\Query
+ */
 class LaravelBulkQuery
 {
     /** @var AuthInterface */

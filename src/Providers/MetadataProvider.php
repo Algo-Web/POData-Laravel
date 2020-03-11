@@ -27,6 +27,10 @@ use POData\Providers\Metadata\ResourceStreamInfo;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Metadata\Type\TypeCode;
 
+/**
+ * Class MetadataProvider
+ * @package AlgoWeb\PODataLaravel\Providers
+ */
 class MetadataProvider extends MetadataBaseProvider
 {
     use MetadataProviderStepTrait;

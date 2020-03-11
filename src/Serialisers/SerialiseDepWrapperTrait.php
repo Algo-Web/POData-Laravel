@@ -18,6 +18,10 @@ use POData\Providers\Metadata\ResourceSetWrapper;
 use POData\UriProcessor\RequestDescription;
 use POData\UriProcessor\SegmentStack;
 
+/**
+ * Trait SerialiseDepWrapperTrait
+ * @package AlgoWeb\PODataLaravel\Serialisers
+ */
 trait SerialiseDepWrapperTrait
 {
     /**

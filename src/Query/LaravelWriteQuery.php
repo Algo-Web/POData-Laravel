@@ -20,6 +20,10 @@ use POData\Providers\Metadata\ResourceSet;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 
+/**
+ * Class LaravelWriteQuery
+ * @package AlgoWeb\PODataLaravel\Query
+ */
 class LaravelWriteQuery extends LaravelBaseQuery
 {
     /**

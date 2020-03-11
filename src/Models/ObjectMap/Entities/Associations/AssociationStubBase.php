@@ -7,6 +7,10 @@ namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 
+/**
+ * Class AssociationStubBase
+ * @package AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations
+ */
 abstract class AssociationStubBase
 {
     /**

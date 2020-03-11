@@ -7,6 +7,10 @@ namespace AlgoWeb\PODataLaravel\Serialisers;
 use Illuminate\Database\Eloquent\Model;
 use POData\Common\InvalidOperationException;
 
+/**
+ * Class ModelSerialiser
+ * @package AlgoWeb\PODataLaravel\Serialisers
+ */
 class ModelSerialiser
 {
     // take a supplied Eloquent model with metadata trait and serialise it in bulk.

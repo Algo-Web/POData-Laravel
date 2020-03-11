@@ -7,6 +7,10 @@ namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
 use Illuminate\Support\Str;
 
+/**
+ * Class AssociationFactory
+ * @package AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations
+ */
 abstract class AssociationFactory
 {
     /** @var bool */

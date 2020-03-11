@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Class MetadataBaseProvider
+ * @package AlgoWeb\PODataLaravel\Providers
+ */
 abstract class MetadataBaseProvider extends ServiceProvider
 {
     /** @var Application */

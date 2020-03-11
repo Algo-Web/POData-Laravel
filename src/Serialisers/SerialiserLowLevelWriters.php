@@ -25,6 +25,10 @@ use POData\Providers\Metadata\Type\DateTime;
 use POData\Providers\Metadata\Type\IType;
 use POData\Providers\Metadata\Type\StringType;
 
+/**
+ * Class SerialiserLowLevelWriters
+ * @package AlgoWeb\PODataLaravel\Serialisers
+ */
 abstract class SerialiserLowLevelWriters
 {
     /**

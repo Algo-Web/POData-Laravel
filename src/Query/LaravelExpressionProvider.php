@@ -12,6 +12,10 @@ use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\ExpressionTy
 use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\PropertyAccessExpression;
 use POData\UriProcessor\QueryProcessor\FunctionDescription;
 
+/**
+ * Class LaravelExpressionProvider
+ * @package AlgoWeb\PODataLaravel\Query
+ */
 class LaravelExpressionProvider implements IExpressionProvider
 {
     const ADD                   = '+';

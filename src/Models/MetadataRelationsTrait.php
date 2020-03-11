@@ -20,6 +20,10 @@ use Mockery\Mock;
 use POData\Common\InvalidOperationException;
 use ReflectionException;
 
+/**
+ * Trait MetadataRelationsTrait
+ * @package AlgoWeb\PODataLaravel\Models
+ */
 trait MetadataRelationsTrait
 {
     /**

@@ -48,6 +48,10 @@ use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
 use POData\UriProcessor\RequestDescription;
 use POData\UriProcessor\SegmentStack;
 
+/**
+ * Class IronicSerialiser
+ * @package AlgoWeb\PODataLaravel\Serialisers
+ */
 class IronicSerialiser implements IObjectSerialiser
 {
     use SerialiseDepWrapperTrait;

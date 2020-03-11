@@ -13,6 +13,10 @@ use ReflectionException;
 use ReflectionMethod;
 use SplFileObject;
 
+/**
+ * Class ModelReflectionHelper
+ * @package AlgoWeb\PODataLaravel\Models
+ */
 abstract class ModelReflectionHelper
 {
     /** @var string[] */

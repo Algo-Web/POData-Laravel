@@ -24,6 +24,10 @@ use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
 use POData\UriProcessor\RequestDescription;
 use POData\UriProcessor\SegmentStack;
 
+/**
+ * Trait SerialiseNextPageLinksTrait
+ * @package AlgoWeb\PODataLaravel\Serialisers
+ */
 trait SerialiseNextPageLinksTrait
 {
     /**

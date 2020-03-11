@@ -17,6 +17,10 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use POData\Common\InvalidOperationException;
 
+/**
+ * Class AssociationStubFactory
+ * @package AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations
+ */
 abstract class AssociationStubFactory
 {
     /**

@@ -23,6 +23,10 @@ use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 
+/**
+ * Class LaravelReadQuery
+ * @package AlgoWeb\PODataLaravel\Query
+ */
 class LaravelReadQuery extends LaravelBaseQuery
 {
     use LaravelReadQueryUtilityTrait;

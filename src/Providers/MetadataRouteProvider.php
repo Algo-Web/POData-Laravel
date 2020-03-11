@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Class MetadataRouteProvider
+ * @package AlgoWeb\PODataLaravel\Providers
+ */
 class MetadataRouteProvider extends ServiceProvider
 {
     /**

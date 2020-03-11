@@ -20,6 +20,10 @@ use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Providers\Query\QueryResult;
 
+/**
+ * Class LaravelBaseQuery
+ * @package AlgoWeb\PODataLaravel\Query
+ */
 abstract class LaravelBaseQuery
 {
     /** @var AuthInterface */
