@@ -76,7 +76,7 @@ class ElectricBoogalooController extends \Illuminate\Routing\Controller
         if ($isSuccess) {
             return response()->json(['status' => 'success', 'id' => $id, 'errors' => null]);
         }
-        $error  = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
+        $error  = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] ' . $id;
         $errors = new \Illuminate\Support\MessageBag([$error]);
         return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
     }
@@ -102,7 +102,7 @@ class ElectricBoogalooController extends \Illuminate\Routing\Controller
             if ($isSuccess) {
                 return response()->json(['status' => 'success', 'id' => $id, 'errors' => null]);
             }
-            $err    = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
+            $err    = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] ' . $id;
             $errors = new \Illuminate\Support\MessageBag([$err]);
             return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
         }
@@ -122,7 +122,7 @@ class ElectricBoogalooController extends \Illuminate\Routing\Controller
         if ($isSuccess) {
             return response()->json(['status' => 'success', 'id' => $id, 'errors' => null]);
         }
-        $error  = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] '.$id;
+        $error  = 'No query results for model [AlgoWeb\PODataLaravel\Models\TestModel] ' . $id;
         $errors = new \Illuminate\Support\MessageBag([$error]);
         return response()->json(['status' => 'error', 'id' => null, 'errors' => $errors]);
     }
