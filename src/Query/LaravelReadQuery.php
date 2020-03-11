@@ -70,7 +70,9 @@ class LaravelReadQuery extends LaravelBaseQuery
         $sourceEntityInstance = $this->checkSourceInstance($sourceEntityInstance, $resourceSet);
 
         /** @var MetadataTrait $model */
-        $model     = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : $sourceEntityInstance->getRelated();
+        $model     = $sourceEntityInstance instanceof Model ?
+            $sourceEntityInstance :
+            $sourceEntityInstance->getRelated();
         $modelLoad = $model->getEagerLoad();
         $tableName = $model->getTable();
         $rawLoad   = array_unique(array_merge($rawLoad, $modelLoad));

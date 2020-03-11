@@ -195,7 +195,8 @@ class MetadataProvider extends MetadataBaseProvider
         $first          = $associationUnderHammer->getFirst();
         $last           = $associationUnderHammer->getLast();
         $assocType      = $associationUnderHammer->getAssociationType();
-        $firstIsMany    = (AssociationType::NULL_ONE_TO_MANY() == $assocType || AssociationType::ONE_TO_MANY() == $assocType) &&
+        $firstIsMany    = (AssociationType::NULL_ONE_TO_MANY() == $assocType ||
+                           AssociationType::ONE_TO_MANY() == $assocType) &&
                           ($first->getMultiplicity() == AssociationStubRelationType::MANY());
 
         $firstSide      = $firstIsMany ? $last : $first;

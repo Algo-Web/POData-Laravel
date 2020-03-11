@@ -54,7 +54,9 @@ abstract class SerialiserLowLevelWriters
             $nrp                                = $nonRelProp[$corn]['prop'];
             $subProp                            = new ODataProperty();
             $subProp->name                      = $corn;
-            $subProp->value                     = isset($flake) ? SerialiserLowLevelWriters::primitiveToString($rType, $flake) : null;
+            $subProp->value                     = isset($flake) ?
+                                                    SerialiserLowLevelWriters::primitiveToString($rType, $flake) :
+                                                    null;
             $subProp->typeName                  = $nrp->getResourceType()->getFullName();
             $propertyContent->properties[$corn] = $subProp;
         }

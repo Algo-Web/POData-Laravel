@@ -345,12 +345,14 @@ trait MetadataTrait
 
         $rawRels = $this->getRelationships();
         $stubs   = [];
+        /** @var Model $model */
+        $model   = $this;
         foreach ($rawRels as $propertyName) {
             if (in_array(strtolower($propertyName), $lowerNames)) {
                 $msg = 'Property names must be unique, without regard to case';
                 throw new \Exception($msg);
             }
-            $stub                 = AssociationStubFactory::associationStubFromRelation(/* @scrutinizer ignore-type */$this, $propertyName);
+            $stub                 = AssociationStubFactory::associationStubFromRelation($model, $propertyName);
             $stubs[$propertyName] = $stub;
         }
         $gubbins->setStubs($stubs);

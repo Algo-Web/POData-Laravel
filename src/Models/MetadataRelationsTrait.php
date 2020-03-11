@@ -40,7 +40,10 @@ trait MetadataRelationsTrait
      */
     public function getRelationships()
     {
+        /** @var Model $model */
+        $model = $this;
+
         return self::$relationNames = self::$relationNames ??
-                                      ModelReflectionHelper::getRelationshipsFromMethods(/* @scrutinizer ignore-type */$this);
+                                      ModelReflectionHelper::getRelationshipsFromMethods($model);
     }
 }

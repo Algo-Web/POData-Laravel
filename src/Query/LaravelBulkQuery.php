@@ -80,7 +80,13 @@ class LaravelBulkQuery
             } else {
                 $keyDescriptor = [];
                 $pastVerb      = 'created';
-                $result        = $this->processBulkCustom($sourceResourceSet, $data, $mapping, $pastVerb, $keyDescriptor);
+                $result        = $this->processBulkCustom(
+                    $sourceResourceSet,
+                    $data,
+                    $mapping,
+                    $pastVerb,
+                    $keyDescriptor
+                );
             }
             DB::commit();
         } catch (\Exception $e) {
