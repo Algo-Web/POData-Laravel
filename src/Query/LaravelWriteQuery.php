@@ -144,7 +144,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
         $parms        = $this->createUpdateDeleteProcessInput($data, $paramList, $sourceEntityInstance);
         unset($data);
 
-        $result = call_user_func_array(array($controller, $method), $parms);
+        $result = call_user_func_array([$controller, $method], $parms);
 
         return $this->createUpdateDeleteProcessOutput($result);
     }

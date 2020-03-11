@@ -215,7 +215,7 @@ class LaravelBulkQuery
         $controller   = App::make($controlClass);
         $parms        = $this->prepareBulkRequestInput($paramList, $data, $keyDescriptor);
 
-        $callResult = call_user_func_array(array($controller, $method), $parms);
+        $callResult = call_user_func_array([$controller, $method], $parms);
         $payload    = $this->createUpdateDeleteProcessOutput($callResult);
         $success    = isset($payload['id']) && is_array($payload['id']);
 
