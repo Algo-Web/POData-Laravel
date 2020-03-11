@@ -19,6 +19,10 @@ use POData\Common\ODataException;
 use POData\Providers\Metadata\ResourceSet;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 
+/**
+ * Class LaravelBulkQuery
+ * @package AlgoWeb\PODataLaravel\Query
+ */
 class LaravelBulkQuery
 {
     /** @var AuthInterface */
@@ -30,6 +34,11 @@ class LaravelBulkQuery
     /** @var MetadataControllerContainer */
     protected $controllerContainer;
 
+    /**
+     * LaravelBulkQuery constructor.
+     * @param LaravelQuery $query
+     * @param AuthInterface|null $auth
+     */
     public function __construct(LaravelQuery &$query, AuthInterface $auth = null)
     {
         $this->auth                = isset($auth) ? $auth : new NullAuthProvider();
@@ -71,7 +80,13 @@ class LaravelBulkQuery
             } else {
                 $keyDescriptor = [];
                 $pastVerb      = 'created';
-                $result        = $this->processBulkCustom($sourceResourceSet, $data, $mapping, $pastVerb, $keyDescriptor);
+                $result        = $this->processBulkCustom(
+                    $sourceResourceSet,
+                    $data,
+                    $mapping,
+                    $pastVerb,
+                    $keyDescriptor
+                );
             }
             DB::commit();
         } catch (\Exception $e) {
@@ -211,7 +226,7 @@ class LaravelBulkQuery
         $controller   = App::make($controlClass);
         $parms        = $this->prepareBulkRequestInput($paramList, $data, $keyDescriptor);
 
-        $callResult = call_user_func_array(array($controller, $method), $parms);
+        $callResult = call_user_func_array([$controller, $method], $parms);
         $payload    = $this->createUpdateDeleteProcessOutput($callResult);
         $success    = isset($payload['id']) && is_array($payload['id']);
 

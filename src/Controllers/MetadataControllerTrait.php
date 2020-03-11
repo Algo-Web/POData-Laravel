@@ -7,6 +7,10 @@ namespace AlgoWeb\PODataLaravel\Controllers;
 use Illuminate\Routing\Controller as BaseController;
 use POData\Common\InvalidOperationException;
 
+/**
+ * Trait MetadataControllerTrait
+ * @package AlgoWeb\PODataLaravel\Controllers
+ */
 trait MetadataControllerTrait
 {
     /*

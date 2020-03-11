@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
+/**
+ * Class Association
+ * @package AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations
+ */
 abstract class Association
 {
     /** @var array<int, string>  */

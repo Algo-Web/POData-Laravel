@@ -9,6 +9,10 @@ declare(strict_types=1);
  */
 namespace AlgoWeb\PODataLaravel\Providers;
 
+/**
+ * Trait MetadataProviderStepTrait
+ * @package AlgoWeb\PODataLaravel\Providers
+ */
 trait MetadataProviderStepTrait
 {
     /** @var callable|null */
@@ -20,21 +24,33 @@ trait MetadataProviderStepTrait
     /** @var callable|null */
     protected static $afterImplement;
 
+    /**
+     * @param callable|null $method
+     */
     public static function setAfterExtract(callable $method = null): void
     {
         self::$afterExtract = $method;
     }
 
+    /**
+     * @param callable|null $method
+     */
     public static function setAfterUnify(callable $method = null): void
     {
         self::$afterUnify = $method;
     }
 
+    /**
+     * @param callable|null $method
+     */
     public static function setAfterVerify(callable $method = null): void
     {
         self::$afterVerify = $method;
     }
 
+    /**
+     * @param callable|null $method
+     */
     public static function setAfterImplement(callable $method = null): void
     {
         self::$afterImplement = $method;

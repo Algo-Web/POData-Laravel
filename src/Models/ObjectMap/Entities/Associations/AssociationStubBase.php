@@ -7,6 +7,10 @@ namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityField;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 
+/**
+ * Class AssociationStubBase
+ * @package AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations
+ */
 abstract class AssociationStubBase
 {
     /**
@@ -164,6 +168,9 @@ abstract class AssociationStubBase
         return $this->keyFieldName ?? '';
     }
 
+    /**
+     * @return EntityField|null
+     */
     public function getKeyField(): ?EntityField
     {
         return (null === $this->entity) ? null : $this->entity->getFields()[$this->getKeyFieldName()];
@@ -177,6 +184,10 @@ abstract class AssociationStubBase
         $this->keyFieldName = $this->checkStringInput($keyFieldName) ? $keyFieldName : $this->keyFieldName;
     }
 
+    /**
+     * @param AssociationStubBase $otherStub
+     * @return bool
+     */
     public function isCompatible(AssociationStubBase $otherStub): bool
     {
         if ($this->morphicType() != $otherStub->morphicType()) {
@@ -286,8 +297,7 @@ abstract class AssociationStubBase
     {
         $thisFirst  = null === $this->getKeyField() ? false : $this->getKeyField()->getIsKeyField();
         $otherFirst = null === $other->getKeyField() ? false : $other->getKeyField()->getIsKeyField();
-        if (
-            ($thisFirst || $otherFirst) &&
+        if (($thisFirst || $otherFirst) &&
             !($thisFirst && $otherFirst)
             ) {
             return $thisFirst ? -1 : 1;

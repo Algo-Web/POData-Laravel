@@ -11,6 +11,10 @@ namespace AlgoWeb\PODataLaravel\Serialisers;
 
 use POData\Providers\Metadata\ResourceEntityType;
 
+/**
+ * Trait SerialisePropertyCacheTrait
+ * @package AlgoWeb\PODataLaravel\Serialisers
+ */
 trait SerialisePropertyCacheTrait
 {
     /** @var array[] */

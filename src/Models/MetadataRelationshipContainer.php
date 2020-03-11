@@ -13,6 +13,10 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStub
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 use POData\Common\InvalidOperationException;
 
+/**
+ * Class MetadataRelationshipContainer
+ * @package AlgoWeb\PODataLaravel\Models
+ */
 class MetadataRelationshipContainer implements IMetadataRelationshipContainer
 {
     /**
@@ -70,6 +74,9 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
         return $this->stubs[$baseType][$targetType];
     }
 
+    /**
+     * @param AssociationStubBase $item
+     */
     private function buildAssociationFromStub(AssociationStubBase $item): void
     {
         $baseTypeCheck = ($item instanceof AssociationStubPolymorphic &&

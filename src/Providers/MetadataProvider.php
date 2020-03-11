@@ -27,6 +27,10 @@ use POData\Providers\Metadata\ResourceStreamInfo;
 use POData\Providers\Metadata\SimpleMetadataProvider;
 use POData\Providers\Metadata\Type\TypeCode;
 
+/**
+ * Class MetadataProvider
+ * @package AlgoWeb\PODataLaravel\Providers
+ */
 class MetadataProvider extends MetadataBaseProvider
 {
     use MetadataProviderStepTrait;
@@ -56,6 +60,10 @@ class MetadataProvider extends MetadataBaseProvider
     /** @var IMetadataRelationshipContainer|null */
     protected $relationHolder;
 
+    /**
+     * MetadataProvider constructor.
+     * @param $app
+     */
     public function __construct($app)
     {
         parent::__construct($app);
@@ -187,7 +195,8 @@ class MetadataProvider extends MetadataBaseProvider
         $first          = $associationUnderHammer->getFirst();
         $last           = $associationUnderHammer->getLast();
         $assocType      = $associationUnderHammer->getAssociationType();
-        $firstIsMany    = (AssociationType::NULL_ONE_TO_MANY() == $assocType || AssociationType::ONE_TO_MANY() == $assocType) &&
+        $firstIsMany    = (AssociationType::NULL_ONE_TO_MANY() == $assocType ||
+                           AssociationType::ONE_TO_MANY() == $assocType) &&
                           ($first->getMultiplicity() == AssociationStubRelationType::MANY());
 
         $firstSide      = $firstIsMany ? $last : $first;
@@ -393,6 +402,9 @@ class MetadataProvider extends MetadataBaseProvider
         return $association->getLast()->getRelationName();
     }
 
+    /**
+     * @return bool
+     */
     public function isRunningInArtisan(): bool
     {
         return App::runningInConsole() && !App::runningUnitTests();

@@ -9,6 +9,10 @@ use AlgoWeb\PODataLaravel\Interfaces\AuthInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
+/**
+ * Class NullAuthProvider
+ * @package AlgoWeb\PODataLaravel\Auth
+ */
 class NullAuthProvider implements AuthInterface
 {
     /**

@@ -11,6 +11,10 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationStub
 use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceEntityType;
 
+/**
+ * Class EntityGubbins
+ * @package AlgoWeb\PODataLaravel\Models\ObjectMap\Entities
+ */
 class EntityGubbins
 {
     /**

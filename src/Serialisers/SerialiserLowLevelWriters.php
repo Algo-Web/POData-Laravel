@@ -25,6 +25,10 @@ use POData\Providers\Metadata\Type\DateTime;
 use POData\Providers\Metadata\Type\IType;
 use POData\Providers\Metadata\Type\StringType;
 
+/**
+ * Class SerialiserLowLevelWriters
+ * @package AlgoWeb\PODataLaravel\Serialisers
+ */
 abstract class SerialiserLowLevelWriters
 {
     /**
@@ -50,7 +54,9 @@ abstract class SerialiserLowLevelWriters
             $nrp                                = $nonRelProp[$corn]['prop'];
             $subProp                            = new ODataProperty();
             $subProp->name                      = $corn;
-            $subProp->value                     = isset($flake) ? SerialiserLowLevelWriters::primitiveToString($rType, $flake) : null;
+            $subProp->value                     = isset($flake) ?
+                                                    SerialiserLowLevelWriters::primitiveToString($rType, $flake) :
+                                                    null;
             $subProp->typeName                  = $nrp->getResourceType()->getFullName();
             $propertyContent->properties[$corn] = $subProp;
         }

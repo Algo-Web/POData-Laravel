@@ -6,6 +6,10 @@ namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
 use POData\Common\InvalidOperationException;
 
+/**
+ * Class AssociationStubPolymorphic
+ * @package AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations
+ */
 class AssociationStubPolymorphic extends AssociationStubBase
 {
     /**

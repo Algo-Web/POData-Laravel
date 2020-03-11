@@ -7,6 +7,10 @@ namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities;
 use POData\Providers\Metadata\Type\EdmPrimitiveType;
 use POData\Providers\Metadata\Type\TypeCode;
 
+/**
+ * Class EntityField
+ * @package AlgoWeb\PODataLaravel\Models\ObjectMap\Entities
+ */
 class EntityField
 {
     /**

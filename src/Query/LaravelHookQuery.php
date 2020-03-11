@@ -16,6 +16,10 @@ use Illuminate\Support\Facades\App;
 use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\ResourceSet;
 
+/**
+ * Class LaravelHookQuery
+ * @package AlgoWeb\PODataLaravel\Query
+ */
 class LaravelHookQuery extends LaravelBaseQuery
 {
     /**

@@ -20,6 +20,10 @@ use Mockery\Mock;
 use POData\Common\InvalidOperationException;
 use ReflectionException;
 
+/**
+ * Trait MetadataRelationsTrait
+ * @package AlgoWeb\PODataLaravel\Models
+ */
 trait MetadataRelationsTrait
 {
     /**
@@ -36,7 +40,10 @@ trait MetadataRelationsTrait
      */
     public function getRelationships()
     {
+        /** @var Model $model */
+        $model = $this;
+
         return self::$relationNames = self::$relationNames ??
-                                      ModelReflectionHelper::getRelationshipsFromMethods(/* @scrutinizer ignore-type */$this);
+                                      ModelReflectionHelper::getRelationshipsFromMethods($model);
     }
 }

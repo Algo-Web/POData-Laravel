@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations;
 
+/**
+ * Class AssociationStubMonomorphic
+ * @package AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations
+ */
 class AssociationStubMonomorphic extends AssociationStubBase
 {
     /**

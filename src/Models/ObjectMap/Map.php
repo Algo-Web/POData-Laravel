@@ -7,6 +7,10 @@ use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\Association;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\Associations\AssociationMonomorphic;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Entities\EntityGubbins;
 
+/**
+ * Class Map
+ * @package AlgoWeb\PODataLaravel\Models\ObjectMap
+ */
 class Map
 {
     /**
@@ -35,6 +39,10 @@ class Map
         return $this->entities;
     }
 
+    /**
+     * @param string $entityClassName
+     * @return EntityGubbins|null
+     */
     public function resolveEntity(string $entityClassName): ?EntityGubbins
     {
         return array_key_exists($entityClassName, $this->entities) ? $this->entities[$entityClassName] : null;

@@ -20,6 +20,10 @@ use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\Type\IType;
 use POData\Providers\Query\QueryResult;
 
+/**
+ * Class SerialiserUtilities
+ * @package AlgoWeb\PODataLaravel\Serialisers
+ */
 abstract class SerialiserUtilities
 {
     /**

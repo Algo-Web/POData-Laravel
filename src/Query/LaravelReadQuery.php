@@ -23,6 +23,10 @@ use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 
+/**
+ * Class LaravelReadQuery
+ * @package AlgoWeb\PODataLaravel\Query
+ */
 class LaravelReadQuery extends LaravelBaseQuery
 {
     use LaravelReadQueryUtilityTrait;
@@ -66,7 +70,9 @@ class LaravelReadQuery extends LaravelBaseQuery
         $sourceEntityInstance = $this->checkSourceInstance($sourceEntityInstance, $resourceSet);
 
         /** @var MetadataTrait $model */
-        $model     = $sourceEntityInstance instanceof Model ? $sourceEntityInstance : $sourceEntityInstance->getRelated();
+        $model     = $sourceEntityInstance instanceof Model ?
+            $sourceEntityInstance :
+            $sourceEntityInstance->getRelated();
         $modelLoad = $model->getEagerLoad();
         $tableName = $model->getTable();
         $rawLoad   = array_unique(array_merge($rawLoad, $modelLoad));

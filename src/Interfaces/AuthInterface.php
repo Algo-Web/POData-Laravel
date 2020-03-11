@@ -8,6 +8,10 @@ use AlgoWeb\PODataLaravel\Enums\ActionVerb;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
+/**
+ * Interface AuthInterface
+ * @package AlgoWeb\PODataLaravel\Interfaces
+ */
 interface AuthInterface
 {
 

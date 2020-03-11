@@ -27,6 +27,10 @@ use POData\UriProcessor\QueryProcessor\SkipTokenParser\SkipTokenInfo;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 
+/**
+ * Class LaravelQuery
+ * @package AlgoWeb\PODataLaravel\Query
+ */
 class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
 {
     /** @var IExpressionProvider */
@@ -46,6 +50,10 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     /** @var bool */
     protected static $inBatch;
 
+    /**
+     * LaravelQuery constructor.
+     * @param AuthInterface|null $auth
+     */
     public function __construct(AuthInterface $auth = null)
     {
         parent::__construct($auth);
@@ -384,7 +392,7 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         ResourceSet $sourceResourceSet,
         array $data
     ) {
-        return $this->getBulk()->createBulkResourceForResourceSet($sourceResourceSet, $data);
+        return $this->getBulk()->createBulkResourceforResourceSet($sourceResourceSet, $data);
     }
 
     /**
@@ -510,6 +518,9 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         self::$inBatch   = false;
     }
 
+    /**
+     * @param Model $model
+     */
     public static function queueModel(Model &$model): void
     {
         // if we're not processing a batch, don't queue anything

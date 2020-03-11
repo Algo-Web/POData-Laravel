@@ -20,6 +20,10 @@ use POData\Providers\Metadata\ResourceSet;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 
+/**
+ * Class LaravelWriteQuery
+ * @package AlgoWeb\PODataLaravel\Query
+ */
 class LaravelWriteQuery extends LaravelBaseQuery
 {
     /**
@@ -73,8 +77,8 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @param ResourceSet                $sourceResourceSet
      * @param mixed[]                    $data
      * @param string                     $verb
-     * @param  Model|null                $source
      * @param bool                       $shouldUpdate
+     * @param  Model|null                $source
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \Exception
@@ -84,8 +88,8 @@ class LaravelWriteQuery extends LaravelBaseQuery
         ResourceSet $sourceResourceSet,
         array $data,
         string $verb,
-        Model $source = null,
-        bool $shouldUpdate
+        bool $shouldUpdate,
+        Model $source = null
     ) {
         $lastWord = 'update' == $verb ? 'updated' : 'created';
         $class    = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
@@ -140,7 +144,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
         $parms        = $this->createUpdateDeleteProcessInput($data, $paramList, $sourceEntityInstance);
         unset($data);
 
-        $result = call_user_func_array(array($controller, $method), $parms);
+        $result = call_user_func_array([$controller, $method], $parms);
 
         return $this->createUpdateDeleteProcessOutput($result);
     }
@@ -262,7 +266,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
         /** @var Model|null $source */
         $source = $this->unpackSourceEntity($sourceEntityInstance);
 
-        $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source, false);
+        $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, false, $source);
         if (null !== $result) {
             LaravelQuery::queueModel($result);
         }

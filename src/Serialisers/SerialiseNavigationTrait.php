@@ -15,6 +15,10 @@ use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ProjectionNode;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\RootProjectionNode;
 use POData\UriProcessor\RequestDescription;
 
+/**
+ * Trait SerialiseNavigationTrait
+ * @package AlgoWeb\PODataLaravel\Serialisers
+ */
 trait SerialiseNavigationTrait
 {
     /**

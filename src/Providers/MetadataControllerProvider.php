@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use POData\Common\InvalidOperationException;
 
+/**
+ * Class MetadataControllerProvider
+ * @package AlgoWeb\PODataLaravel\Providers
+ */
 class MetadataControllerProvider extends MetadataBaseProvider
 {
     /*

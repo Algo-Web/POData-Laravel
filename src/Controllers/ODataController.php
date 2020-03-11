@@ -14,6 +14,10 @@ use POData\OperationContext\ServiceHost as ServiceHost;
 use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
 use POData\SimpleDataService as DataService;
 
+/**
+ * Class ODataController
+ * @package AlgoWeb\PODataLaravel\Controllers
+ */
 class ODataController extends BaseController
 {
     /**
