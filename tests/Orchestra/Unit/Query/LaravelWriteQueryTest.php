@@ -48,7 +48,7 @@ class LaravelWriteQueryTest extends TestCase
         $foo->shouldReceive('createUpdateMainWrapper')->passthru()->once();
         $foo->shouldReceive('unpackSourceEntity')->passthru()->once();
         $foo->shouldReceive('createUpdateCoreWrapper')
-            ->with(m::any(), m::any(), 'update', m::any(), false)->once();
+            ->with(m::any(), m::any(), 'update', false, m::any())->once();
         $foo->shouldReceive('updateResource')->passthru();
 
         $foo->updateResource($resourceSet, $model, $keyDesc, $data);

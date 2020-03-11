@@ -77,8 +77,8 @@ class LaravelWriteQuery extends LaravelBaseQuery
      * @param ResourceSet                $sourceResourceSet
      * @param mixed[]                    $data
      * @param string                     $verb
-     * @param  Model|null                $source
      * @param bool                       $shouldUpdate
+     * @param  Model|null                $source
      * @throws InvalidOperationException
      * @throws ODataException
      * @throws \Exception
@@ -88,8 +88,8 @@ class LaravelWriteQuery extends LaravelBaseQuery
         ResourceSet $sourceResourceSet,
         array $data,
         string $verb,
-        Model $source = null,
-        bool $shouldUpdate
+        bool $shouldUpdate,
+        Model $source = null
     ) {
         $lastWord = 'update' == $verb ? 'updated' : 'created';
         $class    = $sourceResourceSet->getResourceType()->getInstanceType()->getName();
@@ -266,7 +266,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
         /** @var Model|null $source */
         $source = $this->unpackSourceEntity($sourceEntityInstance);
 
-        $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, $source, false);
+        $result = $this->createUpdateCoreWrapper($resourceSet, $data, $verb, false, $source);
         if (null !== $result) {
             LaravelQuery::queueModel($result);
         }
