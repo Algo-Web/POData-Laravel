@@ -60,6 +60,10 @@ class MetadataProvider extends MetadataBaseProvider
     /** @var IMetadataRelationshipContainer|null */
     protected $relationHolder;
 
+    /**
+     * MetadataProvider constructor.
+     * @param $app
+     */
     public function __construct($app)
     {
         parent::__construct($app);
@@ -397,6 +401,9 @@ class MetadataProvider extends MetadataBaseProvider
         return $association->getLast()->getRelationName();
     }
 
+    /**
+     * @return bool
+     */
     public function isRunningInArtisan(): bool
     {
         return App::runningInConsole() && !App::runningUnitTests();

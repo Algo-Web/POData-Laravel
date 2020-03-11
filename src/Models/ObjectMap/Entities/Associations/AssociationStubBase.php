@@ -168,6 +168,9 @@ abstract class AssociationStubBase
         return $this->keyFieldName ?? '';
     }
 
+    /**
+     * @return EntityField|null
+     */
     public function getKeyField(): ?EntityField
     {
         return (null === $this->entity) ? null : $this->entity->getFields()[$this->getKeyFieldName()];
@@ -181,6 +184,10 @@ abstract class AssociationStubBase
         $this->keyFieldName = $this->checkStringInput($keyFieldName) ? $keyFieldName : $this->keyFieldName;
     }
 
+    /**
+     * @param AssociationStubBase $otherStub
+     * @return bool
+     */
     public function isCompatible(AssociationStubBase $otherStub): bool
     {
         if ($this->morphicType() != $otherStub->morphicType()) {

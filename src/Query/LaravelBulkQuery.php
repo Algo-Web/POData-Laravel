@@ -34,6 +34,11 @@ class LaravelBulkQuery
     /** @var MetadataControllerContainer */
     protected $controllerContainer;
 
+    /**
+     * LaravelBulkQuery constructor.
+     * @param LaravelQuery $query
+     * @param AuthInterface|null $auth
+     */
     public function __construct(LaravelQuery &$query, AuthInterface $auth = null)
     {
         $this->auth                = isset($auth) ? $auth : new NullAuthProvider();

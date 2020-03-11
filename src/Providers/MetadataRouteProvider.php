@@ -45,6 +45,9 @@ class MetadataRouteProvider extends ServiceProvider
     {
     }
 
+    /**
+     * @return string|null
+     */
     private function getAuthMiddleware(): ?string
     {
         $disable = $this->isAuthDisable();

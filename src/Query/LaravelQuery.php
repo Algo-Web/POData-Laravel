@@ -50,6 +50,10 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
     /** @var bool */
     protected static $inBatch;
 
+    /**
+     * LaravelQuery constructor.
+     * @param AuthInterface|null $auth
+     */
     public function __construct(AuthInterface $auth = null)
     {
         parent::__construct($auth);
@@ -514,6 +518,9 @@ class LaravelQuery extends LaravelBaseQuery implements IQueryProvider
         self::$inBatch   = false;
     }
 
+    /**
+     * @param Model $model
+     */
     public static function queueModel(Model &$model): void
     {
         // if we're not processing a batch, don't queue anything

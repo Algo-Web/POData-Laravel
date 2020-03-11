@@ -74,6 +74,9 @@ class MetadataRelationshipContainer implements IMetadataRelationshipContainer
         return $this->stubs[$baseType][$targetType];
     }
 
+    /**
+     * @param AssociationStubBase $item
+     */
     private function buildAssociationFromStub(AssociationStubBase $item): void
     {
         $baseTypeCheck = ($item instanceof AssociationStubPolymorphic &&

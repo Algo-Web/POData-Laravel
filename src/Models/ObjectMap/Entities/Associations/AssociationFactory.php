@@ -54,6 +54,12 @@ abstract class AssociationFactory
         return $association;
     }
 
+    /**
+     * @param AssociationStubBase $stub
+     * @param AssociationStubBase $stubTwo
+     * @return AssociationStubBase
+     * @throws \Exception
+     */
     private static function marshalPolyToMono(
         AssociationStubBase $stub,
         AssociationStubBase $stubTwo
@@ -74,6 +80,11 @@ abstract class AssociationFactory
         return $stubNew;
     }
 
+    /**
+     * @param AssociationStubBase $stubOne
+     * @param AssociationStubBase $stubTwo
+     * @return Association|null
+     */
     private static function checkAssociations(
         AssociationStubBase $stubOne,
         AssociationStubBase $stubTwo

@@ -41,6 +41,10 @@ abstract class AssociationStubFactory
         return $stub;
     }
 
+    /**
+     * @param Relation $relation
+     * @return string
+     */
     private static function getHandlerMethod(Relation $relation): string
     {
         $methods                                      = [];
