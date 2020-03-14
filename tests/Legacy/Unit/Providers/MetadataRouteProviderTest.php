@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Providers;
 
 use AlgoWeb\PODataLaravel\Providers\MetadataRouteProvider;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Mockery as m;
 use Tests\Legacy\AlgoWeb\PODataLaravel\TestCase as TestCase;
@@ -44,6 +45,48 @@ class MetadataRouteProviderTest extends TestCase
             $actionArray  = $route->getAction();
             $actual[$uri] = $actionArray['middleware'];
         }
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testReportAuthEnabledWhenAuthEnabledIsTrue()
+    {
+        putenv('APP_DISABLE_AUTH=false');
+
+        $app = App::make('app');
+        $prov = new MetadataRouteProvider($app);
+
+        $reflec = new \ReflectionClass($prov);
+
+        $method = $reflec->getMethod('isAuthDisable');
+        $method->setAccessible(true);
+
+        $expected = false;
+        $actual = $method->invokeArgs($prov, []);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testReportAuthDisabledWhenAuthEnabledIsFalse()
+    {
+        putenv('APP_DISABLE_AUTH=true');
+
+        $app = App::make('app');
+        $prov = new MetadataRouteProvider($app);
+
+        $reflec = new \ReflectionClass($prov);
+
+        $method = $reflec->getMethod('isAuthDisable');
+        $method->setAccessible(true);
+
+        $expected = true;
+        $actual = $method->invokeArgs($prov, []);
+
         $this->assertEquals($expected, $actual);
     }
 }
