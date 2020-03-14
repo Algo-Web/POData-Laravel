@@ -62,7 +62,7 @@ These need to go in your Laravel project's .env file.
 * APP_METADATA_CACHING - Whether or not to turn model metadata caching on
 * APP_METADATA_CACHE_DURATION - If caching, how long (in minutes) to
 retain cached metadata
-* APP_DISABLE_AUTH - Disable authentication (boolean)
+* APP_ENABLE_AUTH - Enable authentication (boolean)
 * APP_DRY_RUN - Roll back DB changes unconditionally (boolean)
 
 ## Contributing

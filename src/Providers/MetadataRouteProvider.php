@@ -48,7 +48,7 @@ class MetadataRouteProvider extends ServiceProvider
      */
     private function getAuthMiddleware(): ?string
     {
-        $disable = $this->isAuthDisable();
+        $disable = !$this->isAuthEnable();
         if ($disable) {
             return null;
         }
@@ -67,9 +67,9 @@ class MetadataRouteProvider extends ServiceProvider
     /**
      * @return bool
      */
-    protected function isAuthDisable(): bool
+    protected function isAuthEnable(): bool
     {
-        $env = env('APP_DISABLE_AUTH', null);
+        $env = env('APP_ENABLE_AUTH', null);
         return true === boolval($env);
     }
 }
