@@ -7,6 +7,7 @@ Unreleased
    * Travis builds now using pcov instead of xdebug
    * Simplify relation generation and tracking
    * Format codebase to compliance with PSR-12, in light of minimum PHP version bump
+   * Pull Illuminate-based context handling in from POData - it belongs here, not there
 
 0.3.6 (2020-02-22)
 ------------------
