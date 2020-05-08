@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Serialisers;
 
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -12,9 +13,25 @@ use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Tests\Legacy\AlgoWeb\PODataLaravel\TestCase as TestCase;
+use POData\Providers\Metadata\Type\DateTime;
 
 class SerialiserTestBase extends TestCase
 {
+    /**
+     * @throws \Exception
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+        DateTime::setTimeProvider([new Carbon(), 'now']);
+    }
+
+    public function tearDown(): void
+    {
+        DateTime::setTimeProvider(null);
+        parent::tearDown();
+    }
+
     protected function setUpSchemaFacade()
     {
         $map = new Map();
