@@ -146,7 +146,7 @@ abstract class SerialiserLowLevelWriters
                 $internalProperty->value = SerialiserLowLevelWriters::primitiveToString($rType, $result->{$propName});
 
                 $internalContent->properties[$propName] = $internalProperty;
-            } elseif (ResourcePropertyKind::COMPLEX_TYPE == $resourceKind) {
+            } elseif (ResourcePropertyKind::COMPLEX_TYPE() == $resourceKind) {
                 $rType                      = $prop->getResourceType();
                 $internalProperty->typeName = $rType->getFullName();
                 $internalProperty->value    = SerialiserLowLevelWriters::writeComplexValue(

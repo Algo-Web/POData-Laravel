@@ -81,7 +81,7 @@ class MetadataProviderRelationTest extends TestCase
         $actualPK = $source->resolveProperty('id');
         $this->assertNotNull($actualPK);
         $this->assertTrue($actualPK instanceof ResourceProperty, get_class($actualPK));
-        $this->assertTrue($actualPK->isKindOf(ResourcePropertyKind::KEY));
+        $this->assertTrue($actualPK->isKindOf(ResourcePropertyKind::KEY()));
         unset($source, $literalPK, $actualPK);
 
         $source = $simple->resolveResourceType('TestMorphManySourceAlternate');
@@ -90,7 +90,7 @@ class MetadataProviderRelationTest extends TestCase
         $actualPK = $source->resolveProperty('alternate_id');
         $this->assertNotNull($actualPK);
         $this->assertTrue($actualPK instanceof ResourceProperty, get_class($actualPK));
-        $this->assertTrue($actualPK->isKindOf(ResourcePropertyKind::KEY));
+        $this->assertTrue($actualPK->isKindOf(ResourcePropertyKind::KEY()));
     }
 
     public function testMonomorphicManyToManyRelation()

@@ -275,13 +275,13 @@ class SerialiserWriteBagTest extends SerialiserTestBase
         $subType1->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE());
 
         $rProp1 = m::mock(ResourceProperty::class);
-        $rProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE);
+        $rProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE());
         $rProp1->shouldReceive('getName')->andReturn('name');
         $rProp1->shouldReceive('getInstanceType')->andReturn(new StringType());
         $rProp1->shouldReceive('getResourceType')->andReturn($subType1);
 
         $rProp2 = m::mock(ResourceProperty::class);
-        $rProp2->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE);
+        $rProp2->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE());
         $rProp2->shouldReceive('getName')->andReturn('type');
         $rProp2->shouldReceive('getInstanceType')->andReturn(new StringType());
         $rProp2->shouldReceive('getResourceType')->andReturn($subType1);
