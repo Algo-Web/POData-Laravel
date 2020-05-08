@@ -32,10 +32,10 @@ class InfrastructureTest extends TestCase
         $result = $this->get($url);
         if ($result instanceof TestCase) {
             $this->assertEquals(200, $result->response->getStatusCode());
-            $this->assertContains('OrchestraTestModel', $result->response->getContent());
+            $this->assertStringContainsString('OrchestraTestModel', $result->response->getContent());
         } else {
             $this->assertEquals(200, $result->getStatusCode());
-            $this->assertContains('OrchestraTestModel', $result->getContent());
+            $this->assertStringContainsString('OrchestraTestModel', $result->getContent());
         }
     }
 

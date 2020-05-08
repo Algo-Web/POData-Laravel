@@ -1143,7 +1143,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $ironicResult = $ironic->writeTopLevelElement($result);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
 
-        $this->assertEquals($objectResult, $ironicResult, '', 0, 20);
+        $this->assertEquals($objectResult, $ironicResult, '', 0);
     }
 
     public function testExpandSingleModelWithArrayPayload()
@@ -1301,7 +1301,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
-        $this->assertContains($expected, $actual);
+        $this->assertStringContainsString($expected, $actual);
     }
 
     public function testWriteTopLevelElementWithBadSerialisedType()
