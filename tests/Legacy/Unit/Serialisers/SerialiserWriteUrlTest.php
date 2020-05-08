@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\App;
 use Mockery as m;
 use POData\ObjectModel\ObjectModelSerializer;
 use POData\OperationContext\ServiceHost;
-use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
+use AlgoWeb\PODataLaravel\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
 use POData\Providers\Query\QueryResult;
 use POData\Providers\Query\QueryType;
 use Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel;
