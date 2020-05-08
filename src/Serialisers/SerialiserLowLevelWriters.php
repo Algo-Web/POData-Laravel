@@ -131,7 +131,7 @@ abstract class SerialiserLowLevelWriters
             $propName               = $prop->getName();
             $internalProperty       = new ODataProperty();
             $internalProperty->name = $propName;
-            if (SerialiserUtilities::isMatchPrimitive($resourceKind)) {
+            if (SerialiserUtilities::isMatchPrimitive($resourceKind->getValue())) {
                 $iType = $prop->getInstanceType();
                 if (!$iType instanceof IType) {
                     throw new InvalidOperationException(get_class($iType));
