@@ -71,4 +71,28 @@ class IncomingIlluminateRequestTest extends TestCase
         $actual = $request->getAllInput();
         $this->assertEquals($expected, $actual);
     }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testGetQueryOptionsAndCounts()
+    {
+        $req = m::mock(Request::class);
+        $req->shouldReceive('getMethod')->andReturn('GET');
+        $req->shouldReceive('all')->andReturn(['Hiver' => 'hammer'])->once();
+
+        $request = new IncomingIlluminateRequest($req);
+
+        $expected = [['hiver' => 'hammer']];
+        $actual = $request->getQueryParameters();
+        $this->assertEquals($expected, $actual);
+
+        $reflec = new \ReflectionClass($request);
+        $prop = $reflec->getProperty('queryOptionsCount');
+        $prop->setAccessible(true);
+
+        $expected = ['hiver' => 1];
+        $actual = $prop->getValue($request);
+        $this->assertEquals($expected, $actual);
+    }
 }
