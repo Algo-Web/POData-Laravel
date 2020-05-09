@@ -1301,7 +1301,11 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
-        $this->assertStringContainsString($expected, $actual);
+        if (method_exists($this, 'assertStringContainsString')) {
+            $this->assertStringContainsString($expected, $actual);
+        } else {
+            $this->assertContains($expected, $actual);
+        }
     }
 
     public function testWriteTopLevelElementWithBadSerialisedType()
