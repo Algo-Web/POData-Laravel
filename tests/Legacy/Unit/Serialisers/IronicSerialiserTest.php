@@ -582,7 +582,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $foo->shouldReceive('getRequest')->andReturn($request);
         $foo->shouldReceive('getService->getProvidersWrapper->resolveResourceType')->andReturn($targType);
 
-        $expected = 'Concrete resource type not selected for payload '.
+        $expected = 'Concrete resource type not selected for payload ' .
                      \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestMorphTarget::class;
         $actual = null;
 

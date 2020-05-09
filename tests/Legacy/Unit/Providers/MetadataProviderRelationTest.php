@@ -347,13 +347,13 @@ class MetadataProviderRelationTest extends TestCase
         $accTail = 'cg:GetterAccess="Public" cg:SetterAccess="Public"/>';
 
         $rel1 = '<NavigationProperty Name="morph" Relationship="Data.TestMorphTargetChild_morph_polyMorphicPlaceholder"'
-                .' ToRole="polyMorphicPlaceholders" FromRole="TestMorphTargetChildren_morph" '.$accTail;
+                . ' ToRole="polyMorphicPlaceholders" FromRole="TestMorphTargetChildren_morph" ' . $accTail;
         $rel2 = '<NavigationProperty Name="childMorph" Relationship="Data.TestMorphTarget_childMorph_'
-                .'TestMorphTargetChild" ToRole="TestMorphTargetChildren" FromRole="TestMorphTargets_childMorph" '
+                . 'TestMorphTargetChild" ToRole="TestMorphTargetChildren" FromRole="TestMorphTargets_childMorph" '
                 .$accTail;
         $type1 = '<EntityType OpenType="false" Abstract="false" Name="TestMorphTargetChild">';
         $type2 = '<EntityType OpenType="false" BaseType="Data.polyMorphicPlaceholder" Abstract="false" '
-                 .'Name="TestMorphTarget">';
+                 . 'Name="TestMorphTarget">';
 
         $this->assertTrue(false !== strpos($xml, $rel1));
         $this->assertTrue(false !== strpos($xml, $rel2));
