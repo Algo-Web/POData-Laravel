@@ -28,7 +28,7 @@ use POData\ObjectModel\ODataProperty;
 use POData\ObjectModel\ODataPropertyContent;
 use POData\ObjectModel\ODataTitle;
 use POData\OperationContext\ServiceHost;
-use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
+use AlgoWeb\PODataLaravel\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
 use POData\Providers\Metadata\IMetadataProvider;
 use POData\Providers\Metadata\ResourceComplexType;
 use POData\Providers\Metadata\ResourceEntityType;
@@ -1143,7 +1143,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $ironicResult = $ironic->writeTopLevelElement($result);
         $this->assertEquals(get_class($objectResult), get_class($ironicResult));
 
-        $this->assertEquals($objectResult, $ironicResult, '', 0, 20);
+        $this->assertEquals($objectResult, $ironicResult, '', 0);
     }
 
     public function testExpandSingleModelWithArrayPayload()
@@ -1301,7 +1301,11 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         } catch (InvalidOperationException $e) {
             $actual = $e->getMessage();
         }
-        $this->assertContains($expected, $actual);
+        if (method_exists($this, 'assertStringContainsString')) {
+            $this->assertStringContainsString($expected, $actual);
+        } else {
+            $this->assertContains($expected, $actual);
+        }
     }
 
     public function testWriteTopLevelElementWithBadSerialisedType()

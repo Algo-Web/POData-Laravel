@@ -18,6 +18,7 @@ use POData\Common\InvalidOperationException;
 use POData\Providers\Metadata\IMetadataProvider;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceProperty;
+use POData\Providers\Metadata\ResourcePropertyKind;
 use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\Type\StringType;
 use POData\Providers\Query\QueryResult;
@@ -108,7 +109,7 @@ class SerialiserUtilitiesTest extends TestCase
     {
         $keyProp = m::mock(ResourceProperty::class);
         $keyProp->shouldReceive('getInstanceType')->andReturn(new \stdClass());
-        $keyProp->shouldReceive('getKind')->andReturn(16);
+        $keyProp->shouldReceive('getKind')->andReturn(new ResourcePropertyKind(16));
         $keyProp->shouldReceive('getName')->andReturn('property');
 
         $rType = m::mock(ResourceType::class)->makePartial();
@@ -124,13 +125,17 @@ class SerialiserUtilitiesTest extends TestCase
         SerialiserLowLevelWriters::writeComplexValue($rType, $result, 'property', $instanceColl);
     }
 
+    /**
+     * @throws InvalidOperationException
+     * @throws \ReflectionException
+     */
     public function testWriteComplexValueBadResourcePropertyType()
     {
         $iType = new StringType();
 
         $keyProp = m::mock(ResourceProperty::class);
         $keyProp->shouldReceive('getInstanceType')->andReturn($iType);
-        $keyProp->shouldReceive('getKind')->andReturn(16);
+        $keyProp->shouldReceive('getKind')->andReturn(new ResourcePropertyKind(16));
         $keyProp->shouldReceive('getName')->andReturn('property');
         $keyProp->shouldReceive('getResourceType->getInstanceType')->andReturn(new \stdClass())->once();
 

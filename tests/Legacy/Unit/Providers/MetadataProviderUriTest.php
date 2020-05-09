@@ -19,9 +19,10 @@ use POData\Configuration\EntitySetRights;
 use POData\Configuration\IServiceConfiguration;
 use POData\IService;
 use POData\OperationContext\ServiceHost;
-use POData\OperationContext\Web\Illuminate\IlluminateOperationContext;
+use AlgoWeb\PODataLaravel\OperationContext\Web\Illuminate\IlluminateOperationContext;
 use POData\Providers\ProvidersWrapper;
 use POData\Providers\Query\IQueryProvider;
+use POData\Readers\ODataReaderRegistry;
 use POData\UriProcessor\ResourcePathProcessor\ResourcePathProcessor;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\MetadataProviderDummy;
@@ -107,7 +108,7 @@ class MetadataProviderUriTest extends TestCase
 
         $config = m::mock(IServiceConfiguration::class);
         $config->shouldReceive('getMaxDataServiceVersion')->andReturn(new Version(3, 0));
-        $config->shouldReceive('getEntitySetAccessRule')->andReturn(EntitySetRights::ALL);
+        $config->shouldReceive('getEntitySetAccessRule')->andReturn(EntitySetRights::ALL());
         $config->shouldReceive('getEntitySetPageSize')->andReturn(400);
 
         $host = $this->setUpMockHost($reqUrl, $baseUrl);
@@ -116,12 +117,15 @@ class MetadataProviderUriTest extends TestCase
 
         $wrapper = new ProvidersWrapper($meta, $query, $config);
 
+        $rego = m::mock(ODataReaderRegistry::class);
+
         $service = m::mock(IService::class);
         $service->shouldReceive('getHost')->andReturn($host);
         $service->shouldReceive('getProvidersWrapper')->andReturn($wrapper);
         $service->shouldReceive('getOperationContext')->andReturn($context);
         $service->shouldReceive('getConfiguration')->andReturn($config);
         $service->shouldReceive('getMetadataProvider')->andReturn($meta);
+        $service->shouldReceive('getODataReaderRegistry')->andReturn($rego);
 
         $desc = ResourcePathProcessor::process($service);
         $this->assertTrue($desc->getSegments()[0]->isSingleResult());
@@ -179,7 +183,7 @@ class MetadataProviderUriTest extends TestCase
 
         $config = m::mock(IServiceConfiguration::class);
         $config->shouldReceive('getMaxDataServiceVersion')->andReturn(new Version(3, 0));
-        $config->shouldReceive('getEntitySetAccessRule')->andReturn(EntitySetRights::ALL);
+        $config->shouldReceive('getEntitySetAccessRule')->andReturn(EntitySetRights::ALL());
         $config->shouldReceive('getEntitySetPageSize')->andReturn(400);
 
         $host = $this->setUpMockHost($reqUrl, $baseUrl);
@@ -188,12 +192,15 @@ class MetadataProviderUriTest extends TestCase
 
         $wrapper = new ProvidersWrapper($meta, $query, $config);
 
+        $rego = m::mock(ODataReaderRegistry::class);
+
         $service = m::mock(IService::class);
         $service->shouldReceive('getHost')->andReturn($host);
         $service->shouldReceive('getProvidersWrapper')->andReturn($wrapper);
         $service->shouldReceive('getOperationContext')->andReturn($context);
         $service->shouldReceive('getConfiguration')->andReturn($config);
         $service->shouldReceive('getMetadataProvider')->andReturn($meta);
+        $service->shouldReceive('getOdataReaderRegistry')->andReturn($rego);
 
         $desc = ResourcePathProcessor::process($service);
         $this->assertTrue($desc->getSegments()[0]->isSingleResult());
@@ -241,7 +248,7 @@ class MetadataProviderUriTest extends TestCase
 
         $config = m::mock(IServiceConfiguration::class);
         $config->shouldReceive('getMaxDataServiceVersion')->andReturn(new Version(3, 0));
-        $config->shouldReceive('getEntitySetAccessRule')->andReturn(EntitySetRights::ALL);
+        $config->shouldReceive('getEntitySetAccessRule')->andReturn(EntitySetRights::ALL());
         $config->shouldReceive('getEntitySetPageSize')->andReturn(400);
 
         $host = $this->setUpMockHost($reqUrl, $baseUrl);
@@ -250,12 +257,15 @@ class MetadataProviderUriTest extends TestCase
 
         $wrapper = new ProvidersWrapper($meta, $query, $config);
 
+        $rego = m::mock(ODataReaderRegistry::class);
+
         $service = m::mock(IService::class);
         $service->shouldReceive('getHost')->andReturn($host);
         $service->shouldReceive('getProvidersWrapper')->andReturn($wrapper);
         $service->shouldReceive('getOperationContext')->andReturn($context);
         $service->shouldReceive('getConfiguration')->andReturn($config);
         $service->shouldReceive('getMetadataProvider')->andReturn($meta);
+        $service->shouldReceive('getODataReaderRegistry')->andReturn($rego);
 
         $desc = ResourcePathProcessor::process($service);
         $this->assertTrue($desc->getSegments()[0]->isSingleResult());
@@ -304,7 +314,7 @@ class MetadataProviderUriTest extends TestCase
 
         $config = m::mock(IServiceConfiguration::class);
         $config->shouldReceive('getMaxDataServiceVersion')->andReturn(new Version(3, 0));
-        $config->shouldReceive('getEntitySetAccessRule')->andReturn(EntitySetRights::ALL);
+        $config->shouldReceive('getEntitySetAccessRule')->andReturn(EntitySetRights::ALL());
         $config->shouldReceive('getEntitySetPageSize')->andReturn(400);
 
         $host = $this->setUpMockHost($reqUrl, $baseUrl);
@@ -313,12 +323,15 @@ class MetadataProviderUriTest extends TestCase
 
         $wrapper = new ProvidersWrapper($meta, $query, $config);
 
+        $rego = m::mock(ODataReaderRegistry::class);
+
         $service = m::mock(IService::class);
         $service->shouldReceive('getHost')->andReturn($host);
         $service->shouldReceive('getProvidersWrapper')->andReturn($wrapper);
         $service->shouldReceive('getOperationContext')->andReturn($context);
         $service->shouldReceive('getConfiguration')->andReturn($config);
         $service->shouldReceive('getMetadataProvider')->andReturn($meta);
+        $service->shouldReceive('getOdataReaderRegistry')->andReturn($rego);
 
         $desc = ResourcePathProcessor::process($service);
         $this->assertTrue($desc->getSegments()[0]->isSingleResult());
@@ -400,7 +413,7 @@ class MetadataProviderUriTest extends TestCase
 
         $config = m::mock(IServiceConfiguration::class);
         $config->shouldReceive('getMaxDataServiceVersion')->andReturn(new Version(3, 0));
-        $config->shouldReceive('getEntitySetAccessRule')->andReturn(EntitySetRights::ALL);
+        $config->shouldReceive('getEntitySetAccessRule')->andReturn(EntitySetRights::ALL());
         $config->shouldReceive('getEntitySetPageSize')->andReturn(400);
 
         $host = $this->setUpMockHost($reqUrl, $baseUrl);
@@ -409,12 +422,15 @@ class MetadataProviderUriTest extends TestCase
 
         $wrapper = new ProvidersWrapper($meta, $query, $config);
 
+        $rego = m::mock(ODataReaderRegistry::class);
+
         $service = m::mock(IService::class);
         $service->shouldReceive('getHost')->andReturn($host);
         $service->shouldReceive('getProvidersWrapper')->andReturn($wrapper);
         $service->shouldReceive('getOperationContext')->andReturn($context);
         $service->shouldReceive('getConfiguration')->andReturn($config);
         $service->shouldReceive('getMetadataProvider')->andReturn($meta);
+        $service->shouldReceive('getOdataReaderRegistry')->andReturn($rego);
 
         $desc = ResourcePathProcessor::process($service);
         $this->assertTrue($desc->getSegments()[0]->isSingleResult());
@@ -484,7 +500,7 @@ class MetadataProviderUriTest extends TestCase
 
         $config = m::mock(IServiceConfiguration::class);
         $config->shouldReceive('getMaxDataServiceVersion')->andReturn(new Version(3, 0));
-        $config->shouldReceive('getEntitySetAccessRule')->andReturn(EntitySetRights::ALL);
+        $config->shouldReceive('getEntitySetAccessRule')->andReturn(EntitySetRights::ALL());
         $config->shouldReceive('getEntitySetPageSize')->andReturn(400);
 
         $host = $this->setUpMockHost($reqUrl, $baseUrl);
@@ -493,12 +509,15 @@ class MetadataProviderUriTest extends TestCase
 
         $wrapper = new ProvidersWrapper($meta, $query, $config);
 
+        $rego = m::mock(ODataReaderRegistry::class);
+
         $service = m::mock(IService::class);
         $service->shouldReceive('getHost')->andReturn($host);
         $service->shouldReceive('getProvidersWrapper')->andReturn($wrapper);
         $service->shouldReceive('getOperationContext')->andReturn($context);
         $service->shouldReceive('getConfiguration')->andReturn($config);
         $service->shouldReceive('getMetadataProvider')->andReturn($meta);
+        $service->shouldReceive('getODataReaderRegistry')->andReturn($rego);
 
         $desc = ResourcePathProcessor::process($service);
         $this->assertTrue($desc->getSegments()[0]->isSingleResult());

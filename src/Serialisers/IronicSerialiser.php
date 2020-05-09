@@ -455,7 +455,7 @@ class IronicSerialiser implements IObjectSerialiser
         /** @var ODataMediaLink|null $mediaLink */
         $mediaLink = null;
         if ($resourceType->isMediaLinkEntry()) {
-            $eTag      = $streamProviderWrapper->getStreamETag2($entryObject, null, $context);
+            $eTag      = $streamProviderWrapper->getStreamETag2($entryObject, $context, null);
             $mediaLink = new ODataMediaLink($type, '/$value', $relativeUri . '/$value', '*/*', $eTag, 'edit-media');
         }
         /** @var ODataMediaLink[] $mediaLinks */
@@ -465,19 +465,19 @@ class IronicSerialiser implements IObjectSerialiser
             foreach ($namedStreams as $streamTitle => $resourceStreamInfo) {
                 $readUri = $streamProviderWrapper->getReadStreamUri2(
                     $entryObject,
-                    $resourceStreamInfo,
                     $context,
+                    $resourceStreamInfo,
                     $relativeUri
                 );
                 $mediaContentType = $streamProviderWrapper->getStreamContentType2(
                     $entryObject,
-                    $resourceStreamInfo,
-                    $context
+                    $context,
+                    $resourceStreamInfo
                 );
                 $eTag = $streamProviderWrapper->getStreamETag2(
                     $entryObject,
-                    $resourceStreamInfo,
-                    $context
+                    $context,
+                    $resourceStreamInfo
                 );
 
                 $nuLink       = new ODataMediaLink($streamTitle, $readUri, $readUri, $mediaContentType, $eTag);
@@ -490,7 +490,7 @@ class IronicSerialiser implements IObjectSerialiser
      * @param  QueryResult               $entryObject
      * @param  ResourceProperty          $prop
      * @param  ODataLink                 $nuLink
-     * @param  int                       $propKind
+     * @param  ResourcePropertyKind      $propKind
      * @param  string                    $propName
      * @throws InvalidOperationException
      * @throws ODataException
@@ -500,12 +500,12 @@ class IronicSerialiser implements IObjectSerialiser
         QueryResult $entryObject,
         ResourceProperty $prop,
         ODataLink $nuLink,
-        int $propKind,
+        ResourcePropertyKind $propKind,
         string $propName
     ): void {
         $nextName             = $prop->getResourceType()->getName();
         $value                = $entryObject->results->{$propName};
-        $isCollection         = ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind;
+        $isCollection         = ResourcePropertyKind::RESOURCESET_REFERENCE() == $propKind;
         $nuLink->isCollection = $isCollection;
 
         if (is_array($value)) {
@@ -571,13 +571,13 @@ class IronicSerialiser implements IObjectSerialiser
             /** @var ResourcePropertyKind|int $propKind */
             $propKind = $prop->getKind();
 
-            if (!(ResourcePropertyKind::RESOURCESET_REFERENCE == $propKind
-                  || ResourcePropertyKind::RESOURCE_REFERENCE == $propKind)) {
+            if (!(ResourcePropertyKind::RESOURCESET_REFERENCE() == $propKind
+                  || ResourcePropertyKind::RESOURCE_REFERENCE() == $propKind)) {
                 $msg = '$propKind != ResourcePropertyKind::RESOURCESET_REFERENCE &&'
                        . ' $propKind != ResourcePropertyKind::RESOURCE_REFERENCE';
                 throw new InvalidOperationException($msg);
             }
-            $propTail             = ResourcePropertyKind::RESOURCE_REFERENCE == $propKind ? 'entry' : 'feed';
+            $propTail             = ResourcePropertyKind::RESOURCE_REFERENCE() == $propKind ? 'entry' : 'feed';
             $propType             = 'application/atom+xml;type=' . $propTail;
             $propName             = $prop->getName();
             $nuLink->title        = $propName;

@@ -10,10 +10,17 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use POData\Configuration\EntitySetRights;
+use POData\Configuration\ServiceConfiguration;
 use POData\OperationContext\ServiceHost as ServiceHost;
-use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
+use AlgoWeb\PODataLaravel\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
+use POData\Providers\Metadata\IMetadataProvider;
 use POData\SimpleDataService as DataService;
 
+/**
+ * Class ODataController
+ * @package AlgoWeb\PODataLaravel\Controllers
+ */
 class ODataController extends BaseController
 {
     /**
@@ -31,19 +38,27 @@ class ODataController extends BaseController
         try {
             DB::beginTransaction();
             $context = new OperationContextAdapter($request);
-            $host    = new ServiceHost($context, $request);
+            $host    = new ServiceHost($context);
             $host->setServiceUri('/odata.svc/');
 
             $query = App::make('odataquery');
             $meta  = App::make('metadata');
 
-            $service  = new DataService($query, $meta, $host);
-            $cereal   = new IronicSerialiser($service, null);
-            $service  = new DataService($query, $meta, $host, $cereal);
+            $config = $this->makeConfig($meta);
             $pageSize = $this->getAppPageSize();
             if (null !== $pageSize) {
-                $service->maxPageSize = intval($pageSize);
+                $config->setEntitySetPageSize('*', $pageSize);
+            } else {
+                $config->setEntitySetPageSize('*', 400);
             }
+            $config->setEntitySetAccessRule('*', EntitySetRights::ALL());
+            $config->setAcceptCountRequests(true);
+            $config->setAcceptProjectionRequests(true);
+
+            $service  = new DataService($query, $meta, $host, null, null, $config);
+            $cereal   = new IronicSerialiser($service, null);
+            $service  = new DataService($query, $meta, $host, $cereal, null, $config);
+
             $service->handleRequest();
 
             $odataResponse = $context->outgoingResponse();
@@ -86,5 +101,15 @@ class ODataController extends BaseController
         /** @var mixed|null $size */
         $size = env('APP_PAGE_SIZE', null);
         return null !== $size ? intval($size) : null;
+    }
+
+    /**
+     * @param IMetadataProvider|null $meta
+     * @return ServiceConfiguration
+     */
+    protected function makeConfig(?IMetadataProvider $meta): ServiceConfiguration
+    {
+        $config = new ServiceConfiguration($meta);
+        return $config;
     }
 }

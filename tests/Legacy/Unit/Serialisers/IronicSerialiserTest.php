@@ -29,7 +29,7 @@ use POData\ObjectModel\ODataPropertyContent;
 use POData\ObjectModel\ODataTitle;
 use POData\OperationContext\IOperationContext;
 use POData\OperationContext\ServiceHost;
-use POData\OperationContext\Web\Illuminate\IlluminateOperationContext;
+use AlgoWeb\PODataLaravel\OperationContext\Web\Illuminate\IlluminateOperationContext;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceSetWrapper;
 use POData\Providers\Metadata\SimpleMetadataProvider;
@@ -582,7 +582,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $foo->shouldReceive('getRequest')->andReturn($request);
         $foo->shouldReceive('getService->getProvidersWrapper->resolveResourceType')->andReturn($targType);
 
-        $expected = 'Concrete resource type not selected for payload '.
+        $expected = 'Concrete resource type not selected for payload ' .
                      \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestMorphTarget::class;
         $actual = null;
 

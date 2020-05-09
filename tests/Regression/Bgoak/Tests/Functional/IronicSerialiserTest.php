@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
 use POData\OperationContext\ServiceHost;
-use POData\OperationContext\Web\Illuminate\IlluminateOperationContext;
+use AlgoWeb\PODataLaravel\OperationContext\Web\Illuminate\IlluminateOperationContext;
 use POData\Providers\Query\QueryResult;
 use POData\SimpleDataService;
 use Tests\Regression\AlgoWeb\PODataLaravel\Bgoak\Models\Address;

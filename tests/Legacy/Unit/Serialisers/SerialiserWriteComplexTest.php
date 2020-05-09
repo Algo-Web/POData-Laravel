@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Cache;
 use Mockery as m;
 use POData\ObjectModel\ObjectModelSerializer;
 use POData\OperationContext\ServiceHost;
-use POData\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
+use AlgoWeb\PODataLaravel\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourcePropertyKind;
 use POData\Providers\Metadata\ResourceType;
@@ -131,12 +131,12 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         $subType2->shouldReceive('getInstanceType')->andReturn(new StringType());
 
         $rProp1 = m::mock(ResourceProperty::class);
-        $rProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE);
+        $rProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE());
         $rProp1->shouldReceive('getName')->andReturn('id');
         $rProp1->shouldReceive('getInstanceType')->andReturn(new Int32());
         $rProp1->shouldReceive('getResourceType')->andReturn($subType1);
         $rProp2 = m::mock(ResourceProperty::class);
-        $rProp2->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE);
+        $rProp2->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE());
         $rProp2->shouldReceive('getName')->andReturn('foo');
         $rProp2->shouldReceive('getInstanceType')->andReturn(new StringType());
         $rProp2->shouldReceive('getResourceType')->andReturn($subType2);
@@ -184,12 +184,12 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         $subType2->shouldReceive('getInstanceType')->andReturn(new StringType());
 
         $rProp1 = m::mock(ResourceProperty::class);
-        $rProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE);
+        $rProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE());
         $rProp1->shouldReceive('getName')->andReturn('name');
         $rProp1->shouldReceive('getInstanceType')->andReturn(new StringType());
         $rProp1->shouldReceive('getResourceType')->andReturn($subType1);
         $rProp2 = m::mock(ResourceProperty::class);
-        $rProp2->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE);
+        $rProp2->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE());
         $rProp2->shouldReceive('getName')->andReturn('type');
         $rProp2->shouldReceive('getInstanceType')->andReturn(new StringType());
         $rProp2->shouldReceive('getResourceType')->andReturn($subType2);
@@ -236,13 +236,13 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         $rTypeBase->shouldReceive('getFullName')->andReturn('putEmHigh');
 
         $subProp1 = m::mock(ResourceProperty::class);
-        $subProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE);
+        $subProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE());
         $subProp1->shouldReceive('getName')->andReturn('name');
         $subProp1->shouldReceive('getInstanceType')->andReturn(new StringType());
         $subProp1->shouldReceive('getResourceType')->andReturn($rTypeBase);
 
         $subProp2 = m::mock(ResourceProperty::class);
-        $subProp2->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE);
+        $subProp2->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE());
         $subProp2->shouldReceive('getName')->andReturn('type');
         $subProp2->shouldReceive('getInstanceType')->andReturn(new StringType());
         $subProp2->shouldReceive('getResourceType')->andReturn($rTypeBase);
@@ -255,14 +255,14 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
 
         $rProp1 = m::mock(ResourceProperty::class);
         $rProp1->shouldReceive('isKindOf')->withArgs([ResourcePropertyKind::BAG])->andReturn(false);
-        $rProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE);
+        $rProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE());
         $rProp1->shouldReceive('getName')->andReturn('id');
         $rProp1->shouldReceive('getInstanceType')->andReturn(new StringType());
         $rProp1->shouldReceive('getResourceType')->andReturn($subType2);
 
         $rProp2 = m::mock(ResourceProperty::class);
         $rProp2->shouldReceive('isKindOf')->withArgs([ResourcePropertyKind::BAG])->andReturn(false);
-        $rProp2->shouldReceive('getKind')->andReturn(ResourcePropertyKind::COMPLEX_TYPE);
+        $rProp2->shouldReceive('getKind')->andReturn(ResourcePropertyKind::COMPLEX_TYPE());
         $rProp2->shouldReceive('getName')->andReturn('foo');
         $rProp2->shouldReceive('getInstanceType')->andReturn(new StringType());
         $rProp2->shouldReceive('getResourceType')->andReturn($subType2);
@@ -314,14 +314,14 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
 
         $rProp1 = m::mock(ResourceProperty::class);
         $rProp1->shouldReceive('isKindOf')->withArgs([ResourcePropertyKind::BAG])->andReturn(false);
-        $rProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE);
+        $rProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE());
         $rProp1->shouldReceive('getName')->andReturn('id');
         $rProp1->shouldReceive('getInstanceType')->andReturn(new Int32());
         $rProp1->shouldReceive('getResourceType')->andReturn($subType1);
 
         $rProp2 = m::mock(ResourceProperty::class);
         $rProp2->shouldReceive('isKindOf')->withArgs([ResourcePropertyKind::BAG])->andReturn(false);
-        $rProp2->shouldReceive('getKind')->andReturn(ResourcePropertyKind::COMPLEX_TYPE);
+        $rProp2->shouldReceive('getKind')->andReturn(ResourcePropertyKind::COMPLEX_TYPE());
         $rProp2->shouldReceive('getName')->andReturn('foo');
         $rProp2->shouldReceive('getInstanceType')->andReturn(new StringType());
 

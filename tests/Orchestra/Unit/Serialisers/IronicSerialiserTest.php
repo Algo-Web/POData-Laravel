@@ -105,7 +105,7 @@ class IronicSerialiserTest extends TestCase
 
         $rType = m::mock(ResourceType::class);
         $rType->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE());
-        $badProp = new ResourceProperty('resource', 'mine', ResourcePropertyKind::PRIMITIVE, $rType);
+        $badProp = new ResourceProperty('resource', 'mine', ResourcePropertyKind::PRIMITIVE(), $rType);
 
         $this->expectException(InvalidOperationException::class);
         $this->expectExceptionMessage('$propKind != ResourcePropertyKind::RESOURCESET_REFERENCE && $propKind != ResourcePropertyKind::RESOURCE_REFERENCE');
