@@ -14,8 +14,13 @@ use POData\Configuration\EntitySetRights;
 use POData\Configuration\ServiceConfiguration;
 use POData\OperationContext\ServiceHost as ServiceHost;
 use AlgoWeb\PODataLaravel\OperationContext\Web\Illuminate\IlluminateOperationContext as OperationContextAdapter;
+use POData\Providers\Metadata\IMetadataProvider;
 use POData\SimpleDataService as DataService;
 
+/**
+ * Class ODataController
+ * @package AlgoWeb\PODataLaravel\Controllers
+ */
 class ODataController extends BaseController
 {
     /**
@@ -39,7 +44,7 @@ class ODataController extends BaseController
             $query = App::make('odataquery');
             $meta  = App::make('metadata');
 
-            $config   = new ServiceConfiguration($meta);
+            $config = $this->makeConfig($meta);
             $pageSize = $this->getAppPageSize();
             if (null !== $pageSize) {
                 $config->setEntitySetPageSize('*', $pageSize);
@@ -96,5 +101,15 @@ class ODataController extends BaseController
         /** @var mixed|null $size */
         $size = env('APP_PAGE_SIZE', null);
         return null !== $size ? intval($size) : null;
+    }
+
+    /**
+     * @param IMetadataProvider|null $meta
+     * @return ServiceConfiguration
+     */
+    protected function makeConfig(?IMetadataProvider $meta): ServiceConfiguration
+    {
+        $config = new ServiceConfiguration($meta);
+        return $config;
     }
 }
