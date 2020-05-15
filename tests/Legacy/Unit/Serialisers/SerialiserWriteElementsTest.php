@@ -89,6 +89,13 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $this->assertEquals($objectResult, $ironicResult);
     }
 
+    /**
+     * @throws \POData\Common\InvalidOperationException
+     * @throws \POData\Common\ODataException
+     * @throws \POData\Common\UrlFormatException
+     * @throws \ReflectionException
+     * @throws \Exception
+     */
     public function testCompareWriteMultipleModelsHasPageOverrun()
     {
         $request = $this->setUpRequest();
@@ -137,7 +144,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $results->results = [];
         for ($i = 1; $i < 301; $i++) {
             $model              = new TestModel($metadata, null);
-            $model->id          = $i;
+            $model->id          = strval($i);
             $res                = new QueryResult();
             $res->results       = $model;
             $results->results[] = $res;

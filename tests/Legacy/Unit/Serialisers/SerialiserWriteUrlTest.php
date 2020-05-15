@@ -129,7 +129,7 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
         $meta['photo'] = ['type' => 'blob', 'nullable' => true, 'fillable' => true, 'default' => null];
 
         $testModel     = new TestModel($meta, null);
-        $testModel->id = 1;
+        $testModel->id = '1';
         App::instance(TestModel::class, $testModel);
 
         $op   = new OperationContextAdapter($request);
@@ -154,7 +154,7 @@ class SerialiserWriteUrlTest extends SerialiserTestBase
         $ironic = new IronicSerialiser($service, $processor->getRequest());
 
         $model     = new TestModel();
-        $model->id = 4;
+        $model->id = '4';
 
         $result          = new QueryResult();
         $result->results = $model;

@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\DB;
 use Mockery as m;
 use POData\Common\InvalidOperationException;
 use POData\Common\ODataException;
+use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\Providers\Metadata\ResourceType;
@@ -274,7 +275,7 @@ class LaravelQueryTest extends TestCase
         $instance->name = TestModel::class;
 
         $queryType = QueryType::ENTITIES();
-        $type      = m::mock(ResourceType::class);
+        $type      = m::mock(ResourceEntityType::class);
         $type->shouldReceive('getInstanceType')->andReturn($instance);
 
         $resource = m::mock(ResourceSet::class);
@@ -312,7 +313,7 @@ class LaravelQueryTest extends TestCase
         $instance       = new \stdClass();
         $instance->name = TestModel::class;
 
-        $type = m::mock(ResourceType::class);
+        $type = m::mock(ResourceEntityType::class);
         $type->shouldReceive('getInstanceType')->andReturn($instance);
 
         $resource = m::mock(ResourceSet::class);
@@ -332,7 +333,7 @@ class LaravelQueryTest extends TestCase
         $instanceType       = new \stdClass();
         $instanceType->name = 'AlgoWeb\\PODataLaravel\\Models\\TestMorphManySource';
 
-        $resourceType = m::mock(ResourceType::class);
+        $resourceType = m::mock(ResourceEntityType::class);
         $resourceType->shouldReceive('getInstanceType')->andReturn($instanceType);
         $resourceType->shouldReceive('getName')->andReturn('name');
 
@@ -419,7 +420,7 @@ class LaravelQueryTest extends TestCase
         $instanceType       = new \StdClass();
         $instanceType->name = 'AlgoWeb\\PODataLaravel\\Models\\TestMorphManySource';
 
-        $resourceType = m::mock(ResourceType::class);
+        $resourceType = m::mock(ResourceEntityType::class);
         $resourceType->shouldReceive('getInstanceType')->andReturn($instanceType);
         $resourceType->shouldReceive('getName')->andReturn('name');
 
@@ -460,7 +461,7 @@ class LaravelQueryTest extends TestCase
         $instanceType       = new \StdClass();
         $instanceType->name = 'AlgoWeb\\PODataLaravel\\Models\\TestMorphManySource';
 
-        $resourceType = m::mock(ResourceType::class);
+        $resourceType = m::mock(ResourceEntityType::class);
         $resourceType->shouldReceive('getInstanceType')->andReturn($instanceType);
         $resourceType->shouldReceive('getName')->andReturn('name');
 
@@ -506,7 +507,7 @@ class LaravelQueryTest extends TestCase
         $instanceType       = new \StdClass();
         $instanceType->name = 'AlgoWeb\\PODataLaravel\\Models\\TestMorphManySource';
 
-        $resourceType = m::mock(ResourceType::class);
+        $resourceType = m::mock(ResourceEntityType::class);
         $resourceType->shouldReceive('getInstanceType')->andReturn($instanceType);
         $resourceType->shouldReceive('getName')->andReturn('name');
 

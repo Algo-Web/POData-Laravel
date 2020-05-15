@@ -38,6 +38,7 @@ use POData\Providers\Query\QueryResult;
 use POData\Providers\Stream\StreamProviderWrapper;
 use POData\SimpleDataService;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjectionNode;
+use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ProjectionNode;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\RootProjectionNode;
 use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
 use POData\UriProcessor\RequestDescription;
@@ -213,8 +214,10 @@ class IronicSerialiserTest extends SerialiserTestBase
         $mockService = m::mock(IService::class);
         $mockService->shouldReceive('getHost->getAbsoluteServiceUri->getUrlAsString')
             ->andReturn('http://localhost/odata.svc/Models');
+
+        $projNode = m::mock(ProjectionNode::class)->makePartial();
         $node = m::mock(RootProjectionNode::class);
-        $node->shouldReceive('findNode')->withArgs(['edge'])->andReturn('eins')->times(1);
+        $node->shouldReceive('findNode')->withArgs(['edge'])->andReturn($projNode)->times(1);
         $request = m::mock(RequestDescription::class)->makePartial();
         $request->shouldReceive('getRootProjectionNode')->andReturn($node)->times(1);
 

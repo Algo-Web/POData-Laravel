@@ -245,7 +245,7 @@ class IronicSerialiser implements IObjectSerialiser
         $pageSize    = $this->getService()->getConfiguration()->getEntitySetPageSize($resourceSet);
         $requestTop  = (null === $requestTop) ? $pageSize+1 : $requestTop;
 
-        if (true === $entryObjects->hasMore && $requestTop > $pageSize) {
+        if (true == $entryObjects->hasMore && $requestTop > $pageSize) {
             $this->buildNextPageLink($entryObjects, $odata);
         }
 
