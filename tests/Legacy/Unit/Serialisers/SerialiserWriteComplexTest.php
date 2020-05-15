@@ -254,14 +254,14 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         $subType2->shouldReceive('getAllProperties')->andReturn([$subProp1, $subProp2]);
 
         $rProp1 = m::mock(ResourceProperty::class);
-        $rProp1->shouldReceive('isKindOf')->withArgs([ResourcePropertyKind::BAG])->andReturn(false);
+        $rProp1->shouldReceive('isKindOf')->withArgs([ResourcePropertyKind::BAG()])->andReturn(false);
         $rProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE());
         $rProp1->shouldReceive('getName')->andReturn('id');
         $rProp1->shouldReceive('getInstanceType')->andReturn(new StringType());
         $rProp1->shouldReceive('getResourceType')->andReturn($subType2);
 
         $rProp2 = m::mock(ResourceProperty::class);
-        $rProp2->shouldReceive('isKindOf')->withArgs([ResourcePropertyKind::BAG])->andReturn(false);
+        $rProp2->shouldReceive('isKindOf')->withArgs([ResourcePropertyKind::BAG()])->andReturn(false);
         $rProp2->shouldReceive('getKind')->andReturn(ResourcePropertyKind::COMPLEX_TYPE());
         $rProp2->shouldReceive('getName')->andReturn('foo');
         $rProp2->shouldReceive('getInstanceType')->andReturn(new StringType());
@@ -313,14 +313,14 @@ class SerialiserWriteComplexTest extends SerialiserTestBase
         $subType1->shouldReceive('getResourceTypeKind')->andReturn(ResourceTypeKind::PRIMITIVE());
 
         $rProp1 = m::mock(ResourceProperty::class);
-        $rProp1->shouldReceive('isKindOf')->withArgs([ResourcePropertyKind::BAG])->andReturn(false);
+        $rProp1->shouldReceive('isKindOf')->withArgs([ResourcePropertyKind::BAG()])->andReturn(false);
         $rProp1->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE());
         $rProp1->shouldReceive('getName')->andReturn('id');
         $rProp1->shouldReceive('getInstanceType')->andReturn(new Int32());
         $rProp1->shouldReceive('getResourceType')->andReturn($subType1);
 
         $rProp2 = m::mock(ResourceProperty::class);
-        $rProp2->shouldReceive('isKindOf')->withArgs([ResourcePropertyKind::BAG])->andReturn(false);
+        $rProp2->shouldReceive('isKindOf')->withArgs([ResourcePropertyKind::BAG()])->andReturn(false);
         $rProp2->shouldReceive('getKind')->andReturn(ResourcePropertyKind::COMPLEX_TYPE());
         $rProp2->shouldReceive('getName')->andReturn('foo');
         $rProp2->shouldReceive('getInstanceType')->andReturn(new StringType());

@@ -65,7 +65,7 @@ class SerialiserLowLevelWritersTest extends TestCase
     public function testWriteBagValueWithBadPrimitiveType()
     {
         $rProp = m::mock(ResourceProperty::class);
-        $rProp->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE);
+        $rProp->shouldReceive('getKind')->andReturn(ResourcePropertyKind::PRIMITIVE());
         $rProp->shouldReceive('getName')->andReturn('property');
 
         $rType = m::mock(ResourceType::class);
