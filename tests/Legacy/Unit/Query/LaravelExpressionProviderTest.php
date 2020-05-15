@@ -7,9 +7,11 @@ namespace Tests\Legacy\AlgoWeb\PODataLaravel\Unit\Query;
 use AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider as LaravelExpressionProvider;
 use POData\Common\ODataConstants;
 use POData\Providers\Metadata\ResourceType;
+use POData\Providers\Metadata\Type\IType;
 use POData\UriProcessor\QueryProcessor\ExpressionParser\Expressions\ExpressionType;
 use POData\UriProcessor\QueryProcessor\FunctionDescription;
 use Tests\Legacy\AlgoWeb\PODataLaravel\TestCase as TestCase;
+use Mockery as m;
 
 /**
  * Generated Test Class.
@@ -22,6 +24,16 @@ class LaravelExpressionProviderTest extends TestCase
     protected $object;
 
     /**
+     * @var IType
+     */
+    protected $retType;
+
+    /**
+     * @var IType[]
+     */
+    protected $argTypes = [];
+
+    /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
@@ -29,6 +41,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         parent::setUp();
 //        $this->object = new \AlgoWeb\PODataLaravel\Query\LaravelExpressionProvider();
+        $this->retType = m::mock(IType::class)->makePartial();
     }
 
     /**
@@ -329,7 +342,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription('ka-fricking-boom', null, null);
+        $func = new FunctionDescription('ka-fricking-boom', $this->retType, $this->argTypes);
 
         $expected = 'onFunctionCallExpression';
         $actual   = null;
@@ -346,7 +359,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::STRFUN_COMPARE, null, null);
+        $func = new FunctionDescription(ODataConstants::STRFUN_COMPARE, $this->retType, $this->argTypes);
 
         $expected = 'strcmp(foo, bar)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
@@ -357,7 +370,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::STRFUN_ENDSWITH, null, null);
+        $func = new FunctionDescription(ODataConstants::STRFUN_ENDSWITH, $this->retType, $this->argTypes);
 
         $expected = '(strcmp(substr(foo, strlen(foo) - strlen(bar)), bar) === 0)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
@@ -368,7 +381,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::STRFUN_INDEXOF, null, null);
+        $func = new FunctionDescription(ODataConstants::STRFUN_INDEXOF, $this->retType, $this->argTypes);
 
         $expected = 'strpos(foo, bar)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
@@ -379,7 +392,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::STRFUN_REPLACE, null, null);
+        $func = new FunctionDescription(ODataConstants::STRFUN_REPLACE, $this->retType, $this->argTypes);
 
         $expected = 'str_replace(bar, city, foo)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar', 'city']);
@@ -390,7 +403,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::STRFUN_STARTSWITH, null, null);
+        $func = new FunctionDescription(ODataConstants::STRFUN_STARTSWITH, $this->retType, $this->argTypes);
 
         $expected = '(strpos(foo, bar) === 0)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
@@ -401,7 +414,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::STRFUN_TOLOWER, null, null);
+        $func = new FunctionDescription(ODataConstants::STRFUN_TOLOWER, $this->retType, $this->argTypes);
 
         $expected = 'strtolower(FoO)';
         $result   = $foo->onFunctionCallExpression($func, [ 'FoO']);
@@ -412,7 +425,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::STRFUN_TOUPPER, null, null);
+        $func = new FunctionDescription(ODataConstants::STRFUN_TOUPPER, $this->retType, $this->argTypes);
 
         $expected = 'strtoupper(FoO)';
         $result   = $foo->onFunctionCallExpression($func, [ 'FoO']);
@@ -423,7 +436,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::STRFUN_TRIM, null, null);
+        $func = new FunctionDescription(ODataConstants::STRFUN_TRIM, $this->retType, $this->argTypes);
 
         $expected = 'trim(FoO)';
         $result   = $foo->onFunctionCallExpression($func, [ 'FoO']);
@@ -433,7 +446,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::STRFUN_SUBSTRING, null, null);
+        $func = new FunctionDescription(ODataConstants::STRFUN_SUBSTRING, $this->retType, $this->argTypes);
 
         $expected = 'substr(foo, 2)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo', 2]);
@@ -444,7 +457,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::STRFUN_SUBSTRING, null, null);
+        $func = new FunctionDescription(ODataConstants::STRFUN_SUBSTRING, $this->retType, $this->argTypes);
 
         $expected = 'substr(foo, 2, 3)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo', 2, 3]);
@@ -455,7 +468,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::STRFUN_SUBSTRINGOF, null, null);
+        $func = new FunctionDescription(ODataConstants::STRFUN_SUBSTRINGOF, $this->retType, $this->argTypes);
 
         $expected = '(strpos(bar, foo) !== false)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
@@ -466,7 +479,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::STRFUN_CONCAT, null, null);
+        $func = new FunctionDescription(ODataConstants::STRFUN_CONCAT, $this->retType, $this->argTypes);
 
         $expected = 'foo . bar';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar']);
@@ -477,7 +490,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::STRFUN_LENGTH, null, null);
+        $func = new FunctionDescription(ODataConstants::STRFUN_LENGTH, $this->retType, $this->argTypes);
 
         $expected = 'strlen(foo)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
@@ -488,7 +501,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::GUIDFUN_EQUAL, null, null);
+        $func = new FunctionDescription(ODataConstants::GUIDFUN_EQUAL, $this->retType, $this->argTypes);
 
         $expected = 'POData\Providers\Metadata\Type\Guid::guidEqual(foo, bar)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar' ]);
@@ -499,7 +512,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::DATETIME_COMPARE, null, null);
+        $func = new FunctionDescription(ODataConstants::DATETIME_COMPARE, $this->retType, $this->argTypes);
 
         $expected = 'POData\Providers\Metadata\Type\DateTime::dateTimeCmp(foo, bar)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar' ]);
@@ -510,7 +523,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::DATETIME_YEAR, null, null);
+        $func = new FunctionDescription(ODataConstants::DATETIME_YEAR, $this->retType, $this->argTypes);
 
         $expected = 'POData\Providers\Metadata\Type\DateTime::year(foo)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
@@ -521,7 +534,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::DATETIME_MONTH, null, null);
+        $func = new FunctionDescription(ODataConstants::DATETIME_MONTH, $this->retType, $this->argTypes);
 
         $expected = 'POData\Providers\Metadata\Type\DateTime::month(foo)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
@@ -532,7 +545,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::DATETIME_DAY, null, null);
+        $func = new FunctionDescription(ODataConstants::DATETIME_DAY, $this->retType, $this->argTypes);
 
         $expected = 'POData\Providers\Metadata\Type\DateTime::day(foo)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
@@ -543,7 +556,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::DATETIME_HOUR, null, null);
+        $func = new FunctionDescription(ODataConstants::DATETIME_HOUR, $this->retType, $this->argTypes);
 
         $expected = 'POData\Providers\Metadata\Type\DateTime::hour(foo)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
@@ -554,7 +567,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::DATETIME_MINUTE, null, null);
+        $func = new FunctionDescription(ODataConstants::DATETIME_MINUTE, $this->retType, $this->argTypes);
 
         $expected = 'POData\Providers\Metadata\Type\DateTime::minute(foo)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
@@ -565,7 +578,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::DATETIME_SECOND, null, null);
+        $func = new FunctionDescription(ODataConstants::DATETIME_SECOND, $this->retType, $this->argTypes);
 
         $expected = 'POData\Providers\Metadata\Type\DateTime::second(foo)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
@@ -576,7 +589,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::MATHFUN_ROUND, null, null);
+        $func = new FunctionDescription(ODataConstants::MATHFUN_ROUND, $this->retType, $this->argTypes);
 
         $expected = 'round(foo)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
@@ -587,7 +600,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::MATHFUN_FLOOR, null, null);
+        $func = new FunctionDescription(ODataConstants::MATHFUN_FLOOR, $this->retType, $this->argTypes);
 
         $expected = 'floor(foo)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
@@ -598,7 +611,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::MATHFUN_CEILING, null, null);
+        $func = new FunctionDescription(ODataConstants::MATHFUN_CEILING, $this->retType, $this->argTypes);
 
         $expected = 'ceil(foo)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
@@ -609,7 +622,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription(ODataConstants::BINFUL_EQUAL, null, null);
+        $func = new FunctionDescription(ODataConstants::BINFUL_EQUAL, $this->retType, $this->argTypes);
 
         $expected = 'POData\Providers\Metadata\Type\Binary::binaryEqual(foo, bar)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo', 'bar' ]);
@@ -620,7 +633,7 @@ class LaravelExpressionProviderTest extends TestCase
     {
         $foo = new LaravelExpressionProvider();
 
-        $func = new FunctionDescription('is_null', null, null);
+        $func = new FunctionDescription('is_null', $this->retType, $this->argTypes);
 
         $expected = 'is_null(foo)';
         $result   = $foo->onFunctionCallExpression($func, [ 'foo' ]);
