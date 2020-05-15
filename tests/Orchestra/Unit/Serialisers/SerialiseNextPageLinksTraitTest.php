@@ -25,10 +25,8 @@ class SerialiseNextPageLinksTraitTest extends TestCase
      */
     public function testGetNextLinkUriWithBadOrderByInfo()
     {
-        $order = new \stdClass();
-
         $node = m::mock(ExpandedProjectionNode::class);
-        $node->shouldReceive('getInternalOrderByInfo')->andReturn($order);
+        $node->shouldReceive('getInternalOrderByInfo')->andReturn(null);
 
         $foo = m::mock(DummyIronicSerialiser::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->shouldReceive('getCurrentExpandedProjectionNode')->andReturn($node);
@@ -36,7 +34,7 @@ class SerialiseNextPageLinksTraitTest extends TestCase
         $object = new \stdClass();
 
         $this->expectException(InvalidOperationException::class);
-        $this->expectExceptionMessage('stdClass');
+        $this->expectExceptionMessage('Null');
 
         $foo->getNextLinkUri($object);
     }
