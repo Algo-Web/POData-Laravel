@@ -381,7 +381,7 @@ class MetadataProviderNewTest extends TestCase
         foreach ($classen as $className) {
             $testModel = new $className($metaRaw);
             App::instance($className, $testModel);
-            $type              = m::mock(ResourceType::class);
+            $type              = m::mock(ResourceEntityType::class);
             $types[$className] = $type;
         }
         $classen[] = TestModel::class;
