@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\App;
 use Mockery as m;
 use POData\Common\InvalidOperationException;
 use POData\IService;
+use POData\ObjectModel\ODataLink;
 use POData\OperationContext\IOperationContext;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceProperty;
@@ -164,8 +165,9 @@ class IronicSerialiserTest extends TestCase
         $actual = $foo->buildLinksFromRels($result, [$rProp], 'foo');
 
         $this->assertEquals(1, count($actual));
+        /** @var ODataLink $link */
         $link = $actual[0];
-        $this->assertTrue($link->isExpanded);
-        $this->assertFalse($link->isCollection);
+        $this->assertTrue($link->isExpanded());
+        $this->assertFalse($link->isCollection());
     }
 }
