@@ -209,5 +209,4 @@ class IronicSerialiserTest extends TestCase
         $result->results =
         $result->hasMore = true;
     }
-
 }

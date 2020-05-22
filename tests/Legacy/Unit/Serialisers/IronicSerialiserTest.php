@@ -452,7 +452,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $propContent['name']->setTypeName('Edm.String');
         $propContent['alternate_id']->setTypeName('Edm.Int32');
         $propContent['id']->setTypeName('Edm.Int32');
-        $propContent['name']->setValue ('Hammer, M.C.');
+        $propContent['name']->setValue('Hammer, M.C.');
         $propContent['id']->setValue('42');
         $propContent['morph_id']->setName('morph_id');
         $propContent['morph_id']->setTypeName('Edm.String');
