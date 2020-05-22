@@ -90,9 +90,6 @@ trait SerialiseNextPageLinksTrait
         if (null === $internalOrderByInfo) {
             throw new InvalidOperationException('Null');
         }
-        if (!$internalOrderByInfo instanceof InternalOrderByInfo) {
-            throw new InvalidOperationException(get_class($internalOrderByInfo));
-        }
         $numSegments          = count($internalOrderByInfo->getOrderByPathSegments());
         $queryParameterString = $this->getNextPageLinkQueryParametersForRootResourceSet();
 
