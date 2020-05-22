@@ -20,7 +20,6 @@ use POData\ObjectModel\ODataEntry;
 use POData\ObjectModel\ODataFeed;
 use POData\ObjectModel\ODataLink;
 use POData\ObjectModel\ODataMediaLink;
-use POData\ObjectModel\ODataNavigationPropertyInfo;
 use POData\ObjectModel\ODataProperty;
 use POData\ObjectModel\ODataPropertyContent;
 use POData\ObjectModel\ODataTitle;
@@ -588,8 +587,7 @@ class IronicSerialiser implements IObjectSerialiser
 
             $shouldExpand = $this->shouldExpandSegment($propName);
 
-            $navProp = new ODataNavigationPropertyInfo($prop, $shouldExpand);
-            if ($navProp->expanded) {
+            if ($shouldExpand) {
                 $this->expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName);
             }
             $nuLink->isExpanded = isset($nuLink->expandedResult);

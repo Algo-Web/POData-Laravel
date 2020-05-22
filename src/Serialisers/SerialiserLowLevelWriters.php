@@ -84,9 +84,9 @@ abstract class SerialiserLowLevelWriters
                 if (!$instance instanceof IType) {
                     throw new InvalidOperationException(get_class($instance));
                 }
-                $bag[] = SerialiserLowLevelWriters::primitiveToString($instance, $value);
+                $bag->addPropertyContent(SerialiserLowLevelWriters::primitiveToString($instance, $value));
             } elseif (ResourceTypeKind::COMPLEX() == $kVal) {
-                $bag[] = SerialiserLowLevelWriters::writeComplexValue($resourceType, $value);
+                $bag->addPropertyContent(SerialiserLowLevelWriters::writeComplexValue($resourceType, $value));
             }
         }
         return $bag;
