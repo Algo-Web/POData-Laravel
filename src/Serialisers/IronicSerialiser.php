@@ -309,7 +309,7 @@ class IronicSerialiser implements IObjectSerialiser
             }
             $urls->setUrls($lines);
 
-            if ($i > 0 && true === $entryObjects->hasMore) {
+            if (true === $entryObjects->hasMore) {
                 $this->buildNextPageLink($entryObjects, $urls);
             }
         }
@@ -598,7 +598,6 @@ class IronicSerialiser implements IObjectSerialiser
             if ($shouldExpand) {
                 $this->expandNavigationProperty($entryObject, $prop, $nuLink, $propKind, $propName);
             }
-            $nuLink->setIsExpanded(null !== ($nuLink->getExpandedResult()));
             $links[]            = $nuLink;
         }
         return $links;

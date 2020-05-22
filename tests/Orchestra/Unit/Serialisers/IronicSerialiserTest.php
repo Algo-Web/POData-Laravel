@@ -15,6 +15,7 @@ use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraHasManyTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Serialisers\DummyIronicSerialiser;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
 use POData\Common\InvalidOperationException;
@@ -198,4 +199,15 @@ class IronicSerialiserTest extends TestCase
 
         $foo->writeMediaData(null, '', '', $rType);
     }
+
+    public function testWriteUrlElementsEmptyWithHasMoreSet()
+    {
+        $foo = m::mock(IronicSerialiser::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('buildNextPageLink')->andReturnNull()->never();
+
+        $result = new QueryResult();
+        $result->results =
+        $result->hasMore = true;
+    }
+
 }
