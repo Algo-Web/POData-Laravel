@@ -89,19 +89,19 @@ class IronicSerialiserTest extends TestCase
 
         $result = $cereal->writeTopLevelElement($obj);
         $this->assertEquals(1, count($result->links));
-        $link = $result->links[0]->expandedResult;
+        $link = $result->links[0]->getExpandedResult()->getEntry();
         $this->assertEquals(2, count($link->links));
         $links    = $link->links;
         $targLink = null;
         foreach ($links as $link) {
-            if ($link->title !== 'City') {
+            if ($link->getTitle() !== 'City') {
                 continue;
             }
             $targLink = $link;
             break;
         }
         $this->assertNotNull($targLink);
-        $this->assertTrue($targLink->isExpanded);
-        $this->assertNotNull($targLink->expandedResult);
+        $this->assertTrue($targLink->isExpanded());
+        $this->assertNotNull($targLink->getExpandedResult());
     }
 }

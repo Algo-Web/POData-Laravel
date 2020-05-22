@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Serialisers;
 
-use AlgoWeb\PODataLaravel\Models\ODataNavigationPropertyInfo;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
