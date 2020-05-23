@@ -15,11 +15,15 @@ use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraHasManyTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Serialisers\DummyIronicSerialiser;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use AlgoWeb\PODataLaravel\Providers\MetadataProvider;
+use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
 use Illuminate\Support\Facades\App;
 use Mockery as m;
 use POData\Common\InvalidOperationException;
+use POData\Common\Url;
 use POData\IService;
+use POData\ObjectModel\ODataLink;
 use POData\OperationContext\IOperationContext;
+use POData\OperationContext\ServiceHost;
 use POData\Providers\Metadata\ResourceEntityType;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourcePropertyKind;
@@ -164,8 +168,45 @@ class IronicSerialiserTest extends TestCase
         $actual = $foo->buildLinksFromRels($result, [$rProp], 'foo');
 
         $this->assertEquals(1, count($actual));
+        /** @var ODataLink $link */
         $link = $actual[0];
-        $this->assertTrue($link->isExpanded);
-        $this->assertFalse($link->isCollection);
+        $this->assertTrue($link->isExpanded());
+        $this->assertFalse($link->isCollection());
+    }
+
+    /**
+     * @throws InvalidOperationException
+     * @throws \Exception
+     */
+    public function testWriteMediaDataBadStreamWrapper()
+    {
+        $request = m::mock(RequestDescription::class)->makePartial();
+        $url = m::mock(Url::class)->makePartial();
+        $url->shouldReceive('getUrlAsString')->andReturn('http://localhost');
+        $host = m::mock(ServiceHost::class)->makePartial();
+        $host->shouldReceive('getAbsoluteServiceUri')->andReturn($url);
+        $service = m::mock(IService::class)->makePartial();
+        $service->shouldReceive('getOperationContext')->andReturnNull();
+        $service->shouldReceive('getStreamProviderWrapper')->andReturnNull();
+        $service->shouldReceive('getHost')->andReturn($host);
+
+        $rType = m::mock(ResourceType::class)->makePartial();
+
+        $foo = new DummyIronicSerialiser($service, $request);
+
+        $this->expectException(InvalidOperationException::class);
+        $this->expectExceptionMessage('Retrieved stream provider must not be null');
+
+        $foo->writeMediaData(null, '', '', $rType);
+    }
+
+    public function testWriteUrlElementsEmptyWithHasMoreSet()
+    {
+        $foo = m::mock(IronicSerialiser::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $foo->shouldReceive('buildNextPageLink')->andReturnNull()->never();
+
+        $result = new QueryResult();
+        $result->results =
+        $result->hasMore = true;
     }
 }

@@ -108,7 +108,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $this->assertNull($foo->getProjectionNodes());
     }
 
-    public function testGetProjectionNodesSonethingToReturn()
+    public function testGetProjectionNodesSomethingToReturn()
     {
         $mockService = m::mock(IService::class);
         $mockService->shouldReceive('getHost->getAbsoluteServiceUri->getUrlAsString')
@@ -439,35 +439,35 @@ class IronicSerialiserTest extends SerialiserTestBase
         $metaProv->shouldReceive('getCandidateModels')->andReturn($classen);
         $metaProv->boot();
 
-        $propContent             = new ODataPropertyContent();
-        $propContent->properties = [
-            'name' => new ODataProperty(),
-            'alternate_id' => new ODataProperty(),
-            'id' => new ODataProperty(),
-            'morph_id' => new ODataProperty()
-        ];
-        $propContent->properties['name']->name                   = 'name';
-        $propContent->properties['alternate_id']->name           = 'alternate_id';
-        $propContent->properties['id']->name                     = 'id';
-        $propContent->properties['name']->typeName               = 'Edm.String';
-        $propContent->properties['alternate_id']->typeName       = 'Edm.Int32';
-        $propContent->properties['id']->typeName                 = 'Edm.Int32';
-        $propContent->properties['name']->value                  = 'Hammer, M.C.';
-        $propContent->properties['id']->value                    = '42';
-        $propContent->properties['morph_id']->name               = 'morph_id';
-        $propContent->properties['morph_id']->typeName           = 'Edm.String';
+        $propContent             = new ODataPropertyContent([]);
+        $propContent->setProperties([
+            'name' => new ODataProperty('name', null, null),
+            'alternate_id' => new ODataProperty('alternate_id', null, null),
+            'id' => new ODataProperty('id', null, null),
+            'morph_id' => new ODataProperty('morph_id', null, null)
+        ]);
+        $propContent['name']->setName('name');
+        $propContent['alternate_id']->setName('alternate_id');
+        $propContent['id']->setName('id');
+        $propContent['name']->setTypeName('Edm.String');
+        $propContent['alternate_id']->setTypeName('Edm.Int32');
+        $propContent['id']->setTypeName('Edm.Int32');
+        $propContent['name']->setValue('Hammer, M.C.');
+        $propContent['id']->setValue('42');
+        $propContent['morph_id']->setName('morph_id');
+        $propContent['morph_id']->setTypeName('Edm.String');
 
         $odataLink        = new ODataLink();
-        $odataLink->name  = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph_TestMorphOneSource';
-        $odataLink->title = 'morph_TestMorphOneSource';
-        $odataLink->type  = 'application/atom+xml;type=entry';
-        $odataLink->url   = 'TestMorphTargets(id=42)/morph_TestMorphOneSource';
+        $odataLink->setName('http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph_TestMorphOneSource');
+        $odataLink->setTitle('morph_TestMorphOneSource');
+        $odataLink->setType('application/atom+xml;type=entry');
+        $odataLink->setUrl('TestMorphTargets(id=42)/morph_TestMorphOneSource');
 
         $odataLink1        = new ODataLink();
-        $odataLink1->name  = 'http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph_TestMorphOneSourceAlternate';
-        $odataLink1->title = 'morph_TestMorphOneSourceAlternate';
-        $odataLink1->type  = 'application/atom+xml;type=entry';
-        $odataLink1->url   = 'TestMorphTargets(id=42)/morph_TestMorphOneSourceAlternate';
+        $odataLink1->setName('http://schemas.microsoft.com/ado/2007/08/dataservices/related/morph_TestMorphOneSourceAlternate');
+        $odataLink1->setTitle('morph_TestMorphOneSourceAlternate');
+        $odataLink1->setType('application/atom+xml;type=entry');
+        $odataLink1->setUrl('TestMorphTargets(id=42)/morph_TestMorphOneSourceAlternate');
 
         $mediaLink1 = new ODataMediaLink(
             'photo',
@@ -489,9 +489,9 @@ class IronicSerialiserTest extends SerialiserTestBase
         $expected->id               = 'http://localhost/odata.svc/TestMorphTargets(id=42)';
         $expected->title            = new ODataTitle('TestMorphTarget');
         $expected->editLink         = new ODataLink();
-        $expected->editLink->url    = 'TestMorphTargets(id=42)';
-        $expected->editLink->name   = 'edit';
-        $expected->editLink->title  = 'TestMorphTarget';
+        $expected->editLink->setUrl('TestMorphTargets(id=42)');
+        $expected->editLink->setName('edit');
+        $expected->editLink->setTitle('TestMorphTarget');
         $expected->type             = new ODataCategory('Data.TestMorphTarget');
         $expected->propertyContent  = $propContent;
         $expected->links[]          = $odataLink;
@@ -671,8 +671,8 @@ class IronicSerialiserTest extends SerialiserTestBase
         $ironic->shouldReceive('getUpdated')->andReturn($known);
 
         $ironicResult = $ironic->writeTopLevelElement($result);
-        $this->assertTrue($ironicResult->links[0]->expandedResult instanceof ODataFeed);
-        $this->assertEquals(0, count($ironicResult->links[0]->expandedResult->entries));
+        $this->assertTrue($ironicResult->links[0]->getExpandedResult()->getData() instanceof ODataFeed);
+        $this->assertEquals(0, count($ironicResult->links[0]->getExpandedResult()->getData()->getEntries()));
     }
 
     public function testCrankshaftFeedExpansion()
@@ -766,15 +766,16 @@ class IronicSerialiserTest extends SerialiserTestBase
         $ironic->setPropertyExpansion('oneTarget', false);
         $ironicResult = $ironic->writeTopLevelElements($collection);
 
-        $this->assertEquals(3, count($ironicResult->entries));
-        $this->assertNull($ironicResult->entries[0]->links[1]->expandedResult);
-        $this->assertNull($ironicResult->entries[1]->links[1]->expandedResult);
-        $this->assertNull($ironicResult->entries[2]->links[1]->expandedResult);
-        $this->assertTrue($ironicResult->entries[0]->links[0]->expandedResult instanceof ODataFeed);
-        $this->assertTrue($ironicResult->entries[0]->links[0]->expandedResult instanceof ODataFeed);
-        $this->assertEquals(1, count($ironicResult->entries[0]->links[0]->expandedResult->entries));
-        $this->assertTrue($ironicResult->entries[2]->links[0]->expandedResult instanceof ODataFeed);
-        $this->assertEquals(1, count($ironicResult->entries[2]->links[0]->expandedResult->entries));
+        $entries = $ironicResult->getEntries();
+        $this->assertEquals(3, count($entries));
+        $this->assertNull($entries[0]->links[1]->getExpandedResult());
+        $this->assertNull($entries[1]->links[1]->getExpandedResult());
+        $this->assertNull($entries[2]->links[1]->getExpandedResult());
+        $this->assertTrue($entries[0]->links[0]->getExpandedResult()->getData() instanceof ODataFeed);
+        $this->assertTrue($entries[0]->links[0]->getExpandedResult()->getData() instanceof ODataFeed);
+        $this->assertEquals(1, count($entries[0]->links[0]->getExpandedResult()->getData()->getEntries()));
+        $this->assertTrue($entries[2]->links[0]->getExpandedResult()->getData() instanceof ODataFeed);
+        $this->assertEquals(1, count($entries[2]->links[0]->getExpandedResult()->getData()->getEntries()));
     }
 
     public function testGetConcreteTypeFromAbstractTypeWhereAbstractHasNoDerivedTypes()

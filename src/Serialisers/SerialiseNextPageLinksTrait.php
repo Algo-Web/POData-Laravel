@@ -15,6 +15,7 @@ use POData\Common\ODataException;
 use POData\IService;
 use POData\ObjectModel\ODataFeed;
 use POData\ObjectModel\ODataLink;
+use POData\ObjectModel\ODataNextPageLink;
 use POData\ObjectModel\ODataURLCollection;
 use POData\Providers\Metadata\ResourceSetWrapper;
 use POData\Providers\Query\QueryResult;
@@ -39,10 +40,9 @@ trait SerialiseNextPageLinksTrait
         $res                 = $entryObjects->results;
         $lastObject          = end($res);
         $segment             = $this->getNextLinkUri($lastObject);
-        $nextLink            = new ODataLink();
-        $nextLink->name      = ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING;
-        $nextLink->url       = rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment;
-        $odata->nextPageLink = $nextLink;
+        $nextLink            = new ODataNextPageLink(ODataConstants::ATOM_LINK_NEXT_ATTRIBUTE_STRING);
+        $nextLink->setUrl(rtrim($this->absoluteServiceUri, '/') . '/' . $stackSegment . $segment);
+        $odata->setNextPageLink($nextLink);
     }
 
     /**
@@ -89,9 +89,6 @@ trait SerialiseNextPageLinksTrait
         $internalOrderByInfo           = $currentExpandedProjectionNode->getInternalOrderByInfo();
         if (null === $internalOrderByInfo) {
             throw new InvalidOperationException('Null');
-        }
-        if (!$internalOrderByInfo instanceof InternalOrderByInfo) {
-            throw new InvalidOperationException(get_class($internalOrderByInfo));
         }
         $numSegments          = count($internalOrderByInfo->getOrderByPathSegments());
         $queryParameterString = $this->getNextPageLinkQueryParametersForRootResourceSet();

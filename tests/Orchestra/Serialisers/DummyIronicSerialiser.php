@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Serialisers;
 
 use AlgoWeb\PODataLaravel\Serialisers\IronicSerialiser;
+use POData\ObjectModel\ODataMediaLink;
+use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Query\QueryResult;
 
 class DummyIronicSerialiser extends IronicSerialiser
@@ -37,5 +39,16 @@ class DummyIronicSerialiser extends IronicSerialiser
     public function buildLinksFromRels(QueryResult $entryObject, array $relProp, string $relativeUri): array
     {
         return parent::buildLinksFromRels($entryObject, $relProp, $relativeUri);
+    }
+
+    public function writeMediaData(
+        $entryObject,
+        $type,
+        $relativeUri,
+        ResourceType $resourceType,
+        ODataMediaLink &$mediaLink = null,
+        array &$mediaLinks = []
+    ) {
+        parent::writeMediaData($entryObject, $type, $relativeUri, $resourceType, $mediaLink, $mediaLinks);
     }
 }
