@@ -365,7 +365,7 @@ trait MetadataTrait
      *
      * @return array
      */
-    protected function getTableColumns()
+    public function getTableColumns()
     {
         if (0 === count(self::$tableColumns)) {
             $table   = $this->getTable();
