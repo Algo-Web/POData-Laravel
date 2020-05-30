@@ -12,6 +12,7 @@ namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Models;
 use AlgoWeb\PODataLaravel\Models\ModelReflectionHelper;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraBelongsToTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraPolymorphToManySourceMalformedModel;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\RelationTestDummyModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use Mockery as m;
 
@@ -74,4 +75,15 @@ class ModelReflectionHelperTest extends TestCase
         $actual = ModelReflectionHelper::getModelClassMethods($foo);
         $this->assertEquals($expected, $actual);
     }
+
+    public function testProblematicMethodExcluded()
+    {
+        $foo = new RelationTestDummyModel();
+
+        $expected = [];
+        $actual = ModelReflectionHelper::getRelationshipsFromMethods($foo);
+
+        $this->assertEquals($expected, $actual);
+    }
+
 }
