@@ -37,7 +37,7 @@ trait MetadataTrait
     protected static $tableColumns         = [];
     protected static $tableColumnsDoctrine = [];
     protected static $tableData            = [];
-    protected static $dontCastTypes        = ['object', 'array', 'collection', 'int'];
+    protected static $canCastTypes         = ['integer', 'real', 'float', 'double, string', 'boolean', 'date', 'datetime', 'timestamp'];
 
     /**
      * Retrieve and assemble this model's metadata for OData packaging.
@@ -113,7 +113,7 @@ trait MetadataTrait
         // now, after everything's gathered up, apply Eloquent model's $cast array
         foreach ($casts as $key => $type) {
             $type = strtolower($type);
-            if (array_key_exists($key, $tableData) && !in_array($type, self::$dontCastTypes)) {
+            if (array_key_exists($key, $tableData) && in_array($type, self::$canCastTypes)) {
                 $tableData[$key]['type'] = $type;
             }
         }
