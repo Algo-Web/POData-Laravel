@@ -14,7 +14,7 @@ use Illuminate\Database\Query\Builder;
 class TestModel extends Model
 {
     use MetadataTrait {
-        metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
+        fetchMetadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
         // not bury ourselves under a stack overflow and segfault
         isRunningInArtisan as isArtisan;
     }
@@ -104,7 +104,7 @@ class TestModel extends Model
         $this->isArtisan = boolval($value);
     }
 
-    public function metadata()
+    public function fetchMetadata()
     {
         if (isset($this->metaArray)) {
             return $this->metaArray;

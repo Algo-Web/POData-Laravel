@@ -1374,7 +1374,7 @@ class LaravelQueryTest extends TestCase
         $target       = m::mock(ResourceSet::class);
         $srcInstance  = $this->generateTestModelWithMetadata();
         $targInstance = $this->generateTestModelWithMetadata();
-        $navPropName  = 'metadata';
+        $navPropName  = 'fetchMetadata';
 
         $hook = m::mock(LaravelHookQuery::class)->makePartial();
         $foo  = m::mock(LaravelQuery::class)->makePartial();

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model as Model;
 class TestGetterModel extends Model
 {
     use MetadataTrait {
-        metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
+        fetchMetadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
         // not bury ourselves under a stack overflow and segfault
     }
 
@@ -47,7 +47,7 @@ class TestGetterModel extends Model
         return [ 'name', 'added_at', 'weight', 'code'];
     }
 
-    public function metadata()
+    public function fetchMetadata()
     {
         if (isset($this->metaArray)) {
             return $this->metaArray;

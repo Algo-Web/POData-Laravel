@@ -45,7 +45,7 @@ trait MetadataTrait
      * @throws \Doctrine\DBAL\DBALException
      * @return array
      */
-    public function metadata()
+    public function fetchMetadata()
     {
         if (!$this instanceof Model) {
             throw new InvalidOperationException(get_class($this));
@@ -316,7 +316,7 @@ trait MetadataTrait
 
         $lowerNames = [];
 
-        $fields       = $this->metadata();
+        $fields       = $this->fetchMetadata();
         $entityFields = [];
         foreach ($fields as $name => $field) {
             if (in_array(strtolower($name), $lowerNames)) {

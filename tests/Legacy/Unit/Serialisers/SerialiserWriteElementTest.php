@@ -403,7 +403,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $belongsTo = m::mock(BelongsTo::class)->makePartial();
         $belongsTo->shouldReceive('getResults')->andReturn(null);
         $targ = m::mock(TestMonomorphicTarget::class)->makePartial();
-        $targ->shouldReceive('metadata')->andReturn($metadata);
+        $targ->shouldReceive('fetchMetadata')->andReturn($metadata);
         $targ->shouldReceive('manyTarget')->andReturn($belongsTo);
         $targ->shouldReceive('oneTarget')->andReturn($belongsTo);
         $targ->id = 11;
@@ -417,7 +417,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $model = m::mock(TestMonomorphicSource::class)->makePartial();
         $model->shouldReceive('hasOne')->andReturn($hasOne);
         $model->shouldReceive('manySource')->andReturn($hasMany);
-        $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->shouldReceive('fetchMetadata')->andReturn($metadata);
         $model->id = 42;
 
         $result          = new QueryResult();
@@ -700,7 +700,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $relation->shouldReceive('get')->andReturn(collect([$targ1, $targ2]));
 
         $model = m::mock(TestMonomorphicSource::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->shouldReceive('fetchMetadata')->andReturn($metadata);
         $model->id   = 1;
         $model->name = 'Name';
         $model->shouldReceive('getAttribute')->withArgs(['manySource'])->andReturn(([$targ1, $targ2]));
@@ -941,7 +941,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $relation->shouldReceive('get')->andReturn(collect([$targ1, $targ2]));
 
         $model = m::mock(TestMorphManySource::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->shouldReceive('fetchMetadata')->andReturn($metadata);
         $model->id   = 1;
         $model->name = 'Name';
         $model->shouldReceive('getAttribute')->withArgs(['morphTarget'])->andReturn(([$targ1, $targ2]));
@@ -1037,7 +1037,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
 
         $model = m::mock(TestMonomorphicParentOfMorphTarget::class)->makePartial()
             ->shouldAllowMockingProtectedMethods();
-        $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->shouldReceive('fetchMetadata')->andReturn($metadata);
         $model->shouldReceive('getRelationshipsFromMethods')->andReturn($relMethods);
         $model->id   = 1;
         $model->name = 'Name';
@@ -1120,7 +1120,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $belongsTo = m::mock(BelongsTo::class)->makePartial();
         $belongsTo->shouldReceive('getResults')->andReturn(null);
         $targ = m::mock(TestMonomorphicTarget::class)->makePartial();
-        $targ->shouldReceive('metadata')->andReturn($metadata);
+        $targ->shouldReceive('fetchMetadata')->andReturn($metadata);
         $targ->shouldReceive('manyTarget')->andReturn($belongsTo);
         $targ->shouldReceive('oneTarget')->andReturn($belongsTo);
         $targ->id = 11;
@@ -1134,7 +1134,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $model = m::mock(TestMonomorphicSource::class)->makePartial();
         $model->shouldReceive('hasOne')->andReturn($hasOne);
         $model->shouldReceive('manySource')->andReturn($hasMany);
-        $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->shouldReceive('fetchMetadata')->andReturn($metadata);
         $model->id = 42;
 
         $result          = new QueryResult();
@@ -1212,7 +1212,7 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $belongsTo = m::mock(BelongsTo::class)->makePartial();
         $belongsTo->shouldReceive('getResults')->andReturn(null);
         $targ = m::mock(TestMonomorphicTarget::class)->makePartial();
-        $targ->shouldReceive('metadata')->andReturn($metadata);
+        $targ->shouldReceive('fetchMetadata')->andReturn($metadata);
         $targ->shouldReceive('manyTarget')->andReturn($belongsTo);
         $targ->shouldReceive('oneTarget')->andReturn($belongsTo);
         $targ->id = 11;
@@ -1229,13 +1229,13 @@ class SerialiserWriteElementTest extends SerialiserTestBase
         $model = m::mock(TestMonomorphicSource::class)->makePartial();
         $model->shouldReceive('oneSource')->andReturn($hasTwo)->times(1);
         $model->shouldReceive('manySource')->andReturn($hasMany);
-        $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->shouldReceive('fetchMetadata')->andReturn($metadata);
         $model->id = 42;
 
         $arrayModel = m::mock(TestMonomorphicSource::class)->makePartial();
         $arrayModel->shouldReceive('oneSource')->andReturn($hasOne)->times(1);
         $arrayModel->shouldReceive('manySource')->andReturn($hasMany);
-        $arrayModel->shouldReceive('metadata')->andReturn($metadata);
+        $arrayModel->shouldReceive('fetchMetadata')->andReturn($metadata);
         $arrayModel->id = 42;
 
         $result          = new QueryResult();
