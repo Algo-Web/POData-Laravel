@@ -11,6 +11,8 @@ namespace AlgoWeb\PODataLaravel\Models;
 use Cruxinator\ClassFinder\ClassFinder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
+use AlgoWeb\PODataLaravel\Controllers\MetadataControllerTrait;
+use Illuminate\Routing\Controller;
 
 /**
  * Class ClassReflectionHelper
@@ -32,6 +34,27 @@ abstract class ClassReflectionHelper
             },
             true
         );
+    }
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public static function getCandidateControllers(): array
+    {
+        $classes = ClassFinder::getClasses(
+            static::getAppNamespace(),
+            function ($className) {
+                return in_array(MetadataControllerTrait::class, class_uses($className)) &&
+                       (App::make($className) instanceof Controller);
+            },
+            true
+        );
+        $ends = array_reduce($classes, function ($carry, $item) {
+            $carry[] = App::make($item);
+            return $carry;
+        }, []);
+        return $ends;
     }
 
     /**
