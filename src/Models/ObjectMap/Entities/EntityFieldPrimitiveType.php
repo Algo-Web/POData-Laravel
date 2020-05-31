@@ -17,6 +17,7 @@ use MyCLabs\Enum\Enum;
  * @method static EntityFieldPrimitiveType BOOLEAN()
  * @method static EntityFieldPrimitiveType DATETIME()
  * @method static EntityFieldPrimitiveType DATETIMETZ()
+ * @method static EntityFieldPrimitiveType TIMESTAMP()
  * @method static EntityFieldPrimitiveType DATE()
  * @method static EntityFieldPrimitiveType TIME()
  * @method static EntityFieldPrimitiveType DECIMAL()
@@ -41,6 +42,7 @@ class EntityFieldPrimitiveType extends Enum
     const BOOLEAN      = 'boolean';
     const DATETIME     = 'datetime';
     const DATETIMETZ   = 'datetimetz';
+    const TIMESTAMP    = 'timestamp';
     const DATE         = 'date';
     const TIME         = 'time';
     const DECIMAL      = 'decimal';
