@@ -179,3 +179,10 @@ tools:
 build_failure_conditions:
   - 'elements.rating(<= D).new.exists'
   - 'issues.severity(>= CRITICAL).new.exists'
+
+build:
+  environment:
+    php:
+      version: "7.1"
+      pecl_extensions:
+        - pcov
