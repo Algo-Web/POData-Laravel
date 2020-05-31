@@ -38,6 +38,7 @@ use POData\SimpleDataService;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\ExpandedProjectionNode;
 use POData\UriProcessor\QueryProcessor\ExpandProjectionParser\RootProjectionNode;
 use POData\UriProcessor\RequestDescription;
+use Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestModel;
 
 class IronicSerialiserTest extends TestCase
 {
@@ -92,6 +93,35 @@ class IronicSerialiserTest extends TestCase
         $result->results = [];
 
         $foo->writeTopLevelElements($result);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testWriteTopLevelElementsWithBadCustomStateKabooms()
+    {
+        $rType = m::mock(ResourceEntityType::class)->makePartial();
+        $rType->shouldReceive('getCustomState')->andReturnNull()->once();
+        $rType->shouldReceive('isAbstract')->andReturn(false);
+        $rType->shouldReceive('getInstanceType->getName')->andReturn(TestModel::class);
+
+        $service = m::mock(SimpleDataService::class);
+        $service->shouldReceive('getHost->getAbsoluteServiceUri->getUrlAsString')->andReturn('http://localhost');
+        $service->shouldReceive('getProvidersWrapper->resolveResourceType')->andReturn($rType);
+
+        $request = m::mock(RequestDescription::class);
+        $request->shouldReceive('getTargetResourceType->getName')->andReturn('property')->once();
+        $request->shouldReceive('getContainerName')->andThrow(InvalidOperationException::class);
+
+        $foo = new DummyIronicSerialiser($service, $request);
+
+        $this->expectException(InvalidOperationException::class);
+        $this->expectExceptionMessage('Bad custom state on ResourceType');
+
+        $result          = new QueryResult();
+        $result->results = new TestModel();
+
+        $foo->writeTopLevelElement($result);
     }
 
     public function testBuildLinksFromRelsBadResourceProperty()

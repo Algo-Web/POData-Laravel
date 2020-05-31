@@ -72,11 +72,7 @@ abstract class ModelReflectionHelper
             return array_values(array_intersect($raw, $whiteList));
         }
         $blackList = $model->getHidden();
-        if (0 < count($blackList)) {
-            return array_values(array_diff($raw, $blackList));
-        }
-
-        return $raw;
+        return array_values(array_diff($raw, $blackList));
     }
 
     /**

@@ -368,12 +368,10 @@ trait MetadataTrait
     public function getTableColumns()
     {
         if (0 === count(self::$tableColumns)) {
-            $table   = $this->getTable();
-            $connect = $this->getConnection();
-            $builder = $connect->getSchemaBuilder();
-            $columns = $builder->getColumnListing($table);
-
-            self::$tableColumns = (array)$columns;
+            $table              = $this->getTable();
+            $connect            = $this->getConnection();
+            $builder            = $connect->getSchemaBuilder();
+            self::$tableColumns = $builder->getColumnListing($table);
         }
         return self::$tableColumns;
     }

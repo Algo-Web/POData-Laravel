@@ -63,11 +63,6 @@ class RelationTestDummyModel extends Model
         return $this->polyglotRkKey($rel);
     }
 
-    public function checkMethodNameListAccess(Relation $rel, array $methodList)
-    {
-        return $this->checkMethodNameList($rel, $methodList);
-    }
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      * @throws \Exception
@@ -76,5 +71,20 @@ class RelationTestDummyModel extends Model
     {
         throw new \Exception('KABOOM');
         return $this->belongsToMany(OrchestraTestModel::class);
+    }
+
+    public function checkMethodNameListAccess(Relation $rel, array $methodList)
+    {
+        return $this->checkMethodNameList($rel, $methodList);
+    }
+
+    public function setVisible(array $visible)
+    {
+        $this->visible = $visible;
+    }
+
+    public function setHidden(array $hidden)
+    {
+        $this->hidden = $hidden;
     }
 }
