@@ -112,9 +112,11 @@ trait MetadataTrait
 
         // now, after everything's gathered up, apply Eloquent model's $cast array
         foreach ($casts as $key => $type) {
-            $type = strtolower($type);
-            if (array_key_exists($key, $tableData) && in_array($type, self::$canCastTypes)) {
-                $tableData[$key]['type'] = $type;
+            if (is_string($type)) {
+                $type = strtolower($type);
+                if (array_key_exists($key, $tableData) && in_array($type, self::$canCastTypes)) {
+                    $tableData[$key]['type'] = $type;
+                }
             }
         }
 
