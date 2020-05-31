@@ -541,7 +541,7 @@ class IronicSerialiser implements IObjectSerialiser
                 $result->resourceSetName = $type->getName();
             } else {
                 $result                 = new ODataFeed();
-                $result->selfLink       = new ODataLink(ODataConstants::ATOM_SELF_RELATION_ATTRIBUTE_VALUE);
+                $result->setSelfLink(new ODataLink(ODataConstants::ATOM_SELF_RELATION_ATTRIBUTE_VALUE));
             }
             $nuLink->setExpandedResult(new ODataExpandedResult($result));
         }
