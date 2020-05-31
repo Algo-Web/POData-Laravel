@@ -88,22 +88,8 @@ class LaravelHookQuery extends LaravelBaseQuery
             $relation->detach($targetEntityInstance);
             $changed = true;
         } elseif ($relation instanceof HasOneOrMany) {
-            // dig up inverse property name, so we can pass it to unhookSingleModel with source and target elements
-            // swapped
-            $otherPropName = $this->getMetadataProvider()
-                ->resolveReverseProperty($sourceEntityInstance, $navPropName);
-            if (null === $otherPropName) {
-                $srcClass = get_class($sourceEntityInstance);
-                $msg      = 'Bad navigation property, ' . $navPropName . ', on source model ' . $srcClass;
-                throw new \InvalidArgumentException($msg);
-            }
-            $this->unhookSingleModel(
-                $targetResourceSet,
-                $targetEntityInstance,
-                $sourceResourceSet,
-                $sourceEntityInstance,
-                $otherPropName
-            );
+            $keyName = $relation->getForeignKeyName();
+            $relation->update([$keyName => null]);
         }
         if ($changed) {
             LaravelQuery::queueModel($sourceEntityInstance);

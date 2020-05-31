@@ -361,38 +361,6 @@ class MetadataProvider extends MetadataBaseProvider
         return $this->relationHolder;
     }
 
-    /**
-     * Resolve possible reverse relation property names.
-     *
-     * @param Model $source
-     * @param string $propName
-     * @throws InvalidOperationException
-     * @return null|string
-     * @internal param Model $target
-     */
-    public function resolveReverseProperty(Model $source, string $propName)
-    {
-        $entity = $this->getObjectMap()->resolveEntity(get_class($source));
-        if (null === $entity) {
-            $msg = 'Source model not defined';
-            throw new \InvalidArgumentException($msg);
-        }
-        $association = $entity->resolveAssociation($propName);
-
-        if (null === $association) {
-            return null;
-        }
-        $isFirst = $propName === $association->getFirst()->getRelationName();
-        if (!$isFirst) {
-            return $association->getFirst()->getRelationName();
-        }
-
-        if (!$association instanceof AssociationMonomorphic) {
-            throw new InvalidOperationException('');
-        }
-        return $association->getLast()->getRelationName();
-    }
-
     public function isRunningInArtisan(): bool
     {
         return App::runningInConsole() && !App::runningUnitTests();
