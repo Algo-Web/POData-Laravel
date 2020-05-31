@@ -7,6 +7,16 @@
         "optimize-autoloader": true,
         "sort-packages": true
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AlgoWeb\\PODataLaravel\\Providers\\MetadataProvider",
+                "AlgoWeb\\PODataLaravel\\Providers\\MetadataControllerProvider",
+                "AlgoWeb\\PODataLaravel\\Providers\\MetadataRouteProvider",
+                "AlgoWeb\\PODataLaravel\\Providers\\QueryProvider"
+            ]
+        }
+    },
     "require": {
         "php": "^7.1",
         "algo-web/podata": "0.3.*|dev-master",

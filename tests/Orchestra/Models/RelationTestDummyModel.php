@@ -18,6 +18,8 @@ class RelationTestDummyModel extends Model
 
     protected $relMethods = [];
 
+    protected $hidden = ['testModels'];
+
     public function getRelationClassMethods(Relation $rel)
     {
         $class = get_class($rel);
@@ -61,8 +63,28 @@ class RelationTestDummyModel extends Model
         return $this->polyglotRkKey($rel);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @throws \Exception
+     */
+    public function testModels()
+    {
+        throw new \Exception('KABOOM');
+        return $this->belongsToMany(OrchestraTestModel::class);
+    }
+
     public function checkMethodNameListAccess(Relation $rel, array $methodList)
     {
         return $this->checkMethodNameList($rel, $methodList);
+    }
+
+    public function setVisible(array $visible)
+    {
+        $this->visible = $visible;
+    }
+
+    public function setHidden(array $hidden)
+    {
+        $this->hidden = $hidden;
     }
 }

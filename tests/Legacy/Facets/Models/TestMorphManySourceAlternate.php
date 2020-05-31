@@ -12,7 +12,7 @@ use Mockery as m;
 class TestMorphManySourceAlternate extends Model
 {
     use MetadataTrait {
-        metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
+        fetchMetadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
         // not bury ourselves under a stack overflow and segfault
     }
 
@@ -57,7 +57,7 @@ class TestMorphManySourceAlternate extends Model
         return $this->connect;
     }
 
-    public function metadata()
+    public function fetchMetadata()
     {
         if (isset($this->metaArray)) {
             return $this->metaArray;

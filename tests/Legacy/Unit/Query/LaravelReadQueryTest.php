@@ -240,7 +240,7 @@ class LaravelReadQueryTest extends TestCase
     public function testNonTrivialOrderByOnModel()
     {
         $rawModel = $this->generateTestModelWithMetadata();
-        $rawMeta  = $rawModel->metadata();
+        $rawMeta  = $rawModel->fetchMetadata();
 
         $rSet = m::mock(ResourceSet::class);
 
@@ -253,7 +253,7 @@ class LaravelReadQueryTest extends TestCase
         $builder->shouldReceive('get')->andReturn(collect([]))->atLeast(1);
 
         $model = m::mock(TestModel::class)->makePartial();
-        $model->shouldReceive('metadata')->andReturn($rawMeta);
+        $model->shouldReceive('fetchMetadata')->andReturn($rawMeta);
         $model->shouldReceive('orderBy')->withArgs(['testmodel.name', 'desc'])->andReturn($builder)->times(1);
         $model->shouldReceive('getTable')->andReturn('testmodel');
 

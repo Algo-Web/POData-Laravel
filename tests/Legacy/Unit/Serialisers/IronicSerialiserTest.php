@@ -650,7 +650,7 @@ class IronicSerialiserTest extends SerialiserTestBase
         $query = m::mock(LaravelQuery::class);
 
         $model = m::mock(TestMonomorphicManySource::class)->makePartial();
-        $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->shouldReceive('fetchMetadata')->andReturn($metadata);
         $model->id   = 1;
         $model->name = 'Name';
         $model->shouldReceive('getAttribute')->withArgs(['manySource'])->andReturn(collect([]));
@@ -730,17 +730,17 @@ class IronicSerialiserTest extends SerialiserTestBase
         $emptyMany->shouldReceive('getResults')->andReturn(collect([]));
 
         $src1 = m::mock(TestMonomorphicSource::class)->makePartial();
-        $src1->shouldReceive('metadata')->andReturn($metadata);
+        $src1->shouldReceive('fetchMetadata')->andReturn($metadata);
         $src1->shouldReceive('manySource')->andReturn($hasMany);
         $src1->id = 1;
 
         $src2 = m::mock(TestMonomorphicSource::class)->makePartial();
-        $src2->shouldReceive('metadata')->andReturn($metadata);
+        $src2->shouldReceive('fetchMetadata')->andReturn($metadata);
         $src2->shouldReceive('manySource')->andReturn($emptyMany);
         $src2->id = 2;
 
         $src3 = m::mock(TestMonomorphicSource::class)->makePartial();
-        $src3->shouldReceive('metadata')->andReturn($metadata);
+        $src3->shouldReceive('fetchMetadata')->andReturn($metadata);
         $src3->shouldReceive('manySource')->andReturn($hasMany);
         $src3->id = 3;
 

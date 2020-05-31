@@ -12,6 +12,7 @@ namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Models;
 use AlgoWeb\PODataLaravel\Models\ModelReflectionHelper;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraBelongsToTestModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\OrchestraPolymorphToManySourceMalformedModel;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\Models\RelationTestDummyModel;
 use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 use Mockery as m;
 
@@ -73,5 +74,33 @@ class ModelReflectionHelperTest extends TestCase
 
         $actual = ModelReflectionHelper::getModelClassMethods($foo);
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testProblematicMethodExcluded()
+    {
+        $foo = new RelationTestDummyModel();
+
+        $expected = [];
+        $actual = ModelReflectionHelper::getRelationshipsFromMethods($foo);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testMethodWhitelistOverlap()
+    {
+        $foo = new RelationTestDummyModel();
+        $foo->bigReset();
+
+        $expected = [0 => 'getRelationClassMethods', 1 => 'setRelationClassMethods', 2 => 'bigReset',
+            3 => 'polyglotFkKeyAccess', 4 => 'polyglotRkKeyAccess', 5 => 'checkMethodNameListAccess'];
+        $actual = ModelReflectionHelper::getModelClassMethods($foo);
+        $this->assertEquals($expected, $actual);
+
+        $foo->setVisible(['bigReset', 'foobar']);
+
+        $expected = ['bigReset'];
+        $actual = ModelReflectionHelper::getModelClassMethods($foo);
+        $this->assertEquals($expected, $actual);
+        $foo->bigReset();
     }
 }

@@ -271,7 +271,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $belongsTo = m::mock(BelongsTo::class)->makePartial();
         $belongsTo->shouldReceive('getResults')->andReturn(null);
         $targ = m::mock(TestMonomorphicTarget::class)->makePartial();
-        $targ->shouldReceive('metadata')->andReturn($metadata);
+        $targ->shouldReceive('fetchMetadata')->andReturn($metadata);
         $targ->shouldReceive('manyTarget')->andReturn($belongsTo);
         $targ->shouldReceive('oneTarget')->andReturn($belongsTo);
         $targ->id = 11;
@@ -285,7 +285,7 @@ class SerialiserWriteElementsTest extends SerialiserTestBase
         $model = m::mock(TestMonomorphicSource::class)->makePartial();
         $model->shouldReceive('hasOne')->andReturn($hasOne);
         $model->shouldReceive('manySource')->andReturn($hasMany);
-        $model->shouldReceive('metadata')->andReturn($metadata);
+        $model->shouldReceive('fetchMetadata')->andReturn($metadata);
         $model->id = 42;
 
         $meta = App::make('metadata');

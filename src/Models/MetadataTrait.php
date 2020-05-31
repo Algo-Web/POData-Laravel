@@ -37,7 +37,7 @@ trait MetadataTrait
     protected static $tableColumns         = [];
     protected static $tableColumnsDoctrine = [];
     protected static $tableData            = [];
-    protected static $dontCastTypes        = ['object', 'array', 'collection', 'int'];
+    protected static $canCastTypes         = ['integer', 'real', 'float', 'double, string', 'boolean', 'date', 'datetime', 'timestamp'];
 
     /**
      * Retrieve and assemble this model's metadata for OData packaging.
@@ -45,7 +45,7 @@ trait MetadataTrait
      * @throws \Doctrine\DBAL\DBALException
      * @return array
      */
-    public function metadata()
+    public function fetchMetadata()
     {
         if (!$this instanceof Model) {
             throw new InvalidOperationException(get_class($this));
@@ -112,9 +112,11 @@ trait MetadataTrait
 
         // now, after everything's gathered up, apply Eloquent model's $cast array
         foreach ($casts as $key => $type) {
-            $type = strtolower($type);
-            if (array_key_exists($key, $tableData) && !in_array($type, self::$dontCastTypes)) {
-                $tableData[$key]['type'] = $type;
+            if (is_string($type)) {
+                $type = strtolower($type);
+                if (array_key_exists($key, $tableData) && in_array($type, self::$canCastTypes)) {
+                    $tableData[$key]['type'] = $type;
+                }
             }
         }
 
@@ -316,7 +318,7 @@ trait MetadataTrait
 
         $lowerNames = [];
 
-        $fields       = $this->metadata();
+        $fields       = $this->fetchMetadata();
         $entityFields = [];
         foreach ($fields as $name => $field) {
             if (in_array(strtolower($name), $lowerNames)) {
@@ -365,15 +367,13 @@ trait MetadataTrait
      *
      * @return array
      */
-    protected function getTableColumns()
+    public function getTableColumns()
     {
         if (0 === count(self::$tableColumns)) {
-            $table   = $this->getTable();
-            $connect = $this->getConnection();
-            $builder = $connect->getSchemaBuilder();
-            $columns = $builder->getColumnListing($table);
-
-            self::$tableColumns = (array)$columns;
+            $table              = $this->getTable();
+            $connect            = $this->getConnection();
+            $builder            = $connect->getSchemaBuilder();
+            self::$tableColumns = $builder->getColumnListing($table);
         }
         return self::$tableColumns;
     }

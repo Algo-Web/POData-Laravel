@@ -72,7 +72,7 @@ class MetadataTraitTest extends TestCase
     }
 
     /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::metadata
+     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::fetchMetadata
      */
     public function testMetadataNotAnEloquentModel()
     {
@@ -82,7 +82,7 @@ class MetadataTraitTest extends TestCase
         $actual   = null;
 
         try {
-            $result = $this->object->metadata();
+            $result = $this->object->fetchMetadata();
         } catch (\Exception $e) {
             $actual = $e->getMessage();
         }
@@ -90,7 +90,7 @@ class MetadataTraitTest extends TestCase
     }
 
     /**
-     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::metadata
+     * @covers \AlgoWeb\PODataLaravel\Models\MetadataTrait::fetchMetadata
      */
     public function testMetadataTableNotPresent()
     {
@@ -103,7 +103,7 @@ class MetadataTraitTest extends TestCase
         $foo = \Mockery::mock(TestModel::class)->makePartial();
         $foo->shouldReceive('getConnection')->andReturn($connect);
 
-        $result = $foo->metadata();
+        $result = $foo->fetchMetadata();
         $this->assertTrue(is_array($result));
         $this->assertEquals(0, count($result));
     }
@@ -142,7 +142,7 @@ class MetadataTraitTest extends TestCase
         $expected['id']   = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
         $expected['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
-        $result = $foo->metadata();
+        $result = $foo->fetchMetadata();
         $this->assertEquals($expected, $result);
     }
 
@@ -184,7 +184,7 @@ class MetadataTraitTest extends TestCase
         $foo->shouldReceive('getweightAttribute')->andReturn(null);
         $foo->shouldReceive('getConnection')->andReturn($connect);
         self::resetModel($foo);
-        $result = $foo->metadata();
+        $result = $foo->fetchMetadata();
         $this->assertEquals(count($expected), count($result));
         foreach ($expected as $key => $val) {
             $this->assertTrue($val === $result[$key]);
@@ -198,7 +198,7 @@ class MetadataTraitTest extends TestCase
         $expected['name'] = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
 
         $foo    = new TestExplicitModel();
-        $result = $foo->metadata();
+        $result = $foo->fetchMetadata();
         $this->assertEquals(count($expected), count($result));
         foreach ($expected as $key => $val) {
             $this->assertTrue($val === $result[$key]);

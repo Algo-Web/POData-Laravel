@@ -61,12 +61,18 @@ abstract class ModelReflectionHelper
      */
     public static function getModelClassMethods(Model $model): array
     {
-        return array_values(array_diff(
+        $raw = array_values(array_diff(
             get_class_methods($model),
             get_class_methods(Model::class),
             get_class_methods(Mock::class) ?? [],
             get_class_methods(MetadataTrait::class)
         ));
+        $whiteList = $model->getVisible();
+        if (0 < count($whiteList)) {
+            return array_values(array_intersect($raw, $whiteList));
+        }
+        $blackList = $model->getHidden();
+        return array_values(array_diff($raw, $blackList));
     }
 
     /**

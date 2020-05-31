@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class TestMonomorphicTarget extends Model
 {
     use MetadataTrait {
-        metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
+        fetchMetadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
         // not bury ourselves under a stack overflow and segfault
     }
     protected $metaArray;
@@ -82,7 +82,7 @@ class TestMonomorphicTarget extends Model
         }
     }
 
-    public function metadata()
+    public function fetchMetadata()
     {
         if (isset($this->metaArray)) {
             return $this->metaArray;

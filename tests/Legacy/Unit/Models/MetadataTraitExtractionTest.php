@@ -188,9 +188,9 @@ class MetadataTraitExtractionTest extends TestCase
         $foo->added_at = '2017-10-11T00:00:00';
         $foo->code     = 'code';
 
-        $actual = $foo->metadata();
+        $actual = $foo->fetchMetadata();
         $this->assertEquals($expected, $actual);
-        $final = $foo->metadata();
+        $final = $foo->fetchMetadata();
         $this->assertEquals($expected, $final);
     }
 
@@ -231,13 +231,13 @@ class MetadataTraitExtractionTest extends TestCase
         $foo->added_at = '2017-10-11T00:00:00';
         $foo->code     = 'code';
 
-        $result = $foo->metadata();
+        $result = $foo->fetchMetadata();
         $this->assertEquals('float', $result['weight']['type']);
         // now reset metadata, change to an excluded cast type, and verify that weight drops back to its underlying
         // metadata type
         self::resetModel($foo);
         $foo->setCasts(['weight' => 'ARRAY']);
-        $result = $foo->metadata();
+        $result = $foo->fetchMetadata();
         $this->assertEquals('string', $result['weight']['type']);
     }
 
@@ -286,7 +286,7 @@ class MetadataTraitExtractionTest extends TestCase
         $foo->added_at = '2017-10-11T00:00:00';
         $foo->code     = 'code';
 
-        $actual = $foo->metadata();
+        $actual = $foo->fetchMetadata();
         $this->assertEquals($expected, $actual);
     }
 }

@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model as Model;
 class TestMorphTargetAlternate extends Model
 {
     use MetadataTrait {
-        metadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
+        fetchMetadata as traitmetadata; // Need to alias the trait version of the method so we can call it and
         // not bury ourselves under a stack overflow and segfault
     }
     protected $metaArray;
@@ -52,7 +52,7 @@ class TestMorphTargetAlternate extends Model
         return $this->connect;
     }
 
-    public function metadata()
+    public function fetchMetadata()
     {
         if (isset($this->metaArray)) {
             return $this->metaArray;

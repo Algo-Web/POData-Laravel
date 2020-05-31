@@ -34,7 +34,7 @@ class ModelSerialiser
         $class = get_class($model);
         // dig up metadata
         if (!isset(self::$metadataCache[$class])) {
-            self::$metadataCache[$class] = $model->metadata();
+            self::$metadataCache[$class] = $model->fetchMetadata();
         }
         $meta = self::$metadataCache[$class];
         /** @var string[] $keys */

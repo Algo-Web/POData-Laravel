@@ -99,6 +99,7 @@ class IronicSerialiser implements IObjectSerialiser
             array_pop($this->lightStack);
             return null;
         }
+
         SerialiserUtilities::checkSingleElementInput($entryObject);
 
         $this->loadStackIfEmpty();
@@ -142,7 +143,7 @@ class IronicSerialiser implements IObjectSerialiser
 
         $resourceSet = $resourceType->getCustomState();
         if (!$resourceSet instanceof ResourceSet) {
-            throw new InvalidOperationException('');
+            throw new InvalidOperationException('Bad custom state on ResourceType');
         }
         $title = $resourceType->getName();
         $type  = $resourceType->getFullName();
