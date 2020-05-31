@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: alex
@@ -8,7 +10,15 @@
 
 namespace AlgoWeb\PODataLaravel\Orchestra\Tests\Unit\Models\ObjectMap;
 
-class MapTest
-{
+use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
+use AlgoWeb\PODataLaravel\Orchestra\Tests\TestCase;
 
+class MapTest extends TestCase
+{
+    public function testResolveBlankEntityName()
+    {
+        $foo = new Map();
+
+        $this->assertNull($foo->resolveEntity(''));
+    }
 }

@@ -97,4 +97,11 @@ class EntityGubbinsTest extends TestCase
         $actual   = $foo->getAssociationNames();
         $this->assertEquals($expected, $actual);
     }
+
+    public function testResolveBlankAssociationName()
+    {
+        $foo = new DummyEntityGubbins();
+
+        $this->assertNull($foo->resolveAssociation(''));
+    }
 }
