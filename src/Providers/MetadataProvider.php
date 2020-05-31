@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use AlgoWeb\PODataLaravel\Models\ClassReflectionHelper;
 use AlgoWeb\PODataLaravel\Models\IMetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Models\MetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
@@ -343,14 +344,7 @@ class MetadataProvider extends MetadataBaseProvider
      */
     protected function getCandidateModels(): array
     {
-        return ClassFinder::getClasses(
-            $this->getAppNamespace(),
-            function ($className) {
-                return in_array(MetadataTrait::class, class_uses($className)) &&
-                    is_subclass_of($className, Model::class);
-            },
-            true
-        );
+        return ClassReflectionHelper::getCandidateModels();
     }
 
     /**

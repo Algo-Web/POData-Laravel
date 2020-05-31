@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
+use AlgoWeb\PODataLaravel\Models\ClassReflectionHelper;
 use AlgoWeb\PODataLaravel\Models\IMetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Models\ObjectMap\Map;
 use Illuminate\Contracts\Foundation\Application;
@@ -50,11 +51,6 @@ abstract class MetadataBaseProvider extends ServiceProvider
      */
     protected function getAppNamespace(): string
     {
-        try {
-            $startName = App::getNamespace();
-        } catch (\Exception $e) {
-            $startName = 'App';
-        }
-        return $startName;
+        return ClassReflectionHelper::getAppNamespace();
     }
 }
