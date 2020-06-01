@@ -36,7 +36,7 @@ class LaravelWriteQuery extends LaravelBaseQuery
             $varType = isset($spec['type']) ? $spec['type'] : null;
             $varName = $spec['name'];
             if (null == $varType && null !== $sourceEntityInstance) {
-                $parms[] = ('id' == $varName) ? $sourceEntityInstance->getKey() : $sourceEntityInstance->{$varName};
+                $parms[] = $sourceEntityInstance->{$varName};
                 continue;
             }
             // TODO: Give this smarts and actively pick up instantiation details
