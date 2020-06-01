@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AlgoWeb\PODataLaravel\Providers;
 
+use AlgoWeb\PODataLaravel\Models\ClassReflectionHelper;
 use AlgoWeb\PODataLaravel\Models\IMetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Models\MetadataRelationshipContainer;
 use AlgoWeb\PODataLaravel\Models\MetadataTrait;
@@ -343,14 +344,7 @@ class MetadataProvider extends MetadataBaseProvider
      */
     protected function getCandidateModels(): array
     {
-        return ClassFinder::getClasses(
-            $this->getAppNamespace(),
-            function ($className) {
-                return in_array(MetadataTrait::class, class_uses($className)) &&
-                    is_subclass_of($className, Model::class);
-            },
-            true
-        );
+        return ClassReflectionHelper::getCandidateModels();
     }
 
     /**
@@ -359,38 +353,6 @@ class MetadataProvider extends MetadataBaseProvider
     public function getRelationHolder(): ?IMetadataRelationshipContainer
     {
         return $this->relationHolder;
-    }
-
-    /**
-     * Resolve possible reverse relation property names.
-     *
-     * @param Model $source
-     * @param string $propName
-     * @throws InvalidOperationException
-     * @return null|string
-     * @internal param Model $target
-     */
-    public function resolveReverseProperty(Model $source, string $propName)
-    {
-        $entity = $this->getObjectMap()->resolveEntity(get_class($source));
-        if (null === $entity) {
-            $msg = 'Source model not defined';
-            throw new \InvalidArgumentException($msg);
-        }
-        $association = $entity->resolveAssociation($propName);
-
-        if (null === $association) {
-            return null;
-        }
-        $isFirst = $propName === $association->getFirst()->getRelationName();
-        if (!$isFirst) {
-            return $association->getFirst()->getRelationName();
-        }
-
-        if (!$association instanceof AssociationMonomorphic) {
-            throw new InvalidOperationException('');
-        }
-        return $association->getLast()->getRelationName();
     }
 
     public function isRunningInArtisan(): bool

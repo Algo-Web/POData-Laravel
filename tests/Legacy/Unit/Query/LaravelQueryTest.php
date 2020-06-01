@@ -1554,10 +1554,11 @@ class LaravelQueryTest extends TestCase
 
         $hasMany = m::mock(HasMany::class)->makePartial();
         $hasMany->shouldReceive('getRelated')->andReturn($relParent)->once();
+        $hasMany->shouldReceive('update')->withAnyArgs()->andReturnNull()->once();
 
         $belongsTo = m::mock(BelongsTo::class)->makePartial();
-        $belongsTo->shouldReceive('getRelated')->andReturn($relChild)->once();
-        $belongsTo->shouldReceive('dissociate')->andReturn(null)->once();
+        $belongsTo->shouldReceive('getRelated')->andReturn($relChild)->never();
+        $belongsTo->shouldReceive('dissociate')->andReturn(null)->never();
 
         $parent = m::mock(TestMonomorphicSource::class)->makePartial();
         $parent->shouldReceive('manySource')->andReturn($hasMany)->atLeast(1);
@@ -1576,46 +1577,6 @@ class LaravelQueryTest extends TestCase
         $foo = m::mock(LaravelQueryDummy::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $foo->setModelHook($hook);
         $this->assertTrue($foo->unhookSingleModel($source, $parent, $target, $child, $parentNavName));
-    }
-
-    public function testUnhookModelWithUnresolvableOppositeRelation()
-    {
-        $meta             = [];
-        $meta['id']       = ['type' => 'integer', 'nullable' => false, 'fillable' => false, 'default' => null];
-        $meta['name']     = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-        $meta['added_at'] = ['type' => 'datetime', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['weight']   = ['type' => 'integer', 'nullable' => true, 'fillable' => true, 'default' => null];
-        $meta['code']     = ['type' => 'string', 'nullable' => false, 'fillable' => true, 'default' => null];
-
-        $source = m::mock(ResourceSet::class);
-        $target = m::mock(ResourceSet::class);
-
-        $hasMany = m::mock(HasMany::class)->makePartial();
-
-        $parent = new TestMonomorphicSource($meta);
-        $child  = new TestMonomorphicTarget($meta);
-
-        $metaProv = m::mock(MetadataProvider::class);
-        $metaProv->shouldReceive('resolveReverseProperty')->andReturn(null);
-
-        $hook = m::mock(LaravelHookQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $hook->shouldReceive('getMetadataProvider')->andReturn($metaProv);
-        $hook->shouldReceive('isModelHookInputsOk')->andReturn($hasMany);
-
-        $foo = m::mock(LaravelQuery::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $foo->shouldReceive('getMetadataProvider')->andReturn($metaProv);
-        $foo->shouldReceive('getModelHook')->andReturn($hook);
-
-        $expected = 'Bad navigation property, manySource, on source model '
-                    . \Tests\Legacy\AlgoWeb\PODataLaravel\Facets\Models\TestMonomorphicSource::class;
-        $actual = null;
-
-        try {
-            $foo->unhookSingleModel($source, $parent, $target, $child, 'manySource');
-        } catch (\InvalidArgumentException $e) {
-            $actual = $e->getMessage();
-        }
-        $this->assertEquals($expected, $actual);
     }
 
     public function testUnhookModelManyToMany()

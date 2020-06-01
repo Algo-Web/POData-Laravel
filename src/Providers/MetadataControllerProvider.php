@@ -6,6 +6,7 @@ namespace AlgoWeb\PODataLaravel\Providers;
 
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerContainer;
 use AlgoWeb\PODataLaravel\Controllers\MetadataControllerTrait;
+use AlgoWeb\PODataLaravel\Models\ClassReflectionHelper;
 use Cruxinator\ClassFinder\ClassFinder;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
@@ -101,18 +102,6 @@ class MetadataControllerProvider extends MetadataBaseProvider
      */
     protected function getCandidateControllers()
     {
-        $classes = ClassFinder::getClasses(
-            $this->getAppNamespace(),
-            function ($className) {
-                return in_array(MetadataControllerTrait::class, class_uses($className)) &&
-                    ($this->app->make($className) instanceof Controller);
-            },
-            true
-        );
-        $ends = array_reduce($classes, function ($carry, $item) {
-            $carry[] = $this->app->make($item);
-            return $carry;
-        }, []);
-        return $ends;
+        return ClassReflectionHelper::getCandidateControllers();
     }
 }
