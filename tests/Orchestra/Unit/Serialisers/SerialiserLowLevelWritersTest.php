@@ -19,6 +19,7 @@ use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourcePropertyKind;
 use POData\Providers\Metadata\ResourceType;
 use POData\Providers\Metadata\ResourceTypeKind;
+use POData\Providers\Metadata\Type\Boolean;
 use POData\Providers\Metadata\Type\DateTime;
 use POData\Providers\Metadata\Type\StringType;
 
@@ -37,9 +38,9 @@ class SerialiserLowLevelWritersTest extends TestCase
     public function testDateWithNonDateIType()
     {
         $date = Carbon::create(2019, 1, 1, 0, 0, 0);
-        $type = new StringType();
+        $type = new Boolean();
 
-        $expected = '2019-01-01 00:00:00';
+        $expected = 'false';
 
         $actual = SerialiserLowLevelWriters::primitiveToString($type, $date);
 
