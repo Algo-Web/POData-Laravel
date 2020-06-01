@@ -319,7 +319,8 @@ abstract class AssociationStubBase
      */
     protected function checkStringInput($input): bool
     {
-        if (null === $input || !is_string($input) || empty($input)) {
+        // null inputs are caught by the is_string check
+        if (!is_string($input) || empty($input)) {
             return false;
         }
         return true;

@@ -329,8 +329,6 @@ trait MetadataTrait
             $nuField      = new EntityField();
             $nuField->setName($name);
             $nuField->setIsNullable($field['nullable']);
-            $nuField->setReadOnly(false);
-            $nuField->setCreateOnly(false);
             $nuField->setDefaultValue($field['default']);
             $nuField->setIsKeyField($this->getKeyName() == $name);
             $nuField->setFieldType(EntityFieldType::PRIMITIVE());

@@ -7,6 +7,10 @@ namespace AlgoWeb\PODataLaravel\Models\ObjectMap\Entities;
 use POData\Providers\Metadata\Type\EdmPrimitiveType;
 use POData\Providers\Metadata\Type\TypeCode;
 
+/**
+ * Class EntityField
+ * @package AlgoWeb\PODataLaravel\Models\ObjectMap\Entities
+ */
 class EntityField
 {
     /**
@@ -22,7 +26,7 @@ class EntityField
     /**
      * @var bool
      */
-    private $isNullable;
+    private $isNullable = false;
 
     /**
      * @var mixed
@@ -32,17 +36,17 @@ class EntityField
     /**
      * @var bool
      */
-    private $readOnly;
+    private $readOnly = false;
 
     /**
      * @var bool
      */
-    private $createOnly;
+    private $createOnly = false;
 
     /**
      * @var bool
      */
-    private $isKeyField;
+    private $isKeyField = false;
 
     /**
      * @var EntityFieldPrimitiveType
