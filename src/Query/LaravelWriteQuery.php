@@ -60,8 +60,11 @@ class LaravelWriteQuery extends LaravelBaseQuery
     protected function createUpdateDeleteProcessOutput(JsonResponse $result)
     {
         $outData = $result->getData(true);
+        $keys = array_keys($outData);
+        $expKeys = ['id', 'status', 'errors'];
+        $isGood = $expKeys === (array_intersect($expKeys, $keys));
 
-        if (!(key_exists('id', $outData) && key_exists('status', $outData) && key_exists('errors', $outData))) {
+        if (!$isGood) {
             throw ODataException::createInternalServerError(
                 'Controller response array missing at least one of id, status and/or errors fields.'
             );
