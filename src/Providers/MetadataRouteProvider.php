@@ -41,9 +41,14 @@ class MetadataRouteProvider extends ServiceProvider
     {
     }
 
+    /**
+     * Determine what auth middleware, if any, to use for OData routes
+     *
+     * @return string|null
+     */
     private function getAuthMiddleware(): ?string
     {
-        $disable = $this->isAuthDisable();
+        $disable = !$this->isAuthEnable();
         if ($disable) {
             return null;
         }
@@ -62,8 +67,9 @@ class MetadataRouteProvider extends ServiceProvider
     /**
      * @return bool
      */
-    protected function isAuthDisable(): bool
+    protected function isAuthEnable(): bool
     {
-        return true === boolval(env('APP_DISABLE_AUTH', null));
+        $env = env('APP_ENABLE_AUTH', null);
+        return true === boolval($env);
     }
 }

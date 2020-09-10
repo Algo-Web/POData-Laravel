@@ -19,12 +19,12 @@ class ExpandTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
-        putenv('APP_DISABLE_AUTH=true');
+        putenv('APP_ENABLE_AUTH=false');
     }
 
     public static function tearDownAfterClass(): void
     {
-        putenv('APP_DISABLE_AUTH=false');
+        putenv('APP_ENABLE_AUTH=false');
     }
 
     //use DatabaseMigrations;
